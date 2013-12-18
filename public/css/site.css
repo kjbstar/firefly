@@ -1,0 +1,4 @@
+.load-error {
+  background:url('/img/error.png') center center no-repeat;
+  min-height:30px;
+}

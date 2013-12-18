@@ -1,0 +1,380 @@
+<?php
+require_once(app_path() . '/helpers/MetaHelper.php');
+require_once(app_path() . '/helpers/Toolkit.php');
+/**
+ * File contains the MetaController
+ *
+ * PHP version 5.5.6
+ *
+ * @category Controllers
+ * @package  Controllers
+ * @author   Sander Dorigo <sander@dorigo.nl>
+ * @license  GPL 3.0
+ * @link     http://geld.nder.dev/
+ */
+
+/**
+ * Class MetaController
+ *
+ * This class can handle all three types of meta-information:
+ * the budget, the beneficiary and the category.
+ *
+ * In a future version, this might be extended towards one single "field"
+ * with another table.
+ *
+ * @category AccountController
+ * @package  Controllers
+ * @author   Sander Dorigo <sander@dorigo.nl>
+ * @license  GPL 3.0
+ * @link     http://www.sanderdorigo.nl/
+ */
+class MetaController extends BaseController
+{
+
+    /**
+     * Shows the index of the object.
+     * TODO see todo on index
+     *
+     * @return View
+     */
+    public function showIndex()
+    {
+        $objects = Auth::user()->components()->whereNull('parent_component_id')
+            ->where('type', OBJ)->get();
+        $result = [];
+        $parents = []; // for multisort.
+        foreach ($objects as $obj) {
+            $current = [];
+            $parents[] = $obj->name;
+            $current['id'] = $obj->id;
+            $current['name'] = $obj->name;
+            $current['count'] = $obj->transactions()->count();
+            $current['children'] = [];
+
+            $children = $obj->childrenComponents()->get();
+
+            $names = []; // for multisort.
+            foreach ($children as $c) {
+                $child = [];
+                $names[] = $c->name;
+                $child['id'] = $c->id;
+                $child['name'] = $obj->name . '/' . $c->name;
+                $child['count'] = $c->transactions()->count();
+                // add to array:
+                $current['children'][] = $child;
+            }
+            array_multisort($names, SORT_NATURAL, $current['children']);
+
+            $result[] = $current;
+        }
+
+        array_multisort($parents, SORT_STRING, $result);
+
+        return View::make('meta.index')->with('title', 'All ' . OBJS)->with(
+            'objects', $result
+        );
+    }
+
+    /**
+     * Shows all transactions without X.
+     *
+     * @return View
+     */
+    public function showEmpty()
+    {
+
+        $list = MetaHelper::transactionsWithoutComponent(OBJ);
+
+        return View::make('meta.empty')->with(
+            'title', 'Transactions without a ' . OBJ
+        )->with(
+                'transactions', $list
+            );
+    }
+
+    /**
+     * Add a new object.
+     *
+     * @return View
+     */
+    public function add()
+    {
+        $parents = MetaHelper::getParentList(OBJ);
+
+        return View::make('meta.add')->with('title', 'Add new ' . OBJ)->with(
+            'parents', $parents
+        );
+    }
+
+    /**
+     * Process adding of new object.
+     *
+     * @return Redirect
+     */
+    public function postAdd()
+    {
+        $parentID = intval(Input::get('parent_component_id')) > 0 ? intval(
+            Input::get('parent_component_id')
+        ) : null;
+        $data = [];
+
+        $data['name'] = Input::get('name');
+        $data['parent_component_id'] = $parentID;
+        $data['user_id'] = Auth::user()->id;
+        $data['type'] = OBJ;
+
+
+        $object = new Component($data);
+        $validator = Validator::make($object->toArray(), Component::$rules);
+        if ($validator->fails()) {
+            return Redirect::route('add' . OBJ)->withErrors($validator)
+                ->withInput();
+        } else {
+            $object->save();
+
+            return Redirect::route(OBJS);
+        }
+    }
+
+    /**
+     * Edit an object.
+     *
+     * @param Component $component The component
+     *
+     * @return View
+     */
+    public function edit(Component $component)
+    {
+        $parents = MetaHelper::getParentList(OBJ);
+        $component->parent_component_id = is_null(
+            $component->parent_component_id
+        )
+            ? 0
+            : intval(
+                $component->parent_component_id
+            );
+
+        return View::make('meta.edit')->with('object', $component)->with(
+            'parents', $parents
+        )->with('title', 'Edit ' . OBJ . ' ' . $component->name);
+    }
+
+    /**
+     * Edit an object.
+     *
+     * @param Component $component The component.
+     *
+     * @return Redirect
+     */
+    public function postEdit(Component $component)
+    {
+        $component->parent_component_id
+            = intval(Input::get('parent_component_id')) > 0 ? intval(
+            Input::get('parent_component_id')
+        ) : null;
+        $component->name = Input::get('name');
+        $validator = Validator::make($component->toArray(), Component::$rules);
+        if ($validator->fails()) {
+            return Redirect::route('edit' . OBJ, $component->id)->withErrors(
+                $validator
+            )->withInput();
+        } else {
+            $component->save();
+
+            return Redirect::route(OBJS);
+        }
+    }
+
+    /**
+     * Delete an object.
+     *
+     * @param Component $component The component.
+     *
+     * @return View
+     */
+    public function delete(Component $component)
+    {
+        return View::make('meta.delete')->with('object', $component)->with(
+            'title', 'Delete ' . OBJ . ' ' . $component->name
+        );
+    }
+
+    /**
+     * Actually delete it.
+     *
+     * @param Component $component The component.
+     *
+     * @return Redirect
+     */
+    public function postDelete(Component $component)
+    {
+        $component->delete();
+
+        return Redirect::route(OBJS);
+    }
+
+    /**
+     * Show a general overview of the object.
+     *
+     * @param Component $component The component
+     * @param int       $year      The year
+     * @param int       $month     The month
+     *
+     * @return string
+     */
+    public function showOverview(
+        Component $component, $year = null, $month = null
+    ) {
+        $date = Toolkit::parseDate($year, $month);
+        $parent = is_null($component->parent_component_id) ? null
+            : $component->parentComponent()->first();
+
+        // switch on the presence of a date:
+        if (is_null($date)) {
+            $entries = MetaHelper::generateOverviewOfMonths($component);
+        } else {
+            $entries = MetaHelper::generateTransactionListByMonth(
+                $component, $date
+            );
+        }
+        $title = 'Overview for ' . OBJ . ' "' . $component->name . '"';
+        if (!is_null($date)) {
+            $title .= ' in ' . $date->format('F Y');
+        }
+
+
+        // entries is renamed to transactions to be compatible with the
+        //list view
+        return View::make('meta.overview')->with('title', $title)->with(
+            'component', $component
+        )->with('transactions', $entries)->with('parent', $parent)->with(
+                'allObjects', ['beneficiary', 'budget', 'category']
+            )->with('date', $date);
+    }
+
+    /**
+     * Function that shows a nice chart for this object.
+     *
+     * @param Component $component The Component
+     * @param int       $year      The year
+     * @param int       $month     The month
+     *
+     * @return mixed
+     */
+    public function showOverviewChart(
+        Component $component, $year = null, $month = null
+    ) {
+
+        $date = Toolkit::parseDate($year, $month);
+
+        if (is_null($date)) {
+            $results = MetaHelper::chartDataForYear($component);
+        } else {
+            // use date, do overview for days.
+            $results = MetaHelper::chartDataForMonth($component, $date);
+        }
+
+        // make the chart:
+        $chart = App::make('gchart');
+        $chart->addColumn('Date', 'date');
+        $chart->addColumn('Total transactions', 'number');
+        $chart->addColumn('Average amount spent per transaction', 'number');
+        $chart->addColumn('Total amount spent', 'number');
+        $chart->addColumn('Average amount earned per transaction', 'number');
+        $chart->addColumn('Total amount earned', 'number');
+
+        foreach ($results as $row) {
+            $chart->addRow(
+                $row['date'], $row['count'], $row['average_spent'],
+                $row['total_spent'], $row['average_earned'],
+                $row['total_earned']
+            );
+        }
+        $chart->generate();
+        $data = $chart->getData();
+
+        return Response::json($data);
+    }
+
+    /**
+     * Generates a pie chart comparing A to B.
+     */
+    public function showPieChart()
+    {
+        $obj = Input::get('object');
+        $compare = Input::get('compare');
+        $objectID = intval(Input::get('id'));
+
+        // validate date for monthly limited overview.
+        $date = Toolkit::parseDate(Input::get('year'), Input::get('month'));
+
+        $object = Component::where('type', $obj)->find($objectID);
+        if ($object) {
+            // here we get the data:
+            // TODO budgets=compare, beneficiaries=object
+            // get all transactions ID's from the main object.
+            // join the other component.
+            $query = $object->transactions()->with(
+                ['components' => function ($query) use ($compare) {
+                        $query->where('type', $compare);
+                    }]
+            );
+            if ($date) {
+                $query->inMonth($date);
+            }
+            $transactions = $query->get();
+            $result = [];
+
+            foreach ($transactions as $t) {
+                foreach ($t->components as $component) {
+                    $result[$component->name]
+                        = !isset($result[$component->name]) ? $t->amount
+                        : $result[$component->name] + $t->amount;
+                }
+
+            }
+            // make a chart
+            $chart = App::make('gchart');
+            $chart->addColumn(ucfirst($compare) . ' name', 'string');
+            $chart->addColumn('amount', 'number');
+            // loop it and fill the chart:
+            foreach ($result as $r => $amount) {
+                if ($amount < 0) {
+                    $amount = $amount * -1;
+                }
+                $chart->addRow($r, $amount);
+            }
+            $chart->generate();
+
+            return $chart->getData();
+        }
+
+        App::abort(404);
+
+        return View::make('error.404');
+    }
+
+    /**
+     * Generate a typeahead compatible component list.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function typeahead()
+    {
+        $objects = Auth::user()->components()->where('type', OBJ)->get();
+        $return = [];
+        foreach ($objects as $o) {
+            $name = $o->name;
+            $parent = $o->parentComponent()->first();
+            if ($parent) {
+                $name = $parent->name . '/' . $name;
+            }
+            $return[] = $name;
+        }
+        sort($return);
+
+        return Response::json($return);
+    }
+
+
+} 

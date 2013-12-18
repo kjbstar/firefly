@@ -1,0 +1,26 @@
+application: nder-firefly-m3
+version: 1
+runtime: php
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /favicon\.ico
+  static_files: public/favicon.ico
+  upload: public/favicon\.ico
+
+- url: /bootstrap
+  static_dir: public/bootstrap
+
+- url: /img
+  static_dir: public/img
+
+- url: /css
+  static_dir: public/css
+
+- url: /js
+  static_dir: public/js
+
+- url: /.*
+  script: public/index.php
+  login: required
