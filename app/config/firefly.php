@@ -1,4 +1,2 @@
 <?php
-return [
-    'date_format' => 'D j F Y'
-];
+return ['date_format' => 'D j F Y'];
