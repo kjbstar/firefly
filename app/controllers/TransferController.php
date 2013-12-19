@@ -131,7 +131,8 @@ class TransferController extends BaseController
             $transfer->toArray(), Transfer::$rules
         );
         if ($validator->fails()) {
-            return Redirect::route('edittransfer')->withInput()->withErrors(
+            return Redirect::route('edittransfer',
+                $transfer->id)->withInput()->withErrors(
                     $validator
                 );
         } else {
