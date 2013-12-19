@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class LimitController
+ */
 class LimitController extends BaseController
 {
 

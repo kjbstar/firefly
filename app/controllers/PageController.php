@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class PageController
+ */
 class PageController extends BaseController
 {
     /**
