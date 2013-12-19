@@ -1,11 +1,6 @@
 <?php
 require_once(app_path() . '/helpers/ListHelper.php');
-/**
- * Created by PhpStorm.
- * User: sander
- * Date: 14/12/13
- * Time: 08:03
- */
+
 
 use Carbon\Carbon as Carbon;
 

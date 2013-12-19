@@ -1,11 +1,6 @@
 <?php
 include_once(app_path() . '/helpers/Toolkit.php');
-/**
- * Created by PhpStorm.
- * User: sander
- * Date: 14/12/13
- * Time: 07:48
- */
+
 
 use Carbon\Carbon as Carbon;
 

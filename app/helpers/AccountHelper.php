@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sander
- * Date: 13/12/13
- * Time: 20:57
- */
 use Carbon\Carbon as Carbon;
 
 /**

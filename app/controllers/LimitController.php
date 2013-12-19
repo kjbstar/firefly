@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sander
- * Date: 12/12/13
- * Time: 06:24
- */
 
 class LimitController extends BaseController
 {

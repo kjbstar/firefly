@@ -1,12 +1,7 @@
 <?php
 use Carbon\Carbon as Carbon;
 
-/**
- * Created by PhpStorm.
- * User: sander
- * Date: 14/12/13
- * Time: 07:55
- */
+
 
 class ListHelper
 {
