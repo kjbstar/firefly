@@ -65,18 +65,18 @@
         "source": {
             "type": "git",
             "url": "https://github.com/doctrine/collections.git",
-            "reference": "bcb53776a096a0c64579cc8d8ec0db62f1109fbc"
+            "reference": "76c33a25070ffb39a65f6db1e1a050051d0d91b8"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/doctrine/collections/zipball/bcb53776a096a0c64579cc8d8ec0db62f1109fbc",
-            "reference": "bcb53776a096a0c64579cc8d8ec0db62f1109fbc",
+            "url": "https://api.github.com/repos/doctrine/collections/zipball/76c33a25070ffb39a65f6db1e1a050051d0d91b8",
+            "reference": "76c33a25070ffb39a65f6db1e1a050051d0d91b8",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.2"
         },
-        "time": "2013-08-29 16:56:45",
+        "time": "2013-12-18 17:20:08",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -97,7 +97,8 @@
             {
                 "name": "Jonathan Wage",
                 "email": "jonwage@gmail.com",
-                "homepage": "http://www.jwage.com/"
+                "homepage": "http://www.jwage.com/",
+                "role": "Creator"
             },
             {
                 "name": "Guilherme Blanco",
@@ -134,18 +135,18 @@
         "source": {
             "type": "git",
             "url": "https://github.com/doctrine/inflector.git",
-            "reference": "8b4b3ccec7aafc596e2fc1e593c9f2e78f939c8c"
+            "reference": "561a11ef25981a73d2ec29b07d0091cad390e3cc"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/doctrine/inflector/zipball/8b4b3ccec7aafc596e2fc1e593c9f2e78f939c8c",
-            "reference": "8b4b3ccec7aafc596e2fc1e593c9f2e78f939c8c",
+            "url": "https://api.github.com/repos/doctrine/inflector/zipball/561a11ef25981a73d2ec29b07d0091cad390e3cc",
+            "reference": "561a11ef25981a73d2ec29b07d0091cad390e3cc",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.2"
         },
-        "time": "2013-04-10 16:14:30",
+        "time": "2013-12-18 17:22:13",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -166,7 +167,8 @@
             {
                 "name": "Jonathan Wage",
                 "email": "jonwage@gmail.com",
-                "homepage": "http://www.jwage.com/"
+                "homepage": "http://www.jwage.com/",
+                "role": "Creator"
             },
             {
                 "name": "Guilherme Blanco",
@@ -184,7 +186,7 @@
             {
                 "name": "Johannes Schmitt",
                 "email": "schmittjoh@gmail.com",
-                "homepage": "https://github.com/schmittjoh",
+                "homepage": "http://jmsyst.com",
                 "role": "Developer of wrapped JMSSerializerBundle"
             }
         ],
@@ -597,12 +599,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/doctrine/cache.git",
-            "reference": "ff36d4216fef8242c3d8ee97fceee977e3c9b9a6"
+            "reference": "36c4eee5051629524389da376ba270f15765e49f"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/doctrine/cache/zipball/ff36d4216fef8242c3d8ee97fceee977e3c9b9a6",
-            "reference": "ff36d4216fef8242c3d8ee97fceee977e3c9b9a6",
+            "url": "https://api.github.com/repos/doctrine/cache/zipball/36c4eee5051629524389da376ba270f15765e49f",
+            "reference": "36c4eee5051629524389da376ba270f15765e49f",
             "shasum": ""
         },
         "require": {
@@ -615,7 +617,7 @@
             "phpunit/phpunit": ">=3.7",
             "satooshi/php-coveralls": "~0.6"
         },
-        "time": "2013-11-23 16:10:06",
+        "time": "2013-12-18 17:21:03",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1180,12 +1182,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/doctrine/annotations.git",
-            "reference": "97b4a00c5a40c42d8c0b789dabc04b3332c788ab"
+            "reference": "4f5eee18b4cecbecd43cee7cd6ca9e8209467332"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/doctrine/annotations/zipball/97b4a00c5a40c42d8c0b789dabc04b3332c788ab",
-            "reference": "97b4a00c5a40c42d8c0b789dabc04b3332c788ab",
+            "url": "https://api.github.com/repos/doctrine/annotations/zipball/4f5eee18b4cecbecd43cee7cd6ca9e8209467332",
+            "reference": "4f5eee18b4cecbecd43cee7cd6ca9e8209467332",
             "shasum": ""
         },
         "require": {
@@ -1195,7 +1197,7 @@
         "require-dev": {
             "doctrine/cache": "1.*"
         },
-        "time": "2013-12-13 21:02:36",
+        "time": "2013-12-18 17:19:23",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1999,61 +2001,6 @@
         "homepage": "http://symfony.com"
     },
     {
-        "name": "symfony/dom-crawler",
-        "version": "2.4.x-dev",
-        "version_normalized": "2.4.9999999.9999999-dev",
-        "target-dir": "Symfony/Component/DomCrawler",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/DomCrawler.git",
-            "reference": "809495cca56a45e0df92b8d68764cf7d454b88c5"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/DomCrawler/zipball/809495cca56a45e0df92b8d68764cf7d454b88c5",
-            "reference": "809495cca56a45e0df92b8d68764cf7d454b88c5",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "symfony/css-selector": "~2.0"
-        },
-        "suggest": {
-            "symfony/css-selector": ""
-        },
-        "time": "2013-12-03 14:52:22",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.4-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\DomCrawler\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony DomCrawler Component",
-        "homepage": "http://symfony.com"
-    },
-    {
         "name": "symfony/css-selector",
         "version": "2.4.x-dev",
         "version_normalized": "2.4.9999999.9999999-dev",
@@ -2170,12 +2117,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/phpseclib/phpseclib.git",
-            "reference": "df8c3723aa0e575a3fccaf91acb79091d46bb2f3"
+            "reference": "0dc8b27a6a47c22a20efd7172fd71d88234869ca"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/df8c3723aa0e575a3fccaf91acb79091d46bb2f3",
-            "reference": "df8c3723aa0e575a3fccaf91acb79091d46bb2f3",
+            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/0dc8b27a6a47c22a20efd7172fd71d88234869ca",
+            "reference": "0dc8b27a6a47c22a20efd7172fd71d88234869ca",
             "shasum": ""
         },
         "require": {
@@ -2189,7 +2136,7 @@
             "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
             "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP >= 4.3.3."
         },
-        "time": "2013-12-11 22:30:13",
+        "time": "2013-12-17 19:55:56",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -2421,12 +2368,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/doctrine/dbal.git",
-            "reference": "390db30f686f3a7ab555178ac22d3f94198e378f"
+            "reference": "28264a15a404496155d84a0abfa3404d01302905"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/doctrine/dbal/zipball/390db30f686f3a7ab555178ac22d3f94198e378f",
-            "reference": "390db30f686f3a7ab555178ac22d3f94198e378f",
+            "url": "https://api.github.com/repos/doctrine/dbal/zipball/28264a15a404496155d84a0abfa3404d01302905",
+            "reference": "28264a15a404496155d84a0abfa3404d01302905",
             "shasum": ""
         },
         "require": {
@@ -2440,7 +2387,7 @@
         "suggest": {
             "symfony/console": "Allows use of the command line interface"
         },
-        "time": "2013-12-13 22:32:11",
+        "time": "2013-12-18 18:35:15",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -2488,6 +2435,61 @@
         ]
     },
     {
+        "name": "symfony/dom-crawler",
+        "version": "2.4.x-dev",
+        "version_normalized": "2.4.9999999.9999999-dev",
+        "target-dir": "Symfony/Component/DomCrawler",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/DomCrawler.git",
+            "reference": "34ae881791b5efd8fd44fdc2b0e2ad1da20aa86b"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/DomCrawler/zipball/34ae881791b5efd8fd44fdc2b0e2ad1da20aa86b",
+            "reference": "34ae881791b5efd8fd44fdc2b0e2ad1da20aa86b",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "symfony/css-selector": "~2.0"
+        },
+        "suggest": {
+            "symfony/css-selector": ""
+        },
+        "time": "2013-12-17 13:01:50",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.4-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\DomCrawler\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony DomCrawler Component",
+        "homepage": "http://symfony.com"
+    },
+    {
         "name": "symfony/dependency-injection",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
@@ -2495,12 +2497,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/DependencyInjection.git",
-            "reference": "5194aaf5e76a315ab44c7d4381fbbc12dc60894f"
+            "reference": "0c5cd4183f2a48c14f86644620885a2837828750"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/DependencyInjection/zipball/5194aaf5e76a315ab44c7d4381fbbc12dc60894f",
-            "reference": "5194aaf5e76a315ab44c7d4381fbbc12dc60894f",
+            "url": "https://api.github.com/repos/symfony/DependencyInjection/zipball/0c5cd4183f2a48c14f86644620885a2837828750",
+            "reference": "0c5cd4183f2a48c14f86644620885a2837828750",
             "shasum": ""
         },
         "require": {
@@ -2516,7 +2518,7 @@
             "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
             "symfony/yaml": ""
         },
-        "time": "2013-12-16 17:07:20",
+        "time": "2013-12-18 16:49:04",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -2553,12 +2555,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/nrk/predis.git",
-            "reference": "56627f30f83e1adf5e27c8d44bf0f55eaeab801a"
+            "reference": "b7cba070147e9c430e813fa411d2851cac3e2b96"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/nrk/predis/zipball/56627f30f83e1adf5e27c8d44bf0f55eaeab801a",
-            "reference": "56627f30f83e1adf5e27c8d44bf0f55eaeab801a",
+            "url": "https://api.github.com/repos/nrk/predis/zipball/b7cba070147e9c430e813fa411d2851cac3e2b96",
+            "reference": "b7cba070147e9c430e813fa411d2851cac3e2b96",
             "shasum": ""
         },
         "require": {
@@ -2568,7 +2570,7 @@
             "ext-curl": "Allows access to Webdis when paired with phpiredis",
             "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
         },
-        "time": "2013-12-17 12:00:39",
+        "time": "2013-12-18 15:09:01",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
