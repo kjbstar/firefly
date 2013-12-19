@@ -6,6 +6,7 @@
             <tr>
                 <th>ID</th>
                 <th>Date</th>
+                <th>Amount</th>
                 <th>Description</th>
                 <th>Category</th>
                 <th>Budget</th>
@@ -14,6 +15,7 @@
             <tr>
                 <td>#{{$t->id}}</td>
                 <td>{{$t->date->format('d F Y')}}</td>
+                <td>{{mf($t->amount,true)}}</td>
                 <td><a href="{{URL::Route('edittransaction',
                 $t->id)}}">{{$t->description}}</a></td>
                 <td>{{$t->cat}}</td>
