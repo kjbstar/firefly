@@ -88,11 +88,31 @@ class HomeHelper
         }
 
         $objects = self::homeComponentList(Str::singular($type), $date);
+
+        // the object list cuts off at 10.
+        $limitedObjects = [];
+        $rest = [
+            'id' => 0,
+            'name' => 'others',
+            'amount' => 0,
+            'url' => '#'
+        ];
+        $count = 0;
+        foreach ($objects as $index => $object) {
+            if ($count <= 9) {
+                $limitedObjects[$index] = $object;
+            } else {
+                $rest['amount'] += $object['amount'];
+            }
+            $count++;
+        }
+        $limitedObjects['others'] = $rest;
+
         // make a chart:
         $chart = App::make('gchart');
         $chart->addColumn(ucfirst($type), 'string');
         $chart->addColumn('Amount', 'number');
-        foreach ($objects as $name => $data) {
+        foreach ($limitedObjects as $name => $data) {
             $amount
                 = $data['amount'] < 0 ? $data['amount'] * -1 : $data['amount'];
             $chart->addRow(['f' => $name, 'v' => $data['id']], $amount);
