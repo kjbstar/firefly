@@ -111,7 +111,7 @@ Route::get('/home/list/{id}/{year}/{month}/{type}',['uses' => 'ListController@sh
 /**
  * All (new) transaction routes:
  */
-Route::get('/home/transactions',['uses' => 'TransactionController@showIndex', 'as' => 'transactions']);
+Route::get('/home/transaction',['uses' => 'TransactionController@showIndex', 'as' => 'transactions']);
 Route::get('/home/transaction/{transaction}/edit',['uses' => 'TransactionController@edit', 'as' => 'edittransaction']);
 Route::post('/home/transaction/{transaction}/edit', ['uses' => 'TransactionController@postEdit','before' => 'csrf']);
 Route::get('/home/transaction/{transaction}/delete',['uses' => 'TransactionController@delete', 'as' => 'deletetransaction']);
@@ -122,7 +122,7 @@ Route::post('/home/transaction/add/{account?}',['uses' => 'TransactionController
 /*
  * All (new) transfer routes
  */
-Route::get('/home/transfers',['uses' => 'TransferController@showIndex', 'as' => 'transfers']);
+Route::get('/home/transfer',['uses' => 'TransferController@showIndex', 'as' => 'transfers']);
 Route::get('/home/transfer/{transfer}/edit',['uses' => 'TransferController@edit', 'as' => 'edittransfer']);
 Route::post('/home/transfer/{transfer}/edit', ['uses' => 'TransferController@postEdit','before' => 'csrf']);
 Route::get('/home/transfer/{transfer}/delete',['uses' => 'TransferController@delete', 'as' => 'deletetransfer']);
@@ -133,9 +133,9 @@ Route::post('/home/transfer/add/{account?}',['uses' => 'TransferController@postA
 /*
  * All (new) account routes.
  *  */
-Route::get('/home/accounts',['uses' => 'AccountController@showIndex', 'as' => 'accounts']);
-Route::get('/home/accounts/add',['uses' => 'AccountController@add', 'as' => 'addaccount']);
-Route::post('/home/accounts/add',['uses' => 'AccountController@postAdd', 'before' => 'csrf']);
+Route::get('/home/account',['uses' => 'AccountController@showIndex', 'as' => 'accounts']);
+Route::get('/home/account/add',['uses' => 'AccountController@add', 'as' => 'addaccount']);
+Route::post('/home/account/add',['uses' => 'AccountController@postAdd', 'before' => 'csrf']);
 Route::get('/home/account/{account}/edit',['uses' => 'AccountController@edit', 'as' => 'editaccount']);
 Route::post('/home/account/{account}/edit',['uses' => 'AccountController@postEdit', 'before' => 'csrf']);
 Route::get('/home/account/{account}/delete',['uses' => 'AccountController@delete', 'as' => 'deleteaccount']);
