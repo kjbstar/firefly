@@ -1,4 +1,5 @@
 @extends('layouts.default')
+@section('breadcrumbs', Breadcrumbs::render(OBJ,$component,$date))
 @section('content')
 <div class="row">
     <div class="col-lg-12">

@@ -1,4 +1,5 @@
 @extends('layouts.default')
+@section('breadcrumbs', Breadcrumbs::render('edittransaction',$transaction))
 @section('content')
 <div class="row">
     <div class="col-lg-12">
@@ -127,20 +128,6 @@
             </div>
         </div>
         
-        <!-- extra tag info -->
-        <div class="form-group">
-            <label for="inputMark" class="col-sm-3 control-label">Tags</label>
-            <div class="col-sm-9">
-                <p class="control-group">
-                    <?php
-                    $result = DB::select('select tags.tag from tag_transaction left join tags on tags.id = tag_transaction.tag_id where transaction_id=' . $transaction->id);
-                    foreach($result as $q) {
-                        echo '<span class="label label-primary">'.Crypt::decrypt($q->tag).'</span> ';
-                    }
-                    ?>
-                </p>
-            </div>
-        </div>
 
 
 

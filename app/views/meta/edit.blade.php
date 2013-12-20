@@ -1,4 +1,5 @@
 @extends('layouts.default')
+@section('breadcrumbs', Breadcrumbs::render('edit'.OBJ,$object))
 @section('content')
 <div class="row">
   <div class="col-md-4">
