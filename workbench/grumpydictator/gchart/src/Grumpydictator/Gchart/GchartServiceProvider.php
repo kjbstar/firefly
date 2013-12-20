@@ -4,6 +4,11 @@ namespace Grumpydictator\Gchart;
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class GchartServiceProvider
+ *
+ * @package Grumpydictator\Gchart
+ */
 class GchartServiceProvider extends ServiceProvider {
 
   /**
@@ -40,7 +45,7 @@ class GchartServiceProvider extends ServiceProvider {
    * @return array
    */
   public function provides() {
-    return array('gchart');
+    return ['gchart'];
   }
 
 }
