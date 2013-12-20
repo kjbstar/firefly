@@ -108,10 +108,11 @@ return [
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Grumpydictator\Gchart\GchartServiceProvider',
         'Profiler\ProfilerServiceProvider',
-        'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider'], /*
+        'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
+        'DaveJamesMiller\Breadcrumbs\ServiceProvider',
+    ],
 
 
-	),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -176,6 +177,7 @@ return [
         'URL'         => 'Illuminate\Support\Facades\URL',
         'Validator'   => 'Illuminate\Support\Facades\Validator',
         'View'        => 'Illuminate\Support\Facades\View',
+        'Breadcrumbs' => 'DaveJamesMiller\Breadcrumbs\Facade',
 
     ],
 

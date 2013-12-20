@@ -18,6 +18,7 @@
   <body>
     <div class="container">
       @include('partials.menu')
+      @yield('breadcrumbs')
       @include('partials.flash')
       @yield('content')
       <div style="height:80px;"></div>

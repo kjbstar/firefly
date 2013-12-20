@@ -1,4 +1,5 @@
 @extends('layouts.default')
+@section('breadcrumbs', Breadcrumbs::render('accounts'))
 @section('content')
 <div class="row">
     <div class="col-lg-8">
