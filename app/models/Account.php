@@ -2,6 +2,9 @@
 
 use Carbon\Carbon as Carbon;
 
+/**
+ * Class Account
+ */
 class Account extends Eloquent
 {
 
