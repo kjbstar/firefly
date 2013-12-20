@@ -91,12 +91,9 @@ class HomeHelper
 
         // the object list cuts off at 10.
         $limitedObjects = [];
-        $rest = [
-            'id' => 0,
-            'name' => 'others',
-            'amount' => 0,
-            'url' => '#'
-        ];
+        $rest = ['id' => 0, 'name' => 'other ' . Str::plural($type),
+                 'amount' => 0,
+                 'url' => '#'];
         $count = 0;
         foreach ($objects as $index => $object) {
             if ($count <= 9) {
@@ -106,7 +103,9 @@ class HomeHelper
             }
             $count++;
         }
-        $limitedObjects['others'] = $rest;
+        if ($rest['amount'] != 0) {
+            $limitedObjects['other ' . Str::plural($type)] = $rest;
+        }
 
         // make a chart:
         $chart = App::make('gchart');
@@ -180,7 +179,10 @@ class HomeHelper
             }
             unset($current);
         }
-        $objects['(no ' . $type . ')'] = $empty;
+        if ($empty['amount'] != 0) {
+            $objects['(no ' . $type . ')'] = $empty;
+        }
+
         // loop the $limits array and check the $objects:
         foreach ($limits as $name => $limit) {
             $object = $objects[$name];
