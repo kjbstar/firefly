@@ -21,18 +21,9 @@ class Balancemodifier extends Eloquent
         return $this->belongsTo('Account');
     }
 
-    public function getDateAttribute($value)
+    public function getDates()
     {
-        return new Carbon($value);
-    }
-
-    public function setDateAttribute($value)
-    {
-        if ($value instanceof Carbon) {
-            $this->attributes['date'] = $value->format('Y-m-d');
-        } else {
-            $this->attributes['date'] = $value;
-        }
+        return ['created_at', 'updated_at', 'date'];
     }
 
     public function scopeOnDay($query, Carbon $date)

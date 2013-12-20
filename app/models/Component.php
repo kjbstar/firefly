@@ -93,5 +93,10 @@ class Component extends Eloquent
     {
         $this->attributes['name'] = Crypt::encrypt($value);
     }
+    public function getDates()
+    {
+        return ['created_at', 'updated_at', 'deleted_at'];
+    }
+
 
 } 

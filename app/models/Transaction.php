@@ -176,19 +176,8 @@ class Transaction extends Eloquent
     {
         $this->attributes['description'] = Crypt::encrypt($value);
     }
-
-    public function getDateAttribute($value)
+    public function getDates()
     {
-        return new Carbon($value);
+        return ['created_at', 'updated_at', 'date'];
     }
-
-    public function setDateAttribute($value)
-    {
-        if ($value instanceof Carbon) {
-            $this->attributes['date'] = $value->format('Y-m-d');
-        } else {
-            $this->attributes['date'] = $value;
-        }
-    }
-
 }

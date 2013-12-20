@@ -27,7 +27,7 @@ class Account extends Eloquent
     }
 
     /**
-     * Returns the transfers to this account.
+     * Returns the transfers coming in to this account.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -37,7 +37,7 @@ class Account extends Eloquent
     }
 
     /**
-     * Returns the transfers from this account.
+     * Returns the transfers going away from this account.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -82,6 +82,19 @@ class Account extends Eloquent
     /**
      * Predict what the balance will be on the given date
      *
+     * The prediction contains the amount we'll expect to be
+     * spent on the given date. It might be 50, so we expect the
+     * spent amount to be 50 for that day.
+     *
+     * The "most" index contains the amount most spent on this day of the
+     *  month ever. Predicting for the 4th day of the month,
+     * you might have once spent 500 euro's that day. This var will
+     * reflect that.
+     *
+     * The "least" contains the amount at the day you spent the least
+     * money. So either 0 or more.
+     *
+     *
      * @param \Carbon\Carbon $date
      *
      * @return float
@@ -92,30 +105,16 @@ class Account extends Eloquent
         $data['most'] = 0;
         $data['least'] = 0;
         $data['prediction'] = 0;
-        /*
-         * The prediction contains the amount we'll expect to be
-         * spent on the given date. It might be 50, so we expect the
-         * spent amount to be 50 for that day.
-         *
-         * The "most" index contains the amount most spent on this day of the
-         *  month ever. Predicting for the 4th day of the month,
-         * you might have once spent 500 euro's that day. This var will
-         * reflect that.
-         *
-         * The "least" contains the amount at the day you spent the least
-         * money.
-         */
 
         // Get all transactions on that day, grouped by
         // the day of the month and the month:
-        $list = $this->transactions()->expenses()->where('ignore', 0)
-            ->where(
-                DB::Raw('DATE_FORMAT(`date`,"%d")'), '=', $date->format('d')
-            )->groupBy('day')->get(
+        $list = $this->transactions()->expenses()->where(
+            'ignore', 0
+        )->onDay($date)->groupBy('day')->get(
                 [DB::Raw('DATE_FORMAT(`date`,"%d-%m") as `day`'),
                 DB::Raw('SUM(`amount`) as `dayamount`')]
             );
-        Log::debug('Days for '.$date->format('d-m-Y').': ' . count($list));
+        Log::debug('Days for ' . $date->format('d-m-Y') . ': ' . count($list));
         $sum = 0;
         foreach ($list as $index => $entry) {
             $amount = floatval($entry->dayamount) * -1;
@@ -135,55 +134,60 @@ class Account extends Eloquent
             }
         }
         Log::debug('Total amount spent on this day: ' . $sum);
+
         // the actual prediction:
         $count = count($list);
         $data['prediction'] = $count > 1 ? $sum / count($list) : $sum;
 
-        Log::debug('Prediction voor '.$date->format('d-m-Y').': '.print_r
-            ($data,true));
+        Log::debug(
+            'Prediction voor ' . $date->format('d-m-Y') . ': ' . print_r(
+                $data, true
+            )
+        );
+
         return $data;
     }
 
+    /**
+     * Account has transactions.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function transactions()
     {
         return $this->hasMany('Transaction');
     }
 
+    /**
+     * Decrypt the name on retrieval.
+     *
+     * @param $value
+     *
+     * @return string
+     */
     public function getNameAttribute($value)
     {
         return Crypt::decrypt($value);
     }
 
+    /**
+     * Encrypt the name on storage.
+     *
+     * @param string $value The unencrypted name
+     */
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = Crypt::encrypt($value);
     }
 
-    public function getOpeningbalancedateAttribute($value)
+    /**
+     * These values must be converted to a Carbon object.
+     *
+     * @return array
+     */
+    public function getDates()
     {
-        if (is_null($value)) {
-            return null;
-        }
-
-        return new Carbon($value);
-    }
-
-    public function scopeNotHidden($query)
-    {
-        return $query->where('hidden', 0);
-    }
-
-    public function setOpeningbalancedateAttribute($value)
-    {
-        if ($value instanceof Carbon) {
-            $this->attributes['openingbalancedate'] = $value->format('Y-m-d');
-        } else {
-            if ($value === "") {
-                $this->attributes['openingbalancedate'] = null;
-            } else {
-                $this->attributes['openingbalancedate'] = $value;
-            }
-        }
+        return ['created_at', 'updated_at', 'openingbalancedate'];
     }
 
 }

@@ -35,14 +35,10 @@ class Limit extends Eloquent
         );
     }
 
-    public function getDateAttribute($value)
+    public function getDates()
     {
-        return new Carbon($value);
+        return ['created_at', 'updated_at', 'date','deleted_at'];
     }
 
-    public function setDateAttribute($value)
-    {
-        $this->attributes['date'] = $value->format('Y-m-d');
-    }
 
 }
