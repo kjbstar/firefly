@@ -68,6 +68,7 @@ class HomeController extends BaseController
         // build a history:
         $history = [];
         $now = new Carbon;
+        $now->addMonth();
         while ($now > $earliest) {
 
             $url = URL::Route(

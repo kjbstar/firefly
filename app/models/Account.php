@@ -113,7 +113,7 @@ class Account extends Eloquent
         // the day of the month and the month:
         $list = $this->transactions()->expenses()->where(
             'ignore', 0
-        )->onDay($date)->groupBy('day')->get(
+        )->onDayOfMonth($date)->groupBy('day')->get(
                 [DB::Raw('DATE_FORMAT(`date`,"%d-%m") as `day`'),
                 DB::Raw('SUM(`amount`) as `dayamount`')]
             );
@@ -191,6 +191,18 @@ class Account extends Eloquent
     public function getDates()
     {
         return ['created_at', 'updated_at', 'openingbalancedate'];
+    }
+
+    /**
+     * Shows only not hidden accounts.
+     *
+     * @param $query
+     *
+     * @return mixed
+     */
+    public function scopeNotHidden($query)
+    {
+        return $query->where('hidden', 0);
     }
 
 }
