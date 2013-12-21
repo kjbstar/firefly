@@ -111,7 +111,9 @@ class Account extends Eloquent
 
         // Get all transactions on that day, grouped by
         // the day of the month and the month:
-        $list = $this->transactions()->expenses()->where(
+        $list = $this->transactions()->expenses()->
+            where('date','>','2014-01-01')->
+            where(
             'ignore', 0
         )->onDayOfMonth($date)->groupBy('day')->get(
                 [DB::Raw('DATE_FORMAT(`date`,"%d-%m") as `day`'),
