@@ -7,6 +7,14 @@ Breadcrumbs::register(
     }
 );
 
+Breadcrumbs::register(
+
+    'settings', function ($breadcrumbs) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push('Settings', route('settings'));
+    }
+);
+
 
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),
