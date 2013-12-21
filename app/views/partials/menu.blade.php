@@ -18,9 +18,9 @@
               <li><a href="{{URL::Route('categories')}}">Categories</a></li>
               <li><a href="{{URL::Route('transactions')}}">Transactions</a></li>
               <li><a href="{{URL::Route('transfers')}}">Transfers</a></li>
-
             </ul>
           </li>
+            <li><a href="{{URL::Route('settings')}}">Settings</a></li>
         </ul>
 
         <div class="collapse navbar-collapse navbar-ex1-collapse">

@@ -60,6 +60,11 @@ Route::post('/reset', ['uses' => 'UserController@doReset', 'before' => 'csrf']);
 Route::post('/login', ['uses' => 'UserController@doLogin', 'before' => 'csrf']);
 Route::post('/register', ['uses' => 'UserController@doRegister', 'before' => 'csrf']);
 
+/*
+ * Routes for user settings:
+ */
+Route::get('/home/settings', ['uses' => 'SettingsController@index', 'as' => 'settings']);
+
 
 /**
  * NEW META ROUTES:
