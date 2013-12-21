@@ -87,13 +87,12 @@ class HomeHelper
             $date = new Carbon;
         }
 
-        $objects = self::homeComponentList(Str::singular($type), $date);
-
+        $result = self::homeComponentList(Str::singular($type), $date);
+        $objects = $result['objects'];
         // the object list cuts off at 10.
         $limitedObjects = [];
-        $rest = ['id' => 0, 'name' => 'other ' . Str::plural($type),
-                 'amount' => 0,
-                 'url' => '#'];
+        $rest = ['id'     => 0, 'name' => 'other ' . Str::plural($type),
+                 'amount' => 0, 'url' => '#'];
         $count = 0;
         foreach ($objects as $index => $object) {
             if ($count <= 9) {
@@ -144,13 +143,11 @@ class HomeHelper
         foreach ($transactions as $t) {
             $component = $t->components->first();
             if (!$component) {
-                // TOOD add to "no object"!
                 $empty['amount'] += $t->amount;
                 continue;
             }
             $name = $component->name;
-            $componentType = $component->type;
-            if (isset($objects[$name]) && $componentType == $type) {
+            if (isset($objects[$name])) {
                 // append data:
                 $current = $objects[$name];
                 $current['amount'] += floatval($t->amount);
@@ -202,16 +199,18 @@ class HomeHelper
             }
             $objects[$name] = $object;
         }
-        // TODO loop again and cut off the "left-overs".
+        $sum = 0;
         $amount = [];
         foreach ($objects as $key => $row) {
             $amount[$key] = $row['amount'];
+            $sum += $row['amount'];
         }
 
         array_multisort($amount, SORT_ASC, $objects);
 
+        $return = ['objects' => $objects, 'sum' => $sum];
 
-        return $objects;
+        return $return;
     }
 
     /**
