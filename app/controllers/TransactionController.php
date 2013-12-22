@@ -46,7 +46,7 @@ class TransactionController extends BaseController
      *
      * @return View
      */
-    public function add(Account $account  = null)
+    public function add(Account $account = null)
     {
         $accounts = [];
         foreach (Auth::user()->accounts()->where('hidden', 0)->get() as $a) {
@@ -92,8 +92,9 @@ class TransactionController extends BaseController
             $transaction->toArray(), Transaction::$rules
         );
         if ($validator->fails()) {
-            return Redirect::route('addtransaction')->withInput()
-                ->withErrors($validator);
+            return Redirect::route('addtransaction')->withInput()->withErrors(
+                    $validator
+                );
         } else {
             $transaction->save();
 
@@ -154,16 +155,25 @@ class TransactionController extends BaseController
             'category', Input::get('category')
         );
         $transaction->components()->detach();
-        $transaction->addComponent($ben);
-        $transaction->addComponent($bud);
-        $transaction->addComponent($cat);
+        // attach the beneficiary, if it is set:
+        if (!is_null($ben)) {
+            $transaction->components()->attach($ben->id);
+        }
+        if (!is_null($bud)) {
+            $transaction->components()->attach($bud->id);
+        }
+        if (!is_null($cat)) {
+            $transaction->components()->attach($cat->id);
+        }
+
         // validate and save:
         $validator = Validator::make(
             $transaction->toArray(), Transaction::$rules
         );
         if ($validator->fails()) {
-            return Redirect::route('edittransaction')
-                ->withInput()->withErrors($validator);
+            return Redirect::route('edittransaction')->withInput()->withErrors(
+                    $validator
+                );
         } else {
             $transaction->save();
             Session::flash('success', 'The transaction has been saved.');

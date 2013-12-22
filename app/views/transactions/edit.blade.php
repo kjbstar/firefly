@@ -84,7 +84,7 @@
         <div class="form-group">
             <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
             <div class="col-sm-9">
-                <input type="text" value="{{Input::old('beneficiary') ? Input::old('beneficiary') : $transaction->beneficiary() ? $transaction->beneficiary()->name : ''}}" name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
+                <input type="text" value="{{Input::old('beneficiary') ? Input::old('beneficiary') : $transaction->beneficiary ? $transaction->beneficiary->name : ''}}" name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
             </div>
         </div>
         
@@ -92,7 +92,7 @@
         <div class="form-group">
             <label for="inputCategory" class="col-sm-3 control-label">Category</label>
             <div class="col-sm-9">
-                <input type="text" value="{{Input::old('category') ? Input::old('category') : $transaction->category() ? $transaction->category()->name : ''}}" name="category" class="form-control" id="inputCategory" autocomplete="off" />
+                <input type="text" value="{{Input::old('category') ? Input::old('category') : $transaction->category ? $transaction->category->name : ''}}" name="category" class="form-control" id="inputCategory" autocomplete="off" />
             </div>
         </div>
 
@@ -100,7 +100,7 @@
         <div class="form-group">
             <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
             <div class="col-sm-9">
-                <input type="text" value="{{Input::old('budget') ? Input::old('budget') : $transaction->budget() ? $transaction->budget()->name : ''}}" name="budget" class="form-control" id="inputBudget" autocomplete="off" />
+                <input type="text" value="{{Input::old('budget') ? Input::old('budget') : $transaction->budget ? $transaction->budget->name : ''}}" name="budget" class="form-control" id="inputBudget" autocomplete="off" />
             </div>
         </div>
 

@@ -16,9 +16,36 @@ class Transaction extends Eloquent
            'amount'      => 'required|numeric|between:-65536,65536|not_in:0',
            'ignore'      => 'required|numeric|between:0,1'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
-    private $_beneficiary;
-    private $_budget;
-    private $_category;
+
+    protected $appends = ['beneficiary','category','budget'];
+
+
+
+    public function getBeneficiaryAttribute() {
+        foreach($this->components as $component) {
+            if($component->type == 'beneficiary') {
+                return $component;
+            }
+        }
+
+    }
+
+    public function getCategoryAttribute() {
+        foreach($this->components as $component) {
+            if($component->type == 'category') {
+                return $component;
+            }
+        }
+
+    }
+    public function getBudgetAttribute() {
+        foreach($this->components as $component) {
+            if($component->type == 'budget') {
+                return $component;
+            }
+        }
+
+    }
 
     /**
      * Which account does this transaction belong to?
@@ -36,10 +63,10 @@ class Transaction extends Eloquent
      *
      * @return mixed
      */
-    public function beneficiary()
-    {
-        return $this->_getComponent('beneficiary');
-    }
+//    public function beneficiary()
+//    {
+//        return $this->_getComponent('beneficiary');
+//    }
 
     /**
      * Returns the object of $type (Component) if there is any.
@@ -49,15 +76,15 @@ class Transaction extends Eloquent
      *
      * @return mixed
      */
-    private function _getComponent($type)
-    {
-        $var = '_' . $type;
-        if (is_null($this->$var)) {
-            $this->$var = $this->components()->where('type', $type)->first();
-        }
-
-        return $this->$var;
-    }
+//    private function _getComponent($type)
+//    {
+//        $var = '_' . $type;
+//        if (is_null($this->$var)) {
+//            $this->$var = $this->components()->where('type', $type)->first();
+//        }
+//
+//        return $this->$var;
+//    }
 
     /**
      * Get all components belonging to this user.
@@ -74,23 +101,23 @@ class Transaction extends Eloquent
      *
      * @param Component $component
      */
-    public function addComponent(Component $component = null)
-    {
-        if (is_null($component)) {
-            return;
-        }
-        $this->components()->attach($component->id);
-    }
+//    public function addComponent(Component $component = null)
+//    {
+//        if (is_null($component)) {
+//            return;
+//        }
+//        $this->components()->attach($component->id);
+//    }
 
     /**
      * Returns true when the transaction is bound to a budget.
      *
      * @return bool
      */
-    public function hasBudget()
-    {
-        return $this->hasComponent('budget');
-    }
+//    public function hasBudget()
+//    {
+//        return $this->hasComponent('budget');
+//    }
 
     /**
      * Returns true if this transaction has a beneficiary
@@ -98,10 +125,10 @@ class Transaction extends Eloquent
      *
      * @return bool
      */
-    public function hasBeneficiary()
-    {
-        return $this->hasComponent('beneficiary');
-    }
+//    public function hasBeneficiary()
+//    {
+//        return $this->hasComponent('beneficiary');
+//    }
 
     /**
      * Returns true if the transaction has a category
@@ -109,30 +136,30 @@ class Transaction extends Eloquent
      *
      * @return bool
      */
-    public function hasCategory()
-    {
-        return $this->hasComponent('category');
-    }
+//    public function hasCategory()
+//    {
+//        return $this->hasComponent('category');
+//    }
 
     /**
      * Get the component of type 'category'
      *
      * @return mixed
      */
-    public function category()
-    {
-        return $this->_getComponent('category');
-    }
+//    public function category()
+//    {
+//        return $this->_getComponent('category');
+//    }
 
     /**
      * Get the component of type 'budget'
      *
      * @return mixed
      */
-    public function budget()
-    {
-        return $this->_getComponent('budget');
-    }
+//    public function budget()
+//    {
+//        return $this->_getComponent('budget');
+//    }
 
     /**
      * Limits the scope to a certain month.
@@ -288,14 +315,14 @@ class Transaction extends Eloquent
      *
      * @return bool
      */
-    private function hasComponent($type)
-    {
-        foreach ($this->components()->get() as $comp) {
-            if ($comp->type === $type) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+//    private function hasComponent($type)
+//    {
+//        foreach ($this->components()->get() as $comp) {
+//            if ($comp->type === $type) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 }
