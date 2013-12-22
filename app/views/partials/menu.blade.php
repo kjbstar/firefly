@@ -7,7 +7,12 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="{{URL::Route('home')}}">Firefly //
-              {{$today->format('F Y')}}</a>
+              @if(isset($today))
+              {{$today->format('F Y')}}
+              @else
+              {{date('F Y')}}
+              @endif
+          </a>
         </div>
         <ul class="nav navbar-nav">
               <li class="dropdown">
