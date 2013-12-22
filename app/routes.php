@@ -64,6 +64,7 @@ Route::post('/register', ['uses' => 'UserController@doRegister', 'before' => 'cs
  * Routes for user settings:
  */
 Route::get('/home/settings', ['uses' => 'SettingsController@index', 'as' => 'settings']);
+Route::post('/home/settings', ['uses' => 'SettingsController@postIndex']);
 
 
 /**

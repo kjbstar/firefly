@@ -111,8 +111,10 @@ class Account extends Eloquent
 
         // Get all transactions on that day, grouped by
         // the day of the month and the month:
+        $predictionStart = Setting::getSetting('predictionStart');
+
         $list = $this->transactions()->expenses()->
-            where('date','>','2014-01-01')->
+            where('date','>',$predictionStart->value)->
             where(
             'ignore', 0
         )->onDayOfMonth($date)->groupBy('day')->get(

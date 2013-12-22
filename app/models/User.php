@@ -26,6 +26,10 @@ class User extends Eloquent implements UserInterface, RemindableInterface
         return $this->hasMany('Account');
     }
 
+    public function settings() {
+        return $this->hasMany('Setting');
+    }
+
     /**
      * Get the user's components.
      *
