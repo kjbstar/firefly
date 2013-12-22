@@ -6,7 +6,8 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{{URL::Route('home')}}">Firefly // {{date('F Y')}}</a>
+          <a class="navbar-brand" href="{{URL::Route('home')}}">Firefly //
+              {{$today->format('F Y')}}</a>
         </div>
         <ul class="nav navbar-nav">
               <li class="dropdown">
