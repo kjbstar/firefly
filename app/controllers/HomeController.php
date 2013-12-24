@@ -62,9 +62,9 @@ class HomeController extends BaseController
         $transactions = HomeHelper::homeTransactionList($today);
         $transfers = HomeHelper::homeTransferList($today);
         $budgets = HomeHelper::homeComponentList('budget', $today);
+
         $categories = HomeHelper::homeComponentList('category', $today);
         $beneficiaries = HomeHelper::homeComponentList('beneficiary', $today);
-
         // build a history:
         $history = [];
         $now = new Carbon;
@@ -107,8 +107,11 @@ class HomeController extends BaseController
     {
         switch ($type) {
             case 'beneficiaries':
+            case 'beneficiary':
             case 'categories':
+            case 'category':
             case 'budgets':
+            case 'budget':
                 return Response::json(
                     HomeHelper::homeComponentChart($type, $year, $month)
                 );

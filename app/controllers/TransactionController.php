@@ -98,9 +98,16 @@ class TransactionController extends BaseController
         } else {
             $transaction->save();
 
-            $transaction->addComponent($ben);
-            $transaction->addComponent($bud);
-            $transaction->addComponent($cat);
+            // attach the beneficiary, if it is set:
+            if (!is_null($ben)) {
+                $transaction->components()->attach($ben->id);
+            }
+            if (!is_null($bud)) {
+                $transaction->components()->attach($bud->id);
+            }
+            if (!is_null($cat)) {
+                $transaction->components()->attach($cat->id);
+            }
             Session::flash('success', 'The transaction has been created.');
 
             return Redirect::to(Session::get('previous'));

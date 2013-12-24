@@ -1,4 +1,5 @@
 <?php
+use Carbon\Carbon as Carbon;
 
 /**
  * Class PageController
@@ -127,5 +128,58 @@ class PageController extends BaseController
         }
 
         return Redirect::to('/');
+    }
+
+    public function compare()
+    {
+
+        $row = 1;
+        $result = [];
+        if (($handle = fopen(
+                "/Library/WebServer/Documents/compare/transactions.txt", "r"
+            )) !== false
+        ) {
+            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+                $date = new Carbon($data[7]);
+                $otherDate = new Carbon($data[2]);
+                $current = [];
+                $current['date'] = $date;
+                $current['otherdate'] = $otherDate;
+                $amount = floatval($data[4]);
+                $current['amount'] = $amount;
+                $current['descr'] = $data[10] . ' ' . $data[11];
+                $num = count($data);
+
+                // find transaction?
+                $transaction = Auth::user()->transactions()->where(function
+                ($q) use ($date,$otherDate) {
+                        $q->where('date',$date->format('Y-m-d'));
+                        $q->orWhere('date',$otherDate->format('Y-m-d'));
+                    }
+
+                    )->where(
+                        function ($q) use ($amount) {
+                            $q->where('amount', $amount);
+                            $q->orWhere('amount', $amount * -1);
+                        }
+                    )->first();
+                if($transaction) {
+                    $current['transaction'] = $transaction;
+                } else {
+                    $current['transaction'] = false;
+                }
+
+
+                //echo "<p> $num fields in line $row: <br /></p>\n";
+                $row++;
+                for ($c = 0; $c < $num; $c++) {
+                 //   echo $c . ': ' . $data[$c] . "<br />\n";
+                }
+                $result[] = $current;
+            }
+            fclose($handle);
+        }
+
+        return View::make('home.compare')->with('data', $result);
     }
 } 

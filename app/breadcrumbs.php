@@ -8,6 +8,13 @@ Breadcrumbs::register(
 );
 
 Breadcrumbs::register(
+    'report', function ($breadcrumbs,$year) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push($year, route('yearreport',$year));
+    }
+);
+
+Breadcrumbs::register(
 
     'settings', function ($breadcrumbs) {
         $breadcrumbs->parent('home');

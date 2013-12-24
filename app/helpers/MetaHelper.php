@@ -20,6 +20,7 @@ class MetaHelper
     public static function generateOverviewOfMonths(Component $component)
     {
         $end = new Carbon;
+        $end->addMonth();
         $start = new Carbon('first day of january 2013');
         $list = [];
         while ($end > $start) {

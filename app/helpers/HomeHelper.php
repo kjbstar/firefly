@@ -87,37 +87,41 @@ class HomeHelper
             $date = new Carbon;
         }
 
-        $result = self::homeComponentList(Str::singular($type), $date);
-        $objects = $result['objects'];
-        // the object list cuts off at 10.
-        $limitedObjects = [];
-        $rest = ['id'     => 0, 'name' => 'other ' . Str::plural($type),
-                 'amount' => 0, 'url' => '#'];
-        $count = 0;
-        foreach ($objects as $index => $object) {
-            if ($count <= 9) {
-                $limitedObjects[$index] = $object;
-            } else {
-                $rest['amount'] += $object['amount'];
-            }
-            $count++;
-        }
-        if ($rest['amount'] != 0) {
-            $limitedObjects['other ' . Str::plural($type)] = $rest;
-        }
-
-        // make a chart:
+        $objects = self::homeComponentList(Str::singular($type), $date);
         $chart = App::make('gchart');
         $chart->addColumn(ucfirst($type), 'string');
+        $chart->addColumn('Budgeted', 'number', 'old-data');
         $chart->addColumn('Amount', 'number');
-        foreach ($limitedObjects as $name => $data) {
+
+
+        foreach ($objects as $index => $data) {
+            // fix the amount:
             $amount
                 = $data['amount'] < 0 ? $data['amount'] * -1 : $data['amount'];
-            $chart->addRow(['f' => $name, 'v' => $data['id']], $amount);
+            $max = $data['limit'] ?$data['limit'] : $amount;
+            if ($index < 10) {
+                $chart->addRow(['f' => $data['name'], 'v' => $data['id']],
+                    $max,$amount);
+            }
         }
         $chart->generate();
+        $return = $chart->getData();
 
-        return $chart->getData();
+        /*
+         * Now that the chart data is there, we can find out if these
+         * components have limits and supplement the information with
+         * "budgetary" information, displaying the limit we've set for these
+         * components (if any).
+         *
+         * Remember that limitData is a chart in itself and can be displayed
+         * seperately.
+         */
+
+//        $return['limitData'] = self::homeComponentChartLimitData(
+//            $limitedObjects, $date
+//        );
+
+        return $return;
 
     }
 
@@ -132,27 +136,27 @@ class HomeHelper
     public static function homeComponentList($type, Carbon $date)
     {
         $objects = [];
-        $empty = ['id'  => 0, 'name' => '(no ' . $type . ')', 'amount' => 0,
+        // a special empty component:
+        $empty = ['id' => 0, 'name' => '(No ' . $type . ')', 'amount' => 0,
                   'url' => '#', 'limit' => null];
 
+
         $limits = [];
-        // get all transactions for this month that have this component.
-        $transactions = Auth::user()->transactions()->hasComponent($type)
-            ->inMonth($date)->get();
+        // get all transactions for this month.
+        // later on, we filter on the component.
+        $transactions = Auth::user()->transactions()->with('components')
+            ->expenses()->inMonth($date)->get();
 
         foreach ($transactions as $t) {
-            $component = $t->components->first();
-            if (!$component) {
+            $component = $t->getComponentByType($type);
+            if (is_null($component)) {
                 $empty['amount'] += $t->amount;
                 continue;
             }
-            $name = $component->name;
-            if (isset($objects[$name])) {
+            $id = intval($component->id);
+            if (isset($objects[$id])) {
                 // append data:
-                $current = $objects[$name];
-                $current['amount'] += floatval($t->amount);
-                $objects[$name] = $current;
-
+                $objects[$id]['amount'] += floatval($t->amount);
             } else {
                 // new object:
                 $url = URL::Route(
@@ -166,23 +170,21 @@ class HomeHelper
                 $current['url'] = $url;
                 $current['limit'] = null;
                 $current['left'] = 100;
-                $objects[$name] = $current;
+                $objects[$id] = $current;
                 // find a limit for this month
                 // and save it to $limits
                 $limit = $component->limits()->inMonth($date)->first();
                 if ($limit) {
-                    $limits[$name] = $limit;
+                    $limits[$id] = $limit;
                 }
             }
             unset($current);
         }
-        if ($empty['amount'] != 0) {
-            $objects['(no ' . $type . ')'] = $empty;
-        }
+        $objects[] = $empty;
 
         // loop the $limits array and check the $objects:
-        foreach ($limits as $name => $limit) {
-            $object = $objects[$name];
+        foreach ($limits as $id => $limit) {
+            $object = $objects[$id];
             $spent = $object['amount'] * -1;
             $max = floatval($limit->amount);
             $object['limit'] = $max;
@@ -197,20 +199,54 @@ class HomeHelper
                 );
                 $object['left'] = 100 - $object['spent'];
             }
-            $objects[$name] = $object;
+            $objects[$id] = $object;
         }
-        $sum = 0;
         $amount = [];
         foreach ($objects as $key => $row) {
             $amount[$key] = $row['amount'];
-            $sum += $row['amount'];
         }
 
         array_multisort($amount, SORT_ASC, $objects);
 
-        $return = ['objects' => $objects, 'sum' => $sum];
+        return $objects;
+    }
 
-        return $return;
+    /**
+     * For each entry in the data array, find the component
+     * and possibly a limit that goes with it. The sum of the
+     * returned list should be 2000, which currently is a hard coded value.
+     *
+     * @param $data
+     */
+    public static function homeComponentChartLimitData($data, Carbon $date)
+    {
+
+        // first force this to be just 2000 euro's.
+        $chart = App::make('gchart');
+        $chart->addColumn('Some object', 'string');
+        $chart->addColumn('Amount', 'number');
+        $left = 2000;
+        foreach ($data as $name => $row) {
+            $amount = $row['amount'] < 0 ? $row['amount'] * -1 : $row['amount'];
+            //echo 'now at '.$row['id'].'<br>';
+
+            $limit = Limit::where(
+                'component_id', $row['id']
+            )->inMonth($date)->first();
+            $left -= floatval($amount);
+            if (!is_null($limit)) {
+                $amount = floatval($limit->amount);
+            }
+
+            $chart->addRow(['v' => $row['id'], 'f' => $name], $amount);
+        }
+        $left = $left < 0 ? 0 : $left;
+        $chart->addRow('Left', $left);
+
+
+        $chart->generate();
+
+        return $chart->getData();
     }
 
     /**

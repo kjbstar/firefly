@@ -9,10 +9,11 @@
                 <th>Category</th>
                 <th>Budget</th>
                 <th>&nbsp;</th>
+                <th>&nbsp;</th>
             </tr>
             @foreach($transactions as $t)
             <tr>
-                <td>{{$t->date->format('D d F Y')}}</td>
+                <td>{{$t->date->format('D d M \'y')}}</td>
                 <td>
                     @if($t->ignore == 1)
                     <span class="glyphicon glyphicon-eye-close" title="Ignored in predictions"></span>
@@ -38,6 +39,9 @@
                     @if(!is_null($t->budget))
                     <a href="{{URL::Route('budgetoverview',[$t->budget->id])}}">{{$t->budget->name}}</a>
                     @endif
+                </td>
+                <td>
+                    {{mf($t->account->balanceOnDate($t->date))}}
                 </td>
                 <td>
                     <div class="btn-group">

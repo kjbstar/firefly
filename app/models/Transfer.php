@@ -65,6 +65,8 @@ class Transfer extends Eloquent
         );
     }
 
+
+
     /**
      * Get the unencrypted description.
      *
@@ -89,6 +91,7 @@ class Transfer extends Eloquent
 
     /**
      * Get all date fields that must be Carbon objects.
+     *
      * @return array
      */
     public function getDates()

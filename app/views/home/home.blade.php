@@ -65,21 +65,21 @@
 <div class="row">
     <div class="col-lg-4 col-md-4">
         <div
-            id="home-beneficiaries-piechart"></div>
+            id="home-beneficiary-piechart"></div>
     </div>
     <div class="col-lg-4 col-md-4">
-        <div id="home-budgets-piechart"></div>
+        <div id="home-budget-piechart"></div>
     </div>
     <div class="col-lg-4 col-md-4">
         <div
-            id="home-categories-piechart"></div>
+            id="home-category-piechart"></div>
     </div>
 </div>
 
 <div class="row">
     <div class="col-lg-4 col-md-4">
         <table class="table table-condensed">
-            @foreach($beneficiaries['objects'] as $b)
+            @foreach($beneficiaries as $b)
             <tr
             @if(isset($b['overpct']))
             class="danger"
@@ -91,13 +91,13 @@
             @endforeach
             <tr>
             <td><em>Total</em></td>
-            <td>{{mf($beneficiaries['sum'],true)}}
+            <td>{{mf(0,true)}}
             </tr>
         </table>
 
     </div>
     <div class="col-lg-4 col-md-4">
-        @foreach($budgets['objects'] as $budget)
+        @foreach($budgets as $budget)
         <h5><a href="{{$budget['url']}}">{{$budget['name']}}</a></h5>
 
         <div class="progress progress-striped" style="height:10px;">
@@ -139,14 +139,14 @@
         <table class="table table-condensed">
             <tr>
                 <td><em>Total</em></td>
-                <td>{{mf($budgets['sum'],true)}}</td>
+                <td>{{mf(0,true)}}</td>
             </tr>
 
         </table>
     </div>
     <div class="col-lg-4 col-md-4">
         <table class="table table-condensed">
-            @foreach($categories['objects'] as $c)
+            @foreach($categories as $c)
             <tr
             @if(isset($c['overpct']))
             class="danger"
@@ -158,7 +158,7 @@
                 @endforeach
                 <tr>
                     <td><em>Total</em></td>
-                    <td>{{mf($categories['sum'],true)}}
+                    <td>{{mf(0,true)}}
                 </tr>
         </table>
 

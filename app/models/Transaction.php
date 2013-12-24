@@ -254,6 +254,15 @@ class Transaction extends Eloquent
         );
     }
 
+    public function scopeInYear($query, Carbon $date)
+    {
+        return $query->where(
+            'date', '>=', $date->format('Y') . '-01-01'
+        )->where(
+                'date', '<=', $date->format('Y') . '-12-31'
+            );
+    }
+
     /**
      * Limits the scope to incomes only.
      *
@@ -306,6 +315,15 @@ class Transaction extends Eloquent
     public function getDates()
     {
         return ['created_at', 'updated_at', 'date'];
+    }
+
+    public function getComponentByType($type) {
+        foreach($this->components as $component) {
+            if($component->type == $type) {
+                return $component;
+            }
+        }
+        return null;
     }
 
     /**
