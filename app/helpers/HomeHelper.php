@@ -125,6 +125,12 @@ class HomeHelper
 
     }
 
+    public static function getEarliestEvent() {
+        $account = Auth::user()->accounts()->orderBy('openingbalancedate',
+            'ASC')->first();
+        return $account->openingbalancedate;
+    }
+
     /**
      * Returns a list of [type]s for the home page for a given date (month).
      *

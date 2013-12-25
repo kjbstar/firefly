@@ -49,7 +49,9 @@ class AccountController extends BaseController
      */
     public function add()
     {
-        return View::make('accounts.add')->with('title', 'Add account');
+        $count = Auth::user()->accounts()->count();
+        return View::make('accounts.add')->with('title',
+            'Add account')->with('count',$count);
     }
 
     /**

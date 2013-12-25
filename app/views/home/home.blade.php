@@ -7,28 +7,82 @@
         <h1>Firefly
             <small>The current state of affairs</small>
         </h1>
+        @if(count($accounts) > 0)
             <div class="btn-group">
                 <a href="{{URL::Route('addtransaction')}}"
                    class="btn btn-default"><span
                         class="glyphicon glyphicon-plus-sign"></span> Add
                     transaction</a>
+                @if(count($accounts) > 1)
                 <a href="{{URL::Route('addtransfer')}}"
                    class="btn btn-default"><span
                         class="glyphicon glyphicon-plus-sign"></span> Add
                     transfer</a>
+                @endif
             </div>
+        @endif
     </div>
 </div>
+@if(count($accounts) == 0)
+<div class="row">
+    <div class="col-lg-6 coll-md-6 col-lg-offset-3 col-md-offset-3">
+        <div class="alert alert-info">
+            <p>
+                <strong>Start with Firefly</strong>
+            </p>
+            <p>
+                In order to start using Firefly, you need to enter at least
+                one account. This can be a checking account,
+                credit card or savings account. It can even be your cash
+                wallet.
+            </p>
+            <p><a class="alert-link" href="{{URL::Route('addaccount')
+            }}">Create an account
+                    to
+                  continue</a>
+                .</p>
+        </div>
+    </div>
+</div>
+@endif
+@if(count($transactions) == 0)
+<div class="row">
+    <div class="col-lg-6 coll-md-6 col-lg-offset-3 col-md-offset-3">
+        <div class="alert alert-info">
+            <p>
+                <strong>Start with Firefly</strong>
+            </p>
+            <p>
+                Now that you have an account, you can create your first
+                transaction. You should start tracking all your expenses and
+                incomes so Firefly can accurately reflect your current
+                financial standing.
+            </p>
+            <p><a class="alert-link" href="{{URL::Route('addtransaction')
+            }}">Create a transaction
+                    to
+                    continue</a>
+                .</p>
+        </div>
+    </div>
+</div>
+@endif
+
 
 <div class="row">
+    @if(count($accounts) > 0)
     <div class="col-lg-6 col-md-6">
         <h4>Accounts</h4>
     </div>
+    @if(count($transactions) > 0)
     <div class="col-lg-6 col-md-6">
         <h4>Transactions</h4>
     </div>
+    @endif
+    @endif
 </div>
 <div class="row">
+    @if(count($accounts) > 0)
     <div class="col-lg-3 col-md-3">
         <div id="home-accounts-chart"></div>
     </div>
@@ -56,13 +110,17 @@
             @endforeach
         </table>
     </div>
+    @endif
 </div>
 <div class="row">
+    @if(count($accounts) > 0 && count($transactions) > 0)
     <div class="col-lg-4 col-md-4"><h4>Beneficiaries</h4></div>
     <div class="col-lg-4 col-md-4"><h4>Budgets</h4></div>
     <div class="col-lg-4 col-md-4"><h4>Categories</h4></div>
+    @endif
 </div>
 <div class="row">
+    @if(count($accounts) > 0 && count($transactions) > 0)
     <div class="col-lg-4 col-md-4">
         <div
             id="home-beneficiary-piechart"></div>
@@ -74,9 +132,11 @@
         <div
             id="home-category-piechart"></div>
     </div>
+    @endif
 </div>
 
 <div class="row">
+    @if(count($accounts) > 0 && count($transactions) > 0)
     <div class="col-lg-4 col-md-4">
         <table class="table table-condensed">
             @foreach($beneficiaries as $b)
@@ -163,9 +223,11 @@
         </table>
 
     </div>
+    @endif
 </div>
 
 <div class="row">
+    @if(count($accounts) > 0)
     <div class="col-lg-12 col-md-12"><h4>Other months</h4>
 
         @foreach($history as $h)
@@ -173,6 +235,7 @@
            href="{{$h['url']}}">{{$h['title']}}</a>
         @endforeach
     </div>
+    @endif
 </div>
 
 @endsection

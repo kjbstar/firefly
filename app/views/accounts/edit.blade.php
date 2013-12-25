@@ -70,7 +70,7 @@
      
 
     <div class="form-group">
-      <button type="submit" class="btn btn-default">Save new account</button>
+      <button type="submit" class="btn btn-default">Save account</button>
     </div>
 
     {{Form::close()}}
