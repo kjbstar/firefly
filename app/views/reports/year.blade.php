@@ -44,17 +44,18 @@
         <table class="table table-bordered table-striped">
             <tr>
                 <td>Earned</td>
-                <td>{{mf($data['totalEarned'],true)}}</td>
+                <td style="text-align:right;">{{mf($data['totalEarned'],
+                    true)}}</td>
             </tr>
             <tr>
                 <td>Spent</td>
-                <td><span class="text-danger">{{mf($data['totalSpent']*-1)
+                <td style="text-align:right;"><span class="text-danger">{{mf($data['totalSpent']*-1)
                     }}</span></td>
             </tr>
             <tr>
                 <td>Balance</td>
-                <td><strong>{{mf($data['totalDiff'],
-                    true)}}</strong></td>
+                <td style="text-align:right;">{{mf($data['totalDiff'],
+                    true)}}</td>
             </tr>
         </table>
     </div>
@@ -70,17 +71,17 @@
         @foreach($accounts['accounts'] as $a)
         <tr>
             <td>{{$a->name}}</td>
-            <td>{{mf($a->balanceOnDate($date),false)}}</td>
-            <td>{{mf($a->balanceOnDate($end),false)}}</td>
-            <td>{{mf($a->balanceOnDate($end)-$a->balanceOnDate($date),false)}}</td>
+            <td style="text-align:right;">{{mf($a->balanceOnDate($date),false)}}</td>
+            <td style="text-align:right;">{{mf($a->balanceOnDate($end),false)}}</td>
+            <td style="text-align:right;">{{mf($a->balanceOnDate($end)-$a->balanceOnDate($date),false)}}</td>
         </tr>
         @endforeach
             <tr>
                 <td>&nbsp;</td>
-                <td>{{mf($accounts['netWorthStart'],true)}}</td>
-                <td>{{mf($accounts['netWorthEnd'],true)}}</td>
-                <td><strong>{{mf($accounts['netWorthDifference'],
-                        true)}}</strong></td>
+                <td style="text-align:right;">{{mf($accounts['netWorthStart'],true)}}</td>
+                <td style="text-align:right;">{{mf($accounts['netWorthEnd'],true)}}</td>
+                <td style="text-align:right;">{{mf($accounts['netWorthDifference'],
+                        true)}}</td>
             </tr>
         </table>
     </div>
@@ -89,11 +90,11 @@
         <table class="table table-bordered">
             <tr>
                 <td>Spent</td>
-                <td>{{mf($data['totalSpent']/12,true)}}</td>
+                <td style="text-align:right;">{{mf($data['totalSpent']/12,true)}}</td>
             </tr>
             <tr>
                 <td>Earned</td>
-                <td>{{mf($data['totalEarned']/12,true)}}</td>
+                <td style="text-align:right;">{{mf($data['totalEarned']/12,true)}}</td>
             </tr>
             </table>
 
@@ -109,37 +110,43 @@
 <div class="row">
     <div class="col-lg-4">
         <h4>Your largest benefactors</h4>
+        <div id="report-benefactor-chart"></div>
         <table class="table table-bordered table-striped">
         @foreach($benefactors as $x)
         <tr>
             <td><a href="{{URL::Route('beneficiaryoverview',$x['id'])}}" title="{{$x['name']}}">{{$x['name']}}</a></td>
-            <td>{{mf($x['sum'],true)}}</td>
+            <td style="text-align:right;">{{mf($x['sum'],true)}}</td>
         </tr>
         @endforeach
         </table>
 
+
     </div>
     <div class="col-lg-4">
         <h4>Your biggest fans</h4>
+        <div id="report-fan-chart"></div>
         <table class="table table-bordered table-striped">
             @foreach($fans as $x)
             <tr>
                 <td><a href="{{URL::Route('beneficiaryoverview',$x['id'])}}" title="{{$x['name']}}">{{$x['name']}}</a></td>
-                <td>{{mf($x['sum'],true)}}</td>
+                <td style="text-align:right;">{{mf($x['sum'],true)}}</td>
             </tr>
             @endforeach
         </table>
+
     </div>
     <div class="col-lg-4">
         <h4>Most money spent on:</h4>
+        <div id="report-cat-chart"></div>
         <table class="table table-bordered table-striped">
             @foreach($spentMostCategories as $x)
             <tr>
                 <td><a href="{{URL::Route('categoryoverview',$x['id'])}}" title="{{$x['name']}}">{{$x['name']}}</a></td>
-                <td>{{mf($x['sum'],true)}}</td>
+                <td style="text-align:right;">{{mf($x['sum'],true)}}</td>
             </tr>
             @endforeach
         </table>
+
     </div>
 </div>
 

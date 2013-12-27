@@ -4,6 +4,9 @@ google.setOnLoadCallback(drawCharts);
 
 function drawCharts() {
     drawNetWorthChart();
+    drawBenefactorChart();
+    drawFanChart();
+    drawCatChart();
 }
 
 function drawNetWorthChart() {
@@ -27,5 +30,68 @@ function drawNetWorthChart() {
         chart.draw(gdata, opt);
     }).fail(function () {
             $('#netWorth').addClass('load-error');
+        });
+}
+
+function drawBenefactorChart() {
+    $.getJSON('/home/report/'+year+'/chart/beneficiary/desc').success(function (data) {
+        var opt = {
+            height: 200,
+            legend: {position: 'none'},
+            chartArea: {
+                width: 160,
+                height: 160
+            }
+        };
+
+        gdata = new google.visualization.DataTable(data);
+        var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
+        money.format(gdata, 1);
+        chart = new google.visualization.PieChart(document.getElementById('report-benefactor-chart'));
+        chart.draw(gdata, opt);
+    }).fail(function () {
+            $('#report-benefactor-chart').addClass('load-error');
+        });
+}
+
+function drawFanChart() {
+    $.getJSON('/home/report/'+year+'/chart/beneficiary/asc').success(function (data) {
+        var opt = {
+            height: 200,
+            legend: {position: 'none'},
+            chartArea: {
+                width: 160,
+                height: 160
+            }
+        };
+
+        gdata = new google.visualization.DataTable(data);
+        var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
+        money.format(gdata, 1);
+        chart = new google.visualization.PieChart(document.getElementById('report-fan-chart'));
+        chart.draw(gdata, opt);
+    }).fail(function () {
+            $('#report-fan-chart').addClass('load-error');
+        });
+}
+
+function drawCatChart() {
+    $.getJSON('/home/report/'+year+'/chart/category/asc').success(function (data) {
+        var opt = {
+            height: 200,
+            legend: {position: 'none'},
+            chartArea: {
+                width: 160,
+                height: 160
+            }
+        };
+
+        gdata = new google.visualization.DataTable(data);
+        var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
+        money.format(gdata, 1);
+        chart = new google.visualization.PieChart(document.getElementById('report-cat-chart'));
+        chart.draw(gdata, opt);
+    }).fail(function () {
+            $('#report-cat-chart').addClass('load-error');
         });
 }

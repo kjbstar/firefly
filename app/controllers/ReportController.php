@@ -4,6 +4,20 @@ use Carbon\Carbon as Carbon;
 class ReportController extends BaseController
 {
 
+    public function showIndex() {
+        $first = Auth::user()->accounts()->orderBy('openingbalancedate',
+            'ASC')->first()->openingbalancedate;
+        $now = new Carbon;
+        $years = [];
+        while($first < $now) {
+            $current = clone $first;
+            $years[] = $current->format('Y');
+            $first->addYear();
+        }
+
+        return View::make('reports.index')->with('years',$years);
+    }
+
 
     public function showYearlyReport($year)
     {
@@ -33,59 +47,23 @@ class ReportController extends BaseController
                 'benefactors', $benefactors
             )->with(
                 'fans', $fans
-            )->with('spentMostCategories', $spentMostCategories)->with
-            ('title','Report for '.$year);
-    }
-
-    public function netWorthChart($year) {
-        $start = new Carbon($year . '-01-01');
-        $start->startOfYear();
-        $end = clone $start;
-        $end->endOfYear();
-
-        $chart = App::make('gchart');
-        $chart->addColumn('Month','date');
-        $chart->addColumn('Income','number');
-        $chart->addColumn('Expenses','number');
-        $chart->addColumn('Net worth','number');
-        $accounts = Auth::user()->accounts()->get();
-
-        while($start < $end) {
-            $current = clone $start;
-            $current->endOfMonth();
-
-            $income = floatval(Auth::user()->transactions()->incomes()->inMonth
-                    ($current)->sum('amount'));
-            $expenses = floatval(Auth::user()->transactions()->expenses()
-                    ->inMonth
-                    ($current)->sum('amount'));
-            $expenses = $expenses * -1;
-            $netWorth = 0;
-
-            // net worth:
-            foreach($accounts as $a) {
-                $netWorth += $a->balanceOnDate($current);
-            }
-
-
-            $chart->addRow($current,$income,$expenses,$netWorth);
-
-            $start->addMonth();
-        }
-
-        $chart->generate();
-        return Response::json($chart->getData());
+            )->with('spentMostCategories', $spentMostCategories)->with(
+                'title', 'Report for ' . $year
+            );
     }
 
     private function basicInformation(Carbon $date)
     {
         $data = [];
         $income = floatval(
-            Auth::user()->transactions()->incomes()->inYear($date)->sum
-                    ('amount')
+            Auth::user()->transactions()->incomes()->inYear($date)->sum(
+                'amount'
+            )
         );
         $expenses = floatval(
-            Auth::user()->transactions()->expenses()->inYear($date)->sum('amount')
+            Auth::user()->transactions()->expenses()->inYear($date)->sum(
+                'amount'
+            )
         );
         $data['totalEarned'] = $income;
         $data['totalSpent'] = $expenses;
@@ -146,6 +124,77 @@ class ReportController extends BaseController
         }
 
         return $finalData;
+
+    }
+
+    public function netWorthChart($year)
+    {
+        $start = new Carbon($year . '-01-01');
+        $start->startOfYear();
+        $end = clone $start;
+        $end->endOfYear();
+
+        $chart = App::make('gchart');
+        $chart->addColumn('Month', 'date');
+        $chart->addColumn('Income', 'number');
+        $chart->addColumn('Expenses', 'number');
+        $chart->addColumn('Net worth', 'number');
+        $accounts = Auth::user()->accounts()->get();
+
+        while ($start < $end) {
+            $current = clone $start;
+            $current->endOfMonth();
+
+            $income = floatval(
+                Auth::user()->transactions()->incomes()->inMonth($current)->sum(
+                    'amount'
+                )
+            );
+            $expenses = floatval(
+                Auth::user()->transactions()->expenses()->inMonth($current)
+                    ->sum('amount')
+            );
+            $expenses = $expenses * -1;
+            $netWorth = 0;
+
+            // net worth:
+            foreach ($accounts as $a) {
+                $netWorth += $a->balanceOnDate($current);
+            }
+
+
+            $chart->addRow($current, $income, $expenses, $netWorth);
+
+            $start->addMonth();
+        }
+
+        $chart->generate();
+
+        return Response::json($chart->getData());
+    }
+
+    public function objectChart($year, $type, $sort)
+    {
+        $sortFlag = $sort == 'asc' ? SORT_ASC : SORT_DESC;
+        $date = new Carbon($year . '-01-01');
+        $data = $this->objectInformation($date, $type, $sortFlag);
+
+        // make chart
+        $chart = App::make('gchart');
+        $chart->addColumn('Object', 'string');
+        $chart->addColumn('Amount', 'number');
+
+        foreach ($data as $entry) {
+            $amount = $entry['sum'] < 0 ? $entry['sum'] * -1 : $entry['sum'];
+            $chart->addRow(
+                ['v' => $entry['id'], 'f' => $entry['name']], $amount
+            );
+        }
+
+        $chart->generate();
+
+        return Response::json($chart->getData());
+
 
     }
 }
