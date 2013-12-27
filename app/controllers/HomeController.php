@@ -65,6 +65,9 @@ class HomeController extends BaseController
 
         $categories = HomeHelper::homeComponentList('category', $today);
         $beneficiaries = HomeHelper::homeComponentList('beneficiary', $today);
+        $accountCount = Auth::user()->accounts()->count();
+        $transactionCount = Auth::user()->transactions()->count();
+
         // build a history:
         $history = [];
         $now = new Carbon;
@@ -91,7 +94,8 @@ class HomeController extends BaseController
                 'categories', $categories
             )->with(
                 'history', $history
-            );
+            )->with('accountCount',$accountCount)->with('transactionCount',
+                $transactionCount);
     }
 
     /**

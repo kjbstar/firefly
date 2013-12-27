@@ -9,6 +9,22 @@
             to {{$account->name}}
             @endif
         </h3>
+        @if($count == 0)
+        <div class="alert alert-info">
+            <p>
+                <strong>Add your first transaction</strong>
+            </p>
+            <p>
+                Transactions are usually expenses paid (with a debit or
+                credit card). They can also be incomes such as salary.
+            </p>
+            <p>
+                The fields on the right are "free fields"; once you've
+                entered something they'll auto-suggest it next time.
+            </p>
+        </div>
+        @endif
+
     </div>
 </div>
 
@@ -28,8 +44,13 @@
             <div class="col-sm-9">
                 <input type="text" name="description" class="form-control" value="{{Input::old('description')}}" id="inputDescription" placeholder="Description">
                 @if($errors->has('description'))
-                <span class="text-danger">{{$errors->first('description')}}</span>
+                <span class="text-danger">{{$errors->first('description')
+                    }}</span><br />
                 @endif
+                <span class="text-info">What best describes the
+                    transaction? Avoid using the store's name or general
+                    descriptions such as "groceries".
+                </span>
             </div>
         </div>
 
@@ -43,8 +64,13 @@
             <div class="col-sm-9">
                 <input type="number" value="{{Input::old('amount')}}" name="amount" step="any" class="form-control" id="inputAmount" placeholder="&euro;">
                 @if($errors->has('amount'))
-                <span class="text-danger">{{$errors->first('amount')}}</span>
+                <span class="text-danger">{{$errors->first('amount')
+                    }}</span><br />
                 @endif
+                <span class="text-info">
+                    If the transaction is an expense, enter a negative amount.
+                    Otherwise, enter a positive amount.
+                </span>
             </div>
         </div>
 
@@ -58,8 +84,12 @@
             <div class="col-sm-9">
                 <input type="date" name="date" value="{{Input::old('date') ? Input::old('date') : date('Y-m-d')}}"  class="form-control" id="inputDate">
                 @if($errors->has('date'))
-                <span class="text-danger">{{$errors->first('date')}}</span>
+                <span class="text-danger">{{$errors->first('date')
+                    }}</span><br />
                 @endif
+                <span class="text-info">Enter the date this transaction
+                    occured. This date cannot be before the date the
+                    account (below) was opened.</span>
             </div>
         </div>
 
@@ -73,8 +103,11 @@
             <div class="col-sm-9">
                 {{Form::select('account_id',$accounts,$id ? $id : Input::old('account_id'),['class' => 'form-control'])}}
                 @if($errors->has('date'))
-                <span class="text-danger">{{$errors->first('account_id')}}</span>
+                <span class="text-danger">{{$errors->first('account_id')
+                    }}</span><br />
                 @endif
+                <span class="text-info">Select the account this
+                    transaction is relevant to.</span>
             </div>
         </div>
 
@@ -88,6 +121,11 @@
             <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
             <div class="col-sm-9">
                 <input type="text" value="{{Input::old('beneficiary')}}" name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
+                <br />
+                <span class="text-info">
+                    Enter the beneficiary, such as the store's name in case
+                    of an expense or the company who paid you.
+                </span>
             </div>
         </div>
         
@@ -95,7 +133,13 @@
         <div class="form-group">
             <label for="inputCategory" class="col-sm-3 control-label">Category</label>
             <div class="col-sm-9">
-                <input type="text" value="{{Input::old('category')}}" name="category" class="form-control" id="inputCategory" autocomplete="off" />
+                <input type="text" value="{{Input::old('category')}}"
+                       name="category" class="form-control"
+                       id="inputCategory" autocomplete="off" /><br />
+                <span class="text-info">
+                    Under which category is this transaction best filed?
+                    Think "house" or "personal".
+                </span>
             </div>
         </div>
 
@@ -103,7 +147,12 @@
         <div class="form-group">
             <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
             <div class="col-sm-9">
-                <input type="text" value="{{Input::old('budget')}}" name="budget" class="form-control" id="inputBudget" autocomplete="off" />
+                <input type="text" value="{{Input::old('budget')}}"
+                       name="budget" class="form-control" id="inputBudget"
+                       autocomplete="off" /><br />
+                <span class="text-info">
+                    If you're budgeting, use this free field.
+                </span>
             </div>
         </div>
 
@@ -112,6 +161,12 @@
             <label for="inputIgnore" class="col-sm-3 control-label">Ignore</label>
             <div class="col-sm-9">
                 <input type="checkbox" name="ignore" value="1"> <small>Ignores this transaction in predictions.</small>
+                <br />
+                <span class="text-info">
+                    Large (one time) transactions can skew the predictions.
+                    So, use this check to make sure your predictions stay
+                    accurate.
+                </span>
             </div>
         </div>
         
@@ -119,7 +174,11 @@
         <div class="form-group">
             <label for="inputMark" class="col-sm-3 control-label">Mark</label>
             <div class="col-sm-9">
-                <input type="checkbox" name="mark" value="1"> <small>Marks this transaction in certain charts.</small>
+                <input type="checkbox" name="mark" value="1"> <small>Marks
+                    this transaction in certain charts.</small><br />
+                <span class="text-info">
+                    Like it says.
+                </span>
             </div>
         </div>
 

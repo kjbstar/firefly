@@ -7,13 +7,13 @@
         <h1>Firefly
             <small>The current state of affairs</small>
         </h1>
-        @if(count($accounts) > 0)
+        @if($accountCount > 0)
             <div class="btn-group">
                 <a href="{{URL::Route('addtransaction')}}"
                    class="btn btn-default"><span
                         class="glyphicon glyphicon-plus-sign"></span> Add
                     transaction</a>
-                @if(count($accounts) > 1)
+                @if($accountCount > 1)
                 <a href="{{URL::Route('addtransfer')}}"
                    class="btn btn-default"><span
                         class="glyphicon glyphicon-plus-sign"></span> Add
@@ -23,7 +23,7 @@
         @endif
     </div>
 </div>
-@if(count($accounts) == 0)
+@if($accountCount == 0)
 <div class="row">
     <div class="col-lg-6 coll-md-6 col-lg-offset-3 col-md-offset-3">
         <div class="alert alert-info">
@@ -45,7 +45,7 @@
     </div>
 </div>
 @endif
-@if(count($transactions) == 0)
+@if($transactionCount == 0)
 <div class="row">
     <div class="col-lg-6 coll-md-6 col-lg-offset-3 col-md-offset-3">
         <div class="alert alert-info">
@@ -70,11 +70,11 @@
 
 
 <div class="row">
-    @if(count($accounts) > 0)
+    @if($accountCount > 0)
     <div class="col-lg-6 col-md-6">
         <h4>Accounts</h4>
     </div>
-    @if(count($transactions) > 0)
+    @if($transactionCount > 0)
     <div class="col-lg-6 col-md-6">
         <h4>Transactions</h4>
     </div>
@@ -82,7 +82,7 @@
     @endif
 </div>
 <div class="row">
-    @if(count($accounts) > 0)
+    @if($accountCount > 0)
     <div class="col-lg-3 col-md-3">
         <div id="home-accounts-chart"></div>
     </div>
@@ -113,14 +113,14 @@
     @endif
 </div>
 <div class="row">
-    @if(count($accounts) > 0 && count($transactions) > 0)
+    @if($accountCount > 0 && $transactionCount > 0)
     <div class="col-lg-4 col-md-4"><h4>Beneficiaries</h4></div>
     <div class="col-lg-4 col-md-4"><h4>Budgets</h4></div>
     <div class="col-lg-4 col-md-4"><h4>Categories</h4></div>
     @endif
 </div>
 <div class="row">
-    @if(count($accounts) > 0 && count($transactions) > 0)
+    @if($accountCount > 0 && $transactionCount > 0)
     <div class="col-lg-4 col-md-4">
         <div
             id="home-beneficiary-piechart"></div>
@@ -136,7 +136,7 @@
 </div>
 
 <div class="row">
-    @if(count($accounts) > 0 && count($transactions) > 0)
+    @if($accountCount > 0 && $transactionCount > 0)
     <div class="col-lg-4 col-md-4">
         <table class="table table-condensed">
             @foreach($beneficiaries as $b)
@@ -227,7 +227,7 @@
 </div>
 
 <div class="row">
-    @if(count($accounts) > 0)
+    @if($accountCount > 0)
     <div class="col-lg-12 col-md-12"><h4>Other months</h4>
 
         @foreach($history as $h)

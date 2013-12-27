@@ -9,7 +9,6 @@
           <p>
               <strong>Your first account</strong>
           </p>
-
       </div>
       @endif
       </div>

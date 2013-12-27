@@ -54,11 +54,13 @@ class TransactionController extends BaseController
         }
         Session::put('previous', URL::previous());
 
+        $count = Auth::user()->transactions()->count();
+
         return View::make('transactions.add')->with(
             'title', 'Add a transaction'
         )->with('account', $account)->with('accounts', $accounts)->with(
                 'id', $account ? $account->id : null
-            );
+            )->with('count',$count);
     }
 
     /**
