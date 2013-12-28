@@ -12,6 +12,7 @@ class PageController extends BaseController
      *
      * @return View
      */
+    /*
     public function refineTransactions()
     {
         $list = [];
@@ -43,6 +44,7 @@ class PageController extends BaseController
 
         return View::make('home.refine')->with('list', $list);
     }
+    */
 
     /**
      * Recalculated EVERY balancemodifier.
@@ -135,6 +137,7 @@ class PageController extends BaseController
      *
      * @return \Illuminate\View\View
      */
+    /*
     public function compare()
     {
 
@@ -187,4 +190,5 @@ class PageController extends BaseController
 
         return View::make('home.compare')->with('data', $result);
     }
+    */
 } 

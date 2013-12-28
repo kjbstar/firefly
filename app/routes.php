@@ -60,6 +60,7 @@ Route::get(
     '/home/report/{year}',
     ['uses' => 'ReportController@showYearlyReport', 'as' => 'yearreport']
 );
+
 Route::get(
     '/home/reports',
     ['uses' => 'ReportController@showIndex', 'as' => 'reports']
@@ -311,10 +312,6 @@ Route::get(
     'as'    => 'accountoverviewchart']
 );
 
-
-Route::get('/home/refine', 'PageController@refineTransactions');
 Route::get(
     '/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']
 );
-
-Route::get('/home/compare', 'PageController@compare');
