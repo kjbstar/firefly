@@ -1,4 +1,11 @@
+@import url(http://fonts.googleapis.com/css?family=Inconsolata);
+
 .load-error {
-  background:url('/img/error.png') center center no-repeat;
-  min-height:30px;
+    background: url("/img/error.png") center center no-repeat;
+    min-height: 30px;
+}
+
+.money {
+    font-family: 'Inconsolata', monospace, sans-serif;
+
 }

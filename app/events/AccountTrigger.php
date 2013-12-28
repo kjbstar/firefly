@@ -31,13 +31,14 @@ class AccountTrigger
      */
     public function editAccount(Account $account)
     {
-        Cache::flush();
         $originalDate = new Carbon($account->getOriginal('openingbalancedate'));
         if ($account->openingbalancedate < $originalDate) {
             $this->triggerAccountDateToPast($account);
+            Cache::forget('getEarliestEvent');
         } else {
             if ($account->openingbalancedate > $originalDate) {
                 $this->triggerAccountDateToFuture($account);
+                Cache::forget('getEarliestEvent');
             }
         }
         if (floatval($account->openingbalance) != floatval(
@@ -171,6 +172,7 @@ class AccountTrigger
         $balanceModifier->account()->associate($account);
         $balanceModifier->balance = $account->openingbalance;
         $balanceModifier->save();
+        Cache::forget('getEarliestEvent');
     }
 
     /**

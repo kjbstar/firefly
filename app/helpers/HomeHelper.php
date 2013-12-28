@@ -82,27 +82,38 @@ class HomeHelper
      */
     public static function homeComponentChart($type, $year, $month)
     {
-        $date = Toolkit::parseDate($year, $month);
-        if (is_null($date)) {
-            $date = new Carbon;
-        }
 
-        $objects = self::homeComponentList(Str::singular($type), $date);
+        // prep some vars:
+        $date = Toolkit::parseDate($year, $month, new Carbon);
+        $past = clone $date;
+        $past->subMonth();
+
+        // get two lists of components.
+        $currentList = self::homeComponentList($type, $date, true);
+        $pastList = self::homeComponentList($type, $past, true);
+        unset($past);
+
+        // make a chart:
         $chart = App::make('gchart');
         $chart->addColumn(ucfirst($type), 'string');
         $chart->addColumn('Budgeted', 'number', 'old-data');
         $chart->addColumn('Amount', 'number');
 
-        foreach ($objects as $index => $data) {
-            // fix the amount:
-            $amount
-                = $data['amount'] < 0 ? $data['amount'] * -1 : $data['amount'];
-            $max = $data['limit'] ? $data['limit'] : $amount;
+        // loop the current list:
+        $index = 0;
+        foreach ($currentList as $id => $obj) {
             if ($index < 10) {
+                if (isset($pastList[$id])) {
+                    $oldValue = $pastList[$id]['amount'];
+                } else {
+                    $oldValue = $obj['limit'];
+                }
                 $chart->addRow(
-                    ['f' => $data['name'], 'v' => $data['id']], $max, $amount
+                    ['f' => $obj['name'], 'v' => $obj['id']], $oldValue,
+                    $obj['amount']
                 );
             }
+            $index++;
         }
         $chart->generate();
         $return = $chart->getData();
@@ -119,8 +130,9 @@ class HomeHelper
      *
      * @return array
      */
-    public static function homeComponentList($type, Carbon $date)
-    {
+    public static function homeComponentList(
+        $type, Carbon $date, $noNegatives = false
+    ) {
         $objects = [];
         // a special empty component:
         $empty = ['id'  => 0, 'name' => '(No ' . $type . ')', 'amount' => 0,
@@ -134,8 +146,14 @@ class HomeHelper
             ->expenses()->inMonth($date)->get();
 
         foreach ($transactions as $t) {
+            if ($noNegatives) {
+                $t->amount = $t->amount < 0 ? $t->amount * -1 : $t->amount;
+            }
+
+
             $component = $t->getComponentByType($type);
             if (is_null($component)) {
+
                 $empty['amount'] += $t->amount;
                 continue;
             }
@@ -166,7 +184,7 @@ class HomeHelper
             }
             unset($current);
         }
-        $objects[] = $empty;
+        $objects[0] = $empty;
 
         // loop the $limits array and check the $objects:
         foreach ($limits as $id => $limit) {
@@ -187,23 +205,23 @@ class HomeHelper
             }
             $objects[$id] = $object;
         }
-        $amount = [];
-        foreach ($objects as $key => $row) {
-            $amount[$key] = $row['amount'];
-        }
-
-        array_multisort($amount, SORT_ASC, $objects);
 
         return $objects;
     }
 
     public static function getEarliestEvent()
     {
-        $account = Auth::user()->accounts()->orderBy(
-            'openingbalancedate', 'ASC'
-        )->first();
+        if (Cache::has('getEarliestEvent')) {
+            return Cache::get('getEarliestEvent');
+        } else {
+            $account = Auth::user()->accounts()->orderBy(
+                'openingbalancedate', 'ASC'
+            )->first();
+            $date = $account->openingbalancedate;
+            Cache::forever('getEarliestEvent', $date);
 
-        return $account->openingbalancedate;
+            return $date;
+        }
     }
 
     /**
@@ -255,6 +273,7 @@ class HomeHelper
      */
     public static function homeAccountChart($year, $month)
     {
+
         // some dates:
         $realDay = new Carbon;
 

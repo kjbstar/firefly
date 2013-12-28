@@ -106,7 +106,7 @@
                 <td><a href="{{URL::Route('edittransaction',
                 $t->id)}}">{{{$t->description}}}</a>
                 </td>
-                <td>{{mf($t->amount,true)}}
+                <td style="text-align: right;">{{mf($t->amount,true)}}
             </tr>
             @endforeach
         </table>
@@ -147,12 +147,12 @@
             @endif
             >
                 <td><a href="{{$b['url']}}">{{{$b['name']}}}</a></td>
-                <td>{{mf($b['amount'],true)}}
+                <td style="text-align: right;">{{mf($b['amount'],true)}}
             </tr>
             @endforeach
             <tr>
             <td><em>Total</em></td>
-            <td>{{mf(0,true)}}
+            <td style="text-align: right;">{{mf(0,true)}}
             </tr>
         </table>
 
@@ -200,7 +200,7 @@
         <table class="table table-condensed">
             <tr>
                 <td><em>Total</em></td>
-                <td>{{mf(0,true)}}</td>
+                <td style="text-align: right;">{{mf(0,true)}}</td>
             </tr>
 
         </table>
@@ -214,12 +214,12 @@
             @endif
             >
             <td><a href="{{$c['url']}}">{{{$c['name']}}}</a></td>
-            <td>{{mf($c['amount'],true)}}
+            <td style="text-align: right;">{{mf($c['amount'],true)}}
                 </tr>
                 @endforeach
                 <tr>
                     <td><em>Total</em></td>
-                    <td>{{mf(0,true)}}
+                    <td style="text-align: right;">{{mf(0,true)}}
                 </tr>
         </table>
 

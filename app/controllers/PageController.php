@@ -1,5 +1,4 @@
 <?php
-use Carbon\Carbon as Carbon;
 
 /**
  * Class PageController

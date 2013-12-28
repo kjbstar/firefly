@@ -62,11 +62,29 @@ class HomeController extends BaseController
         $transactions = HomeHelper::homeTransactionList($today);
         $transfers = HomeHelper::homeTransferList($today);
         $budgets = HomeHelper::homeComponentList('budget', $today);
-
         $categories = HomeHelper::homeComponentList('category', $today);
         $beneficiaries = HomeHelper::homeComponentList('beneficiary', $today);
         $accountCount = Auth::user()->accounts()->count();
         $transactionCount = Auth::user()->transactions()->count();
+
+        // resort the component lists:
+        $amount = [];
+        foreach ($budgets as $key => $row) {
+            $amount[$key] = $row['amount'];
+        }
+        array_multisort($amount, SORT_ASC, $budgets);
+
+        $amount = [];
+        foreach ($categories as $key => $row) {
+            $amount[$key] = $row['amount'];
+        }
+        array_multisort($amount, SORT_ASC, $categories);
+
+        $amount = [];
+        foreach ($beneficiaries as $key => $row) {
+            $amount[$key] = $row['amount'];
+        }
+        array_multisort($amount, SORT_ASC, $beneficiaries);
 
         // build a history:
         $history = [];

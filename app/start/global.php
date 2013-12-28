@@ -83,14 +83,18 @@ App::down(function()
 setlocale(LC_MONETARY, 'nl_NL');
 function mf($n,$format=false) {
   if($format===false) {
-    return '&#8364; '.number_format($n,2,',','.');
+    return '<span class="money">&#8364; '.number_format($n,2,',',
+        '.').'</span>';
   } else {
     if($n === 0.0 || $n === 0 || is_null($n)) {
-      return '<span style="color:#999">&#8364; '.number_format($n,2,',','.').'</span>';
+      return '<span style="color:#999" class="money">&#8364; '.number_format
+      ($n,2,',',
+          '.').'</span>';
     } else if($n > 0) {
-      return '<span class="text-success">&#8364; '.number_format($n,2,',','.').'</span>';
+      return '<span class="text-success money">&#8364; '.number_format($n,2,
+          ',','.').'</span>';
     } else {
-      return '<span class="text-danger">&#8364; '.number_format($n,2,',','.').'</span>';
+      return '<span class="text-danger money">&#8364; '.number_format($n,2,',','.').'</span>';
     }
   }
 }
