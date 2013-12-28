@@ -149,6 +149,7 @@ class TransactionController extends BaseController
         $transaction->mark = Input::get('mark') == '1' ? 1 : 0;
 
         // beneficiary and budget:
+
         $ben = Component::findOrCreate(
             'beneficiary', Input::get('beneficiary')
         );
