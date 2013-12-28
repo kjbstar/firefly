@@ -93,16 +93,21 @@ class HomeHelper
         $chart->addColumn('Budgeted', 'number', 'old-data');
         $chart->addColumn('Amount', 'number');
 
-
+        $sum = 0;
         foreach ($objects as $index => $data) {
             // fix the amount:
             $amount
                 = $data['amount'] < 0 ? $data['amount'] * -1 : $data['amount'];
-            $max = $data['limit'] ?$data['limit'] : $amount;
+            $sum += $amount;
+            $max = $data['limit'] ? $data['limit'] : $amount;
             if ($index < 10) {
-                $chart->addRow(['f' => $data['name'], 'v' => $data['id']],
-                    $max,$amount);
+                $chart->addRow(
+                    ['f' => $data['name'], 'v' => $data['id']], $max, $amount
+                );
             }
+        }
+        if (count($objects) == 1 && $sum == 0) {
+            return [];
         }
         $chart->generate();
         $return = $chart->getData();
@@ -125,12 +130,6 @@ class HomeHelper
 
     }
 
-    public static function getEarliestEvent() {
-        $account = Auth::user()->accounts()->orderBy('openingbalancedate',
-            'ASC')->first();
-        return $account->openingbalancedate;
-    }
-
     /**
      * Returns a list of [type]s for the home page for a given date (month).
      *
@@ -143,7 +142,7 @@ class HomeHelper
     {
         $objects = [];
         // a special empty component:
-        $empty = ['id' => 0, 'name' => '(No ' . $type . ')', 'amount' => 0,
+        $empty = ['id'  => 0, 'name' => '(No ' . $type . ')', 'amount' => 0,
                   'url' => '#', 'limit' => null];
 
 
@@ -215,6 +214,15 @@ class HomeHelper
         array_multisort($amount, SORT_ASC, $objects);
 
         return $objects;
+    }
+
+    public static function getEarliestEvent()
+    {
+        $account = Auth::user()->accounts()->orderBy(
+            'openingbalancedate', 'ASC'
+        )->first();
+
+        return $account->openingbalancedate;
     }
 
     /**

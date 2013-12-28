@@ -60,7 +60,7 @@ class TransactionController extends BaseController
             'title', 'Add a transaction'
         )->with('account', $account)->with('accounts', $accounts)->with(
                 'id', $account ? $account->id : null
-            )->with('count',$count);
+            )->with('count', $count);
     }
 
     /**
@@ -95,25 +95,24 @@ class TransactionController extends BaseController
         );
         if ($validator->fails()) {
             return Redirect::route('addtransaction')->withInput()->withErrors(
-                    $validator
-                );
-        } else {
-            $transaction->save();
-
-            // attach the beneficiary, if it is set:
-            if (!is_null($ben)) {
-                $transaction->components()->attach($ben->id);
-            }
-            if (!is_null($bud)) {
-                $transaction->components()->attach($bud->id);
-            }
-            if (!is_null($cat)) {
-                $transaction->components()->attach($cat->id);
-            }
-            Session::flash('success', 'The transaction has been created.');
-
-            return Redirect::to(Session::get('previous'));
+                $validator
+            );
         }
+        $transaction->save();
+
+        // attach the beneficiary, if it is set:
+        if (!is_null($ben)) {
+            $transaction->components()->attach($ben->id);
+        }
+        if (!is_null($bud)) {
+            $transaction->components()->attach($bud->id);
+        }
+        if (!is_null($cat)) {
+            $transaction->components()->attach($cat->id);
+        }
+        Session::flash('success', 'The transaction has been created.');
+
+        return Redirect::to(Session::get('previous'));
     }
 
     /**
@@ -181,8 +180,8 @@ class TransactionController extends BaseController
         );
         if ($validator->fails()) {
             return Redirect::route('edittransaction')->withInput()->withErrors(
-                    $validator
-                );
+                $validator
+            );
         } else {
             $transaction->save();
             Session::flash('success', 'The transaction has been saved.');
