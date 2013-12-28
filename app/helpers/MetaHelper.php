@@ -76,7 +76,8 @@ class MetaHelper
      */
     public static function transactionsWithoutComponent($type)
     {
-        $query = Auth::user()->transactions()->with('components');
+        $query = Auth::user()->transactions()->orderBy('date','DESC')->with
+        ('components');
         $list = [];
         foreach ($query->get() as $tr) {
             if (!ListHelper::hasComponent($tr, $type)) {
