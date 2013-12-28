@@ -222,7 +222,7 @@ class AccountController extends BaseController
         // interval values
         $intervalAbove = 0;
         $intervalBelow = 0;
-        while ($past < $date) {
+        while ($past <= $date) {
             $current = clone $past;
             // do a prediction
             if ($current > $default) {

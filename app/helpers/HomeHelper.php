@@ -103,7 +103,7 @@ class HomeHelper
         $index = 0;
         foreach ($currentList as $id => $obj) {
             if ($index < 10) {
-                if (isset($pastList[$id])) {
+                if (isset($pastList[$id]) && $obj['amount'] > 0) {
                     $oldValue = $pastList[$id]['amount'];
                 } else {
                     $oldValue = $obj['limit'];
