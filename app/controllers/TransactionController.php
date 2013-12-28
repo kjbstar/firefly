@@ -101,15 +101,9 @@ class TransactionController extends BaseController
         $transaction->save();
 
         // attach the beneficiary, if it is set:
-        if (!is_null($ben)) {
-            $transaction->components()->attach($ben->id);
-        }
-        if (!is_null($bud)) {
-            $transaction->components()->attach($bud->id);
-        }
-        if (!is_null($cat)) {
-            $transaction->components()->attach($cat->id);
-        }
+        $transaction->attachComponent($ben);
+        $transaction->attachComponent($bud);
+        $transaction->attachComponent($cat);
         Session::flash('success', 'The transaction has been created.');
 
         return Redirect::to(Session::get('previous'));
@@ -164,15 +158,9 @@ class TransactionController extends BaseController
         );
         $transaction->components()->detach();
         // attach the beneficiary, if it is set:
-        if (!is_null($ben)) {
-            $transaction->components()->attach($ben->id);
-        }
-        if (!is_null($bud)) {
-            $transaction->components()->attach($bud->id);
-        }
-        if (!is_null($cat)) {
-            $transaction->components()->attach($cat->id);
-        }
+        $transaction->attachComponent($ben);
+        $transaction->attachComponent($bud);
+        $transaction->attachComponent($cat);
 
         // validate and save:
         $validator = Validator::make(

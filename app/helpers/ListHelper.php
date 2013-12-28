@@ -2,7 +2,9 @@
 use Carbon\Carbon as Carbon;
 
 
-
+/**
+ * Class ListHelper
+ */
 class ListHelper
 {
     /**

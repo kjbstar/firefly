@@ -16,35 +16,56 @@ class Transaction extends Eloquent
            'amount'      => 'required|numeric|between:-65536,65536|not_in:0',
            'ignore'      => 'required|numeric|between:0,1'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $appends = ['beneficiary', 'category', 'budget'];
 
-    protected $appends = ['beneficiary','category','budget'];
-
-
-
-    public function getBeneficiaryAttribute() {
-        foreach($this->components as $component) {
-            if($component->type == 'beneficiary') {
+    /**
+     * Get the beneficiary.
+     *
+     * @return Component|null
+     */
+    public function getBeneficiaryAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'beneficiary') {
                 return $component;
             }
         }
+
+        return null;
 
     }
 
-    public function getCategoryAttribute() {
-        foreach($this->components as $component) {
-            if($component->type == 'category') {
+    /**
+     * Get the category
+     *
+     * @return Component|null
+     */
+    public function getCategoryAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'category') {
                 return $component;
             }
         }
+
+        return null;
 
     }
-    public function getBudgetAttribute() {
-        foreach($this->components as $component) {
-            if($component->type == 'budget') {
+
+    /**
+     * Get the budget
+     *
+     * @return Component|null
+     */
+    public function getBudgetAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'budget') {
                 return $component;
             }
         }
 
+        return null;
     }
 
     /**
@@ -87,6 +108,19 @@ class Transaction extends Eloquent
 //    }
 
     /**
+     * Add the component to the transaction.
+     *
+     * @param Component $component
+     */
+    public function attachComponent(Component $component = null)
+    {
+        if (is_null($component)) {
+            return;
+        }
+        $this->components()->attach($component->id);
+    }
+
+    /**
      * Get all components belonging to this user.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -95,19 +129,6 @@ class Transaction extends Eloquent
     {
         return $this->belongsToMany('Component');
     }
-
-    /**
-     * Add the component to the transaction.
-     *
-     * @param Component $component
-     */
-//    public function addComponent(Component $component = null)
-//    {
-//        if (is_null($component)) {
-//            return;
-//        }
-//        $this->components()->attach($component->id);
-//    }
 
     /**
      * Returns true when the transaction is bound to a budget.
@@ -254,6 +275,14 @@ class Transaction extends Eloquent
         );
     }
 
+    /**
+     * Scope for a full year
+     *
+     * @param        $query
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
     public function scopeInYear($query, Carbon $date)
     {
         return $query->where(
@@ -317,12 +346,21 @@ class Transaction extends Eloquent
         return ['created_at', 'updated_at', 'date'];
     }
 
-    public function getComponentByType($type) {
-        foreach($this->components as $component) {
-            if($component->type == $type) {
+    /**
+     * Find component of type X.
+     *
+     * @param $type
+     *
+     * @return Component|null
+     */
+    public function getComponentByType($type)
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == $type) {
                 return $component;
             }
         }
+
         return null;
     }
 

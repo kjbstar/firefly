@@ -93,12 +93,10 @@ class HomeHelper
         $chart->addColumn('Budgeted', 'number', 'old-data');
         $chart->addColumn('Amount', 'number');
 
-        $sum = 0;
         foreach ($objects as $index => $data) {
             // fix the amount:
             $amount
                 = $data['amount'] < 0 ? $data['amount'] * -1 : $data['amount'];
-            $sum += $amount;
             $max = $data['limit'] ? $data['limit'] : $amount;
             if ($index < 10) {
                 $chart->addRow(
@@ -106,25 +104,8 @@ class HomeHelper
                 );
             }
         }
-        if (count($objects) == 1 && $sum == 0) {
-            return [];
-        }
         $chart->generate();
         $return = $chart->getData();
-
-        /*
-         * Now that the chart data is there, we can find out if these
-         * components have limits and supplement the information with
-         * "budgetary" information, displaying the limit we've set for these
-         * components (if any).
-         *
-         * Remember that limitData is a chart in itself and can be displayed
-         * seperately.
-         */
-
-//        $return['limitData'] = self::homeComponentChartLimitData(
-//            $limitedObjects, $date
-//        );
 
         return $return;
 
@@ -230,7 +211,8 @@ class HomeHelper
      * and possibly a limit that goes with it. The sum of the
      * returned list should be 2000, which currently is a hard coded value.
      *
-     * @param $data
+     * @param array  $data
+     * @param Carbon $date
      */
     public static function homeComponentChartLimitData($data, Carbon $date)
     {

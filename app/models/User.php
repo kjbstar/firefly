@@ -26,7 +26,13 @@ class User extends Eloquent implements UserInterface, RemindableInterface
         return $this->hasMany('Account');
     }
 
-    public function settings() {
+    /**
+     * Get the users settings.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function settings()
+    {
         return $this->hasMany('Setting');
     }
 
@@ -165,6 +171,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
     /**
      * These fields must be converted to Carbon objects.
+     *
      * @return array
      */
     public function getDates()

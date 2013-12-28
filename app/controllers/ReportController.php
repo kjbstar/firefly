@@ -1,24 +1,43 @@
 <?php
 use Carbon\Carbon as Carbon;
 
+require_once(app_path() . '/helpers/ReportHelper.php');
+
+
+/**
+ * Class ReportController
+ */
 class ReportController extends BaseController
 {
 
-    public function showIndex() {
-        $first = Auth::user()->accounts()->orderBy('openingbalancedate',
-            'ASC')->first()->openingbalancedate;
+    /**
+     * Show the index for the reports.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showIndex()
+    {
+        $first = Auth::user()->accounts()->orderBy(
+            'openingbalancedate', 'ASC'
+        )->first()->openingbalancedate;
         $now = new Carbon;
         $years = [];
-        while($first < $now) {
+        while ($first < $now) {
             $current = clone $first;
             $years[] = $current->format('Y');
             $first->addYear();
         }
 
-        return View::make('reports.index')->with('years',$years);
+        return View::make('reports.index')->with('years', $years);
     }
 
-
+    /**
+     * Shows the report for a year
+     *
+     * @param int $year The year.
+     *
+     * @return \Illuminate\View\View
+     */
     public function showYearlyReport($year)
     {
         $start = new Carbon($year . '-01-01');
@@ -27,17 +46,17 @@ class ReportController extends BaseController
         $end->endOfYear();
 
         // basic information:
-        $data = $this->basicInformation($start);
+        $data = ReportHelper::basicInformation($start);
         // account information:
-        $accounts = $this->accountInformation($start);
+        $accounts = ReportHelper::accountInformation($start);
 
-        $benefactors = $this->objectInformation(
+        $benefactors = ReportHelper::objectInformation(
             $start, 'beneficiary', SORT_DESC
         );
-        $fans = $this->objectInformation(
+        $fans = ReportHelper::objectInformation(
             $start, 'beneficiary', SORT_ASC
         );
-        $spentMostCategories = $this->objectInformation(
+        $spentMostCategories = ReportHelper::objectInformation(
             $start, 'category', SORT_ASC
         );
 
@@ -52,81 +71,13 @@ class ReportController extends BaseController
             );
     }
 
-    private function basicInformation(Carbon $date)
-    {
-        $data = [];
-        $income = floatval(
-            Auth::user()->transactions()->incomes()->inYear($date)->sum(
-                'amount'
-            )
-        );
-        $expenses = floatval(
-            Auth::user()->transactions()->expenses()->inYear($date)->sum(
-                'amount'
-            )
-        );
-        $data['totalEarned'] = $income;
-        $data['totalSpent'] = $expenses;
-        $data['totalDiff'] = $expenses + $income;
-
-        return $data;
-
-    }
-
-    private function accountInformation(Carbon $date)
-    {
-        $end = clone $date;
-        $end->endOfYear();
-        $accounts = [];
-        $accounts['accounts'] = Auth::user()->accounts()->get();
-        $startNw = 0;
-        $endNw = 0;
-        foreach ($accounts['accounts'] as $account) {
-            $startNw += $account->balanceOnDate($date);
-            $endNw += $account->balanceOnDate($end);
-        }
-        $diffNw = $endNw - $startNw;
-        $accounts['netWorthStart'] = $startNw;
-        $accounts['netWorthEnd'] = $endNw;
-        $accounts['netWorthDifference'] = $diffNw;
-
-        return $accounts;
-    }
-
-    private function objectInformation(
-        Carbon $date, $type, $sortFlag
-    ) {
-
-        $objects = Auth::user()->components()->where('type', $type)->get();
-        $rawData = [];
-        $amount = [];
-        foreach ($objects as $object) {
-            $rawData[] = ['id'  => $object->id, 'name' => $object->name,
-                          'sum' => floatval(
-                              $object->transactions()->inYear($date)->sum(
-                                  'amount'
-                              )
-                          )];
-        }
-
-        foreach ($rawData as $key => $row) {
-            $amount[$key] = $row['sum'];
-        }
-
-        // sort by amount:
-        array_multisort($amount, $sortFlag, $rawData);
-        $finalData = [];
-        foreach ($rawData as $index => $obj) {
-            if ($index > 10) {
-                break;
-            }
-            $finalData[] = $obj;
-        }
-
-        return $finalData;
-
-    }
-
+    /**
+     * Generates the chart with income / expenses and your net worth.
+     *
+     * @param $year
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function netWorthChart($year)
     {
         $start = new Carbon($year . '-01-01');
@@ -173,11 +124,21 @@ class ReportController extends BaseController
         return Response::json($chart->getData());
     }
 
+    /**
+     * Generates a pie chart of your top 10 components ($type) ordered by
+     * $sort, in the year $year.
+     *
+     * @param int    $year The year
+     * @param string $type The component
+     * @param string $sort asc|desc
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function objectChart($year, $type, $sort)
     {
         $sortFlag = $sort == 'asc' ? SORT_ASC : SORT_DESC;
         $date = new Carbon($year . '-01-01');
-        $data = $this->objectInformation($date, $type, $sortFlag);
+        $data = ReportHelper::objectInformation($date, $type, $sortFlag);
 
         // make chart
         $chart = App::make('gchart');
