@@ -266,11 +266,29 @@ class Transaction extends Eloquent
      *
      * @return mixed
      */
-    public function scopeHasComponent($query, $component)
+    public function scopeHasComponentType($query, $component)
     {
         return $query->with(
             ['components' => function ($query) use ($component) {
                     $query->where('components.type', $component);
+                }]
+        );
+    }
+
+    /**
+     * Limits the scope to only transactions with a component of type
+     * $component.
+     *
+     * @param $query
+     * @param $component
+     *
+     * @return mixed
+     */
+    public function scopeHasComponent($query, Component $component)
+    {
+        return $query->with(
+            ['components' => function ($query) use ($component) {
+                    $query->where('components.id', $component->id);
                 }]
         );
     }
