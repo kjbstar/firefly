@@ -13,7 +13,7 @@
                 <td>{{$t['date']->format('d m Y')}}</td>
                 <td>{{$t['otherdate']->format('d m Y')}}</td>
                 <td>{{mf($t['amount'])}}</td>
-                <td><small>{{$t['descr']}}</small></td>
+                <td><small>{{{$t['descr']}}}</small></td>
                 @if($t['transaction'] === false)
                 <td class="danger">NOT FOUND</td>
                 @endif

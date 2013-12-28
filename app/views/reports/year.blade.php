@@ -70,7 +70,7 @@
             </tr>
         @foreach($accounts['accounts'] as $a)
         <tr>
-            <td>{{$a->name}}</td>
+            <td>{{{$a->name}}}</td>
             <td style="text-align:right;">{{mf($a->balanceOnDate($date),false)}}</td>
             <td style="text-align:right;">{{mf($a->balanceOnDate($end),false)}}</td>
             <td style="text-align:right;">{{mf($a->balanceOnDate($end)-$a->balanceOnDate($date),false)}}</td>
@@ -114,7 +114,8 @@
         <table class="table table-bordered table-striped">
         @foreach($benefactors as $x)
         <tr>
-            <td><a href="{{URL::Route('beneficiaryoverview',$x['id'])}}" title="{{$x['name']}}">{{$x['name']}}</a></td>
+            <td><a href="{{URL::Route('beneficiaryoverview',
+            $x['id'])}}" title="{{{$x['name']}}}">{{{$x['name']}}}</a></td>
             <td style="text-align:right;">{{mf($x['sum'],true)}}</td>
         </tr>
         @endforeach
@@ -128,7 +129,8 @@
         <table class="table table-bordered table-striped">
             @foreach($fans as $x)
             <tr>
-                <td><a href="{{URL::Route('beneficiaryoverview',$x['id'])}}" title="{{$x['name']}}">{{$x['name']}}</a></td>
+                <td><a href="{{URL::Route('beneficiaryoverview',
+                $x['id'])}}" title="{{{$x['name']}}}">{{{$x['name']}}}</a></td>
                 <td style="text-align:right;">{{mf($x['sum'],true)}}</td>
             </tr>
             @endforeach
@@ -141,7 +143,8 @@
         <table class="table table-bordered table-striped">
             @foreach($spentMostCategories as $x)
             <tr>
-                <td><a href="{{URL::Route('categoryoverview',$x['id'])}}" title="{{$x['name']}}">{{$x['name']}}</a></td>
+                <td><a href="{{URL::Route('categoryoverview',
+                $x['id'])}}" title="{{{$x['name']}}}">{{{$x['name']}}}</a></td>
                 <td style="text-align:right;">{{mf($x['sum'],true)}}</td>
             </tr>
             @endforeach

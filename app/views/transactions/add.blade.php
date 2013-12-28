@@ -6,7 +6,7 @@
         <h3>
             Add a new transaction
             @if($account)
-            to {{$account->name}}
+            to {{{$account->name}}}
             @endif
         </h3>
         @if($count == 0)
@@ -42,7 +42,9 @@
              ">
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
-                <input type="text" name="description" class="form-control" value="{{Input::old('description')}}" id="inputDescription" placeholder="Description">
+                <input type="text" name="description" class="form-control"
+                       value="{{{Input::old('description')}}}"
+                       id="inputDescription" placeholder="Description">
                 @if($errors->has('description'))
                 <span class="text-danger">{{$errors->first('description')
                     }}</span><br />
@@ -128,7 +130,8 @@
         <div class="form-group">
             <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
             <div class="col-sm-9">
-                <input type="text" value="{{Input::old('beneficiary')}}" name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
+                <input type="text" value="{{{Input::old('beneficiary')}}}"
+                       name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
                 <br />
                 @if($count == 0)
                 <span class="text-info">
@@ -143,7 +146,7 @@
         <div class="form-group">
             <label for="inputCategory" class="col-sm-3 control-label">Category</label>
             <div class="col-sm-9">
-                <input type="text" value="{{Input::old('category')}}"
+                <input type="text" value="{{{Input::old('category')}}}"
                        name="category" class="form-control"
                        id="inputCategory" autocomplete="off" /><br />
                 @if($count == 0)
@@ -159,7 +162,7 @@
         <div class="form-group">
             <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
             <div class="col-sm-9">
-                <input type="text" value="{{Input::old('budget')}}"
+                <input type="text" value="{{{Input::old('budget')}}}"
                        name="budget" class="form-control" id="inputBudget"
                        autocomplete="off" /><br />
                 @if($count == 0)

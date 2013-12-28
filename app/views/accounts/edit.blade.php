@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
   <div class="col-lg-6">
-    <h3>Edit {{$account->name}}</h3>
+    <h3>Edit {{{$account->name}}}</h3>
 
     {{Form::open(['class' => 'form-horizontal'])}}
     
@@ -15,7 +15,9 @@
              ">
             <label for="inputName" class="col-sm-4 control-label">Name</label>
             <div class="col-sm-8">
-                <input type="text" name="name" class="form-control" value="{{$account->name}}" id="inputName" placeholder="{{$account->name}}">
+                <input type="text" name="name" class="form-control"
+                       value="{{{$account->name}}}" id="inputName"
+                       placeholder="{{{$account->name}}}">
                 @if($errors->has('name'))
                 <span class="text-danger">{{$errors->first('name')}}</span>
                 @endif

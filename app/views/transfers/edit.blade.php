@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h3>
-            Edit transfer {{$transfer->description}}
+            Edit transfer {{{$transfer->description}}}
         </h3>
     </div>
 </div>
@@ -22,7 +22,9 @@
              ">
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
-                <input type="text" name="description" class="form-control" value="{{Input::old('description') ? Input::old('description') : $transfer->description}}" id="inputDescription" placeholder="Description">
+                <input type="text" name="description" class="form-control"
+                       value="{{{Input::old('description') ? Input::old
+                       ('description') : $transfer->description}}}" id="inputDescription" placeholder="Description">
                 @if($errors->has('description'))
                 <span class="text-danger">{{$errors->first('description')}}</span>
                 @endif

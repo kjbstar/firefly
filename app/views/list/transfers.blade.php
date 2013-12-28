@@ -10,10 +10,13 @@
     @foreach($transfers as $t)
     <tr>
         <td>{{$t->date->format('D d F Y')}}</td>
-        <td><a href="{{URL::Route('edittransfer',[$t->id])}}">{{$t->description}}</a></td>
+        <td><a href="{{URL::Route('edittransfer',
+        [$t->id])}}">{{{$t->description}}}</a></td>
         <td>{{mf($t->amount,true)}}</td>
-        <td><a href="{{URL::Route('accountoverview',[$t->accountfrom_id])}}">{{$t->accountfrom()->first()->name}}</a></td>
-        <td><a href="{{URL::Route('accountoverview',[$t->accountto_id])}}">{{$t->accountto()->first()->name}}</a></td>
+        <td><a href="{{URL::Route('accountoverview',[$t->accountfrom_id])
+        }}">{{{$t->accountfrom()->first()->name}}}</a></td>
+        <td><a href="{{URL::Route('accountoverview',
+        [$t->accountto_id])}}">{{{$t->accountto()->first()->name}}}</a></td>
         <td>
             <div class="btn-group">
                 <a href="{{URL::Route('edittransfer',[$t->id])}}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>

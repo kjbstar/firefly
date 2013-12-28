@@ -23,7 +23,8 @@
 
       <li class="list-group-item">
         <span class="badge">{{$o['count']}}</span>
-        <a href="{{URL::Route(OBJ.'overview',array($o['id']))}}">{{$o['name']}}</a>
+        <a href="{{URL::Route(OBJ.'overview',
+        array($o['id']))}}">{{{$o['name']}}}</a>
 
         <div class="btn-group pull-right">
           <a href="{{URL::Route('edit'.OBJ,[$o['id']])}}" class="btn btn-default btn-xs"><span
@@ -39,7 +40,8 @@
       <li class="list-group-item">
         <span class="badge">{{$child['count']}}</span>
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="{{URL::Route(OBJ.'overview',array($child['id']))}}">{{$child['name']}}</a>
+        <a href="{{URL::Route(OBJ.'overview',array($child['id']))
+        }}">{{{$child['name']}}}</a>
 
         <div class="btn-group pull-right">
           <a href="{{URL::Route('edit'.OBJ,[$child['id']])}}" class="btn btn-default btn-xs"><span

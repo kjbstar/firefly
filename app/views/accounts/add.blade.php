@@ -27,7 +27,9 @@
              ">
             <label for="inputName" class="col-sm-4 control-label">Name</label>
             <div class="col-sm-8">
-                <input type="text" name="name" class="form-control" value="{{Input::old('name')}}" id="inputName" placeholder="Name">
+                <input type="text" name="name" class="form-control"
+                       value="{{{Input::old('name')}}}" id="inputName"
+                       placeholder="Name">
                 @if($errors->has('name'))
                 <span class="text-danger">{{$errors->first('name')
                     }}</span><br />

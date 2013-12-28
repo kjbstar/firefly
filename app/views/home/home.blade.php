@@ -90,7 +90,7 @@
         <table class="table table-condensed table-bordered">
             @foreach($accounts as $account)
             <tr>
-                <td><a href="{{$account['url']}}">{{$account['name']}}</a
+                <td><a href="{{$account['url']}}">{{{$account['name']}}}</a
                         ></td>
                 <td class="lead" style="text-align:right;">{{mf
                     ($account['current'],true)}}</td>
@@ -103,7 +103,8 @@
             @foreach($transactions as $t)
             <tr>
                 <td>{{$t->date->format('j F Y')}}</td>
-                <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a>
+                <td><a href="{{URL::Route('edittransaction',
+                $t->id)}}">{{{$t->description}}}</a>
                 </td>
                 <td>{{mf($t->amount,true)}}
             </tr>
@@ -145,7 +146,7 @@
             class="danger"
             @endif
             >
-                <td><a href="{{$b['url']}}">{{$b['name']}}</a></td>
+                <td><a href="{{$b['url']}}">{{{$b['name']}}}</a></td>
                 <td>{{mf($b['amount'],true)}}
             </tr>
             @endforeach
@@ -158,7 +159,7 @@
     </div>
     <div class="col-lg-4 col-md-4">
         @foreach($budgets as $budget)
-        <h5><a href="{{$budget['url']}}">{{$budget['name']}}</a></h5>
+        <h5><a href="{{$budget['url']}}">{{{$budget['name']}}}</a></h5>
 
         <div class="progress progress-striped" style="height:10px;">
             @if(isset($budget['overpct']))
@@ -212,7 +213,7 @@
             class="danger"
             @endif
             >
-            <td><a href="{{$c['url']}}">{{$c['name']}}</a></td>
+            <td><a href="{{$c['url']}}">{{{$c['name']}}}</a></td>
             <td>{{mf($c['amount'],true)}}
                 </tr>
                 @endforeach

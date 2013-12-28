@@ -9,7 +9,9 @@
 
     <div class="form-group">
       <label for="inputName">{{ucfirst(OBJ)}} name / identifier</label>
-      <input type="text" name="name" class="form-control" id="inputName" placeholder="{{ucfirst(OBJ)}} Name" value="{{Input::old('name')}}"><br />
+      <input type="text" name="name" class="form-control" id="inputName"
+             placeholder="{{ucfirst(OBJ)}} Name" value="{{{Input::old('name')
+             }}}"><br />
       <span class="text-danger">{{$errors->first('name')}}</span>
     </div>
 

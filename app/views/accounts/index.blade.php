@@ -18,7 +18,7 @@
                    @if($account->hidden == 1)
                    class="text-warning"
                    @endif
-                   >{{$account->name}}</a>
+                   >{{{$account->name}}}</a>
                 <div class="btn-group pull-right">
                     <a href="{{URL::Route('editaccount',[$account->id])}}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a> <a href="{{URL::Route('deleteaccount',[$account->id])}}" class="btn btn-default btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;&nbsp;
                 </div>

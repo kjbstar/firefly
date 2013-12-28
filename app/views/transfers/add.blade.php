@@ -6,7 +6,7 @@
         <h3>
             Add a new transfer
             @if($account)
-            going from {{$account->name}}
+            going from {{{$account->name}}}
             @endif
         </h3>
     </div>
@@ -25,7 +25,9 @@
              ">
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
-                <input type="text" name="description" class="form-control" value="{{Input::old('description')}}" id="inputDescription" placeholder="Description">
+                <input type="text" name="description" class="form-control"
+                       value="{{{Input::old('description')}}}"
+                       id="inputDescription" placeholder="Description">
                 @if($errors->has('description'))
                 <span class="text-danger">{{$errors->first('description')}}</span>
                 @endif

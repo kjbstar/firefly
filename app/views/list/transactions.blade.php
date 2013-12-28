@@ -22,22 +22,28 @@
                     <span class="glyphicon glyphicon-ok" title="Marked in charts"></span>
                     @endif
                 </td>
-                <td><a href="{{URL::Route('edittransaction',[$t->id])}}">{{$t->description}}</a></td>
+                <td><a href="{{URL::Route('edittransaction',
+                [$t->id])}}">{{{$t->description}}}</a></td>
                 <td>{{mf($t->amount,true)}}</td>
-                <td><a href="{{URL::Route('accountoverview',[$t->account_id])}}">{{$t->account()->first()->name}}</a></td>
+                <td><a href="{{URL::Route('accountoverview',
+                [$t->account_id])}}">{{{$t->account()->first()
+                        ->name}}}</a></td>
                 <td>
                     @if(!is_null($t->beneficiary))
-                    <a href="{{URL::Route('beneficiaryoverview',[$t->beneficiary->id])}}">{{$t->beneficiary->name}}</a>
+                    <a href="{{URL::Route('beneficiaryoverview',
+                    [$t->beneficiary->id])}}">{{{$t->beneficiary->name}}}</a>
                     @endif
                 </td>
                 <td>
                     @if(!is_null($t->category))
-                    <a href="{{URL::Route('categoryoverview',[$t->category->id])}}">{{$t->category->name}}</a>
+                    <a href="{{URL::Route('categoryoverview',
+                    [$t->category->id])}}">{{{$t->category->name}}}</a>
                     @endif
                 </td>
                 <td>
                     @if(!is_null($t->budget))
-                    <a href="{{URL::Route('budgetoverview',[$t->budget->id])}}">{{$t->budget->name}}</a>
+                    <a href="{{URL::Route('budgetoverview',
+                    [$t->budget->id])}}">{{{$t->budget->name}}}</a>
                     @endif
                 </td>
                 <td>

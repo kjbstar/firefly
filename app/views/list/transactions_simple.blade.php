@@ -18,7 +18,8 @@
     @foreach($transactions as $t)
     <tr>
         <td>{{$t->date->format('d-m-Y')}}</td>
-        <td><a href="{{URL::Route('edittransaction',[$t->id])}}">{{$t->description}}</a>
+        <td><a href="{{URL::Route('edittransaction',
+        [$t->id])}}">{{{$t->description}}}</a>
         </td>
         <td>{{mf($t->amount,true)}}</td>
         <td>{{$t->pct}}%</td>

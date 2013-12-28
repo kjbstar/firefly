@@ -3,7 +3,11 @@
 @section('content')
 <div class="row">
     <div class="col-lg-6">
-        <h3>Overview for {{$account->name}}</h3>
+        <h3>Overview for {{{$account->name}}}
+            @if(!is_null($date))
+            in {{$date->format('F Y')}}
+            @endif
+        </h3>
         <div class="btn-group">
             <a href="{{URL::Route('addtransaction',[$account->id])}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
             <a href="{{URL::Route('addtransfer',[$account->id])}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transfer</a>
@@ -89,7 +93,7 @@
 @stop
 @section('scripts')
 <script type="text/javascript">
-    var id = {{$account->id}};
+    var id = {{{$account->id}}};
     @if(!is_null($date))
     var month = {{$date->format('m')}};
     var year = {{$date->format('Y')}};

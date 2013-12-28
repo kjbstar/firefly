@@ -8,7 +8,9 @@
     {{Form::open()}}
     <div class="form-group">
       <label for="inputName">{{ucfirst(OBJ)}} name / identifier</label>
-      <input type="text" name="name" class="form-control" id="inputName" placeholder="{{$object->name}}" value="{{$object->name}}"><br />
+      <input type="text" name="name" class="form-control" id="inputName"
+             placeholder="{{{$object->name}}}" value="{{{$object->name}}}"><br
+            />
       <span class="text-danger">{{$errors->first('name')}}</span>
     </div>
 
