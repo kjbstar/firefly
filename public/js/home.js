@@ -13,10 +13,10 @@ var pieChartOpt = {
     height: 200,
     legend: {position: 'none'},
     chartArea: {
-        width: 160,
-        height: 160
+        width: 180,
+        height: 180
     },
-    diff: {innerCircle: { radiusFactor: 0.3 }},
+    diff: {innerCircle: { radiusFactor: 0.4 }},
     pieSliceText: 'none'
 };
 
