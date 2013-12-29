@@ -21,7 +21,8 @@ class HomeHelper
     {
         $start = clone $date;
         $start->startOfMonth();
-        $query = Auth::user()->accounts()->notHidden()->get();
+        $query = Auth::user()->accounts()->remember(1440, 'homeAccountList')
+            ->notHidden()->get();
         $accounts = [];
 
         foreach ($query as $account) {
@@ -142,8 +143,13 @@ class HomeHelper
         $limits = [];
         // get all transactions for this month.
         // later on, we filter on the component.
-        $transactions = Auth::user()->transactions()->with('components')
-            ->expenses()->inMonth($date)->get();
+        $transactions = Auth::user()->transactions()->with(
+            ['components'              => function ($query) use ($type) {
+                    return $query->where('type', $type);
+                }, 'components.limits' => function ($query) use ($date) {
+                    return $query->inMonth($date);
+                }]
+        )->expenses()->inMonth($date)->get();
 
         foreach ($transactions as $t) {
             if ($noNegatives) {
@@ -177,7 +183,7 @@ class HomeHelper
                 $objects[$id] = $current;
                 // find a limit for this month
                 // and save it to $limits
-                $limit = $component->limits()->inMonth($date)->first();
+                $limit = $component->limits->first();
                 if ($limit) {
                     $limits[$id] = $limit;
                 }

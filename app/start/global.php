@@ -11,15 +11,15 @@
 |
 */
 
-ClassLoader::addDirectories(array(
+ClassLoader::addDirectories(
+    array(
 
-	app_path().'/commands',
-	app_path().'/controllers',
-	app_path().'/models',
-	app_path().'/database/seeds',
+    app_path() . '/commands', app_path() . '/controllers',
+    app_path() . '/models', app_path() . '/database/seeds',
 
 
-));
+    )
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -32,9 +32,9 @@ ClassLoader::addDirectories(array(
 |
 */
 
-$logFile = 'log-'.php_sapi_name().'.txt';
+$logFile = 'log-' . php_sapi_name() . '.txt';
 
-Log::useDailyFiles(storage_path().'/logs/'.$logFile);
+Log::useDailyFiles(storage_path() . '/logs/' . $logFile);
 
 /*
 |--------------------------------------------------------------------------
@@ -49,10 +49,11 @@ Log::useDailyFiles(storage_path().'/logs/'.$logFile);
 |
 */
 
-App::error(function(Exception $exception, $code)
-{
-	Log::error($exception);
-});
+App::error(
+    function (Exception $exception, $code) {
+        Log::error($exception);
+    }
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -65,10 +66,11 @@ App::error(function(Exception $exception, $code)
 |
 */
 
-App::down(function()
-{
-	return Response::make("Be right back!", 503);
-});
+App::down(
+    function () {
+        return Response::make("Be right back!", 503);
+    }
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -80,27 +82,30 @@ App::down(function()
 | definitions instead of putting them all in the main routes file.
 |
 */
-setlocale(LC_MONETARY, 'nl_NL');
-function mf($n,$format=false) {
-  if($format===false) {
-    return '<span class="money">&#8364; '.number_format($n,2,',',
-        '.').'</span>';
-  } else {
-    if($n === 0.0 || $n === 0 || is_null($n)) {
-      return '<span style="color:#999" class="money">&#8364; '.number_format
-      ($n,2,',',
-          '.').'</span>';
-    } else if($n > 0) {
-      return '<span class="text-success money">&#8364; '.number_format($n,2,
-          ',','.').'</span>';
-    } else {
-      return '<span class="text-danger money">&#8364; '.number_format($n,2,',','.').'</span>';
+function mf($n, $coloured = false, $list = true)
+{
+    $n = floatval($n);
+    $string = number_format($n, 2, ',', '.');
+    if ($list === true) {
+        $string = str_pad($string, 10, '_', STR_PAD_LEFT);
+        $string = str_replace('_', '&nbsp;', $string);
     }
-  }
+
+    if ($coloured === true && $n === 0.0) {
+        return '<span style="color:#999" class="money">&#8364;' . $string
+        . '</span>';
+    }
+    if ($coloured === true && $n > 0) {
+        return '<span class="text-success money">&#8364;' . $string . '</span>';
+    }
+    if ($coloured === true && $n < 0) {
+        return '<span class="text-danger money">&#8364;' . $string . '</span>';
+    }
+
+    return '<span class="money">&#8364; ' . $string . '</span>';
 }
 
-require app_path().'/filters.php';
-require app_path().'/events/TransactionTrigger.php';
-require app_path().'/events/TransferTrigger.php';
-//require app_path().'/events/TagTrigger.php';
-require app_path().'/events/AccountTrigger.php';
+require app_path() . '/filters.php';
+require app_path() . '/events/TransactionTrigger.php';
+require app_path() . '/events/TransferTrigger.php';
+require app_path() . '/events/AccountTrigger.php';

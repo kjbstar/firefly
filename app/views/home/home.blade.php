@@ -92,7 +92,7 @@
             <tr>
                 <td><a href="{{$account['url']}}">{{{$account['name']}}}</a
                         ></td>
-                <td class="lead" style="text-align:right;">{{mf
+                <td style="text-align:right;">{{mf
                     ($account['current'],true)}}</td>
             </tr>
             @endforeach
@@ -186,13 +186,13 @@
         <p>
             <small>
                 @if($budget['limit'])
-                Limit: {{mf($budget['limit'])}}.
+                Limit: {{mf($budget['limit'],false,false)}}.
                 @endif
                 @if(isset($budget['overspent']))
-            <span class="text-danger">Spent: {{mf($budget['amount']*-1)}}
+            <span class="text-danger">Spent: {{mf($budget['amount']*-1,false,false)}}
                 .</span>
                 @else
-                Spent: {{mf($budget['amount']*-1)}}.
+                Spent: {{mf($budget['amount']*-1,false,false)}}.
                 @endif
             </small>
         </p>
