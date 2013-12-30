@@ -1,5 +1,5 @@
 // load google
-google.load('visualization', '1.0', {'packages': ['corechart']});
+google.load('visualization', '1.1', {'packages': ['corechart']});
 google.setOnLoadCallback(drawAllCharts);
 
 
@@ -45,7 +45,7 @@ function drawAllCharts() {
         var holder = $(value);
         var obj = holder.data('object');
         var compare = holder.data('compare');
-
+        var holderID = holder.attr('id');
 
 
         $.getJSON('/home/meta/piechart', {
@@ -62,9 +62,8 @@ function drawAllCharts() {
                 var gdata = new google.visualization.DataTable(data);
                 var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
                 money.format(gdata, 1);
-                var chart = new google.visualization.PieChart(document.getElementById(holder.attr('id')));
+                var chart = new google.visualization.PieChart(document.getElementById(holderID));
                 chart.draw(gdata, opt);
-
             }).fail(function () {
                 holder.addClass('load-error');
             });

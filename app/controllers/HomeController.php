@@ -44,7 +44,7 @@ class HomeController extends BaseController
     /**
      * Show the homepage. Can be for another month.
      *
-     * @param int $year  The year
+     * @param int $year The year
      * @param int $month The month
      *
      * @return View
@@ -52,10 +52,7 @@ class HomeController extends BaseController
     public function showHome($year = null, $month = null)
     {
         $earliest = HomeHelper::getEarliestEvent();
-        $today = Toolkit::parseDate($year, $month);
-        if (is_null($today)) {
-            $today = new Carbon;
-        }
+        $today = Toolkit::parseDate($year, $month, new Carbon);
 
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
@@ -102,6 +99,10 @@ class HomeController extends BaseController
             $now->subMonth();
         }
 
+        // get some budgetary information:
+        $budgetInfo = HomeHelper::getBudgetaryInformation($today);
+
+
         return View::make('home.home')->with('title', 'Home')->with(
             'accounts', $accounts
         )->with('today', $today)->with(
@@ -112,8 +113,11 @@ class HomeController extends BaseController
                 'categories', $categories
             )->with(
                 'history', $history
-            )->with('accountCount',$accountCount)->with('transactionCount',
-                $transactionCount);
+            )->with('accountCount', $accountCount)->with(
+                'transactionCount', $transactionCount
+            )->with(
+                'budgetInfo', $budgetInfo
+            );
     }
 
     /**

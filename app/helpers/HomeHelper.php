@@ -44,6 +44,44 @@ class HomeHelper
         return $accounts;
     }
 
+    public static function getBudgetaryInformation(Carbon $date)
+    {
+        // default values and array
+        $defaultBudget = Setting::getSetting('defaultBudget');
+        $amount = floatval($defaultBudget->value);
+        $budget = ['amount' => $amount,'over' => false];
+        $days = round((intval($date->format('d')) / intval($date->format('t')
+            ))*100);
+        $budget['days'] = $days;
+        // start!
+        if ($amount > 0) {
+            $spent = floatval(
+                    Auth::user()->transactions()->inMonth($date)->expenses()
+                        ->sum(
+                            'amount'
+                        )
+                ) * -1;
+            $budget['spent'] = $spent;
+            // overspent this budget:
+            if($spent > $amount) {
+                $budget['over'] =true;
+                $budget['pct'] = round(($amount / $spent)*100);
+            }
+            // did not overspend this budget.
+            if($spent <= $amount) {
+                $budget['pct'] = round(($spent / $amount) * 100);
+            }
+
+//            $budgetInfo['spent']
+//                = $budgetInfo['spentPCT'] = round(
+//                ($budgetInfo['spent'] / floatval($defaultBudget->value)) * 100
+//            );
+//            $budgetInfo['spentPCT']
+//                = $budgetInfo['spentPCT'] > 100 ? 100 : $budgetInfo['spentPCT'];
+        }
+        return $budget;
+    }
+
     /**
      * Returns a list of transactions for the home page for a given month.
      *
@@ -137,7 +175,7 @@ class HomeHelper
         $objects = [];
         // a special empty component:
         $empty = ['id'  => 0, 'name' => '(No ' . $type . ')', 'amount' => 0,
-                  'url' => '#', 'limit' => null];
+                  'url' => URL::Route('empty'.$type), 'limit' => null];
 
 
         $limits = [];
@@ -287,6 +325,7 @@ class HomeHelper
         $date->endOfMonth();
         $start = clone $date;
         $start->startOfMonth();
+        $start->subDay(); // also last day of previous month
 
         $chart = App::make('gchart');
         $chart->addColumn('Day of the month', 'date');

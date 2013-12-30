@@ -22,6 +22,14 @@ Breadcrumbs::register(
     }
 );
 
+Breadcrumbs::register(
+
+    'budgeting', function ($breadcrumbs) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push('Budgeting', route('budgeting'));
+    }
+);
+
 
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),

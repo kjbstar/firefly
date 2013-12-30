@@ -25,7 +25,7 @@
                 @if(isset($date))
               <td>{{mf($component->transactions()->where(DB::Raw('DATE_FORMAT(`date`,"%m-%Y")'), '=', $date->format('m-Y'))->avg('amount'),true)}}</td>
                 @else
-                  <td>{{mf($component->transactions()->avg('amount'),true)}}</td>
+                  <td>{{mf($component->transactions()->avg('amount'),true,true)}}</td>
                 @endif
             </tr>
             <tr>
@@ -33,7 +33,8 @@
               @if(isset($date))
               <td>{{mf($component->transactions()->where(DB::Raw('DATE_FORMAT(`date`,"%m-%Y")'), '=', $date->format('m-Y'))->sum('amount'),true)}}</td>
               @else
-                <td>{{mf($component->transactions()->sum('amount'),true)}}</td>
+                <td>{{mf($component->transactions()->sum('amount'),true,true
+                    )}}</td>
               @endif
             </tr>
             <tr>
@@ -81,9 +82,9 @@
                 <td><a href="{{$m['url']}}"
                        title="{{$m['month']}}">{{$m['title']}}</a></td>
                 <td>{{$m['count']}}</td>
-                <td>{{mf($m['avg'],true)}}</td>
+                <td>{{mf($m['avg'],true,true)}}</td>
                 @if(isset($m['limit']))
-                <td>{{mf($m['limit'])}}</td>
+                <td>{{mf($m['limit'],false,true)}}</td>
                 <td>
 
                     <div class="btn-group">
@@ -98,9 +99,9 @@
                 @endif
 
                 @if(isset($m['limit']) && ($m['sum']*-1) > $m['limit'])
-                <td class="danger">{{mf($m['sum'])}}</td>
+                <td class="danger">{{mf($m['sum'],false,true)}}</td>
                 @else
-                <td>{{mf($m['sum'])}}</td>
+                <td>{{mf($m['sum'],false,true)}}</td>
                 @endif
 
 

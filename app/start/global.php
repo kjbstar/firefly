@@ -82,27 +82,31 @@ App::down(
 | definitions instead of putting them all in the main routes file.
 |
 */
-function mf($n, $coloured = false, $list = true)
+function mf($n, $coloured = false, $list = false)
 {
     $n = floatval($n);
     $string = number_format($n, 2, ',', '.');
+    $class = '';
+    $classSmall = '';
     if ($list === true) {
         $string = str_pad($string, 10, '_', STR_PAD_LEFT);
         $string = str_replace('_', '&nbsp;', $string);
+        $class = ' class="money"';
+        $classSmall = 'money';
     }
 
     if ($coloured === true && $n === 0.0) {
-        return '<span style="color:#999" class="money">&#8364;' . $string
-        . '</span>';
+        return '<span style="color:#999"'.$class.'>&#8364;' . $string .
+        '</span>';
     }
     if ($coloured === true && $n > 0) {
-        return '<span class="text-success money">&#8364;' . $string . '</span>';
+        return '<span class="text-success '.$classSmall.'">&#8364;' . $string . '</span>';
     }
     if ($coloured === true && $n < 0) {
-        return '<span class="text-danger money">&#8364;' . $string . '</span>';
+        return '<span class="text-danger '.$classSmall.'">&#8364;' . $string . '</span>';
     }
 
-    return '<span class="money">&#8364; ' . $string . '</span>';
+    return '<span '.$class.'>&#8364; ' . $string . '</span>';
 }
 
 require app_path() . '/filters.php';

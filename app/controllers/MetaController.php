@@ -338,11 +338,15 @@ class MetaController extends BaseController
             $chart->addColumn(ucfirst($compare) . ' name', 'string');
             $chart->addColumn('amount', 'number');
             // loop it and fill the chart:
+            $index = 0;
             foreach ($result as $r => $amount) {
-                if ($amount < 0) {
-                    $amount = $amount * -1;
+                if ($index < 11) {
+                    if ($amount < 0) {
+                        $amount = $amount * -1;
+                    }
+                    $chart->addRow($r, $amount);
                 }
-                $chart->addRow($r, $amount);
+                $index++;
             }
             $chart->generate();
 

@@ -7,6 +7,7 @@
         <h1>Firefly
             <small>The current state of affairs</small>
         </h1>
+
         @if($accountCount > 0)
             <div class="btn-group">
                 <a href="{{URL::Route('addtransaction')}}"
@@ -74,11 +75,9 @@
     <div class="col-lg-6 col-md-6">
         <h4>Accounts</h4>
     </div>
-    @if($transactionCount > 0)
     <div class="col-lg-6 col-md-6">
-        <h4>Transactions</h4>
+        <h4>General information</h4>
     </div>
-    @endif
     @endif
 </div>
 <div class="row">
@@ -93,23 +92,117 @@
                 <td><a href="{{$account['url']}}">{{{$account['name']}}}</a
                         ></td>
                 <td style="text-align:right;">{{mf
-                    ($account['current'],true)}}</td>
+                    ($account['current'],true,true)}}</td>
             </tr>
             @endforeach
         </table>
     </div>
     <div class="col-lg-6 col-md-6">
+        <ul class="nav nav-tabs">
+            @if($budgetInfo['amount'] > 0)
+            <li class="active"><a href="#budgeting-tab"
+                                  data-toggle="tab">Budgeting</a></li>
+            <li><a href="#transactions-tab" data-toggle="tab">Transactions</a></li>
+            @else
+            <li class="active"><a href="#transactions-tab"
+                    data-toggle="tab">Transactions</a></li>
+            @endif
+
+            <li><a href="#transfers-tab" data-toggle="tab">Transfers</a></li>
+        </ul>
+        <div class="tab-content" style="margin-top:10px;">
+            @if($budgetInfo['amount'] > 0)
+            <div class="tab-pane active" id="budgeting-tab">
+                <!-- progress in this month -->
+                <div class="progress progress-striped" style="margin-bottom:0;height:10px;">
+                    <div class="progress-bar progress-bar-info"
+                         role="progressbar"
+                         aria-valuenow="{{$budgetInfo['days']}}" aria-valuemin="0"
+                         aria-valuemax="100" style="width:
+                         {{$budgetInfo['days']}}%;">
+
+                        <span class="sr-only">{{$budgetInfo['days']}}% Complete</span>
+                    </div>
+
+                </div>
+
+                <!-- monetary progress -->
+                <div class="progress progress-striped">
+                    @if($budgetInfo['over'])
+                    <div class="progress-bar progress-bar-warning"
+                         role="progressbar"
+                         aria-valuenow="{{$budgetInfo['pct']}}"
+                         aria-valuemin="0"
+                         aria-valuemax="100" style="width:
+                         {{$budgetInfo['pct']}}%;">
+                        <span class="sr-only">{{$budgetInfo['pct']}}% Complete</span>
+                    </div>
+                    <div class="progress-bar progress-bar-danger"
+                         role="progressbar"
+                         aria-valuenow="{{$budgetInfo['pct']}}"
+                         aria-valuemin="0"
+                         aria-valuemax="100" style="width:
+                         {{100-$budgetInfo['pct']}}%;">
+                        <span class="sr-only">{{$budgetInfo['pct']}}% Complete</span>
+                    </div>
+                    @else
+                    <div class="progress-bar progress-bar-success"
+                         role="progressbar"
+                         aria-valuenow="{{$budgetInfo['pct']}}"
+                         aria-valuemin="0"
+                         aria-valuemax="100" style="width:
+                         {{$budgetInfo['pct']}}%;">
+                        <span class="sr-only">{{$budgetInfo['pct']}}% Complete</span>
+                    </div>
+                    @endif
+
+                </div>
+                {{mf($budgetInfo['spent'])}} / <small>&nbsp;&nbsp;{{mf
+                    ($budgetInfo['amount'])
+                    }}</small>
+
+            </div>
+            @endif
+            <div class="tab-pane" id="transactions-tab">
+                <table class="table table-condensed table-bordered">
+                    @foreach($transactions as $t)
+                    <tr>
+                        <td>{{$t->date->format('j F Y')}}</td>
+                        <td><a href="{{URL::Route('edittransaction',
+                $t->id)}}">{{{$t->description}}}</a>
+                        </td>
+                        <td style="text-align: right;">{{mf($t->amount,true,true)}}
+                    </tr>
+                    @endforeach
+                </table>
+            </div>
+            <div class="tab-pane" id="transfers-tab">
+                <table class="table table-condensed table-bordered">
+                @foreach($transfers as $t)
+                <tr>
+                    <td>{{$t->date->format('j F Y')}}</td>
+                    <td><a href="{{URL::Route('edittransaction',
+                $t->id)}}">{{{$t->description}}}</a>
+                    </td>
+                    <td style="text-align: right;">{{mf($t->amount,false,
+                        true)}}
+                </tr>
+                @endforeach
+                </table>
+            </div>
+        </div>
+        <!--
         <table class="table table-condensed table-bordered">
-            @foreach($transactions as $t)
+        @foreach($transactions as $t)
             <tr>
                 <td>{{$t->date->format('j F Y')}}</td>
                 <td><a href="{{URL::Route('edittransaction',
                 $t->id)}}">{{{$t->description}}}</a>
                 </td>
-                <td style="text-align: right;">{{mf($t->amount,true)}}
+                <td style="text-align: right;">{{mf($t->amount,true,true)}}
             </tr>
             @endforeach
-        </table>
+        </table>-->
     </div>
     @endif
 </div>
@@ -140,6 +233,9 @@
     @if($accountCount > 0 && $transactionCount > 0)
     <div class="col-lg-4 col-md-4">
         <table class="table table-condensed">
+            <?php
+                $sum=0;
+            ?>
             @foreach($beneficiaries as $b)
             <tr
             @if(isset($b['overpct']))
@@ -147,17 +243,23 @@
             @endif
             >
                 <td><a href="{{$b['url']}}">{{{$b['name']}}}</a></td>
-                <td style="text-align: right;">{{mf($b['amount'],true)}}
+                <td style="text-align: right;">{{mf($b['amount'],true,true)}}
             </tr>
+            <?php
+            $sum += $b['amount'];
+            ?>
             @endforeach
             <tr>
             <td><em>Total</em></td>
-            <td style="text-align: right;">{{mf(0,true)}}
+            <td style="text-align: right;">{{mf($sum,true,true)}}
             </tr>
         </table>
 
     </div>
     <div class="col-lg-4 col-md-4">
+        <?php
+        $sum=0;
+        ?>
         @foreach($budgets as $budget)
         <h5><a href="{{$budget['url']}}">{{{$budget['name']}}}</a></h5>
 
@@ -196,17 +298,23 @@
                 @endif
             </small>
         </p>
+        <?php
+        $sum += $budget['amount'];
+        ?>
         @endforeach
         <table class="table table-condensed">
             <tr>
                 <td><em>Total</em></td>
-                <td style="text-align: right;">{{mf(0,true)}}</td>
+                <td style="text-align: right;">{{mf($sum,true)}}</td>
             </tr>
 
         </table>
     </div>
     <div class="col-lg-4 col-md-4">
         <table class="table table-condensed">
+            <?php
+            $sum=0;
+            ?>
             @foreach($categories as $c)
             <tr
             @if(isset($c['overpct']))
@@ -214,12 +322,15 @@
             @endif
             >
             <td><a href="{{$c['url']}}">{{{$c['name']}}}</a></td>
-            <td style="text-align: right;">{{mf($c['amount'],true)}}
+            <td style="text-align: right;">{{mf($c['amount'],true,true)}}
                 </tr>
+                <?php
+                $sum += $c['amount'];
+                ?>
                 @endforeach
                 <tr>
                     <td><em>Total</em></td>
-                    <td style="text-align: right;">{{mf(0,true)}}
+                    <td style="text-align: right;">{{mf($sum,true,true)}}
                 </tr>
         </table>
 

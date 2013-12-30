@@ -47,11 +47,11 @@
                 @endif
                 ><!--  class="success", warning, danger-->
                 <td><a href="{{$m['url']}}">{{$m['title']}}</a></td>
-                <td>{{mf($m['balance_start'],true)}}</td>
-                <td>{{mf($m['in'],true)}}</td>
-                <td>{{mf($m['out'],true)}}</td>
-                <td>{{mf($m['diff'],true)}}</td>
-                <td>{{mf($m['balance_end'],true)}}</td>
+                <td>{{mf($m['balance_start'],true,true)}}</td>
+                <td>{{mf($m['in'],true,true)}}</td>
+                <td>{{mf($m['out'],true,true)}}</td>
+                <td>{{mf($m['diff'],true,true)}}</td>
+                <td>{{mf($m['balance_end'],true,true)}}</td>
             </tr>
             @endforeach
         </table>

@@ -62,8 +62,7 @@ Route::get(
 );
 
 Route::get(
-    '/home/reports',
-    ['uses' => 'ReportController@showIndex', 'as' => 'reports']
+    '/home/reports', ['uses' => 'ReportController@showIndex', 'as' => 'reports']
 );
 
 // reports:
@@ -107,6 +106,18 @@ Route::get(
     '/home/settings', ['uses' => 'SettingsController@index', 'as' => 'settings']
 );
 Route::post('/home/settings', ['uses' => 'SettingsController@postIndex']);
+
+/*
+ * Routes for user amounts / budgeting.
+ */
+Route::get(
+    '/home/budgeting', ['uses' => 'SettingsController@budgeting',
+                      'as' => 'budgeting']
+);
+Route::post(
+    '/home/budgeting', ['uses' => 'SettingsController@postBudgeting']
+);
+
 
 
 /**

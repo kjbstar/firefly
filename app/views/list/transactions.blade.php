@@ -9,7 +9,6 @@
                 <th>Category</th>
                 <th>Budget</th>
                 <th>&nbsp;</th>
-                <th>&nbsp;</th>
             </tr>
             @foreach($transactions as $t)
             <tr>
@@ -24,7 +23,7 @@
                 </td>
                 <td><a href="{{URL::Route('edittransaction',
                 [$t->id])}}">{{{$t->description}}}</a></td>
-                <td>{{mf($t->amount,true)}}</td>
+                <td>{{mf($t->amount,true,true)}}</td>
                 <td><a href="{{URL::Route('accountoverview',
                 [$t->account_id])}}">{{{$t->account()->first()
                         ->name}}}</a></td>
@@ -45,9 +44,6 @@
                     <a href="{{URL::Route('budgetoverview',
                     [$t->budget->id])}}">{{{$t->budget->name}}}</a>
                     @endif
-                </td>
-                <td>
-                    {{mf($t->account->balanceOnDate($t->date))}}
                 </td>
                 <td>
                     <div class="btn-group">
