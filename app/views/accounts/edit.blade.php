@@ -64,11 +64,17 @@
         <div class="form-group">
             <label for="inputHidden" class="col-sm-4 control-label">Hidden</label>
             <div class="col-sm-8">
-                <input 
-                    @if($account->hidden)
-                    checked="checked"
-                    @endif
-                    type="checkbox" name="hidden" value="1"> <small>Hides this account.</small>
+                <div class="checkbox">
+                    <label>
+                        <input
+                        @if($account->hidden)
+                        checked="checked"
+                        @endif
+                        name="hidden" value="1"
+                            type="checkbox"> Hides the account from most
+                        screens.
+                    </label>
+                </div>
             </div>
         </div>
     

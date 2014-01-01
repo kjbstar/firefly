@@ -92,22 +92,9 @@
             </div>
         </div>
     
-        <!-- Opening balance date -->
-        <!-- ignore in transactions (default is zero) -->
-        @if($count > 0)
-        <div class="form-group">
-            <label for="inputHidden" class="col-sm-4 control-label">Hidden</label>
-            <div class="col-sm-8">
-                <input type="checkbox" name="hidden" value="1"> <small>Hides this account.</small>
-            </div>
-        </div>
-        @endif
-    
-     
 
-    <div class="form-group">
+     
       <button type="submit" class="btn btn-default">Save new account</button>
-    </div>
 
     {{Form::close()}}
 

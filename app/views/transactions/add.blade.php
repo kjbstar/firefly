@@ -180,8 +180,9 @@
         <div class="form-group">
             <label for="inputIgnore" class="col-sm-3 control-label">Ignore</label>
             <div class="col-sm-9">
-                <input type="checkbox" name="ignore" value="1"> <small>Ignores this transaction in predictions.</small>
-                <br />
+                <div class="checkbox">
+                <input type="checkbox" name="ignore" value="1"> Ignores this transaction in predictions.
+                </div>
                 @if($count == 0)
                 <span class="text-info">
                     Large (one time) transactions can skew the predictions.
@@ -196,13 +197,16 @@
         <div class="form-group">
             <label for="inputMark" class="col-sm-3 control-label">Mark</label>
             <div class="col-sm-9">
-                <input type="checkbox" name="mark" value="1"> <small>Marks
-                    this transaction in certain charts.</small><br />
+                <div class="checkbox">
+                <input type="checkbox" name="mark" value="1">Marks
+                    this transaction in certain charts.
                 @if($count == 0)
+                    <br />
                 <span class="text-info">
                     Like it says.
                 </span>
                 @endif
+                    </div>
             </div>
         </div>
 
