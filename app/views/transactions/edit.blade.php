@@ -121,11 +121,14 @@
         <div class="form-group">
             <label for="inputIgnore" class="col-sm-3 control-label">Ignore</label>
             <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
                 <input type="checkbox" name="ignore" value="1"
                        @if($transaction->ignore == 1)
                        checked="checked"
                        @endif
-                       > <small>Ignores this transaction in predictions.</small>
+                       > Ignores this transaction in predictions
+                        .</label></div>
             </div>
         </div>
         
@@ -133,11 +136,14 @@
         <div class="form-group">
             <label for="inputMark" class="col-sm-3 control-label">Mark</label>
             <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
                 <input type="checkbox" name="mark" value="1"
                        @if($transaction->mark == 1)
                        checked="checked"
                        @endif
-                       > <small>Marks this transaction in certain charts.</small>
+                       > Marks this transaction in certain charts.
+                        </label></div>
             </div>
         </div>
         

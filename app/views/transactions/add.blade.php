@@ -181,7 +181,9 @@
             <label for="inputIgnore" class="col-sm-3 control-label">Ignore</label>
             <div class="col-sm-9">
                 <div class="checkbox">
+                    <label>
                 <input type="checkbox" name="ignore" value="1"> Ignores this transaction in predictions.
+                    </label>
                 </div>
                 @if($count == 0)
                 <span class="text-info">
@@ -198,9 +200,12 @@
             <label for="inputMark" class="col-sm-3 control-label">Mark</label>
             <div class="col-sm-9">
                 <div class="checkbox">
+                    <label>
                 <input type="checkbox" name="mark" value="1">Marks
                     this transaction in certain charts.
+                    </label>
                 @if($count == 0)
+
                     <br />
                 <span class="text-info">
                     Like it says.
