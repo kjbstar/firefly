@@ -50,7 +50,10 @@
              has-error
              @endif
              ">
-            <label for="inputOpeningbalance" class="col-sm-4 control-label">Opening balance</label>
+            <label for="inputOpeningbalance" class="col-sm-4 control-label
+            help-popover" title="Opening balance" data-content="Use
+            this field to set the 'base' for Firefly to work with.">Opening
+                balance</label>
             <div class="col-sm-8">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
@@ -75,7 +78,12 @@
              has-error
              @endif
              ">
-            <label for="inputOpeningbalancedate" class="col-sm-4 control-label">Opening balance date</label>
+            <label for="inputOpeningbalancedate" class="col-sm-4
+            control-label help-popover" title="Opening balance date"
+                   data-content="Combined with the opening balance,
+                   the date sets the start for managing this account with
+                   Firefly.">Opening balance
+                date</label>
             <div class="col-sm-8"t>
                 <input type="date" value="{{Input::old('openingbalancedate')}}" name="openingbalancedate" class="form-control" id="inputOpeningbalancedate">
                 @if($errors->has('openingbalancedate'))
@@ -102,4 +110,8 @@
 </div>
 
 
+@stop
+@section('scripts')
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script src="/js/accounts.js"></script>
 @stop
