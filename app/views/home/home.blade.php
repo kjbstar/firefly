@@ -243,7 +243,7 @@
             @endif
             >
                 <td><a href="{{$b['url']}}">{{{$b['name']}}}</a></td>
-                <td style="text-align: right;">{{mf($b['amount'],true,true)}}
+                <td style="text-align: right;">{{mf($b['amount'],true,true)}}</td>
             </tr>
             <?php
             $sum += $b['amount'];
@@ -253,6 +253,13 @@
             <td><em>Total</em></td>
             <td style="text-align: right;">{{mf($sum,true,true)}}
             </tr>
+            @if($allowance['amount'] > 0)
+            <tr>
+                <td><em>Allowance left</em></td>
+                <td style="text-align: right;">{{mf($allowance['amount']+$sum,true,
+                    true)}}</td>
+            </tr>
+            @endif
         </table>
 
     </div>
@@ -305,9 +312,15 @@
         <table class="table table-condensed">
             <tr>
                 <td><em>Total</em></td>
-                <td style="text-align: right;">{{mf($sum,true)}}</td>
+                <td style="text-align: right;">{{mf($sum,true,true)}}</td>
             </tr>
-
+            @if($allowance['amount'] > 0)
+            <tr>
+                <td><em>Allowance left</em></td>
+                <td style="text-align: right;">{{mf($allowance['amount']+$sum,true,
+                    true)}}</td>
+            </tr>
+            @endif
         </table>
     </div>
     <div class="col-lg-4 col-md-4">
@@ -330,8 +343,15 @@
                 @endforeach
                 <tr>
                     <td><em>Total</em></td>
-                    <td style="text-align: right;">{{mf($sum,true,true)}}
+                    <td style="text-align: right;">{{mf($sum,true,true)}}</td>
                 </tr>
+                @if($allowance['amount'] > 0)
+                <tr>
+                    <td><em>Allowance left</em></td>
+                    <td style="text-align: right;">{{mf($allowance['amount']+$sum,true,
+                        true)}}</td>
+                </tr>
+                @endif
         </table>
 
     </div>
