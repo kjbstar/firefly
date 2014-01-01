@@ -138,6 +138,7 @@ class MetaController extends BaseController
      */
     public function add()
     {
+        Session::put('previous', URL::previous());
         $parents = MetaHelper::getParentList(OBJ);
 
         return View::make('meta.add')->with('title', 'Add new ' . OBJ)->with(
@@ -171,7 +172,7 @@ class MetaController extends BaseController
         } else {
             $object->save();
 
-            return Redirect::route(OBJS);
+            return Redirect::to(Session::get('previous'));
         }
     }
 
@@ -184,6 +185,7 @@ class MetaController extends BaseController
      */
     public function edit(Component $component)
     {
+        Session::put('previous', URL::previous());
         $parents = MetaHelper::getParentList(OBJ);
         $component->parent_component_id = is_null(
             $component->parent_component_id
@@ -220,7 +222,7 @@ class MetaController extends BaseController
         } else {
             $component->save();
 
-            return Redirect::route(OBJS);
+            return Redirect::to(Session::get('previous'));
         }
     }
 
@@ -233,6 +235,8 @@ class MetaController extends BaseController
      */
     public function delete(Component $component)
     {
+        Session::put('previous', URL::previous());
+
         return View::make('meta.delete')->with('object', $component)->with(
             'title', 'Delete ' . OBJ . ' ' . $component->name
         );
@@ -249,7 +253,7 @@ class MetaController extends BaseController
     {
         $component->delete();
 
-        return Redirect::route(OBJS);
+        return Redirect::to(Session::get('previous'));
     }
 
     /**

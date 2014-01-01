@@ -48,11 +48,11 @@ class TransactionController extends BaseController
      */
     public function add(Account $account = null)
     {
+        Session::put('previous', URL::previous());
         $accounts = [];
         foreach (Auth::user()->accounts()->where('hidden', 0)->get() as $a) {
             $accounts[$a->id] = $a->name;
         }
-        Session::put('previous', URL::previous());
 
         $count = Auth::user()->transactions()->count();
 
@@ -118,6 +118,7 @@ class TransactionController extends BaseController
      */
     public function edit(Transaction $transaction)
     {
+        Session::put('previous', URL::previous());
         $accounts = [];
         foreach (Auth::user()->accounts()->where('hidden', 0)->get() as $a) {
             $accounts[$a->id] = $a->name;
@@ -176,7 +177,7 @@ class TransactionController extends BaseController
             $transaction->save();
             Session::flash('success', 'The transaction has been saved.');
 
-            return Redirect::route('transactions');
+            return Redirect::to(Session::get('previous'));
         }
     }
 
@@ -189,6 +190,7 @@ class TransactionController extends BaseController
      */
     public function delete(Transaction $transaction)
     {
+        Session::put('previous', URL::previous());
         return View::make('transactions.delete')->with(
             'transaction', $transaction
         )->with('title', 'Delete transaction ' . $transaction->title);
@@ -205,7 +207,7 @@ class TransactionController extends BaseController
     {
         $transaction->delete();
 
-        return Redirect::route('transactions');
+        return Redirect::to(Session::get('previous'));
     }
 
 }

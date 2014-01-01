@@ -14,6 +14,7 @@ class SettingsController extends BaseController
      */
     public function index()
     {
+        Session::put('previous', URL::previous());
 
         // let's grab the only setting that might be available.
         $predictionStart = Setting::getSetting('predictionStart');
@@ -36,7 +37,7 @@ class SettingsController extends BaseController
         $predictionStart->save();
         Session::flash('success', 'Settings saved!');
 
-        return Redirect::route('settings');
+        return Redirect::to(Session::get('previous'));
 
     }
 
@@ -47,6 +48,7 @@ class SettingsController extends BaseController
      */
     public function allowances()
     {
+        Session::put('previous', URL::previous());
         Cache::flush();
         $defaultAllowance = Setting::getSetting('defaultAllowance');
         $defaultAllowance->value = floatval($defaultAllowance->value);
@@ -75,7 +77,7 @@ class SettingsController extends BaseController
         $defaultAllowance->save();
         Session::flash('success', 'Default allowance saved!');
 
-        return Redirect::route('allowances');
+        return Redirect::to(Session::get('previous'));
     }
 
 
@@ -83,6 +85,7 @@ class SettingsController extends BaseController
 
     public function addAllowance()
     {
+        Session::put('previous', URL::previous());
         return View::make('settings.add-allowance');
     }
 
@@ -107,13 +110,14 @@ class SettingsController extends BaseController
             $setting->save();
         }
 
-        return Redirect::route('allowances');
+        return Redirect::to(Session::get('previous'));
 
 
     }
 
     public function editAllowance(Setting $setting)
     {
+        Session::put('previous', URL::previous());
         return View::make('settings.edit-allowance')->with('setting',
             $setting);
     }
@@ -128,11 +132,12 @@ class SettingsController extends BaseController
             saved.'
         );
 
-        return Redirect::route('allowances');
+        return Redirect::to(Session::get('previous'));
     }
 
     public function deleteAllowance(Setting $setting)
     {
+        Session::put('previous', URL::previous());
         return View::make('settings.delete-allowance')->with('setting',
             $setting);
     }
@@ -145,7 +150,7 @@ class SettingsController extends BaseController
         has a specific allowance'
         );
 
-        return Redirect::route('allowances');
+        return Redirect::to(Session::get('previous'));
     }
 
 }

@@ -1,5 +1,5 @@
 <?php
-require_once(app_path().'/helpers/Toolkit.php');
+require_once(app_path() . '/helpers/Toolkit.php');
 /**
  * Class LimitController
  */
@@ -10,13 +10,14 @@ class LimitController extends BaseController
      * Add a limit to a certain component for a given year and month.
      *
      * @param \Component $component The component
-     * @param int       $year      The year
-     * @param int       $month     The month.
+     * @param int        $year      The year
+     * @param int        $month     The month.
      *
      * @return \Illuminate\View\View
      */
     public function addLimit(Component $component, $year, $month)
     {
+        Session::put('previous', URL::previous());
         $date = Toolkit::parseDate($year, $month);
         if ($date) {
             return View::make('meta-limit.add')->with(
@@ -57,7 +58,7 @@ class LimitController extends BaseController
             } else {
                 $limit->save();
 
-                return Redirect::route(OBJ . 'overview', [$component->id]);
+                return Redirect::to(Session::get('previous'));
             }
         }
 
@@ -75,6 +76,7 @@ class LimitController extends BaseController
      */
     public function editLimit(Limit $limit)
     {
+        Session::put('previous', URL::previous());
         $object = Auth::user()->components()->find($limit->component_id);
         if ($object) {
             return View::make('meta-limit.edit')->with('object', $object)->with(
@@ -108,7 +110,7 @@ class LimitController extends BaseController
             } else {
                 $limit->save();
 
-                return Redirect::route(OBJ . 'overview', [$object->id]);
+                return Redirect::to(Session::get('previous'));
             }
         }
 
@@ -126,6 +128,7 @@ class LimitController extends BaseController
      */
     public function deleteLimit(Limit $limit)
     {
+        Session::put('previous', URL::previous());
         $object = Auth::user()->components()->find($limit->component_id);
         if ($object) {
             return View::make('meta-limit.delete')->with('object', $object)
@@ -151,7 +154,7 @@ class LimitController extends BaseController
             $limit->delete();
             Session::flash('success', 'Limit removed.');
 
-            return Redirect::route(OBJ . 'overview', [$object->id]);
+            return Redirect::to(Session::get('previous'));
         }
 
         App::abort(404);

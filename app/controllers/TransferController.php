@@ -46,6 +46,7 @@ class TransferController extends BaseController
      */
     public function add(Account $account = null)
     {
+        Session::put('previous', URL::previous());
         $accounts = [];
         foreach (Auth::user()->accounts()->where('hidden', 0)->get() as $a) {
             $accounts[$a->id] = $a->name;
@@ -85,7 +86,7 @@ class TransferController extends BaseController
             $transfer->save();
             Session::flash('success', 'The transfer has been created.');
 
-            return Redirect::route('transfers');
+            return Redirect::to(Session::get('previous'));
         }
     }
 
@@ -98,6 +99,7 @@ class TransferController extends BaseController
      */
     public function edit(Transfer $transfer)
     {
+        Session::put('previous', URL::previous());
         $accounts = [];
         foreach (Auth::user()->accounts()->where('hidden', 0)->get() as $a) {
             $accounts[$a->id] = $a->name;
@@ -139,7 +141,7 @@ class TransferController extends BaseController
             $transfer->save();
             Session::flash('success', 'The transfer has been edited.');
 
-            return Redirect::route('transfers');
+            return Redirect::to(Session::get('previous'));
         }
     }
 
@@ -152,6 +154,7 @@ class TransferController extends BaseController
      */
     public function delete(Transfer $transfer)
     {
+        Session::put('previous', URL::previous());
         return View::make('transfers.delete')->with('transfer', $transfer)
             ->with('title', 'Delete transfer ' . $transfer->description);
     }
@@ -167,6 +170,6 @@ class TransferController extends BaseController
     {
         $transfer->delete();
 
-        return Redirect::route('transfers');
+        return Redirect::to(Session::get('previous'));
     }
 }

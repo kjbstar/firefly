@@ -50,6 +50,7 @@ class AccountController extends BaseController
     public function add()
     {
         $count = Auth::user()->accounts()->count();
+        Session::put('previous', URL::previous());
         return View::make('accounts.add')->with('title',
             'Add account')->with('count',$count);
     }
@@ -78,7 +79,7 @@ class AccountController extends BaseController
         }
         $account->save();
 
-        return Redirect::route('accounts');
+        return Redirect::to(Session::get('previous'));
     }
 
     /**
@@ -90,6 +91,7 @@ class AccountController extends BaseController
      */
     public function edit(Account $account)
     {
+        Session::put('previous', URL::previous());
         return View::make('accounts.edit')->with(
             'title', 'Edit account ' . $account->name
         )->with('account', $account);
@@ -119,7 +121,7 @@ class AccountController extends BaseController
         $account->save();
         Session::flash('success', 'The account has been saved.');
 
-        return Redirect::route('accounts');
+        return Redirect::to(Session::get('previous'));
     }
 
     /**
@@ -131,6 +133,7 @@ class AccountController extends BaseController
      */
     public function delete(Account $account)
     {
+        Session::put('previous', URL::previous());
         return View::make('accounts.delete')->with('account', $account)->with(
             'title', 'Delete account ' . $account->name
         );
@@ -147,7 +150,7 @@ class AccountController extends BaseController
     {
         $account->delete();
 
-        return Redirect::route('accounts');
+        return Redirect::to(Session::get('previous'));
     }
 
     /**
