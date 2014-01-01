@@ -62,7 +62,9 @@
         <!-- Opening balance date -->
         <!-- ignore in transactions (default is zero) -->
         <div class="form-group">
-            <label for="inputHidden" class="col-sm-4 control-label">Hidden</label>
+            <label for="inputHidden" class="col-sm-4 control-label">Hidden
+                <small>(optional)</small>
+            </label>
             <div class="col-sm-8">
                 <div class="checkbox">
                     <label>

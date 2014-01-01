@@ -17,7 +17,8 @@
     </div>
 
     <div class="form-group">
-      <label for="inputBalance" class="col-sm-4 control-label">Parent {{OBJ}}</label>
+      <label for="inputBalance" class="col-sm-4 control-label">Parent {{OBJ}}
+          <small>(optional)</small></label>
         <div class="col-sm-8">
       {{Form::select('parent_component_id',$parents,$object->parent_component_id,array('class' => 'form-control'))}}
             <span class="text-danger">{{$errors->first('parent_component_id')}}</span>
