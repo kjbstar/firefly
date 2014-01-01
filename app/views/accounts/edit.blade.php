@@ -32,7 +32,10 @@
              ">
             <label for="inputOpeningbalance" class="col-sm-4 control-label">Opening balance</label>
             <div class="col-sm-8">
-                <input type="number" value="{{$account->openingbalance}}" name="openingbalance" step="any" class="form-control" id="inputOpeningbalance" placeholder="&euro;">
+                <div class="input-group">
+                    <span class="input-group-addon">&euro;</span>
+                    <input type="number" value="{{$account->openingbalance}}" name="openingbalance" step="any" class="form-control" id="inputOpeningbalance">
+                </div>
                 @if($errors->has('openingbalance'))
                 <span class="text-danger">{{$errors->first('openingbalance')}}</span>
                 @endif

@@ -61,13 +61,22 @@
     </p>
   </div>
   <div class="col-lg-6 col-md-6">
-    <p>
-      piechart with average expense per {{OBJ}}, limited to the top 10. The rest is "The rest".
-    </p>
+    <div id="object-avg-chart">
+
+        </div>
+      <p><small>Only {{OBJS}} with more than 5 transactions are
+              counted.</small></p>
   </div>
 </div>
 @stop
 @section('scripts')
+@section('scripts')
+<script type="text/javascript">
+    var object = "{{OBJ}}";
+    var objects = "{{OBJS}}";
+</script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script src="/js/meta.js"></script>
 @stop
 @section('styles')
 @stop

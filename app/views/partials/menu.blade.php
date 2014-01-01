@@ -65,9 +65,9 @@
                     <li><a href="{{URL::Route('settings')}}"><span
                                 class="glyphicon glyphicon-cog"></span>
                             Settings</a></li>
-                    <li><a href="{{URL::Route('budgeting')}}"><span
+                    <li><a href="{{URL::Route('allowances')}}"><span
                                 class="glyphicon glyphicon-euro"></span>
-                            Budgeting</a></li>
+                            Allowances</a></li>
                     <li><a href="{{URL::Route('reports')}}"><span
                                 class="glyphicon glyphicon-euro"></span>
                             Reports</a></li>

@@ -80,16 +80,55 @@ class MetaController extends BaseController
      *
      * @return View
      */
-    public function showEmpty()
+    public function showEmpty($year = null, $month = null)
     {
+        $date = Toolkit::parseDate($year, $month);
 
-        $list = MetaHelper::transactionsWithoutComponent(OBJ);
+        $list = MetaHelper::transactionsWithoutComponent(OBJ, $date);
 
         return View::make('meta.empty')->with(
             'title', 'Transactions without a ' . OBJ
         )->with(
                 'transactions', $list
-            );
+            )->with('date', $date);
+    }
+
+    public function showAverageChart()
+    {
+        $objects = Auth::user()->components()->where('type', OBJ)->get();
+        $chartData = [];
+        $chart = App::make('gchart');
+        $chart->addColumn(OBJ, 'string');
+        $chart->addColumn('Average amount per transaction', 'number');
+
+        foreach ($objects as $object) {
+            $average = $object->transactions()->expenses()->avg('amount');
+            $count = $object->transactions()->expenses()->count();
+            if ($count >= 5) {
+                $chartData[] = ['name' => $object->name,
+                                'average' => floatval($average)];
+            }
+            //$chart->addRow($object->name, floatval($average));
+        }
+        $amount = [];
+        foreach ($chartData as $key => $row) {
+            $amount[$key] = $row['average'];
+        }
+        array_multisort($amount, SORT_ASC, $chartData);
+
+        $index = 0;
+        foreach ($chartData as $entry) {
+            if ($index < 35) {
+                $chart->addRow($entry['name'], $entry['average']);
+            }
+            $index++;
+        }
+
+
+        $chart->generate();
+
+        return Response::json($chart->getData());
+
     }
 
     /**

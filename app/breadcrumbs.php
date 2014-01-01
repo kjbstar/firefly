@@ -51,6 +51,24 @@ foreach ($objects as $object) {
         }
     );
 
+    // route for empty object
+    Breadcrumbs::register(
+        'empty'.$object, function ($breadcrumbs,$date) use ($object) {
+            $breadcrumbs->parent('home');
+            $breadcrumbs->push(
+                'Transactions without a ' . $object,
+                route('empty'.$object)
+            );
+            if(!is_null($date)) {
+                $breadcrumbs->push(
+                    $date->format('F Y'),
+                    route('empty'.$object,[$date->format('Y'),
+                                          $date->format('m')])
+                );
+            }
+        }
+    );
+
     // route to add stuff:
     $addCrumb = 'add' . $object;
     $addTitle = 'Add a new ' . $object;

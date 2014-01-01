@@ -42,7 +42,10 @@
              ">
             <label for="inputAmount" class="col-sm-3 control-label">Amount</label>
             <div class="col-sm-9">
-                <input type="number" value="{{Input::old('amount')}}" name="amount" step="any" class="form-control" id="inputAmount" placeholder="&euro;">
+                <div class="input-group">
+                    <span class="input-group-addon">&euro;</span>
+                    <input type="number" value="{{Input::old('amount')}}" name="amount" step="any" class="form-control" id="inputAmount">
+                </div>
                 @if($errors->has('amount'))
                 <span class="text-danger">{{$errors->first('amount')}}</span>
                 @endif

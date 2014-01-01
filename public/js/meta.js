@@ -3,6 +3,8 @@ google.load('visualization', '1.1', {'packages': ['corechart']});
 google.setOnLoadCallback(drawAllCharts);
 
 
+$('#LimitModal').on('hidden.bs.modal', function() { $(this).removeData(); })
+
 function drawAllCharts() {
     if ($('#overview-chart').length === 1) {
 
@@ -68,6 +70,28 @@ function drawAllCharts() {
                 holder.addClass('load-error');
             });
     });
+
+    // average expense per beneficiary:
+    if($('#object-avg-chart').length === 1) {
+        var URL = '/home/' + object + '/index/average';
+
+        $.getJSON(URL).success(function (data) {
+            var opt = {
+                height: 800,
+                legend: {position: 'none'},
+                chartArea: {top: 20},
+                title: 'Average amount per transaction'
+            };
+            var gdata = new google.visualization.DataTable(data);
+            var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
+            money.format(gdata, 1);
+            var chart = new google.visualization.BarChart(document.getElementById('object-avg-chart'));
+            chart.draw(gdata, opt);
+
+        }).fail(function() {
+                $('#object-avg-chart').addClass('load-error');
+            });
+    }
 
 
 }

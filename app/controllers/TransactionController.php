@@ -168,7 +168,8 @@ class TransactionController extends BaseController
             $transaction->toArray(), Transaction::$rules
         );
         if ($validator->fails()) {
-            return Redirect::route('edittransaction')->withInput()->withErrors(
+            return Redirect::route('edittransaction',$transaction->id
+            )->withInput()->withErrors(
                 $validator
             );
         } else {

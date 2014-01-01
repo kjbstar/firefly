@@ -74,10 +74,14 @@ class MetaHelper
      *
      * @return array
      */
-    public static function transactionsWithoutComponent($type)
+    public static function transactionsWithoutComponent($type,
+        Carbon $date = null)
     {
         $query = Auth::user()->transactions()->orderBy('date','DESC')->with
         ('components');
+        if(!is_null($date)) {
+            $query->inMonth($date);
+        }
         $list = [];
         foreach ($query->get() as $tr) {
             if (!ListHelper::hasComponent($tr, $type)) {

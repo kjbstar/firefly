@@ -44,7 +44,7 @@ class HomeController extends BaseController
     /**
      * Show the homepage. Can be for another month.
      *
-     * @param int $year The year
+     * @param int $year  The year
      * @param int $month The month
      *
      * @return View

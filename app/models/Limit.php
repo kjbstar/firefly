@@ -8,7 +8,7 @@ class Limit extends Eloquent
 {
 
     public static $rules
-        = ['amount'       => 'required|numeric|min:0.01|max:66536',
+        = ['amount'       => 'required|numeric|min:0|max:66536',
            'component_id' => 'required|exists:components,id',];
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
     protected $fillable = ['amount', 'component_id', 'date'];

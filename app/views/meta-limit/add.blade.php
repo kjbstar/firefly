@@ -12,7 +12,10 @@
         </p>
         <div class="form-group">
             <label class="sr-only" for="inputAmount">Amount</label>
-            <input type="number" step="any" name="amount" class="form-control" id="inputAmount" placeholder="&euro;">
+            <div class="input-group">
+                <span class="input-group-addon">&euro;</span>
+            <input type="number" step="any" name="amount" class="form-control" id="inputAmount">
+                </div>
         </div>
         
         

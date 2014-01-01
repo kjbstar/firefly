@@ -34,11 +34,9 @@
                 class="text-danger">colour</span>.
         </p>
 
-
+        <h3>Default montly budget</h3>
         <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Default montly budget</h3>
-            </div>
+
             <div class="panel-body">
                 {{Form::open()}}
                 <p>
@@ -56,6 +54,37 @@
             </div>
         </div>
 
+        <h3>Budgets for specific months</h3>
+
+        <ul class="list-group">
+            @foreach($budgets as $budget)
+            <li class="list-group-item">
+                <span class="badge">{{mf($budget->value,false,false)}}</span>
+                {{$budget->date->format('F Y')}}
+
+                <div class="btn-group pull-right">
+                    <a data-toggle="modal" data-target="#PopupModal"
+                       href="{{URL::Route('editbudgetsetting',
+                       $budget->id)}}" class="btn btn-info btn-default
+                       btn-xs"><span
+                            class="glyphicon glyphicon-pencil"></span></a>
+                    <a data-toggle="modal" data-target="#PopupModal"
+                       href="{{URL::Route('deletebudgetsetting',
+                       $budget->id)}}"
+                       class="btn btn-default btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                    &nbsp;&nbsp;
+                </div>
+            </li>
+            @endforeach
+        </ul>
+
+        <a data-toggle="modal" data-target="#PopupModal"
+           href="{{URL::Route('addbudgetsetting')}}"
+           class="btn btn-default btn-info"><span class="glyphicon
+           glyphicon-plus-sign"></span> Add a budget for a particular month</a>
+
+
+
     </div>
 </div>
 <div class="row">
@@ -65,5 +94,5 @@
 </div>
 @endsection
 @section('scripts')
-
+<script src="/js/settings.js"></script>
 @endsection

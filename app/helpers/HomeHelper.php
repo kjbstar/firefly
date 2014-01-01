@@ -21,7 +21,7 @@ class HomeHelper
     {
         $start = clone $date;
         $start->startOfMonth();
-        $query = Auth::user()->accounts()->remember(1440, 'homeAccountList')
+        $query = Auth::user()->accounts()->remember('homeAccountList', 1440)
             ->notHidden()->get();
         $accounts = [];
 
@@ -48,10 +48,18 @@ class HomeHelper
     {
         // default values and array
         $defaultBudget = Setting::getSetting('defaultBudget');
-        $amount = floatval($defaultBudget->value);
-        $budget = ['amount' => $amount,'over' => false];
-        $days = round((intval($date->format('d')) / intval($date->format('t')
-            ))*100);
+        $specificBudget = Auth::user()->settings()->where(
+            'name', 'specificBudget'
+        )->where('date', $date->format('Y-m') . '-01')->first();
+        $budget = $specificBudget ? $specificBudget : $defaultBudget;
+
+        $amount = floatval($budget->value);
+        $budget = ['amount' => $amount, 'over' => false];
+        $days = round(
+            (intval($date->format('d')) / intval(
+                    $date->format('t')
+                )) * 100
+        );
         $budget['days'] = $days;
         // start!
         if ($amount > 0) {
@@ -63,12 +71,12 @@ class HomeHelper
                 ) * -1;
             $budget['spent'] = $spent;
             // overspent this budget:
-            if($spent > $amount) {
-                $budget['over'] =true;
-                $budget['pct'] = round(($amount / $spent)*100);
+            if ($spent > $amount) {
+                $budget['over'] = true;
+                $budget['pct'] = round(($amount / $spent) * 100);
             }
             // did not overspend this budget.
-            if($spent <= $amount) {
+            if ($spent <= $amount) {
                 $budget['pct'] = round(($spent / $amount) * 100);
             }
 
@@ -79,6 +87,7 @@ class HomeHelper
 //            $budgetInfo['spentPCT']
 //                = $budgetInfo['spentPCT'] > 100 ? 100 : $budgetInfo['spentPCT'];
         }
+
         return $budget;
     }
 
@@ -142,7 +151,9 @@ class HomeHelper
         $index = 0;
         foreach ($currentList as $id => $obj) {
             if ($index < 10) {
-                if (isset($pastList[$id]) && $obj['amount'] > 0) {
+                if (is_null($obj['limit']) && isset($pastList[$id])
+                    && $obj['amount'] > 0
+                ) {
                     $oldValue = $pastList[$id]['amount'];
                 } else {
                     $oldValue = $obj['limit'];
@@ -174,20 +185,26 @@ class HomeHelper
     ) {
         $objects = [];
         // a special empty component:
-        $empty = ['id'  => 0, 'name' => '(No ' . $type . ')', 'amount' => 0,
-                  'url' => URL::Route('empty'.$type), 'limit' => null];
+        $empty = ['id'           => 0, 'name' => '(No ' . $type . ')',
+                  'amount'       => 0, 'url' => URL::Route(
+                    'empty' . $type, [$date->format('Y'), $date->format('m')]
+                ), 'limit'       => null];
 
 
         $limits = [];
         // get all transactions for this month.
         // later on, we filter on the component.
-        $transactions = Auth::user()->transactions()->with(
+        $query = Auth::user()->transactions()->with(
             ['components'              => function ($query) use ($type) {
                     return $query->where('type', $type);
                 }, 'components.limits' => function ($query) use ($date) {
                     return $query->inMonth($date);
                 }]
-        )->expenses()->inMonth($date)->get();
+        )->inMonth($date);
+        if($noNegatives) {
+            $query->expenses();
+        }
+        $transactions = $query->get();
 
         foreach ($transactions as $t) {
             if ($noNegatives) {
@@ -236,11 +253,13 @@ class HomeHelper
             $spent = $object['amount'] * -1;
             $max = floatval($limit->amount);
             $object['limit'] = $max;
+
             if ($spent > $max) {
                 $object['overpct'] = round(
                     ($max / $spent) * 100
                 );
                 $object['spent'] = 100 - $object['overpct'];
+                $object['overspent'] = 100 - $object['spent'];
             } else {
                 $object['spent'] = round(
                     ($spent / $max) * 100
@@ -262,6 +281,7 @@ class HomeHelper
                 'openingbalancedate', 'ASC'
             )->first();
             $date = $account->openingbalancedate;
+
             Cache::forever('getEarliestEvent', $date);
 
             return $date;
