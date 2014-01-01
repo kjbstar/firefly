@@ -51,5 +51,10 @@ class Setting extends Eloquent
         return $this->belongsTo('User');
     }
 
+    public function getDates()
+    {
+        return ['created_at', 'updated_at', 'date'];
+    }
+
 
 }

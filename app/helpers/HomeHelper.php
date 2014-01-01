@@ -44,23 +44,23 @@ class HomeHelper
         return $accounts;
     }
 
-    public static function getBudgetaryInformation(Carbon $date)
+    public static function getAllowanceInformation(Carbon $date)
     {
         // default values and array
-        $defaultBudget = Setting::getSetting('defaultBudget');
-        $specificBudget = Auth::user()->settings()->where(
-            'name', 'specificBudget'
+        $defaultAllowance = Setting::getSetting('defaultAllowance');
+        $specificAllowance = Auth::user()->settings()->where(
+            'name', 'specificAllowance'
         )->where('date', $date->format('Y-m') . '-01')->first();
-        $budget = $specificBudget ? $specificBudget : $defaultBudget;
+        $allowance = !is_null($specificAllowance) ? $specificAllowance : $defaultAllowance;
 
-        $amount = floatval($budget->value);
-        $budget = ['amount' => $amount, 'over' => false];
+        $amount = floatval($allowance->value);
+        $allowance = ['amount' => $amount, 'over' => false];
         $days = round(
             (intval($date->format('d')) / intval(
                     $date->format('t')
                 )) * 100
         );
-        $budget['days'] = $days;
+        $allowance['days'] = $days;
         // start!
         if ($amount > 0) {
             $spent = floatval(
@@ -69,26 +69,19 @@ class HomeHelper
                             'amount'
                         )
                 ) * -1;
-            $budget['spent'] = $spent;
-            // overspent this budget:
+            $allowance['spent'] = $spent;
+            // overspent this allowance:
             if ($spent > $amount) {
-                $budget['over'] = true;
-                $budget['pct'] = round(($amount / $spent) * 100);
+                $allowance['over'] = true;
+                $allowance['pct'] = round(($amount / $spent) * 100);
             }
-            // did not overspend this budget.
+            // did not overspend this allowance.
             if ($spent <= $amount) {
-                $budget['pct'] = round(($spent / $amount) * 100);
+                $allowance['pct'] = round(($spent / $amount) * 100);
             }
-
-//            $budgetInfo['spent']
-//                = $budgetInfo['spentPCT'] = round(
-//                ($budgetInfo['spent'] / floatval($defaultBudget->value)) * 100
-//            );
-//            $budgetInfo['spentPCT']
-//                = $budgetInfo['spentPCT'] > 100 ? 100 : $budgetInfo['spentPCT'];
         }
 
-        return $budget;
+        return $allowance;
     }
 
     /**

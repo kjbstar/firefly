@@ -1,10 +1,10 @@
 @extends('layouts.default')
-@section('breadcrumbs', Breadcrumbs::render('budgeting'))
+@section('breadcrumbs', Breadcrumbs::render('allowances'))
 
 @section('content')
 <div class="row">
     <div class="col-lg-8 col-md-12 col-sm-12">
-        <h2>Budgeting</h2>
+        <h2>Budgeting with allowances</h2>
         <p>
             Although you can give all your <a href="{{URL::Route
             ('beneficiaries')}}">beneficiaries</a>, <a href="{{URL::Route
@@ -34,19 +34,24 @@
                 class="text-danger">colour</span>.
         </p>
 
-        <h3>Default montly budget</h3>
+        <h3>Default montly allowance</h3>
         <div class="panel panel-default">
 
             <div class="panel-body">
                 {{Form::open()}}
                 <p>
-                    Enter the default montly budget you had in mind
+                    Enter the default montly allowance you had in mind
                 </p>
-                <p><input type="amount" name="defaultBudget"
+                <p>
+                <div class="input-group">
+                    <span class="input-group-addon">&euro;</span>
+                    <input type="amount" name="defaultAllowance"
                           class="form-control"
-                         placeholder="&euro;"
-                   value="{{$defaultBudget->value > 0 ? $defaultBudget->value
-                    : ''}}" /></p>
+                   value="{{$defaultAllowance->value > 0 ?
+                   $defaultAllowance->value
+                    : ''}}" />
+                </div>
+                </p>
                 <p>
                     <input type="submit" class="btn btn-info" />
                 </p>
@@ -54,23 +59,23 @@
             </div>
         </div>
 
-        <h3>Budgets for specific months</h3>
+        <h3>Allowances for specific months</h3>
 
         <ul class="list-group">
-            @foreach($budgets as $budget)
+            @foreach($allowances as $allowance)
             <li class="list-group-item">
-                <span class="badge">{{mf($budget->value,false,false)}}</span>
-                {{$budget->date->format('F Y')}}
+                <span class="badge">{{mf($allowance->value,false,false)}}</span>
+                {{$allowance->date->format('F Y')}}
 
                 <div class="btn-group pull-right">
                     <a data-toggle="modal" data-target="#PopupModal"
-                       href="{{URL::Route('editbudgetsetting',
-                       $budget->id)}}" class="btn btn-info btn-default
+                       href="{{URL::Route('editallowance',
+                       $allowance->id)}}" class="btn btn-info btn-default
                        btn-xs"><span
                             class="glyphicon glyphicon-pencil"></span></a>
                     <a data-toggle="modal" data-target="#PopupModal"
-                       href="{{URL::Route('deletebudgetsetting',
-                       $budget->id)}}"
+                       href="{{URL::Route('deleteallowance',
+                       $allowance->id)}}"
                        class="btn btn-default btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
                     &nbsp;&nbsp;
                 </div>
@@ -79,9 +84,10 @@
         </ul>
 
         <a data-toggle="modal" data-target="#PopupModal"
-           href="{{URL::Route('addbudgetsetting')}}"
+           href="{{URL::Route('addallowance')}}"
            class="btn btn-default btn-info"><span class="glyphicon
-           glyphicon-plus-sign"></span> Add a budget for a particular month</a>
+           glyphicon-plus-sign"></span> Add an allowance for a particular
+            month</a>
 
 
 

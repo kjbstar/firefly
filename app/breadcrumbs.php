@@ -24,9 +24,9 @@ Breadcrumbs::register(
 
 Breadcrumbs::register(
 
-    'budgeting', function ($breadcrumbs) {
+    'allowances', function ($breadcrumbs) {
         $breadcrumbs->parent('home');
-        $breadcrumbs->push('Budgeting', route('budgeting'));
+        $breadcrumbs->push('Allowances', route('allowances'));
     }
 );
 

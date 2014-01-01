@@ -42,6 +42,11 @@ Route::bind(
         return Auth::user()->transfers()->find($value);
     }
 );
+Route::bind(
+    'setting', function ($value, $route) {
+        return Auth::user()->settings()->find($value);
+    }
+);
 
 
 // some common patterns:
@@ -107,17 +112,38 @@ Route::get(
 );
 Route::post('/home/settings', ['uses' => 'SettingsController@postIndex']);
 
+
+/*
+ * These settings started with the allowances.
+ * */
+Route::get('/home/allowance/{setting}/edit',
+    ['uses' => 'SettingsController@editAllowance',
+    'as' => 'editallowance']);
+Route::post('/home/allowance/{setting}/edit',
+    ['uses' => 'SettingsController@postEditAllowance']);
+Route::get('/home/allowance/{setting}/delete',
+    ['uses' => 'SettingsController@deleteAllowance',
+    'as' => 'deleteallowance']);
+Route::post('/home/allowance/{setting}/delete',
+    ['uses' => 'SettingsController@postDeleteAllowance']);
+Route::get('/home/allowances/add',
+    ['uses' => 'SettingsController@addAllowance','as' => 'addallowance']);
+Route::post('/home/allowances/add',
+    ['uses' => 'SettingsController@postAddAllowance']);
+
+
+
+
 /*
  * Routes for user amounts / budgeting.
  */
 Route::get(
-    '/home/budgeting', ['uses' => 'SettingsController@budgeting',
-                      'as' => 'budgeting']
+    '/home/allowances',
+    ['uses' => 'SettingsController@allowances', 'as' => 'allowances']
 );
 Route::post(
-    '/home/budgeting', ['uses' => 'SettingsController@postBudgeting']
+    '/home/allowances', ['uses' => 'SettingsController@postAllowances']
 );
-
 
 
 /**
@@ -161,12 +187,15 @@ foreach ($objects as $o) {
                 ['uses' => 'MetaController@showIndex', 'as' => Str::plural($o)]
             );
             Route::get(
-                '/empty',
+                '/empty/{year?}/{month?}',
                 ['uses' => 'MetaController@showEmpty', 'as' => 'empty' . $o]
             );
             Route::get(
+                '/index/average', ['uses' => 'MetaController@showAverageChart']
+            );
+            Route::get(
                 '/typeahead',
-                ['uses' => 'MetaController@typeahead', 'before' => 'meta']
+                ['uses' => 'MetaController@typeahead']
             );
             Route::get(
                 '/{component}/overview/{year?}/{month?}',

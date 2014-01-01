@@ -99,8 +99,8 @@ class HomeController extends BaseController
             $now->subMonth();
         }
 
-        // get some budgetary information:
-        $budgetInfo = HomeHelper::getBudgetaryInformation($today);
+        // get some allowance information:
+        $allowanceInfo = HomeHelper::getAllowanceInformation($today);
 
 
         return View::make('home.home')->with('title', 'Home')->with(
@@ -116,7 +116,7 @@ class HomeController extends BaseController
             )->with('accountCount', $accountCount)->with(
                 'transactionCount', $transactionCount
             )->with(
-                'budgetInfo', $budgetInfo
+                'allowance', $allowanceInfo
             );
     }
 

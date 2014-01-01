@@ -99,7 +99,7 @@
     </div>
     <div class="col-lg-6 col-md-6">
         <ul class="nav nav-tabs">
-            @if($budgetInfo['amount'] > 0)
+            @if($allowance['amount'] > 0)
             <li class="active"><a href="#budgeting-tab"
                                   data-toggle="tab">Budgeting</a></li>
             <li><a href="#transactions-tab" data-toggle="tab">Transactions</a></li>
@@ -111,54 +111,54 @@
             <li><a href="#transfers-tab" data-toggle="tab">Transfers</a></li>
         </ul>
         <div class="tab-content" style="margin-top:10px;">
-            @if($budgetInfo['amount'] > 0)
+            @if($allowance['amount'] > 0)
             <div class="tab-pane active" id="budgeting-tab">
                 <!-- progress in this month -->
                 <div class="progress progress-striped" style="margin-bottom:0;height:10px;">
                     <div class="progress-bar progress-bar-info"
                          role="progressbar"
-                         aria-valuenow="{{$budgetInfo['days']}}" aria-valuemin="0"
+                         aria-valuenow="{{$allowance['days']}}" aria-valuemin="0"
                          aria-valuemax="100" style="width:
-                         {{$budgetInfo['days']}}%;">
+                         {{$allowance['days']}}%;">
 
-                        <span class="sr-only">{{$budgetInfo['days']}}% Complete</span>
+                        <span class="sr-only">{{$allowance['days']}}% Complete</span>
                     </div>
 
                 </div>
 
                 <!-- monetary progress -->
                 <div class="progress progress-striped">
-                    @if($budgetInfo['over'])
+                    @if($allowance['over'])
                     <div class="progress-bar progress-bar-warning"
                          role="progressbar"
-                         aria-valuenow="{{$budgetInfo['pct']}}"
+                         aria-valuenow="{{$allowance['pct']}}"
                          aria-valuemin="0"
                          aria-valuemax="100" style="width:
-                         {{$budgetInfo['pct']}}%;">
-                        <span class="sr-only">{{$budgetInfo['pct']}}% Complete</span>
+                         {{$allowance['pct']}}%;">
+                        <span class="sr-only">{{$allowance['pct']}}% Complete</span>
                     </div>
                     <div class="progress-bar progress-bar-danger"
                          role="progressbar"
-                         aria-valuenow="{{$budgetInfo['pct']}}"
+                         aria-valuenow="{{$allowance['pct']}}"
                          aria-valuemin="0"
                          aria-valuemax="100" style="width:
-                         {{100-$budgetInfo['pct']}}%;">
-                        <span class="sr-only">{{$budgetInfo['pct']}}% Complete</span>
+                         {{100-$allowance['pct']}}%;">
+                        <span class="sr-only">{{$allowance['pct']}}% Complete</span>
                     </div>
                     @else
                     <div class="progress-bar progress-bar-success"
                          role="progressbar"
-                         aria-valuenow="{{$budgetInfo['pct']}}"
+                         aria-valuenow="{{$allowance['pct']}}"
                          aria-valuemin="0"
                          aria-valuemax="100" style="width:
-                         {{$budgetInfo['pct']}}%;">
-                        <span class="sr-only">{{$budgetInfo['pct']}}% Complete</span>
+                         {{$allowance['pct']}}%;">
+                        <span class="sr-only">{{$allowance['pct']}}% Complete</span>
                     </div>
                     @endif
 
                 </div>
-                {{mf($budgetInfo['spent'])}} / <small>&nbsp;&nbsp;{{mf
-                    ($budgetInfo['amount'])
+                {{mf($allowance['spent'])}} / <small>&nbsp;&nbsp;{{mf
+                    ($allowance['amount'])
                     }}</small>
 
             </div>
