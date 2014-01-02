@@ -64,6 +64,9 @@ class Account extends Eloquent
         } else {
             $remember = 7 * 24 * 60;
         }
+        if($date < $this->openingbalancedate) {
+            $date = $this->openingbalancedate;
+        }
 
         return floatval(
             $this->balancemodifiers()->where(

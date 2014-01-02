@@ -1,5 +1,5 @@
 @extends('layouts.default')
-@section('breadcrumbs', Breadcrumbs::render('home'))
+@section('breadcrumbs', Breadcrumbs::render('reports'))
 
 @section('content')
 <div class="row">

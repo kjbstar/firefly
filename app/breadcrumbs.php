@@ -6,10 +6,18 @@ Breadcrumbs::register(
         $breadcrumbs->push('Home', route('home'));
     }
 );
+Breadcrumbs::register(
+    'reports', function ($breadcrumbs) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push('Reports', route('reports'));
+    }
+);
+
 
 Breadcrumbs::register(
     'report', function ($breadcrumbs,$year) {
-        $breadcrumbs->parent('home');
+        $breadcrumbs->parent('reports');
+
         $breadcrumbs->push($year, route('yearreport',$year));
     }
 );

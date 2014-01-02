@@ -51,7 +51,7 @@ class HomeController extends BaseController
      */
     public function showHome($year = null, $month = null)
     {
-        $earliest = HomeHelper::getEarliestEvent();
+        $earliest = Toolkit::getEarliestEvent();
         $today = Toolkit::parseDate($year, $month, new Carbon);
 
         // get all kinds of lists:

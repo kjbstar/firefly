@@ -61,11 +61,14 @@ function drawAllCharts() {
                     height: 300,
                     legend: {position: 'none'}
                 };
+                console.log(data);
                 var gdata = new google.visualization.DataTable(data);
                 var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
                 money.format(gdata, 1);
                 var chart = new google.visualization.PieChart(document.getElementById(holderID));
+                console.log('Draw ' + obj + ' compared with ' + compare);
                 chart.draw(gdata, opt);
+
             }).fail(function () {
                 holder.addClass('load-error');
             });

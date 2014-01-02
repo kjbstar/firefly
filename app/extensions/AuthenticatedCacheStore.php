@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Cache\Repository;
+use Carbon\Carbon as Carbon;
 
 class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     implements Illuminate\Cache\StoreInterface
@@ -9,7 +10,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     public function get($key)
     {
         if (Auth::check()) {
-            $key = Auth::user()->id . $key;
+            $key = Auth::user()->id . '-' . $key;
         }
 
         return parent::get($key);
@@ -18,7 +19,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     public function put($key, $value, $minutes)
     {
         if (Auth::check()) {
-            $key = Auth::user()->id . $key;
+            $key = Auth::user()->id . '-' . $key;
         }
 
         return parent::put($key, $value, $minutes);
@@ -27,7 +28,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     public function increment($key, $value = 1)
     {
         if (Auth::check()) {
-            $key = Auth::user()->id . $key;
+            $key = Auth::user()->id . '-' . $key;
         }
 
         return parent::increment($key, $value);
@@ -36,7 +37,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     public function decrement($key, $value = 1)
     {
         if (Auth::check()) {
-            $key = Auth::user()->id . $key;
+            $key = Auth::user()->id . '-' . $key;
         }
 
         return parent::increment($key, $value);
@@ -45,7 +46,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     public function forever($key, $value)
     {
         if (Auth::check()) {
-            $key = Auth::user()->id . $key;
+            $key = Auth::user()->id . '-' . $key;
         }
 
         return parent::forever($key, $value);
@@ -54,7 +55,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     public function forget($key)
     {
         if (Auth::check()) {
-            $key = Auth::user()->id . $key;
+            $key = Auth::user()->id . '-' . $key;
         }
 
         return parent::forget($key);
@@ -70,6 +71,14 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
         return parent::getPrefix();
 
     }
+
+    public function has($key) {
+        if(self::get($key)) {
+            return true;
+        }
+        return false;
+    }
+
 }
 
 Cache::extend(

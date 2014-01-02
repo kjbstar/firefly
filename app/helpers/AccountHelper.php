@@ -72,9 +72,9 @@ class AccountHelper
     public static function generateOverviewOfMonths(Account $account)
     {
         $end = new Carbon;
-        $start = new Carbon('first day of january 2013');
+        $start = Toolkit::getEarliestEvent();
         $list = [];
-        while ($end > $start) {
+        while ($end >= $start) {
 
             // money in:
             $amountIn = floatval(

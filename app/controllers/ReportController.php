@@ -40,27 +40,31 @@ class ReportController extends BaseController
      */
     public function showYearlyReport($year)
     {
-        $start = new Carbon($year . '-01-01');
-        $start->startOfYear();
-        $end = clone $start;
-        $end->endOfYear();
+        $year = intval($year);
+        // end is the current year.
+        $start = new Carbon(($year-1).'-12-31');
+        $end = new Carbon($year.'-12-31');
+
+
+
 
         // basic information:
-        $data = ReportHelper::basicInformation($start);
+        $data = ReportHelper::basicInformation($end);
         // account information:
-        $accounts = ReportHelper::accountInformation($start);
+        $accounts = ReportHelper::accountInformation($start,$end);
 
         $benefactors = ReportHelper::objectInformation(
-            $start, 'beneficiary', SORT_DESC
+            $end, 'beneficiary', SORT_DESC
         );
         $fans = ReportHelper::objectInformation(
-            $start, 'beneficiary', SORT_ASC
+            $end, 'beneficiary', SORT_ASC
         );
         $spentMostCategories = ReportHelper::objectInformation(
-            $start, 'category', SORT_ASC
+            $end, 'category', SORT_ASC
         );
 
-        return View::make('reports.year')->with('date', $start)->with(
+        return View::make('reports.year')->with('start',
+            $start)->with('end',$end)->with(
             'data', $data
         )->with('accounts', $accounts)->with('end', $end)->with(
                 'benefactors', $benefactors

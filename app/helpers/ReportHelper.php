@@ -42,16 +42,15 @@ class ReportHelper
      *
      * @return array
      */
-    public static function accountInformation(Carbon $date)
+    public static function accountInformation(Carbon $start,Carbon $end)
     {
-        $end = clone $date;
-        $end->endOfYear();
+
         $accounts = [];
         $accounts['accounts'] = Auth::user()->accounts()->get();
         $startNw = 0;
         $endNw = 0;
         foreach ($accounts['accounts'] as $account) {
-            $startNw += $account->balanceOnDate($date);
+            $startNw += $account->balanceOnDate($start);
             $endNw += $account->balanceOnDate($end);
         }
         $diffNw = $endNw - $startNw;
@@ -79,12 +78,22 @@ class ReportHelper
         $rawData = [];
         $amount = [];
         foreach ($objects as $object) {
+            $query = $object->transactions()->inYear($date);
+            if($sortFlag == SORT_ASC) {
+                $query->expenses();
+            } else {
+                $query->incomes();
+            }
+            $sum = floatval(
+                $query->sum(
+                    'amount'
+                )
+            );
+            if($sum != 0.0) {
+
             $rawData[] = ['id'  => $object->id, 'name' => $object->name,
-                          'sum' => floatval(
-                              $object->transactions()->inYear($date)->sum(
-                                  'amount'
-                              )
-                          )];
+                          'sum' => $sum];
+            }
         }
 
         foreach ($rawData as $key => $row) {

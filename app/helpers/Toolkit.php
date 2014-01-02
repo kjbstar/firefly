@@ -30,4 +30,20 @@ class Toolkit
 
         return $default;
     }
+
+    public static function getEarliestEvent()
+    {
+        if (Cache::has('getEarliestEvent')) {
+            return Cache::get('getEarliestEvent');
+        } else {
+            $account = Auth::user()->accounts()->orderBy(
+                'openingbalancedate', 'ASC'
+            )->first();
+            $date = $account->openingbalancedate;
+
+            Cache::forever('getEarliestEvent', $date);
+
+            return $date;
+        }
+    }
 }

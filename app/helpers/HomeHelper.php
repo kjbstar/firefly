@@ -51,7 +51,8 @@ class HomeHelper
         $specificAllowance = Auth::user()->settings()->where(
             'name', 'specificAllowance'
         )->where('date', $date->format('Y-m') . '-01')->first();
-        $allowance = !is_null($specificAllowance) ? $specificAllowance : $defaultAllowance;
+        $allowance = !is_null($specificAllowance) ? $specificAllowance
+            : $defaultAllowance;
 
         $amount = floatval($allowance->value);
         $allowance = ['amount' => $amount, 'over' => false];
@@ -194,7 +195,7 @@ class HomeHelper
                     return $query->inMonth($date);
                 }]
         )->inMonth($date);
-        if($noNegatives) {
+        if ($noNegatives) {
             $query->expenses();
         }
         $transactions = $query->get();
@@ -263,22 +264,6 @@ class HomeHelper
         }
 
         return $objects;
-    }
-
-    public static function getEarliestEvent()
-    {
-        if (Cache::has('getEarliestEvent')) {
-            return Cache::get('getEarliestEvent');
-        } else {
-            $account = Auth::user()->accounts()->orderBy(
-                'openingbalancedate', 'ASC'
-            )->first();
-            $date = $account->openingbalancedate;
-
-            Cache::forever('getEarliestEvent', $date);
-
-            return $date;
-        }
     }
 
     /**

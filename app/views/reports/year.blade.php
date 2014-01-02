@@ -1,21 +1,21 @@
 @extends('layouts.default')
-@section('breadcrumbs', Breadcrumbs::render('report',$date->format('Y')))
+@section('breadcrumbs', Breadcrumbs::render('report',$end->format('Y')))
 
 @section('content')
 <div class="row">
     <div class="col-lg-12 col-md-12">
         <h1>Firefly
-            <small>Report for {{$date->format('Y')}}</small>
+            <small>Report for {{$end->format('Y')}}</small>
         </h1>
         <p class="lead">
             @if($data['totalDiff'] > 0)
-                In {{$date->format('Y')}} you have earned {{mf($data['totalDiff'],true)}},
+                In {{$end->format('Y')}} you have earned {{mf($data['totalDiff'],true)}},
             @elseif($data['totalDiff'] < 0)
-                In {{$date->format('Y')}} you have spent <span
+                In {{$end->format('Y')}} you have spent <span
                 class="text-danger">{{mf
             ($data['totalDiff']*-1)}}</span>,
             @else
-            In {{$date->format('Y')}} you balanced the books (<span
+            In {{$end->format('Y')}} you balanced the books (<span
                 style="color:#999">{{mf
             ($data['totalDiff']*-1)}}</span>),
             @endif
@@ -64,16 +64,17 @@
         <table class="table table-bordered table-striped">
             <tr>
                 <th>Account</th>
-                <th>Jan 1st</th>
-                <th>Dec 31st</th>
+                <th>{{$start->format('M jS, Y')}}</th>
+                <th>{{$end->format('M jS, Y')}}</th>
                 <th>Diff</th>
             </tr>
         @foreach($accounts['accounts'] as $a)
         <tr>
             <td>{{{$a->name}}}</td>
-            <td style="text-align:right;">{{mf($a->balanceOnDate($date),false)}}</td>
+            <td style="text-align:right;">{{mf($a->balanceOnDate($start),false)}}</td>
             <td style="text-align:right;">{{mf($a->balanceOnDate($end),false)}}</td>
-            <td style="text-align:right;">{{mf($a->balanceOnDate($end)-$a->balanceOnDate($date),false)}}</td>
+            <td style="text-align:right;">{{mf($a->balanceOnDate
+                ($end)-$a->balanceOnDate($start),false)}}</td>
         </tr>
         @endforeach
             <tr>
@@ -157,7 +158,7 @@
 @endsection
 @section('scripts')
 <script type="text/javascript">
-    var year = {{$date->format('Y')}};
+    var year = {{$end->format('Y')}};
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script src="/js/report.js"></script>
