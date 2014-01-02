@@ -1,18 +1,27 @@
-<div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Set a new budget</h4>
-      </div>
-        {{Form::open(['class' => 'form-horizontal','role' => 'form'])}}
-      <div class="modal-body">
-        <p>
+@extends('layouts.default')
+@section('breadcrumbs', Breadcrumbs::render('addallowance'))
+
+@section('content')
+
+<div class="row">
+    <div class="col-lg-12 col-md-12">
+        <h3>Add a new allowance</h3>
+    </div>
+</div>
+
+<div class="row">
+<div class="col-lg-6 col-md-12"
+
+    <p>
         Set a specific allowance for a month of your choice.
-        </p>
+    </p>
+
+    {{Form::open(['class' => 'form-horizontal','role' => 'form'])}}
+
         <div class="form-group">
-            <label class="col-sm-3
-            control-label" for="inputAmount">Amount</label>
-            <div class="col-sm-9">
+            <label class="col-sm-4 control-label"
+                   for="inputAmount">Amount</label>
+            <div class="col-sm-8">
             <div class="input-group">
                 <span class="input-group-addon">&euro;</span>
                 <input type="number" step="any" name="amount" class="form-control" id="inputAmount">
@@ -21,22 +30,15 @@
         </div>
 
           <div class="form-group">
-              <label for="inputDate" class="col-sm-3
+              <label for="inputDate" class="col-sm-4
               control-label">Date</label>
-              <div class="col-sm-9">
+              <div class="col-sm-8">
               <input type="month" name="date" class="form-control"
                      id="inputAmount" />
                   </div>
           </div>
-        
-        
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default"
-                data-dismiss="modal">Never mind</button>
         <button type="submit" class="btn btn-primary">Save
             allowance</button>
-      </div>
-        {{Form::close()}}
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+    </div>
+  </div>
+@stop

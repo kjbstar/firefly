@@ -83,8 +83,7 @@
             @endforeach
         </ul>
 
-        <a data-toggle="modal" data-target="#PopupModal"
-           href="{{URL::Route('addallowance')}}"
+        <a href="{{URL::Route('addallowance')}}"
            class="btn btn-default btn-info"><span class="glyphicon
            glyphicon-plus-sign"></span> Add an allowance for a particular
             month</a>

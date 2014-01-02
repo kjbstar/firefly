@@ -29,6 +29,13 @@ Breadcrumbs::register(
         $breadcrumbs->push('Allowances', route('allowances'));
     }
 );
+Breadcrumbs::register(
+
+    'addallowance', function ($breadcrumbs) {
+        $breadcrumbs->parent('allowances');
+        $breadcrumbs->push('Add allowance', route('addallowance'));
+    }
+);
 
 
 // add, edit, delete
