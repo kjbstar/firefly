@@ -3,7 +3,9 @@ google.load('visualization', '1.1', {'packages': ['corechart']});
 google.setOnLoadCallback(drawAllCharts);
 
 
-$('#LimitModal').on('hidden.bs.modal', function() { $(this).removeData(); })
+$('#LimitModal').on('hidden.bs.modal', function () {
+    $(this).removeData();
+})
 
 function drawAllCharts() {
     if ($('#overview-chart').length === 1) {
@@ -66,16 +68,14 @@ function drawAllCharts() {
                 var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
                 money.format(gdata, 1);
                 var chart = new google.visualization.PieChart(document.getElementById(holderID));
-                console.log('Draw ' + obj + ' compared with ' + compare);
                 chart.draw(gdata, opt);
-
             }).fail(function () {
                 holder.addClass('load-error');
             });
     });
 
     // average expense per beneficiary:
-    if($('#object-avg-chart').length === 1) {
+    if ($('#object-avg-chart').length === 1) {
         var URL = '/home/' + object + '/index/average';
 
         $.getJSON(URL).success(function (data) {
@@ -91,7 +91,7 @@ function drawAllCharts() {
             var chart = new google.visualization.BarChart(document.getElementById('object-avg-chart'));
             chart.draw(gdata, opt);
 
-        }).fail(function() {
+        }).fail(function () {
                 $('#object-avg-chart').addClass('load-error');
             });
     }
