@@ -70,14 +70,19 @@ Route::get(
     '/home/reports', ['uses' => 'ReportController@showIndex', 'as' => 'reports']
 );
 
-// reports:
 Route::get(
     '/home/report/{year}/networth', ['uses' => 'ReportController@netWorthChart']
+);
+
+Route::get(
+    '/home/report/{year}/chart/overview/{component}',
+    ['uses' => 'ReportController@objectOverviewChart']
 );
 Route::get(
     '/home/report/{year}/chart/{type}/{sort}',
     ['uses' => 'ReportController@objectChart']
 );
+
 
 // not logged in (GET routes):
 Route::get('/', ['uses' => 'HomeController@showIndex', 'as' => 'index']);
