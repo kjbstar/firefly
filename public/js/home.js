@@ -13,7 +13,7 @@ var pieChartOpt = {
         height: 180
     },
     diff: {innerCircle: { radiusFactor: 0.4 }},
-    pieSliceText: 'none'
+    pieSliceText: 'value'
 };
 
 function drawComponentChart(index, type) {
