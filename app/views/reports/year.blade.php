@@ -109,8 +109,8 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-4">
-        <h4>Your largest benefactors</h4>
+    <div class="col-lg-4 col-md-4">
+        <h3>Your largest benefactors</h3>
         <div id="report-benefactor-chart"></div>
         <table class="table table-bordered table-striped">
         @foreach($benefactors as $x)
@@ -124,8 +124,8 @@
 
 
     </div>
-    <div class="col-lg-4">
-        <h4>Your biggest fans</h4>
+    <div class="col-lg-4 col-md-4">
+        <h3>Your biggest fans</h3>
         <div id="report-fan-chart"></div>
         <table class="table table-bordered table-striped">
             @foreach($fans as $x)
@@ -138,8 +138,8 @@
         </table>
 
     </div>
-    <div class="col-lg-4">
-        <h4>Most money spent on:</h4>
+    <div class="col-lg-4 col-md-4">
+        <h3>Most money spent on:</h3>
         <div id="report-cat-chart"></div>
         <table class="table table-bordered table-striped">
             @foreach($spentMostCategories as $x)
@@ -150,9 +150,25 @@
             </tr>
             @endforeach
         </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h3>Budgets</h3>
 
     </div>
 </div>
+@foreach($budgets as $budget)
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h4>{{$budget->name}}</h4>
+        <div class="report-budget-year-chart"
+             id="report-budget-year-chart-{{$budget->id}}"
+             data-id="{{$budget->id}}"></div>
+    </div>
+</div>
+@endforeach
+
 
 
 @endsection
