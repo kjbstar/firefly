@@ -9,7 +9,7 @@
     </tr>
     @foreach($transfers as $t)
     <tr>
-        <td>{{$t->date->format('D d F Y')}}</td>
+        <td>{{$t->date->format(Config::get('firefly.date_format'))}}</td>
         <td><a href="{{URL::Route('edittransfer',
         [$t->id])}}">{{{$t->description}}}</a></td>
         <td>{{mf($t->amount,true)}}</td>

@@ -223,8 +223,12 @@
 
 
 <div class="row">
-    <div class="col-lg-12 col-lg-offset-0" style="margin-top:20px;">
+    <div class="col-lg-3 col-lg-offset-0" style="margin-top:20px;">
         <input type="submit" name="submit" value="Save new transaction" class="btn btn-default btn-info btn-lg" />
+    </div>
+    <div class="col-lg-9 col-lg-offset-0" style="margin-top:20px;">
+        <label><input name="another" value="1" type="checkbox"> Add another
+            transaction</label>
     </div>
 </div>
 

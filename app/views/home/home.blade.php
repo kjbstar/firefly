@@ -157,9 +157,8 @@
                     @endif
 
                 </div>
-                {{mf($allowance['spent'])}} / <small>&nbsp;&nbsp;{{mf
-                    ($allowance['amount'])
-                    }}</small>
+                &nbsp;&nbsp;{{mf($allowance['amount'])}} - {{mf($allowance['spent'])}}
+                = {{mf($allowance['amount'] - $allowance['spent'],true)}}
 
             </div>
             @endif
@@ -167,7 +166,7 @@
                 <table class="table table-condensed table-bordered">
                     @foreach($transactions as $t)
                     <tr>
-                        <td>{{$t->date->format('j F Y')}}</td>
+                        <td>{{$t->date->format(Config::get('firefly.date_format'))}}</td>
                         <td><a href="{{URL::Route('edittransaction',
                 $t->id)}}">{{{$t->description}}}</a>
                         </td>
@@ -180,7 +179,7 @@
                 <table class="table table-condensed table-bordered">
                 @foreach($transfers as $t)
                 <tr>
-                    <td>{{$t->date->format('j F Y')}}</td>
+                    <td>{{$t->date->format(Config::get('firefly.date_format'))}}</td>
                     <td><a href="{{URL::Route('edittransaction',
                 $t->id)}}">{{{$t->description}}}</a>
                     </td>
@@ -191,18 +190,6 @@
                 </table>
             </div>
         </div>
-        <!--
-        <table class="table table-condensed table-bordered">
-        @foreach($transactions as $t)
-            <tr>
-                <td>{{$t->date->format('j F Y')}}</td>
-                <td><a href="{{URL::Route('edittransaction',
-                $t->id)}}">{{{$t->description}}}</a>
-                </td>
-                <td style="text-align: right;">{{mf($t->amount,true,true)}}
-            </tr>
-            @endforeach
-        </table>-->
     </div>
     @endif
 </div>
@@ -256,8 +243,8 @@
             @if($allowance['amount'] > 0)
             <tr>
                 <td><em>Allowance left</em></td>
-                <td style="text-align: right;">{{mf($allowance['amount']+$sum,true,
-                    true)}}</td>
+                <td style="text-align: right;">{{mf
+                    ($allowance['amount']-$allowance['spent'],true,true)}}</td>
             </tr>
             @endif
         </table>
@@ -317,8 +304,8 @@
             @if($allowance['amount'] > 0)
             <tr>
                 <td><em>Allowance left</em></td>
-                <td style="text-align: right;">{{mf($allowance['amount']+$sum,true,
-                    true)}}</td>
+                <td style="text-align: right;">{{mf
+                    ($allowance['amount']-$allowance['spent'],true,true)}}</td>
             </tr>
             @endif
         </table>
@@ -345,13 +332,13 @@
                     <td><em>Total</em></td>
                     <td style="text-align: right;">{{mf($sum,true,true)}}</td>
                 </tr>
-                @if($allowance['amount'] > 0)
-                <tr>
-                    <td><em>Allowance left</em></td>
-                    <td style="text-align: right;">{{mf($allowance['amount']+$sum,true,
-                        true)}}</td>
-                </tr>
-                @endif
+            @if($allowance['amount'] > 0)
+            <tr>
+                <td><em>Allowance left</em></td>
+                <td style="text-align: right;">{{mf
+                    ($allowance['amount']-$allowance['spent'],true,true)}}</td>
+            </tr>
+            @endif
         </table>
 
     </div>
@@ -375,6 +362,9 @@
 <script type="text/javascript">
     var month = {{$today->format('n')}};
     var year = {{$today->format('Y')}};
+    @if($allowance['amount'] > 0)
+    var colorAllowance = true;
+    @endif
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script src="/js/home.js"></script>
