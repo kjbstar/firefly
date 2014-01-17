@@ -44,47 +44,6 @@ class HomeHelper
         return $accounts;
     }
 
-    public static function getAllowanceInformation(Carbon $date)
-    {
-        // default values and array
-        $defaultAllowance = Setting::getSetting('defaultAllowance');
-        $specificAllowance = Auth::user()->settings()->where(
-            'name', 'specificAllowance'
-        )->where('date', $date->format('Y-m') . '-01')->first();
-        $allowance = !is_null($specificAllowance) ? $specificAllowance
-            : $defaultAllowance;
-
-        $amount = floatval($allowance->value);
-        $allowance = ['amount' => $amount, 'over' => false];
-        $days = round(
-            (intval($date->format('d')) / intval(
-                    $date->format('t')
-                )) * 100
-        );
-        $allowance['days'] = $days;
-        // start!
-        if ($amount > 0) {
-            $spent = floatval(
-                    Auth::user()->transactions()->inMonth($date)->expenses()
-                        ->sum(
-                            'amount'
-                        )
-                ) * -1;
-            $allowance['spent'] = $spent;
-            // overspent this allowance:
-            if ($spent > $amount) {
-                $allowance['over'] = true;
-                $allowance['pct'] = round(($amount / $spent) * 100);
-            }
-            // did not overspend this allowance.
-            if ($spent <= $amount) {
-                $allowance['pct'] = round(($spent / $amount) * 100);
-            }
-        }
-
-        return $allowance;
-    }
-
     /**
      * Returns a list of transactions for the home page for a given month.
      *
@@ -141,6 +100,12 @@ class HomeHelper
         $chart->addColumn('Budgeted', 'number', 'old-data');
         $chart->addColumn('Amount', 'number');
 
+        // get allowance info which might be relevant for the
+        // chart:
+        $allowanceInfo = HomeHelper::getAllowanceInformation($date);
+        $left = $allowanceInfo['amount'] - $allowanceInfo['spent'];
+
+
         // loop the current list:
         $index = 0;
         foreach ($currentList as $id => $obj) {
@@ -159,6 +124,15 @@ class HomeHelper
             }
             $index++;
         }
+        // apart from the "empty object" entry, we also add
+        // a special "allowance left" entry if relevant.
+        if ($left > 0) {
+            $chart->addRow(
+                'Allowance left', null, $left
+            );
+        }
+
+
         $chart->generate();
         $return = $chart->getData();
 
@@ -264,6 +238,47 @@ class HomeHelper
         }
 
         return $objects;
+    }
+
+    public static function getAllowanceInformation(Carbon $date)
+    {
+        // default values and array
+        $defaultAllowance = Setting::getSetting('defaultAllowance');
+        $specificAllowance = Auth::user()->settings()->where(
+            'name', 'specificAllowance'
+        )->where('date', $date->format('Y-m') . '-01')->first();
+        $allowance = !is_null($specificAllowance) ? $specificAllowance
+            : $defaultAllowance;
+
+        $amount = floatval($allowance->value);
+        $allowance = ['amount' => $amount, 'over' => false];
+        $days = round(
+            (intval($date->format('d')) / intval(
+                    $date->format('t')
+                )) * 100
+        );
+        $allowance['days'] = $days;
+        // start!
+        if ($amount > 0) {
+            $spent = floatval(
+                    Auth::user()->transactions()->inMonth($date)->expenses()
+                        ->sum(
+                            'amount'
+                        )
+                ) * -1;
+            $allowance['spent'] = $spent;
+            // overspent this allowance:
+            if ($spent > $amount) {
+                $allowance['over'] = true;
+                $allowance['pct'] = round(($amount / $spent) * 100);
+            }
+            // did not overspend this allowance.
+            if ($spent <= $amount) {
+                $allowance['pct'] = round(($spent / $amount) * 100);
+            }
+        }
+
+        return $allowance;
     }
 
     /**
