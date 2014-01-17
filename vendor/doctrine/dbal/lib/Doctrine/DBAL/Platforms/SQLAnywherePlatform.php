@@ -22,12 +22,12 @@ namespace Doctrine\DBAL\Platforms;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\LockMode;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ColumnDiff;
 use Doctrine\DBAL\Schema\Constraint;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Identifier;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 
@@ -189,18 +189,18 @@ class SQLAnywherePlatform extends AbstractPlatform
                 continue;
             }
 
-            $sql[] = $this->getAlterTableClause($diff->name) . ' ' .
+            $sql[] = $this->getAlterTableClause($diff->getName()) . ' ' .
                 $this->getAlterTableRenameColumnClause($oldColumnName, $column);
         }
 
         if ( ! $this->onSchemaAlterTable($diff, $tableSql)) {
             if ( ! empty($alterClauses)) {
-                $sql[] = $this->getAlterTableClause($diff->name) . ' ' . implode(", ", $alterClauses);
+                $sql[] = $this->getAlterTableClause($diff->getName()) . ' ' . implode(", ", $alterClauses);
             }
 
             if ($diff->newName !== false) {
-                $sql[] = $this->getAlterTableClause($diff->name) . ' ' .
-                    $this->getAlterTableRenameTableClause($diff->newName);
+                $sql[] = $this->getAlterTableClause($diff->getName()) . ' ' .
+                    $this->getAlterTableRenameTableClause($diff->getNewName());
             }
 
             $sql = array_merge($sql, $this->_getAlterTableIndexForeignKeySQL($diff), $commentsSQL);
@@ -224,13 +224,13 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * Returns the SQL clause for altering a table.
      *
-     * @param string $tableName The quoted name of the table to alter.
+     * @param Identifier $tableName The quoted name of the table to alter.
      *
      * @return string
      */
-    protected function getAlterTableClause($tableName)
+    protected function getAlterTableClause(Identifier $tableName)
     {
-        return 'ALTER TABLE ' . $tableName;
+        return 'ALTER TABLE ' . $tableName->getQuotedName($this);
     }
 
     /**
@@ -261,13 +261,13 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * Returns the SQL clause for renaming a table in a table alteration.
      *
-     * @param string $newTableName The quoted name of the table to rename to.
+     * @param Identifier $newTableName The quoted name of the table to rename to.
      *
      * @return string
      */
-    protected function getAlterTableRenameTableClause($newTableName)
+    protected function getAlterTableRenameTableClause(Identifier $newTableName)
     {
-        return 'RENAME ' . $newTableName;
+        return 'RENAME ' . $newTableName->getQuotedName($this);
     }
 
     /**
@@ -286,7 +286,14 @@ class SQLAnywherePlatform extends AbstractPlatform
 
         // Do not return alter clause if only comment has changed.
         if ( ! ($columnDiff->hasChanged('comment') && count($columnDiff->changedProperties) === 1)) {
-            return 'ALTER ' . $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
+            $columnAlterationClause = 'ALTER ' .
+                $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
+
+            if ($columnDiff->hasChanged('default') && null === $column->getDefault()) {
+                $columnAlterationClause .= ', ALTER ' . $column->getQuotedName($this) . ' DROP DEFAULT';
+            }
+
+            return $columnAlterationClause;
         }
     }
 
@@ -298,6 +305,22 @@ class SQLAnywherePlatform extends AbstractPlatform
         $columnDef['integer_type'] = 'BIGINT';
 
         return $this->_getCommonIntegerTypeDeclarationSQL($columnDef);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBinaryDefaultLength()
+    {
+        return 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBinaryMaxLength()
+    {
+        return 32767;
     }
 
     /**
@@ -729,6 +752,13 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getListTableColumnsSQL($table, $database = null)
     {
+        $user = 'USER_NAME()';
+
+        if (strpos($table, '.') !== false) {
+            list($user, $table) = explode('.', $table);
+            $user = "'" . $user . "'";
+        }
+
         return "SELECT    col.column_name,
                           COALESCE(def.user_type_name, def.domain_name) AS 'type',
                           def.declared_width AS 'length',
@@ -743,6 +773,7 @@ class SQLAnywherePlatform extends AbstractPlatform
                 ON        col.table_id = def.base_table_id AND col.column_id = def.base_column_id
                 LEFT JOIN SYS.SYSREMARK AS rem
                 ON        col.object_id = rem.object_id
+                WHERE     def.base_owner_name = $user
                 ORDER BY  def.base_column_id ASC";
     }
 
@@ -753,10 +784,18 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getListTableConstraintsSQL($table)
     {
+        $user = '';
+
+        if (strpos($table, '.') !== false) {
+            list($user, $table) = explode('.', $table);
+            $user = "'" . $user . "'";
+        }
+
         return "SELECT con.*
                 FROM   SYS.SYSCONSTRAINT AS con
-                JOIN   SYS.SYSTABLE AS tab ON con.table_object_id = tab.object_id
-                WHERE  tab.table_name = '$table'";
+                JOIN   SYS.SYSTAB AS tab ON con.table_object_id = tab.object_id
+                WHERE  tab.table_name = '$table'
+                AND    tab.creator = USER_ID($user)";
     }
 
     /**
@@ -764,6 +803,13 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getListTableForeignKeysSQL($table)
     {
+        $user = '';
+
+        if (strpos($table, '.') !== false) {
+            list($user, $table) = explode('.', $table);
+            $user = "'" . $user . "'";
+        }
+
         return "SELECT    fcol.column_name AS local_column,
                           ptbl.table_name AS foreign_table,
                           pcol.column_name AS foreign_column,
@@ -831,6 +877,7 @@ class SQLAnywherePlatform extends AbstractPlatform
                 AND       fk.foreign_index_id = dt.foreign_key_id
                 AND       dt.event = 'D'
                 WHERE     ftbl.table_name = '$table'
+                AND       ftbl.creator = USER_ID($user)
                 ORDER BY  fk.foreign_index_id ASC, idxcol.sequence ASC";
     }
 
@@ -839,6 +886,13 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getListTableIndexesSQL($table, $currentDatabase = null)
     {
+        $user = '';
+
+        if (strpos($table, '.') !== false) {
+            list($user, $table) = explode('.', $table);
+            $user = "'" . $user . "'";
+        }
+
         return "SELECT   idx.index_name AS key_name,
                          IF idx.index_category = 1
                              THEN 1
@@ -872,6 +926,7 @@ class SQLAnywherePlatform extends AbstractPlatform
                 JOIN     SYS.SYSTAB AS tbl
                 ON       idx.table_id = tbl.table_id
                 WHERE    tbl.table_name = '$table'
+                AND      tbl.creator = USER_ID($user)
                 ORDER BY idx.index_id ASC, idxcol.sequence ASC";
     }
 
@@ -1313,6 +1368,16 @@ class SQLAnywherePlatform extends AbstractPlatform
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getBinaryTypeDeclarationSQLSnippet($length, $fixed)
+    {
+        return $fixed
+            ? 'BINARY(' . ($length ?: $this->getBinaryDefaultLength()) . ')'
+            : 'VARBINARY(' . ($length ?: $this->getBinaryDefaultLength()) . ')';
+    }
+
+    /**
      * Returns the SQL snippet for creating a table constraint.
      *
      * @param Constraint  $constraint The table constraint to create the SQL snippet for.
@@ -1387,6 +1452,16 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * {@inheritdoc}
      */
+    protected function getRenameIndexSQL($oldIndexName, Index $index, $tableName)
+    {
+        return array(
+            'ALTER INDEX ' . $oldIndexName . ' ON ' . $tableName . ' RENAME TO ' . $index->getQuotedName($this)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getReservedKeywordsClass()
     {
         return 'Doctrine\DBAL\Platforms\Keywords\SQLAnywhereKeywords';
@@ -1425,6 +1500,7 @@ class SQLAnywherePlatform extends AbstractPlatform
             'double' => 'float',
             'float' => 'float',
             'int' => 'integer',
+            'integer' => 'integer',
             'unsigned int' => 'integer',
             'numeric' => 'decimal',
             'smallint' => 'smallint',
@@ -1440,11 +1516,11 @@ class SQLAnywherePlatform extends AbstractPlatform
             'smalldatetime' => 'datetime',
             'time' => 'time',
             'timestamp' => 'datetime',
-            'binary' => 'blob',
+            'binary' => 'binary',
             'image' => 'blob',
             'long binary' => 'blob',
             'uniqueidentifier' => 'guid',
-            'varbinary' => 'blob',
+            'varbinary' => 'binary',
         );
     }
 }

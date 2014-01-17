@@ -164,10 +164,10 @@ class SqliteSchemaManager extends AbstractSchemaManager
         $indexBuffer = array();
 
         // fetch primary
-        $stmt = $this->_conn->executeQuery( "PRAGMA TABLE_INFO ('$tableName')" );
+        $stmt = $this->_conn->executeQuery("PRAGMA TABLE_INFO ('$tableName')");
         $indexArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        foreach($indexArray as $indexColumnRow) {
-            if($indexColumnRow['pk'] == "1") {
+        foreach ($indexArray as $indexColumnRow) {
+            if ($indexColumnRow['pk'] != "0") {
                 $indexBuffer[] = array(
                     'key_name' => 'primary',
                     'primary' => true,
@@ -178,7 +178,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
         }
 
         // fetch regular indexes
-        foreach($tableIndexes as $tableIndex) {
+        foreach ($tableIndexes as $tableIndex) {
             // Ignore indexes with reserved names, e.g. autoindexes
             if (strpos($tableIndex['name'], 'sqlite_') !== 0) {
                 $keyName = $tableIndex['name'];
@@ -187,10 +187,10 @@ class SqliteSchemaManager extends AbstractSchemaManager
                 $idx['primary'] = false;
                 $idx['non_unique'] = $tableIndex['unique']?false:true;
 
-                $stmt = $this->_conn->executeQuery( "PRAGMA INDEX_INFO ( '{$keyName}' )" );
+                $stmt = $this->_conn->executeQuery("PRAGMA INDEX_INFO ('{$keyName}')");
                 $indexArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-                foreach ( $indexArray as $indexColumnRow ) {
+                foreach ($indexArray as $indexColumnRow) {
                     $idx['column_name'] = $indexColumnRow['name'];
                     $indexBuffer[] = $idx;
                 }
@@ -244,16 +244,22 @@ class SqliteSchemaManager extends AbstractSchemaManager
      */
     protected function _getPortableTableColumnDefinition($tableColumn)
     {
-        $e = explode('(', $tableColumn['type']);
-        $tableColumn['type'] = $e[0];
-        if (isset($e[1])) {
-            $length = trim($e[1], ')');
+        $parts = explode('(', $tableColumn['type']);
+        $tableColumn['type'] = $parts[0];
+        if (isset($parts[1])) {
+            $length = trim($parts[1], ')');
             $tableColumn['length'] = $length;
         }
 
         $dbType = strtolower($tableColumn['type']);
         $length = isset($tableColumn['length']) ? $tableColumn['length'] : null;
-        $unsigned = (boolean) isset($tableColumn['unsigned']) ? $tableColumn['unsigned'] : false;
+        $unsigned = false;
+
+        if (strpos($dbType, ' unsigned') !== false) {
+            $dbType = str_replace(' unsigned', '', $dbType);
+            $unsigned = true;
+        }
+
         $fixed = false;
         $type = $this->_platform->getDoctrineTypeMapping($dbType);
         $default = $tableColumn['dflt_value'];
@@ -285,7 +291,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
                 if (isset($tableColumn['length'])) {
                     if (strpos($tableColumn['length'], ',') === false) {
                         $tableColumn['length'] .= ",0";
-                    }                    
+                    }
                     list($precision, $scale) = array_map('trim', explode(',', $tableColumn['length']));
                 }
                 $length = null;
@@ -347,7 +353,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
         }
 
         $result = array();
-        foreach($list as $constraint) {
+        foreach ($list as $constraint) {
             $result[] = new ForeignKeyConstraint(
                 array_values($constraint['local']), $constraint['foreignTable'],
                 array_values($constraint['foreign']), $constraint['name'],

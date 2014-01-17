@@ -20,7 +20,7 @@
 namespace Doctrine\DBAL\Driver\Mysqli;
 
 use Doctrine\DBAL\Driver\Connection as Connection;
-use \Doctrine\DBAL\Driver\PingableConnection;
+use Doctrine\DBAL\Driver\PingableConnection;
 
 /**
  * @author Kim Hemsø Rasmussen <kimhemsoe@gmail.com>
@@ -182,7 +182,7 @@ class MysqliConnection implements Connection, PingableConnection
             \MYSQLI_READ_DEFAULT_GROUP,
         );
 
-        if (version_compare(PHP_VERSION, '5.5.0') >= 0) {
+        if (defined('MYSQLI_SERVER_PUBLIC_KEY')) {
             $supportedDriverOptions[] = \MYSQLI_SERVER_PUBLIC_KEY;
         }
 

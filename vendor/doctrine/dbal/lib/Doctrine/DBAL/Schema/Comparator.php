@@ -60,7 +60,7 @@ class Comparator
 
         $foreignKeysToTable = array();
 
-        foreach ( $toSchema->getTables() as $table ) {
+        foreach ($toSchema->getTables() as $table) {
             $tableName = $table->getShortestName($toSchema->getName());
             if ( ! $fromSchema->hasTable($tableName)) {
                 $diff->newTables[$tableName] = $toSchema->getTable($tableName);
@@ -77,7 +77,7 @@ class Comparator
             $tableName = $table->getShortestName($fromSchema->getName());
 
             $table = $fromSchema->getTable($tableName);
-            if ( ! $toSchema->hasTable($tableName) ) {
+            if ( ! $toSchema->hasTable($tableName)) {
                 $diff->removedTables[$tableName] = $table;
             }
 
@@ -162,11 +162,11 @@ class Comparator
      */
     public function diffSequence(Sequence $sequence1, Sequence $sequence2)
     {
-        if($sequence1->getAllocationSize() != $sequence2->getAllocationSize()) {
+        if ($sequence1->getAllocationSize() != $sequence2->getAllocationSize()) {
             return true;
         }
 
-        if($sequence1->getInitialValue() != $sequence2->getInitialValue()) {
+        if ($sequence1->getInitialValue() != $sequence2->getInitialValue()) {
             return true;
         }
 
@@ -192,9 +192,9 @@ class Comparator
         $table1Columns = $table1->getColumns();
         $table2Columns = $table2->getColumns();
 
-        // See if all the fields in table 1 exist in table 2.
+        /* See if all the fields in table 1 exist in table 2 */
         foreach ($table2Columns as $columnName => $column) {
-            if ( ! $table1->hasColumn($columnName)) {
+            if ( !$table1->hasColumn($columnName)) {
                 $tableDifferences->addedColumns[$columnName] = $column;
                 $changes++;
             }
@@ -227,6 +227,11 @@ class Comparator
         foreach ($table2Indexes as $index2Name => $index2Definition) {
             foreach ($table1Indexes as $index1Name => $index1Definition) {
                 if ($this->diffIndex($index1Definition, $index2Definition) === false) {
+                    if ( ! $index1Definition->isPrimary() && $index1Name != $index2Name) {
+                        $tableDifferences->renamedIndexes[$index1Name] = $index2Definition;
+                        $changes++;
+                    }
+
                     unset($table1Indexes[$index1Name]);
                     unset($table2Indexes[$index2Name]);
                 } else {
@@ -255,7 +260,7 @@ class Comparator
 
         foreach ($fromFkeys as $key1 => $constraint1) {
             foreach ($toFkeys as $key2 => $constraint2) {
-                if($this->diffForeignKey($constraint1, $constraint2) === false) {
+                if ($this->diffForeignKey($constraint1, $constraint2) === false) {
                     unset($fromFkeys[$key1]);
                     unset($toFkeys[$key2]);
                 } else {
@@ -324,11 +329,11 @@ class Comparator
      */
     public function diffForeignKey(ForeignKeyConstraint $key1, ForeignKeyConstraint $key2)
     {
-        if (array_map('strtolower', $key1->getLocalColumns()) != array_map('strtolower', $key2->getLocalColumns())) {
+        if (array_map('strtolower', $key1->getUnquotedLocalColumns()) != array_map('strtolower', $key2->getUnquotedLocalColumns())) {
             return true;
         }
 
-        if (array_map('strtolower', $key1->getForeignColumns()) != array_map('strtolower', $key2->getForeignColumns())) {
+        if (array_map('strtolower', $key1->getUnquotedForeignColumns()) != array_map('strtolower', $key2->getUnquotedForeignColumns())) {
             return true;
         }
 
@@ -361,7 +366,7 @@ class Comparator
     public function diffColumn(Column $column1, Column $column2)
     {
         $changedProperties = array();
-        if ( $column1->getType() != $column2->getType() ) {
+        if ($column1->getType() != $column2->getType()) {
             $changedProperties[] = 'type';
         }
 
@@ -369,7 +374,15 @@ class Comparator
             $changedProperties[] = 'notnull';
         }
 
-        if ($column1->getDefault() != $column2->getDefault()) {
+        $column1Default = $column1->getDefault();
+        $column2Default = $column2->getDefault();
+
+        if ($column1Default != $column2Default ||
+            // Null values need to be checked additionally as they tell whether to create or drop a default value.
+            // null != 0, null != false, null != '' etc. This affects platform's table alteration SQL generation.
+            (null === $column1Default && null !== $column2Default) ||
+            (null === $column2Default && null !== $column1Default)
+        ) {
             $changedProperties[] = 'default';
         }
 
@@ -377,7 +390,11 @@ class Comparator
             $changedProperties[] = 'unsigned';
         }
 
-        if ($column1->getType() instanceof \Doctrine\DBAL\Types\StringType) {
+        $column1Type = $column1->getType();
+
+        if ($column1Type instanceof \Doctrine\DBAL\Types\StringType ||
+            $column1Type instanceof \Doctrine\DBAL\Types\BinaryType
+        ) {
             // check if value of length is set at all, default value assumed otherwise.
             $length1 = $column1->getLength() ?: 255;
             $length2 = $column2->getLength() ?: 255;

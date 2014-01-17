@@ -38,42 +38,56 @@
  *
  * @copyright 2008-2013 Manuel Pichler. All rights reserved.
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
-  * @since     0.10.0
  */
 
-namespace PDepend;
+namespace PDepend\Bugs;
+
+use PDepend\Source\Language\PHP\PHPTokenizerInternal;
+use PDepend\Source\Tokenizer\Tokens;
+
 
 /**
- * Class that implements autoloading for PDepend.
+ * Test case for bug #124.
  *
- * @copyright 2008-2013 Manuel Pichler. All rights reserved.
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
- * @since     0.10.0
+ *
+ * @ticket 124
+ * @covers \stdClass
+ * @group regressiontest
  */
-class Autoload
+class ParserBug124Test extends AbstractRegressionTest
 {
     /**
-     * Registers this autoload instance at the spl autoloader stack.
+     * Tests that the parser detects the classname scalar.
+     *
+     * <code>
+     * $className = stdClass::class;
+     * </code>
      *
      * @return void
      */
-    public function register()
+    public function testClassNameScalarKeyword()
     {
-        spl_autoload_register(array($this, 'autoload'));
-    }
 
-    /**
-     * Callback method that will be called by the PHP runtime environment when
-     * a class with the given name does not exist.
-     *
-     * @param string $className Name of the missing class.
-     *
-     * @return void
-     */
-    public function autoload($className)
-    {
-        if (strpos($className, 'PDepend') === 0) {
-            include strtr($className, '\\', DIRECTORY_SEPARATOR) . '.php';
+        $tokenizer = new PHPTokenizerInternal();
+        $tokenizer->setSourceFile($this->createCodeResourceURI('bugs/124/testClassNameScalarKeyword.php'));
+
+        $actual = array();
+        while (is_object($token = $tokenizer->next())) {
+            $actual[] = $token->type;
         }
+
+
+         $tokenTypes = array(
+             Tokens::T_OPEN_TAG,
+             Tokens::T_VARIABLE,
+             Tokens::T_EQUAL,
+             Tokens::T_STRING,
+             Tokens::T_DOUBLE_COLON,
+             Tokens::T_CLASS_FQN,
+             Tokens::T_SEMICOLON
+        );
+
+        $this->assertEquals($tokenTypes, $actual);
     }
 }

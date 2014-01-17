@@ -151,7 +151,7 @@ class Table extends AbstractAsset
      */
     public function addIndex(array $columnNames, $indexName = null, array $flags = array())
     {
-        if($indexName == null) {
+        if ($indexName == null) {
             $indexName = $this->_generateIdentifierName(
                 array_merge(array($this->getName()), $columnNames), "idx", $this->_getMaxIdentifierLength()
             );
@@ -204,6 +204,52 @@ class Table extends AbstractAsset
         }
 
         return $this->_createIndex($columnNames, $indexName, true, false);
+    }
+
+    /**
+     * Renames an index.
+     *
+     * @param string      $oldIndexName The name of the index to rename from.
+     * @param string|null $newIndexName The name of the index to rename to.
+     *                                  If null is given, the index name will be auto-generated.
+     *
+     * @return \Doctrine\DBAL\Schema\Table This table instance.
+     *
+     * @throws SchemaException if no index exists for the given current name
+     *                         or if an index with the given new name already exists on this table.
+     */
+    public function renameIndex($oldIndexName, $newIndexName = null)
+    {
+        $oldIndexName           = strtolower($oldIndexName);
+        $normalizedNewIndexName = strtolower($newIndexName);
+
+        if ($oldIndexName === $normalizedNewIndexName) {
+            return $this;
+        }
+
+        if ( ! $this->hasIndex($oldIndexName)) {
+            throw SchemaException::indexDoesNotExist($oldIndexName, $this->_name);
+        }
+
+        if ($this->hasIndex($normalizedNewIndexName)) {
+            throw SchemaException::indexAlreadyExists($normalizedNewIndexName, $this->_name);
+        }
+
+        $oldIndex = $this->_indexes[$oldIndexName];
+
+        if ($oldIndex->isPrimary()) {
+            $this->dropPrimaryKey();
+
+            return $this->setPrimaryKey($oldIndex->getColumns(), $newIndexName);
+        }
+
+        unset($this->_indexes[$oldIndexName]);
+
+        if ($oldIndex->isUnique()) {
+            return $this->addUniqueIndex($oldIndex->getColumns(), $newIndexName);
+        }
+
+        return $this->addIndex($oldIndex->getColumns(), $newIndexName, $oldIndex->getFlags());
     }
 
     /**
@@ -481,7 +527,7 @@ class Table extends AbstractAsset
     {
         $constraint->setLocalTable($this);
 
-        if(strlen($constraint->getName())) {
+        if (strlen($constraint->getName())) {
             $name = $constraint->getName();
         } else {
             $name = $this->_generateIdentifierName(
@@ -523,7 +569,7 @@ class Table extends AbstractAsset
     public function getForeignKey($constraintName)
     {
         $constraintName = strtolower($constraintName);
-        if(!$this->hasForeignKey($constraintName)) {
+        if (!$this->hasForeignKey($constraintName)) {
             throw SchemaException::foreignKeyDoesNotExist($constraintName, $this->_name);
         }
 
@@ -542,7 +588,7 @@ class Table extends AbstractAsset
     public function removeForeignKey($constraintName)
     {
         $constraintName = strtolower($constraintName);
-        if(!$this->hasForeignKey($constraintName)) {
+        if (!$this->hasForeignKey($constraintName)) {
             throw SchemaException::foreignKeyDoesNotExist($constraintName, $this->_name);
         }
 
@@ -568,7 +614,7 @@ class Table extends AbstractAsset
         }
         $colNames = array_unique(array_merge($pkCols, $fkCols, array_keys($columns)));
 
-        uksort($columns, function($a, $b) use($colNames) {
+        uksort($columns, function ($a, $b) use ($colNames) {
             return (array_search($a, $colNames) >= array_search($b, $colNames));
         });
 

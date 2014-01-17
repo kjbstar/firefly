@@ -49,13 +49,13 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return FooClass A FooClass instance.
+     * @return Bar\FooClass A Bar\FooClass instance.
      */
     protected function getBarService()
     {
         $a = $this->get('foo.baz');
 
-        $this->services['bar'] = $instance = new \FooClass('foo', $a, $this->getParameter('foo_bar'));
+        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
 
         $a->configure($instance);
 
@@ -132,18 +132,19 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return FooClass A FooClass instance.
+     * @return Bar\FooClass A Bar\FooClass instance.
      */
     protected function getFooService()
     {
         $a = $this->get('foo.baz');
 
-        $this->services['foo'] = $instance = \FooClass::getInstance('foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo')), true, $this);
+        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo')), true, $this);
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();
         $instance->foo = 'bar';
         $instance->moo = $a;
+        $instance->qux = array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo'));
         sc_configure($instance);
 
         return $instance;
@@ -201,13 +202,13 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return FooClass A FooClass instance.
+     * @return Bar\FooClass A Bar\FooClass instance.
      */
     protected function getMethodCall1Service()
     {
         require_once '%path%foo.php';
 
-        $this->services['method_call1'] = $instance = new \FooClass();
+        $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
         $instance->setBar($this->get('foo'));
         $instance->setBar($this->get('foo2', ContainerInterface::NULL_ON_INVALID_REFERENCE));
@@ -297,7 +298,7 @@ class ProjectServiceContainer extends Container
     {
         return array(
             'baz_class' => 'BazClass',
-            'foo_class' => 'FooClass',
+            'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
         );
     }

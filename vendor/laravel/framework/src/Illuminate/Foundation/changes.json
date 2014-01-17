@@ -1,5 +1,5 @@
 {
-	"4.2.*": [
+	"4.1.x": [
 		{"message": "Added new SSH task runner tools.", "backport": null},
 		{"message": "Allow before and after validation rules to reference other fields.", "backport": null},
 		{"message": "Added splice method to Collection class.", "backport": null},
@@ -69,7 +69,16 @@
 		{"message": "Closure can now be passed to Collection->first, functions similarly to array_first.", "backport": null},
 		{"message": "Added Mail::failures to get the failed recipients for a message.", "backport": null},
 		{"message": "Renamed `Model::tags($cacheTags)` to `Model::cacheTags($cacheTags)`", "backport": null},
-		{"message": "Model::destroy now returns the total number of records deleted.", "backport": null}
+		{"message": "Model::destroy now returns the total number of records deleted.", "backport": null},
+		{"message": "Fixed relative URL generation.", "backport": null},
+		{"message": "Added --seeder option to migrate:refresh Artisan command.", "backport": null},
+		{"message": "Added 'cacheDriver' method to query builder.", "backport": null},
+		{"message": "Added support for whereHas on belongsTo relationships.", "backport": null},
+		{"message": "Added groupBy to Collection class.", "backport": null},
+		{"message": "Added the View::composers method.", "backport": null},
+		{"message": "Added new 'sometimes' validation rule short-cut to only run validation if rule is present.", "backport": null},
+		{"message": "Duplicate service providers can't be registered without 'force' parameter.", "backport": null},
+		{"message": "Added --lines option to the 'tail' Artisan command.", "backport": null}
 	],
 	"4.0.x": [
 		{"message": "Added implode method to query builder and Collection class.", "backport": null},

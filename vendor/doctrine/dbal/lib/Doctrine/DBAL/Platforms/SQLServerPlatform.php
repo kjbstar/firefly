@@ -22,7 +22,6 @@ namespace Doctrine\DBAL\Platforms;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\TableDiff;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
@@ -211,7 +210,7 @@ class SQLServerPlatform extends AbstractPlatform
     {
         if ($index instanceof Index) {
             $index = $index->getQuotedName($this);
-        } else if (!is_string($index)) {
+        } elseif (!is_string($index)) {
             throw new \InvalidArgumentException('AbstractPlatform::getDropIndexSQL() expects $index parameter to be string or \Doctrine\DBAL\Schema\Index.');
         }
 
@@ -246,7 +245,7 @@ class SQLServerPlatform extends AbstractPlatform
             }
 
             // Build default constraints SQL statements.
-            if ( ! empty($column['default']) || is_numeric($column['default'])) {
+            if (isset($column['default'])) {
                 $defaultConstraintsSql[] = 'ALTER TABLE ' . $tableName .
                     ' ADD' . $this->getDefaultConstraintDeclarationSQL($tableName, $column);
             }
@@ -352,7 +351,7 @@ class SQLServerPlatform extends AbstractPlatform
      */
     public function getDefaultConstraintDeclarationSQL($table, array $column)
     {
-        if (empty($column['default']) && ! is_numeric($column['default'])) {
+        if ( ! isset($column['default'])) {
             throw new \InvalidArgumentException("Incomplete column definition. 'default' required.");
         }
 
@@ -401,7 +400,7 @@ class SQLServerPlatform extends AbstractPlatform
 
         if ($index->hasFlag('clustered')) {
             $type .= 'CLUSTERED ';
-        } else if ($index->hasFlag('nonclustered')) {
+        } elseif ($index->hasFlag('nonclustered')) {
             $type .= 'NONCLUSTERED ';
         }
 
@@ -446,7 +445,7 @@ class SQLServerPlatform extends AbstractPlatform
             $columnDef = $column->toArray();
             $queryParts[] = 'ADD ' . $this->getColumnDeclarationSQL($column->getQuotedName($this), $columnDef);
 
-            if ( ! empty($columnDef['default']) || is_numeric($columnDef['default'])) {
+            if (isset($columnDef['default'])) {
                 $columnDef['name'] = $column->getQuotedName($this);
                 $queryParts[] = 'ADD' . $this->getDefaultConstraintDeclarationSQL($diff->name, $columnDef);
             }
@@ -517,7 +516,7 @@ class SQLServerPlatform extends AbstractPlatform
              * if default value has changed and another
              * default constraint already exists for the column.
              */
-            if ($columnDefaultHasChanged && ( ! empty($fromColumnDefault) || is_numeric($fromColumnDefault))) {
+            if ($columnDefaultHasChanged && null !== $fromColumnDefault) {
                 $queryParts[] = 'DROP CONSTRAINT ' .
                     $this->generateDefaultConstraintName($diff->name, $columnDiff->oldColumnName);
             }
@@ -525,7 +524,7 @@ class SQLServerPlatform extends AbstractPlatform
             $queryParts[] = 'ALTER COLUMN ' .
                     $this->getColumnDeclarationSQL($column->getQuotedName($this), $columnDef);
 
-            if ($columnDefaultHasChanged && (! empty($columnDef['default']) || is_numeric($columnDef['default']))) {
+            if ($columnDefaultHasChanged && isset($columnDef['default'])) {
                 $columnDef['name'] = $column->getQuotedName($this);
                 $queryParts[] = 'ADD' . $this->getDefaultConstraintDeclarationSQL($diff->name, $columnDef);
             }
@@ -538,15 +537,13 @@ class SQLServerPlatform extends AbstractPlatform
 
             $sql[] = "sp_RENAME '". $diff->name. ".". $oldColumnName . "', '".$column->getQuotedName($this)."', 'COLUMN'";
 
-            // todo: Find a way how to implement column comment alteration statements for renamed columns.
-
             $columnDef = $column->toArray();
 
             /**
              * Drop existing default constraint for the old column name
              * if column has default value.
              */
-            if ( ! empty($columnDef['default']) || is_numeric($columnDef['default'])) {
+            if (isset($columnDef['default'])) {
                 $queryParts[] = 'DROP CONSTRAINT ' .
                     $this->generateDefaultConstraintName($diff->name, $oldColumnName);
             }
@@ -557,7 +554,7 @@ class SQLServerPlatform extends AbstractPlatform
             /**
              * Readd default constraint for the new column name.
              */
-            if ( ! empty($columnDef['default']) || is_numeric($columnDef['default'])) {
+            if (isset($columnDef['default'])) {
                 $columnDef['name'] = $column->getQuotedName($this);
                 $queryParts[] = 'ADD' . $this->getDefaultConstraintDeclarationSQL($diff->name, $columnDef);
             }
@@ -570,13 +567,13 @@ class SQLServerPlatform extends AbstractPlatform
         }
 
         foreach ($queryParts as $query) {
-            $sql[] = 'ALTER TABLE ' . $diff->name . ' ' . $query;
+            $sql[] = 'ALTER TABLE ' . $diff->getName()->getQuotedName($this) . ' ' . $query;
         }
 
         $sql = array_merge($sql, $this->_getAlterTableIndexForeignKeySQL($diff), $commentsSql);
 
         if ($diff->newName !== false) {
-            $sql[] = "sp_RENAME '" . $diff->name . "', '" . $diff->newName . "'";
+            $sql[] = "sp_RENAME '" . $diff->getName()->getQuotedName($this) . "', '" . $diff->getNewName()->getQuotedName($this) . "'";
 
             /**
              * Rename table's default constraints names
@@ -592,7 +589,7 @@ class SQLServerPlatform extends AbstractPlatform
                 "'" . $this->generateIdentifierName($diff->newName) . "') + ''', ''OBJECT'';' " .
                 "FROM sys.default_constraints dc " .
                 "JOIN sys.tables tbl ON dc.parent_object_id = tbl.object_id " .
-                "WHERE tbl.name = '" . $diff->newName . "';" .
+                "WHERE tbl.name = '" . $diff->getNewName()->getQuotedName($this) . "';" .
                 "EXEC sp_executesql @sql";
         }
 
@@ -656,6 +653,21 @@ class SQLServerPlatform extends AbstractPlatform
             $tableName,
             'COLUMN',
             $columnName
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRenameIndexSQL($oldIndexName, Index $index, $tableName)
+    {
+        return array(
+            sprintf(
+                "EXEC sp_RENAME N'%s.%s', N'%s', N'INDEX'",
+                $tableName,
+                $oldIndexName,
+                $index->getQuotedName($this)
+            )
         );
     }
 
@@ -793,6 +805,8 @@ class SQLServerPlatform extends AbstractPlatform
                 ON        col.user_type_id = type.user_type_id
                 JOIN      sys.objects AS obj
                 ON        col.object_id = obj.object_id
+                JOIN      sys.schemas AS scm
+                ON        obj.schema_id = scm.schema_id
                 LEFT JOIN sys.default_constraints def
                 ON        col.default_object_id = def.object_id
                 AND       col.object_id = def.parent_object_id
@@ -801,7 +815,7 @@ class SQLServerPlatform extends AbstractPlatform
                 AND       col.column_id = prop.minor_id
                 AND       prop.name = 'MS_Description'
                 WHERE     obj.type = 'U'
-                AND       obj.name = '$table'";
+                AND       " . $this->getTableWhereClause($table, 'scm.name', 'obj.name');
     }
 
     /**
@@ -822,7 +836,8 @@ class SQLServerPlatform extends AbstractPlatform
                 INNER JOIN sys.foreign_key_columns AS fc
                 INNER JOIN sys.objects AS o ON o.OBJECT_ID = fc.referenced_object_id
                 ON f.OBJECT_ID = fc.constraint_object_id
-                WHERE OBJECT_NAME (f.parent_object_id) = '" . $table . "'";
+                WHERE " .
+                $this->getTableWhereClause($table, 'SCHEMA_NAME (f.schema_id)', 'OBJECT_NAME (f.parent_object_id)');
     }
 
     /**
@@ -832,18 +847,19 @@ class SQLServerPlatform extends AbstractPlatform
     {
         return "SELECT idx.name AS key_name,
                        col.name AS column_name,
-	                   ~idx.is_unique AS non_unique,
-	                   idx.is_primary_key AS [primary],
+                       ~idx.is_unique AS non_unique,
+                       idx.is_primary_key AS [primary],
                        CASE idx.type
                            WHEN '1' THEN 'clustered'
                            WHEN '2' THEN 'nonclustered'
                            ELSE NULL
                        END AS flags
                 FROM sys.tables AS tbl
+                JOIN sys.schemas AS scm ON tbl.schema_id = scm.schema_id
                 JOIN sys.indexes AS idx ON tbl.object_id = idx.object_id
                 JOIN sys.index_columns AS idxcol ON idx.object_id = idxcol.object_id AND idx.index_id = idxcol.index_id
                 JOIN sys.columns AS col ON idxcol.object_id = col.object_id AND idxcol.column_id = col.column_id
-                WHERE tbl.name = '$table'
+                WHERE " . $this->getTableWhereClause($table, 'scm.name', 'tbl.name') . "
                 ORDER BY idx.index_id ASC, idxcol.index_column_id ASC";
     }
 
@@ -861,6 +877,27 @@ class SQLServerPlatform extends AbstractPlatform
     public function getListViewsSQL($database)
     {
         return "SELECT name FROM sysobjects WHERE type = 'V' ORDER BY name";
+    }
+
+    /**
+     * Returns the where clause to filter schema and table name in a query.
+     *
+     * @param string $table        The full qualified name of the table.
+     * @param string $tableColumn  The name of the column to compare the schema to in the where clause.
+     * @param string $schemaColumn The name of the column to compare the table to in the where clause.
+     *
+     * @return string
+     */
+    private function getTableWhereClause($table, $schemaColumn, $tableColumn)
+    {
+        if (strpos($table, ".") !== false) {
+            list($schema, $table) = explode(".", $table);
+            $schema = "'" . $schema . "'";
+        } else {
+            $schema = "SCHEMA_NAME()";
+        }
+
+        return "({$tableColumn} = '{$table}' AND {$schemaColumn} = {$schema})";
     }
 
     /**
@@ -1030,11 +1067,27 @@ class SQLServerPlatform extends AbstractPlatform
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getBinaryTypeDeclarationSQLSnippet($length, $fixed)
+    {
+        return $fixed ? 'BINARY(' . ($length ?: 255) . ')' : 'VARBINARY(' . ($length ?: 255) . ')';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBinaryMaxLength()
+    {
+        return 8000;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getClobTypeDeclarationSQL(array $field)
     {
-        return 'TEXT';
+        return 'VARCHAR(MAX)';
     }
 
     /**
@@ -1168,7 +1221,7 @@ class SQLServerPlatform extends AbstractPlatform
                     $item[$key] = ($value) ? 1 : 0;
                 }
             }
-        } else if (is_bool($item) || is_numeric($item)) {
+        } elseif (is_bool($item) || is_numeric($item)) {
             $item = ($item) ? 1 : 0;
         }
 
@@ -1258,8 +1311,8 @@ class SQLServerPlatform extends AbstractPlatform
             'nchar' => 'string',
             'nvarchar' => 'string',
             'ntext' => 'text',
-            'binary' => 'blob',
-            'varbinary' => 'blob',
+            'binary' => 'binary',
+            'varbinary' => 'binary',
             'image' => 'blob',
             'uniqueidentifier' => 'guid',
         );
@@ -1294,21 +1347,19 @@ class SQLServerPlatform extends AbstractPlatform
      */
     public function appendLockHint($fromClause, $lockMode)
     {
-        switch ($lockMode) {
-            case LockMode::NONE:
-                $lockClause = ' WITH (NOLOCK)';
-                break;
-            case LockMode::PESSIMISTIC_READ:
-                $lockClause = ' WITH (HOLDLOCK, ROWLOCK)';
-                break;
-            case LockMode::PESSIMISTIC_WRITE:
-                $lockClause = ' WITH (UPDLOCK, ROWLOCK)';
-                break;
-            default:
-                $lockClause = '';
-        }
+        switch (true) {
+            case LockMode::NONE === $lockMode:
+                return $fromClause . ' WITH (NOLOCK)';
 
-        return $fromClause . $lockClause;
+            case LockMode::PESSIMISTIC_READ === $lockMode:
+                return $fromClause . ' WITH (HOLDLOCK, ROWLOCK)';
+
+            case LockMode::PESSIMISTIC_WRITE === $lockMode:
+                return $fromClause . ' WITH (UPDLOCK, ROWLOCK)';
+
+            default:
+                return $fromClause;
+        }
     }
 
     /**

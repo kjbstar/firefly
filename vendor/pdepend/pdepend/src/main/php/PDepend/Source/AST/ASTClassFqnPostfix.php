@@ -38,95 +38,49 @@
  *
  * @copyright 2008-2013 Manuel Pichler. All rights reserved.
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
-  * @since     0.10.0
+ * @since 2.0.0
  */
 
-namespace PDepend;
+namespace PDepend\Source\AST;
+
+use PDepend\Source\ASTVisitor\ASTVisitor;
 
 /**
- * Test case for the {@link \PDepend\Autoload} class.
+ * This class represents the full qualified class name postfix.
+ *
+ * <code>
+ * //   -----
+ * Foo::class
+ * //   -----
+ *
+ * //     -----
+ * $bar:: class;
+ * //     -----
+ * </code>
  *
  * @copyright 2008-2013 Manuel Pichler. All rights reserved.
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
- * @since     0.10.0
- *
- * @covers \PDepend\Autoload
- * @group unittest
+ * @since 2.0.0
  */
-class AutoloadTest extends AbstractTest
+class ASTClassFqnPostfix extends ASTNode
 {
     /**
-     * The original include path.
-     *
-     * @var string
+     * Type of this node class.
      */
-    protected $includePath = null;
+    const CLAZZ = __CLASS__;
 
     /**
-     * Stores the original include path.
+     * Accept method of the visitor design pattern. This method will be called
+     * by a visitor during tree traversal.
      *
-     * @return void
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->includePath = get_include_path();
-    }
-
-    /**
-     * Restores the original include path.
+     * @param \PDepend\Source\ASTVisitor\ASTVisitor $visitor The calling visitor instance.
+     * @param mixed $data
      *
-     * @return void
+     * @return mixed
+     * @since 0.9.12
      */
-    protected function tearDown()
+    public function accept(ASTVisitor $visitor, $data = null)
     {
-        set_include_path($this->includePath);
-
-        foreach (spl_autoload_functions() as $callback) {
-            if (is_array($callback) && $callback[0] instanceof Autoload) {
-                spl_autoload_unregister($callback);
-            }
-        }
-        
-        parent::tearDown();
-    }
-
-    /**
-     * testAutoloadLoadsClassInPhpDependNamespace
-     *
-     * @return void
-     */
-    public function testAutoloadLoadsClassInPhpDependNamespace()
-    {
-        $className = 'PDepend\\AutoloadLoadsClassInPhpDependNamespace';
-
-        $autoloader = new Autoload();
-        $autoloader->register();
-
-        set_include_path(self::createCodeResourceUriForTest());
-        $exists = class_exists($className, true);
-        set_include_path($this->includePath);
-
-        $this->assertTrue($exists);
-    }
-
-    /**
-     * testAutoloadNotLoadsClassFromDifferentNamespace
-     *
-     * @return void
-     */
-    public function testAutoloadNotLoadsClassFromDifferentNamespace()
-    {
-        $className = 'PHP_AutoloadNotLoadsClassFromDifferentNamespace';
-
-        $autoloader = new Autoload();
-        $autoloader->register();
-
-        set_include_path(self::createCodeResourceUriForTest());
-        $exists = class_exists($className, true);
-        set_include_path($this->includePath);
-
-        $this->assertFalse($exists);
+        return $visitor->visitClassFqnPostfix($this, $data);
     }
 }
