@@ -34,11 +34,12 @@ class AccountHelper
         // starting NOW to the end of the month.
         $now = new Carbon;
         $now->addDay();
-        //$now->startOfMonth();
+        $now->startOfMonth();
         $eom = clone $now;
         $eom->endOfMonth();
         $predictions = [];
         $balance = $account->balanceOnDate($now);
+        $predictionStart = Setting::getSetting('predictionStart');
         while ($now < $eom) {
             // get the predicted value:
             $entry = [];
@@ -54,7 +55,7 @@ class AccountHelper
             // transactions for this day:
             $entry['transactions'] = $account->transactions()->onDayOfMonth(
                 $now
-            )->get();
+            )->expenses()->where('date','>=',$predictionStart->value)->get();
             $predictions[] = $entry;
             $now->addDay();
         }
@@ -72,6 +73,7 @@ class AccountHelper
     public static function generateOverviewOfMonths(Account $account)
     {
         $end = new Carbon;
+        $end->firstOfMonth();
         $start = Toolkit::getEarliestEvent();
         $list = [];
         while ($end >= $start) {
