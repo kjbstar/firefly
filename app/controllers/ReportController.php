@@ -63,6 +63,8 @@ class ReportController extends BaseController
             $end, 'category', SORT_ASC
         );
 
+        $budgets = Auth::user()->components()->where('type','budget')->get();
+
         return View::make('reports.year')->with('start',
             $start)->with('end',$end)->with(
             'data', $data
@@ -72,7 +74,44 @@ class ReportController extends BaseController
                 'fans', $fans
             )->with('spentMostCategories', $spentMostCategories)->with(
                 'title', 'Report for ' . $year
-            );
+            )->with('budgets',$budgets);
+    }
+
+    public function objectOverviewChart($year, Component $component) {
+        $start = new Carbon($year . '-01-01');
+        $end = clone $start;
+        $end->endOfYear();
+        $chart = App::make('gchart');
+        $chart->addColumn('Month', 'date');
+        $chart->addColumn('Amount spent', 'number');
+        $chart->addColumn('Amount predicted', 'number');
+        $chart->addColumn('Amount budgeted', 'number');
+
+        while($start <= $end) {
+            $current = clone $start;
+
+            // get amount spent:
+            $spent = floatval($component->transactions()->inMonth($current)
+                    ->expenses()->sum('amount')
+                *-1);
+            // get the limit:
+            $limit  = $component->limits()->where('date',
+                $current->format('Y-m-d'))->first();
+            if($limit) {
+                $limited = floatval($limit->amount);
+            } else {
+                $limited = null;
+            }
+            $prediction = $component->predictForMonth($current);
+
+            $chart->addRow($current,$spent,$prediction,$limited);
+
+            $start->addMonth();
+        }
+
+        $chart->generate();
+        return Response::json($chart->getData());
+
     }
 
     /**
@@ -85,7 +124,6 @@ class ReportController extends BaseController
     public function netWorthChart($year)
     {
         $start = new Carbon($year . '-01-01');
-        $start->startOfYear();
         $end = clone $start;
         $end->endOfYear();
 
