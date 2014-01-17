@@ -387,7 +387,7 @@ class MetaController extends BaseController
                     if ($amount < 0) {
                         $amount = $amount * -1;
                     }
-                    $chart->addRow($r, $amount);
+                    $chart->addRow($r, floatval($amount));
                 }
                 $index++;
             }
