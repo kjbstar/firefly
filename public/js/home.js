@@ -12,7 +12,7 @@ var pieChartOpt = {
         width: 180,
         height: 180
     },
-    diff: {innerCircle: { radiusFactor: 0.4 }},
+    //diff: {innerCircle: { radiusFactor: 0.4 }},
     pieSliceText: 'value'
 };
 
@@ -24,7 +24,7 @@ function drawComponentChart(index, type) {
         // make the money look good.
         var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
         money.format(gdata, 1);
-        money.format(gdata, 2);
+        //money.format(gdata, 2);
 
         // make a chart.
         chartObject[index] = new google.visualization.PieChart(document.getElementById('home-' + type + '-piechart'));

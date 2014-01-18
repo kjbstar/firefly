@@ -86,18 +86,14 @@ class HomeHelper
 
         // prep some vars:
         $date = Toolkit::parseDate($year, $month, new Carbon);
-        $past = clone $date;
-        $past->subMonth();
 
         // get two lists of components.
         $currentList = self::homeComponentList($type, $date, true);
-        $pastList = self::homeComponentList($type, $past, true);
-        unset($past);
 
         // make a chart:
         $chart = App::make('gchart');
         $chart->addColumn(ucfirst($type), 'string');
-        $chart->addColumn('Budgeted', 'number', 'old-data');
+//        $chart->addColumn('Budgeted', 'number', 'old-data');
         $chart->addColumn('Amount', 'number');
 
         // get allowance info which might be relevant for the
@@ -108,17 +104,10 @@ class HomeHelper
 
         // loop the current list:
         $index = 0;
-        foreach ($currentList as $id => $obj) {
+        foreach ($currentList as $obj) {
             if ($index < 10) {
-                if (is_null($obj['limit']) && isset($pastList[$id])
-                    && $obj['amount'] > 0
-                ) {
-                    $oldValue = $pastList[$id]['amount'];
-                } else {
-                    $oldValue = $obj['limit'];
-                }
                 $chart->addRow(
-                    ['f' => $obj['name'], 'v' => $obj['id']], $oldValue,
+                    ['f' => $obj['name'], 'v' => $obj['id']],
                     $obj['amount']
                 );
             }
@@ -128,7 +117,7 @@ class HomeHelper
         // a special "allowance left" entry if relevant.
         if ($left > 0) {
             $chart->addRow(
-                'Allowance left', null, $left
+                'Allowance left', $left
             );
         }
 
