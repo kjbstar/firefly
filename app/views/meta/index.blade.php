@@ -76,7 +76,7 @@
     var objects = "{{OBJS}}";
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script src="/js/meta.js"></script>
+<script src="js/meta.js"></script>
 @stop
 @section('styles')
 @stop

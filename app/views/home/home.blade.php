@@ -195,33 +195,13 @@
 </div>
 <div class="row">
     @if($accountCount > 0 && $transactionCount > 0)
-    <div class="col-lg-4 col-md-4"><h4>Beneficiaries</h4></div>
-    <div class="col-lg-4 col-md-4"><h4>Budgets</h4></div>
-    <div class="col-lg-4 col-md-4"><h4>Categories</h4></div>
-    @endif
-</div>
-<div class="row">
-    @if($accountCount > 0 && $transactionCount > 0)
     <div class="col-lg-4 col-md-4">
+        <h4>Beneficiaries</h4>
         <div
             id="home-beneficiary-piechart"></div>
-    </div>
-    <div class="col-lg-4 col-md-4">
-        <div id="home-budget-piechart"></div>
-    </div>
-    <div class="col-lg-4 col-md-4">
-        <div
-            id="home-category-piechart"></div>
-    </div>
-    @endif
-</div>
-
-<div class="row">
-    @if($accountCount > 0 && $transactionCount > 0)
-    <div class="col-lg-4 col-md-4">
         <table class="table table-condensed">
             <?php
-                $sum=0;
+            $sum=0;
             ?>
             @foreach($beneficiaries as $b)
             <tr
@@ -229,16 +209,16 @@
             class="danger"
             @endif
             >
-                <td><a href="{{$b['url']}}">{{{$b['name']}}}</a></td>
-                <td style="text-align: right;">{{mf($b['amount'],true,true)}}</td>
+            <td><a href="{{$b['url']}}">{{{$b['name']}}}</a></td>
+            <td style="text-align: right;">{{mf($b['amount'],true,true)}}</td>
             </tr>
             <?php
             $sum += $b['amount'];
             ?>
             @endforeach
             <tr>
-            <td><em>Total</em></td>
-            <td style="text-align: right;">{{mf($sum,true,true)}}
+                <td><em>Total</em></td>
+                <td style="text-align: right;">{{mf($sum,true,true)}}
             </tr>
             @if($allowance['amount'] > 0)
             <tr>
@@ -248,9 +228,11 @@
             </tr>
             @endif
         </table>
-
     </div>
     <div class="col-lg-4 col-md-4">
+        <h4>Budgets</h4>
+        <div id="home-budget-piechart"></div>
+
         <?php
         $sum=0;
         ?>
@@ -309,8 +291,13 @@
             </tr>
             @endif
         </table>
+
     </div>
     <div class="col-lg-4 col-md-4">
+        <h4>Categories</h4>
+        <div
+            id="home-category-piechart"></div>
+
         <table class="table table-condensed">
             <?php
             $sum=0;
@@ -332,15 +319,14 @@
                     <td><em>Total</em></td>
                     <td style="text-align: right;">{{mf($sum,true,true)}}</td>
                 </tr>
-            @if($allowance['amount'] > 0)
-            <tr>
-                <td><em>Allowance left</em></td>
-                <td style="text-align: right;">{{mf
-                    ($allowance['amount']-$allowance['spent'],true,true)}}</td>
-            </tr>
-            @endif
+                @if($allowance['amount'] > 0)
+                <tr>
+                    <td><em>Allowance left</em></td>
+                    <td style="text-align: right;">{{mf
+                        ($allowance['amount']-$allowance['spent'],true,true)}}</td>
+                </tr>
+                @endif
         </table>
-
     </div>
     @endif
 </div>
@@ -367,5 +353,5 @@
     @endif
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script src="/js/home.js"></script>
+<script src="js/home.js"></script>
 @endsection

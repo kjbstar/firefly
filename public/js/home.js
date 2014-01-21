@@ -17,7 +17,7 @@ var pieChartOpt = {
 };
 
 function drawComponentChart(index, type) {
-    $.getJSON('/home/charts/' + type + '/' + year + '/' + month).success(function (data) {
+    $.getJSON('home/charts/' + type + '/' + year + '/' + month).success(function (data) {
         // parse the data from JSON
         var gdata = new google.visualization.DataTable(data);
 
@@ -53,7 +53,7 @@ $(function () {
 });
 
 function drawAccountChart() {
-    $.getJSON('/home/charts/accounts/' + year + '/' + month).success(function (data) {
+    $.getJSON('home/charts/accounts/' + year + '/' + month).success(function (data) {
         // 260x150
         var opt = {
             height: 150,

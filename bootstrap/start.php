@@ -27,8 +27,7 @@ $app = new Illuminate\Foundation\Application;
 $env = $app->detectEnvironment(
 	function()
 {
-	if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == 'sander.xs4all
-	.nl') {
+	if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == 'sander.xs4all.nl') {
 		return 'xs4all';
 	} else {
 		return 'production';

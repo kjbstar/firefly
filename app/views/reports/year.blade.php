@@ -177,5 +177,5 @@
     var year = {{$end->format('Y')}};
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script src="/js/report.js"></script>
+<script src="js/report.js"></script>
 @endsection

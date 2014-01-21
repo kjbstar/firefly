@@ -14,6 +14,7 @@
               @endif
           </a>
         </div>
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav">
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add
@@ -75,8 +76,6 @@
                 </li>
 
         </ul>
-
-        <div class="collapse navbar-collapse navbar-ex1-collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/logout">Logout</a></li>
           </ul>

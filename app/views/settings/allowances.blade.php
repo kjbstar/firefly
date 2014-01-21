@@ -99,5 +99,5 @@
 </div>
 @endsection
 @section('scripts')
-<script src="/js/settings.js"></script>
+<script src="js/settings.js"></script>
 @endsection

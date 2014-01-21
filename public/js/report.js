@@ -21,7 +21,7 @@ function drawBudgetCharts() {
     $.each(budgets, function (index, value) {
         var holder = $(value);
         var ID = holder.data('id');
-        var URL = '/home/report/' + year + '/chart/overview/' + ID;
+        var URL = 'home/report/' + year + '/chart/overview/' + ID;
         $.getJSON(URL).success(function (data) {
             gdata = new google.visualization.DataTable(data);
             var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
@@ -39,7 +39,7 @@ function drawBudgetCharts() {
 }
 
 function drawNetWorthChart() {
-    $.getJSON('/home/report/' + year + '/networth').success(function (data) {
+    $.getJSON('home/report/' + year + '/networth').success(function (data) {
         var opt = {
             series: {
                 0: {type: 'bars', color: '#3c763d', targetAxisIndex: 0},
@@ -63,7 +63,7 @@ function drawNetWorthChart() {
 }
 
 function drawBenefactorChart() {
-    $.getJSON('/home/report/' + year + '/chart/beneficiary/desc').success(function (data) {
+    $.getJSON('home/report/' + year + '/chart/beneficiary/desc').success(function (data) {
         var opt = {
             height: 200,
             legend: {position: 'none'},
@@ -84,7 +84,7 @@ function drawBenefactorChart() {
 }
 
 function drawFanChart() {
-    $.getJSON('/home/report/' + year + '/chart/beneficiary/asc').success(function (data) {
+    $.getJSON('home/report/' + year + '/chart/beneficiary/asc').success(function (data) {
         var opt = {
             height: 200,
             legend: {position: 'none'},
@@ -105,7 +105,7 @@ function drawFanChart() {
 }
 
 function drawCatChart() {
-    $.getJSON('/home/report/' + year + '/chart/category/asc').success(function (data) {
+    $.getJSON('home/report/' + year + '/chart/category/asc').success(function (data) {
         var opt = {
             height: 200,
             legend: {position: 'none'},
