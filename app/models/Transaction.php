@@ -310,6 +310,13 @@ class Transaction extends Eloquent
             );
     }
 
+    public function scopeAfterDate($query, Carbon $date)
+    {
+        return $query->where(
+            'date', '>=', $date->format('Y-m-d')
+        );
+    }
+
     /**
      * Limits the scope to incomes only.
      *
