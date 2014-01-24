@@ -54,6 +54,13 @@ Route::pattern('id', '[0-9]+');
 Route::pattern('month', '[0-9]+');
 Route::pattern('year', '20[0-9]{2}');
 
+// fancy new SLOW page.
+Route::get(
+    '/home/slow',
+    ['uses' => 'SlowController@index', 'as' => 'slow']
+);
+
+
 // chart route (not sure why on top)
 Route::get(
     '/home/charts/{chart}/{year?}/{month?}',
