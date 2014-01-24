@@ -268,8 +268,7 @@
                 Limit: {{mf($budget['limit'],false,false)}}.
                 @endif
                 @if(isset($budget['overspent']))
-            <span class="text-danger">Spent: {{mf($budget['amount']*-1,false,false)}}
-                .</span>
+            <span class="text-danger">Spent: {{mf($budget['amount']*-1,false,false)}}.</span>
                 @else
                 Spent: {{mf($budget['amount']*-1,false,false)}}.
                 @endif
