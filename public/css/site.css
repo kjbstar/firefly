@@ -10,3 +10,8 @@
 
 }
 .help-popover {cursor:help;}
+
+.animHeader {
+    -webkit-animation-duration: 6s;
+    -webkit-animation-delay: 1s;
+}
