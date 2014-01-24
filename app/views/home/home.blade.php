@@ -69,23 +69,14 @@
 </div>
 @endif
 
-
-<div class="row">
-    @if($accountCount > 0)
-    <div class="col-lg-6 col-md-6">
-        <h4>Accounts</h4>
-    </div>
-    <div class="col-lg-6 col-md-6">
-        <h4>General information</h4>
-    </div>
-    @endif
-</div>
 <div class="row">
     @if($accountCount > 0)
     <div class="col-lg-3 col-md-3">
+        <h4>Accounts</h4>
         <div id="home-accounts-chart"></div>
     </div>
     <div class="col-lg-3 col-md-3">
+        <h4>&nbsp;</h4>
         <table class="table table-condensed table-bordered">
             @foreach($accounts as $account)
             <tr>
@@ -98,6 +89,7 @@
         </table>
     </div>
     <div class="col-lg-6 col-md-6">
+        <h4>General information</h4>
         <ul class="nav nav-tabs">
             @if($allowance['amount'] > 0)
             <li class="active"><a href="#budgeting-tab"
@@ -166,7 +158,15 @@
                 <table class="table table-condensed table-bordered">
                     @foreach($transactions as $t)
                     <tr>
-                        <td>{{$t->date->format(Config::get('firefly.date_format'))}}</td>
+                        <td>
+                            <span class="visible-lg visible-md">
+                            {{$t->date->format(Config::get('firefly.date_format'))}}
+                            </span>
+                            <span class="visible-lg visible-sm hidden-md
+                            hidden-lg">
+                            {{$t->date->format(Config::get('firefly.date_format_small'))}}
+                            </span>
+                        </td>
                         <td><a href="{{URL::Route('edittransaction',
                 $t->id)}}">{{{$t->description}}}</a>
                         </td>
@@ -179,7 +179,15 @@
                 <table class="table table-condensed table-bordered">
                 @foreach($transfers as $t)
                 <tr>
-                    <td>{{$t->date->format(Config::get('firefly.date_format'))}}</td>
+                    <td>
+                        <span class="visible-lg visible-md">
+                            {{$t->date->format(Config::get('firefly.date_format'))}}
+                            </span>
+                            <span class="visible-lg visible-sm hidden-md
+                            hidden-lg">
+                            {{$t->date->format(Config::get('firefly.date_format_small'))}}
+                            </span>
+                    </td>
                     <td><a href="{{URL::Route('edittransaction',
                 $t->id)}}">{{{$t->description}}}</a>
                     </td>
@@ -220,13 +228,6 @@
                 <td><em>Total</em></td>
                 <td style="text-align: right;">{{mf($sum,true,true)}}
             </tr>
-            @if($allowance['amount'] > 0)
-            <tr>
-                <td><em>Allowance left</em></td>
-                <td style="text-align: right;">{{mf
-                    ($allowance['amount']-$allowance['spent'],true,true)}}</td>
-            </tr>
-            @endif
         </table>
     </div>
     <div class="col-lg-4 col-md-4">
@@ -283,13 +284,6 @@
                 <td><em>Total</em></td>
                 <td style="text-align: right;">{{mf($sum,true,true)}}</td>
             </tr>
-            @if($allowance['amount'] > 0)
-            <tr>
-                <td><em>Allowance left</em></td>
-                <td style="text-align: right;">{{mf
-                    ($allowance['amount']-$allowance['spent'],true,true)}}</td>
-            </tr>
-            @endif
         </table>
 
     </div>
@@ -319,13 +313,6 @@
                     <td><em>Total</em></td>
                     <td style="text-align: right;">{{mf($sum,true,true)}}</td>
                 </tr>
-                @if($allowance['amount'] > 0)
-                <tr>
-                    <td><em>Allowance left</em></td>
-                    <td style="text-align: right;">{{mf
-                        ($allowance['amount']-$allowance['spent'],true,true)}}</td>
-                </tr>
-                @endif
         </table>
     </div>
     @endif
