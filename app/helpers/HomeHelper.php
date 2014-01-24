@@ -158,6 +158,11 @@ class HomeHelper
                     return $query->inMonth($date);
                 }]
         )->inMonth($date);
+
+        if($type == 'budget') {
+            $query->expenses();
+        }
+
         if ($noNegatives) {
             $query->expenses();
         }
