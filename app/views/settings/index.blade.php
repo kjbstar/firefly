@@ -5,6 +5,7 @@
 <div class="row">
     <div class="col-lg-12 col-md-12">
         <h2>Settings</h2>
+
         <p>There are some settings for Firefly. It's not much yet,
             but enjoy!.</p>
 
@@ -24,6 +25,7 @@
                     Transactions that occured before this date are ignored in
                     the balance prediction routine.
                 </p>
+
                 <p>
                     <input type="date" name="predictionStart"
                            value="{{$predictionStart->value}}"
@@ -31,6 +33,26 @@
                 </p>
 
             </div>
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Extended reporting</h3>
+            </div>
+            <div class="panel-body">
+                <p>
+                    Some pages can report extra on budgets,
+                    categories or beneficiaries which have your interest.
+                    Pick them.
+                </p>
+                <p>
+                    {{Form::select('extendedReporting[]',$componentList,
+                    $selectedComponents,
+                    ['multiple' => true,'class' => 'form-control',
+                    'size' => 20])}}
+                </p>
+            </div>
+
         </div>
 
 

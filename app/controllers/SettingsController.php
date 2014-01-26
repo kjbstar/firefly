@@ -19,9 +19,30 @@ class SettingsController extends BaseController
         // let's grab the only setting that might be available.
         $predictionStart = Setting::getSetting('predictionStart');
 
+        // let's also grab the 'extendedReporting' setting that
+        // contains components for comparision.
+        $extendedReporting = Setting::getSetting('extendedReporting');
+        $selectedComponents = explode(',', $extendedReporting->value);
+        $componentList = [];
+
+        $components = Auth::user()->components()->get();
+        foreach ($components as $component) {
+            $type = ucfirst(Str::plural($component->type));
+            $componentList[$type] = isset($componentList[$type])
+                ? $componentList[$type] : [];
+
+            $componentList[$type][$component->id] = $component->name;
+        }
+        asort($componentList['Beneficiaries'], SORT_STRING);
+        asort($componentList['Budgets'], SORT_STRING);
+        asort($componentList['Categories'], SORT_STRING);
+
+
         return View::make('settings.index')->with('title', 'Settings')->with(
             'predictionStart', $predictionStart
-        );
+        )->with('extendedReporting', $extendedReporting)->with(
+                'componentList', $componentList
+            )->with('selectedComponents', $selectedComponents);
     }
 
     /**
@@ -35,6 +56,20 @@ class SettingsController extends BaseController
         $predictionStart = Setting::getSetting('predictionStart');
         $predictionStart->value = Input::get('predictionStart');
         $predictionStart->save();
+
+
+        $inputComponents = is_array(Input::get('extendedReporting'))
+            ? Input::get('extendedReporting') : [];
+        $selectedComponents = [];
+        foreach ($inputComponents as $id) {
+            if (Auth::user()->components()->find($id)) {
+                $selectedComponents[] = $id;
+            }
+        }
+        $extendedReporting = Setting::getSetting('extendedReporting');
+        $extendedReporting->value = join(',', $selectedComponents);
+        $extendedReporting->save();
+
         Session::flash('success', 'Settings saved!');
 
         return Redirect::to(Session::get('previous'));
@@ -81,11 +116,10 @@ class SettingsController extends BaseController
     }
 
 
-
-
     public function addAllowance()
     {
         Session::put('previous', URL::previous());
+
         return View::make('settings.add-allowance');
     }
 
@@ -102,10 +136,12 @@ class SettingsController extends BaseController
         // validate
         $validator = Validator::make($setting->toArray(), Setting::$rules);
         if ($validator->fails()) {
-            return Session::flash(
+            Session::flash(
                 'warning', 'Because of an error,
             the allowance could not be added.'
             );
+
+            return Redirect::to(Session::get('previous'));
         } else {
             $setting->save();
         }
@@ -118,8 +154,10 @@ class SettingsController extends BaseController
     public function editAllowance(Setting $setting)
     {
         Session::put('previous', URL::previous());
-        return View::make('settings.edit-allowance')->with('setting',
-            $setting);
+
+        return View::make('settings.edit-allowance')->with(
+            'setting', $setting
+        );
     }
 
     public function postEditAllowance(Setting $setting)
@@ -127,8 +165,7 @@ class SettingsController extends BaseController
         $setting->value = floatval(Input::get('value'));
         $setting->save();
         Session::flash(
-            'success',
-            'Allowance for ' . $setting->date->format('F Y') . ' has been
+            'success', 'Allowance for ' . $setting->date->format('F Y') . ' has been
             saved.'
         );
 
@@ -138,8 +175,10 @@ class SettingsController extends BaseController
     public function deleteAllowance(Setting $setting)
     {
         Session::put('previous', URL::previous());
-        return View::make('settings.delete-allowance')->with('setting',
-            $setting);
+
+        return View::make('settings.delete-allowance')->with(
+            'setting', $setting
+        );
     }
 
     public function postDeleteAllowance(Setting $setting)

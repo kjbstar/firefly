@@ -42,16 +42,14 @@ class ReportController extends BaseController
     {
         $year = intval($year);
         // end is the current year.
-        $start = new Carbon(($year-1).'-12-31');
-        $end = new Carbon($year.'-12-31');
-
-
+        $start = new Carbon(($year - 1) . '-12-31');
+        $end = new Carbon($year . '-12-31');
 
 
         // basic information:
         $data = ReportHelper::basicInformation($end);
         // account information:
-        $accounts = ReportHelper::accountInformation($start,$end);
+        $accounts = ReportHelper::accountInformation($start, $end);
 
         $benefactors = ReportHelper::objectInformation(
             $end, 'beneficiary', SORT_DESC
@@ -63,21 +61,23 @@ class ReportController extends BaseController
             $end, 'category', SORT_ASC
         );
 
-        $budgets = Auth::user()->components()->where('type','budget')->get();
+        $budgets = Auth::user()->components()->where('type', 'budget')->get();
 
-        return View::make('reports.year')->with('start',
-            $start)->with('end',$end)->with(
-            'data', $data
-        )->with('accounts', $accounts)->with('end', $end)->with(
+        return View::make('reports.year')->with(
+            'start', $start
+        )->with('end', $end)->with(
+                'data', $data
+            )->with('accounts', $accounts)->with('end', $end)->with(
                 'benefactors', $benefactors
             )->with(
                 'fans', $fans
             )->with('spentMostCategories', $spentMostCategories)->with(
                 'title', 'Report for ' . $year
-            )->with('budgets',$budgets);
+            )->with('budgets', $budgets);
     }
 
-    public function objectOverviewChart($year, Component $component) {
+    public function objectOverviewChart($year, Component $component)
+    {
         $start = new Carbon($year . '-01-01');
         $end = clone $start;
         $end->endOfYear();
@@ -87,29 +87,33 @@ class ReportController extends BaseController
         $chart->addColumn('Amount predicted', 'number');
         $chart->addColumn('Amount budgeted', 'number');
 
-        while($start <= $end) {
+        while ($start <= $end) {
             $current = clone $start;
 
             // get amount spent:
-            $spent = floatval($component->transactions()->inMonth($current)
-                    ->expenses()->sum('amount')
-                *-1);
+            $spent = floatval(
+                $component->transactions()->inMonth($current)->expenses()->sum(
+                        'amount'
+                    ) * -1
+            );
             // get the limit:
-            $limit  = $component->limits()->where('date',
-                $current->format('Y-m-d'))->first();
-            if($limit) {
+            $limit = $component->limits()->where(
+                'date', $current->format('Y-m-d')
+            )->first();
+            if ($limit) {
                 $limited = floatval($limit->amount);
             } else {
                 $limited = null;
             }
             $prediction = $component->predictForMonth($current);
 
-            $chart->addRow($current,$spent,$prediction,$limited);
+            $chart->addRow($current, $spent, $prediction, $limited);
 
             $start->addMonth();
         }
 
         $chart->generate();
+
         return Response::json($chart->getData());
 
     }
@@ -170,7 +174,7 @@ class ReportController extends BaseController
      * Generates a pie chart of your top 10 components ($type) ordered by
      * $sort, in the year $year.
      *
-     * @param int    $year The year
+     * @param int $year    The year
      * @param string $type The component
      * @param string $sort asc|desc
      *
@@ -199,5 +203,53 @@ class ReportController extends BaseController
         return Response::json($chart->getData());
 
 
+    }
+
+    public function compareYears($first, $second)
+    {
+
+        $extendedReporting = Setting::getSetting('extendedReporting');
+        $selectedComponents = explode(',', $extendedReporting->value);
+        $components = Component::whereIn('id', $selectedComponents)->get();
+
+        return View::make('reports.compared')->with(
+            'components', $components
+        )->with('first', $first)->with('second', $second);
+
+        return 1;
+    }
+
+    public function compareComponentChart(
+        Component $component, $first, $second
+    ) {
+
+        $chart = App::make('gchart');
+        $chart->addColumn('Month', 'string');
+        $chart->addColumn($first, 'number');
+        $chart->addColumn($second, 'number');
+
+        for ($i = 1; $i <= 12; $i++) {
+            // get a date:
+            $currentFirst = new Carbon('01-' . $i . '-' . $first);
+            $currentSecond = new Carbon('01-' . $i . '-' . $second);
+
+            // expenses in first and second year:
+            $firstExpenses = $component->transactions()->inMonth($currentFirst)
+                ->sum('amount');
+            $secondExpenses = $component->transactions()->inMonth(
+                    $currentSecond
+                )->sum('amount');
+
+            $chart->addRow($currentFirst->format('F'),$firstExpenses,
+                $secondExpenses);
+
+
+        }
+
+
+        $chart->generate();
+
+
+        return Response::json($chart->getData());
     }
 }

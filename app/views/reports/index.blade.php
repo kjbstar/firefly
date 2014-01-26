@@ -14,6 +14,15 @@
 
             @endforeach
         </p>
+        <p>
+            <ul>
+            <li>
+                <a href="{{URL::Route('year_compare',[2013,
+                2014])}}">Compare 2013 with
+                    2014</a>
+            </li>
+            </ul>
+        </p>
     </div>
 </div>
 

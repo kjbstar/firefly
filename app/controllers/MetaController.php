@@ -78,6 +78,9 @@ class MetaController extends BaseController
     /**
      * Shows all transactions without X.
      *
+     * @param int $year  The year
+     * @param int $month the month
+     *
      * @return View
      */
     public function showEmpty($year = null, $month = null)
@@ -105,7 +108,7 @@ class MetaController extends BaseController
             $average = $object->transactions()->expenses()->avg('amount');
             $count = $object->transactions()->expenses()->count();
             if ($count >= 5) {
-                $chartData[] = ['name' => $object->name,
+                $chartData[] = ['name'    => $object->name,
                                 'average' => floatval($average)];
             }
             //$chart->addRow($object->name, floatval($average));

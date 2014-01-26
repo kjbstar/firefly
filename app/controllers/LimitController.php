@@ -1,5 +1,6 @@
 <?php
 require_once(app_path() . '/helpers/Toolkit.php');
+
 /**
  * Class LimitController
  */
@@ -22,9 +23,7 @@ class LimitController extends BaseController
         if ($date) {
             return View::make('meta-limit.add')->with(
                 'object', $component
-            )->with(
-                    'date', $date
-                );
+            )->with('date', $date);
         }
 
         App::abort(404);
@@ -46,7 +45,7 @@ class LimitController extends BaseController
         $date = Toolkit::parseDate($year, $month);
         if ($date) {
             $limit = new Limit(['component_id' => $component->id,
-                               'date'          => $date, 'amount' => floatval(
+                                'date'         => $date, 'amount' => floatval(
                     Input::get('amount')
                 )]);
 

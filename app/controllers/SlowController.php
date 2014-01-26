@@ -17,7 +17,9 @@ class SlowController extends BaseController
          * These are the starting variables. Some components,
          * my main account and some dates and times.
          */
-        $components = Component::whereIn('id', [1734, 1595, 1736, 1770])->get();
+        $extendedReporting = Setting::getSetting('extendedReporting');
+        $selectedComponents = explode(',', $extendedReporting->value);
+        $components = Component::whereIn('id', $selectedComponents)->get();
         $account = Account::find(1);
 
         // dates and times:

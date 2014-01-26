@@ -188,7 +188,7 @@
                             {{$t->date->format(Config::get('firefly.date_format_small'))}}
                             </span>
                     </td>
-                    <td><a href="{{URL::Route('edittransaction',
+                    <td><a href="{{URL::Route('edittransfer',
                 $t->id)}}">{{{$t->description}}}</a>
                     </td>
                     <td style="text-align: right;">{{mf($t->amount,false,
