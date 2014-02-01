@@ -1,19 +1,23 @@
 <?php
 namespace DaveJamesMiller\Breadcrumbs;
 
+use Illuminate\Routing\Router;
 use Illuminate\View\Environment as ViewEnvironment;
 
 class Manager
 {
-    protected $callbacks = array();
-
     protected $environment;
+    protected $router;
 
+    protected $callbacks = array();
     protected $view;
 
-    public function __construct(ViewEnvironment $environment)
+    protected $currentRoute;
+
+    public function __construct(ViewEnvironment $environment, Router $router)
     {
         $this->environment = $environment;
+        $this->router = $router;
     }
 
     public function getView()
@@ -31,31 +35,121 @@ class Manager
         $this->callbacks[$name] = $callback;
     }
 
-    public function generate($name)
+    public function exists($name = null)
     {
-        $args = array_slice(func_get_args(), 1);
+        if (is_null($name)) {
+            try {
+                list($name) = $this->currentRoute();
+            } catch (Exception $e) {
+                return false;
+            }
+        }
 
-        return $this->generateArray($name, $args);
+        return isset($this->callbacks[$name]);
     }
 
-    public function generateArray($name, $args = array())
+    public function generate($name)
+    {
+        $params = array_slice(func_get_args(), 1);
+
+        return $this->generateArray($name, $params);
+    }
+
+    public function generateArray($name, $params = array())
     {
         $generator = new Generator($this->callbacks);
-        $generator->call($name, $args);
+        $generator->call($name, $params);
         return $generator->toArray();
     }
 
-    public function render($name)
+    public function generateIfExists($name)
     {
-        $args = array_slice(func_get_args(), 1);
-
-        return $this->renderArray($name, $args);
+        if ($this->exists($name))
+            return call_user_func_array(array($this, 'generate'), func_get_args());
+        else
+            return array();
     }
 
-    public function renderArray($name, $args = array())
+    public function generateArrayIfExists($name, $params = array())
     {
-        $breadcrumbs = $this->generateArray($name, $args);
+        if ($this->exists($name))
+            return call_user_func_array(array($this, 'generateArray'), func_get_args());
+        else
+            return array();
+    }
+
+    public function render($name = null)
+    {
+        if (is_null($name))
+            return $this->renderCurrent();
+
+        $params = array_slice(func_get_args(), 1);
+        return $this->renderArray($name, $params);
+    }
+
+    public function renderIfExists($name = null)
+    {
+        if ($this->exists($name))
+            return call_user_func_array(array($this, 'render'), func_get_args());
+        else
+            return '';
+    }
+
+    public function renderArray($name, $params = array())
+    {
+        $breadcrumbs = $this->generateArray($name, $params);
 
         return $this->environment->make($this->view, compact('breadcrumbs'))->render();
+    }
+
+    public function renderArrayIfExists($name = null)
+    {
+        if ($this->exists($name))
+            return call_user_func_array(array($this, 'renderArray'), func_get_args());
+        else
+            return '';
+    }
+
+    protected function renderCurrent()
+    {
+        list($name, $params) = $this->currentRoute();
+
+        return $this->renderArray($name, $params);
+    }
+
+    protected function currentRoute()
+    {
+        if ($this->currentRoute)
+            return $this->currentRoute;
+
+        $route = $this->router->current();
+
+        $name = $route->getName();
+
+        if (is_null($name)) {
+            $uri = head($route->methods()).' '.$route->uri();
+            throw new Exception("The current route ($uri) is not named - please check routes.php for an \"as\" parameter");
+        }
+
+        $params = $route->parameters();
+
+        return $this->currentRoute = array($name, $route->parameters());
+    }
+
+    public function setCurrentRoute($name)
+    {
+        $params = array_slice(func_get_args(), 1);
+
+        $this->setCurrentRouteArray($name, $params);
+    }
+
+    public function setCurrentRouteArray($name, $params = array())
+    {
+        $this->currentRoute = array($name, $params);
+    }
+
+    public function clearCurrentRoute()
+    {
+        $this->currentRoute = null;
     }
 }

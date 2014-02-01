@@ -57,6 +57,13 @@ class Store implements SessionInterface {
 	protected $handler;
 
 	/**
+	 * Session store started status.
+	 *
+	 * @var bool
+	 */
+	protected $started = false;
+
+	/**
 	 * Create a new session instance.
 	 *
 	 * @param  string  $name
@@ -193,11 +200,12 @@ class Store implements SessionInterface {
 	/**
 	 * Generate a new session identifier.
 	 *
+	 * @param  bool  $destroy
 	 * @return bool
 	 */
-	public function regenerate()
+	public function regenerate($destroy = false)
 	{
-		return $this->migrate();
+		return $this->migrate($destroy);
 	}
 
 	/**
@@ -462,6 +470,37 @@ class Store implements SessionInterface {
 	public function flush()
 	{
 		$this->clear();
+	}
+
+	/**
+	 * Determine if the session contains the previous URL.
+	 *
+	 * @return bool
+	 */
+	public function hasPreviousUrl()
+	{
+		return $this->has('_previous_url');
+	}
+
+	/**
+	 * Get the previous URL from the session.
+	 *
+	 * @return string|null
+	 */
+	public function getPreviousUrl()
+	{
+		return $this->get('_previous_url');
+	}
+
+	/**
+	 * Set the previous URL in the session.
+	 *
+	 * @param  string  $url
+	 * @return void
+	 */
+	public function setPreviousUrl($url)
+	{
+		$this->set('_previous_url', $url);
 	}
 
 	/**
