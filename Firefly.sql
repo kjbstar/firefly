@@ -1,3 +1,16 @@
+# ************************************************************
+# Sequel Pro SQL dump
+# Version 4096
+#
+# http://www.sequelpro.com/
+# http://code.google.com/p/sequel-pro/
+#
+# Host: localhost (MySQL 5.6.13)
+# Database: Firefly
+# Generation Time: 2014-02-01 14:47:25 +0000
+# ************************************************************
+
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -9,8 +22,6 @@
 
 # Dump of table accounts
 # ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `accounts`;
 
 CREATE TABLE `accounts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -27,10 +38,10 @@ CREATE TABLE `accounts` (
   CONSTRAINT `accounts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+
 # Dump of table balancemodifiers
 # ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `balancemodifiers`;
 
 CREATE TABLE `balancemodifiers` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -45,10 +56,24 @@ CREATE TABLE `balancemodifiers` (
   CONSTRAINT `balancemodifiers_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-# Dump of table component_transaction
+
+
+# Dump of table cache
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `component_transaction`;
+CREATE TABLE `cache` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) NOT NULL DEFAULT '',
+  `value` text NOT NULL,
+  `expiration` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table component_transaction
+# ------------------------------------------------------------
 
 CREATE TABLE `component_transaction` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -61,10 +86,29 @@ CREATE TABLE `component_transaction` (
   CONSTRAINT `component_transaction_ibfk_2` FOREIGN KEY (`component_id`) REFERENCES `components` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-# Dump of table limits
+
+
+# Dump of table components
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `limits`;
+CREATE TABLE `components` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `parent_component_id` int(10) unsigned DEFAULT NULL,
+  `type` enum('category','beneficiary','budget') NOT NULL DEFAULT 'category',
+  `name` varchar(500) NOT NULL DEFAULT '',
+  `user_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `components_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table limits
+# ------------------------------------------------------------
 
 CREATE TABLE `limits` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -79,10 +123,47 @@ CREATE TABLE `limits` (
   CONSTRAINT `componentlimits_ibfk_1` FOREIGN KEY (`component_id`) REFERENCES `components` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-# Dump of table transactions
+
+
+# Dump of table piggybanks
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `transactions`;
+CREATE TABLE `piggybanks` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `name` varchar(500) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `target` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `piggybanks_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table settings
+# ------------------------------------------------------------
+
+CREATE TABLE `settings` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `type` enum('date','float','string','int') NOT NULL DEFAULT 'date',
+  `name` varchar(255) NOT NULL,
+  `date` date DEFAULT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id_2` (`user_id`,`name`,`date`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table transactions
+# ------------------------------------------------------------
 
 CREATE TABLE `transactions` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -95,27 +176,17 @@ CREATE TABLE `transactions` (
   `date` date NOT NULL,
   `ignore` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `mark` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `beneficiary_idX` int(10) unsigned DEFAULT NULL,
-  `budget_idX` int(10) unsigned DEFAULT NULL,
-  `category_idX` int(10) unsigned DEFAULT NULL,
-  `assigned` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `fireflyuser_id` (`user_id`),
   KEY `account_id` (`account_id`),
-  KEY `beneficiary_id` (`beneficiary_idX`),
-  KEY `budget_id` (`budget_idX`),
-  KEY `category_id` (`category_idX`),
   CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `transactions_ibfk_5` FOREIGN KEY (`category_idX`) REFERENCES `categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `transactions_ibfk_6` FOREIGN KEY (`beneficiary_idX`) REFERENCES `beneficiaries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `transactions_ibfk_7` FOREIGN KEY (`budget_idX`) REFERENCES `budgets` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 # Dump of table transfers
 # ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `transfers`;
 
 CREATE TABLE `transfers` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -136,10 +207,10 @@ CREATE TABLE `transfers` (
   CONSTRAINT `transfers_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+
 # Dump of table users
 # ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -152,6 +223,8 @@ CREATE TABLE `users` (
   `reset` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
