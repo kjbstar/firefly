@@ -56,25 +56,26 @@ function drawAccountChart() {
     $.getJSON('home/charts/accounts/' + year + '/' + month).success(function (data) {
         // 260x150
         var opt = {
-            height: 150,
+            height: 250,
             legend: {position: 'none'},
             lineWidth: 1,
             curveType: 'function',
             axisTitlesPosition: 'none',
             chartArea: {
-                left: 5,
+                left: 60,
                 top: 5,
-                width: 260,
-                height: 150
+                width: 1060,
+                height: 200
             },
+            intervals: { 'style':'line' }, // Use line intervals.
             hAxis: {
-                textPosition: 'none'
+                //textPosition: 'none'
             },
             vAxes: {
-                0: {textPosition: 'none'},
-                1: {textPosition: 'none'}
-            },
-            vaXis: {textPosition: 'none'}
+                //0: {textPosition: 'none'},
+                //1: {textPosition: 'none'}
+            }
+            //vaXis: {textPosition: 'none'}
         };
 
         gdata = new google.visualization.DataTable(data);
@@ -83,7 +84,7 @@ function drawAccountChart() {
             money.format(gdata, i);
         }
 
-        chart = new google.visualization.AreaChart(document.getElementById('home-accounts-chart'));
+        chart = new google.visualization.LineChart(document.getElementById('home-accounts-chart'));
         chart.draw(gdata, opt);
     }).fail(function () {
             $('#home-accounts-chart').addClass('load-error');
