@@ -99,6 +99,7 @@ class HomeHelper
         // get allowance info which might be relevant for the
         // chart:
         $allowanceInfo = HomeHelper::getAllowanceInformation($date);
+
         $left = $allowanceInfo['amount'] - $allowanceInfo['spent'];
 
 
@@ -244,7 +245,7 @@ class HomeHelper
             : $defaultAllowance;
 
         $amount = floatval($allowance->value);
-        $allowance = ['amount' => $amount, 'over' => false];
+        $allowance = ['amount' => $amount, 'over' => false,'spent' => 0];
         $days = round(
             (intval($date->format('d')) / intval(
                     $date->format('t')
