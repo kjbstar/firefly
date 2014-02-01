@@ -37,12 +37,26 @@ class SettingsController extends BaseController
         asort($componentList['Budgets'], SORT_STRING);
         asort($componentList['Categories'], SORT_STRING);
 
+        // and the setting that controls which accounts (and
+        // subsequent predictions) you want to see on the front page:
+        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
+        $selectedAccounts = explode(',', $frontpageAccounts->value);
+        $accountList = [];
+        foreach (Auth::user()->accounts()->get() as $a) {
+            $accountList[$a->id] = $a->name;
+        }
+
 
         return View::make('settings.index')->with('title', 'Settings')->with(
             'predictionStart', $predictionStart
         )->with('extendedReporting', $extendedReporting)->with(
                 'componentList', $componentList
-            )->with('selectedComponents', $selectedComponents);
+            )->with('selectedComponents', $selectedComponents)->with(
+                'accountList', $accountList
+            )->with(
+                'selectedAccounts', $selectedAccounts
+            );
+
     }
 
     /**
@@ -66,9 +80,24 @@ class SettingsController extends BaseController
                 $selectedComponents[] = $id;
             }
         }
+
+        $inputAccounts = is_array(Input::get('frontpageAccounts')) ? Input::get(
+            'frontpageAccounts'
+        ) : [];
+        $selectedAccounts = [];
+        foreach ($inputAccounts as $id) {
+            if (Auth::user()->accounts()->find($id)) {
+                $selectedAccounts[] = $id;
+            }
+        }
+
         $extendedReporting = Setting::getSetting('extendedReporting');
         $extendedReporting->value = join(',', $selectedComponents);
         $extendedReporting->save();
+
+        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
+        $frontpageAccounts->value = join(',', $selectedAccounts);
+        $frontpageAccounts->save();
 
         Session::flash('success', 'Settings saved!');
 

@@ -55,8 +55,24 @@
 
         </div>
 
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Frontpage account list</h3>
+            </div>
+            <div class="panel-body">
+                <p>
+                    The chart on the frontpage can contain any account (or
+                    combination thereof) you wish.
+                </p>
+                {{Form::select('frontpageAccounts[]',$accountList,
+                $selectedAccounts,
+                ['class' => 'form-control'])}}
+                </div>
+            </div>
 
-        {{Form::submit('Submit',['class' => 'btn btn-info btn-lg'])}}
+
+
+            {{Form::submit('Submit',['class' => 'btn btn-info btn-lg'])}}
         {{Form::close()}}
     </div>
 

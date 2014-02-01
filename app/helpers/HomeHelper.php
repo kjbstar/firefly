@@ -339,7 +339,13 @@ class HomeHelper
         // array holds balances.
         $balances = [];
         // TODO not hard coded.
-        $account = Account::find(1);
+        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
+        if($frontpageAccounts->value == '') {
+            $account = Auth::user()->accounts()->first();
+        } else {
+            $account = Auth::user()->accounts()->find
+                ($frontpageAccounts->value);
+        }
 
         // add columns to CHART:
         $chart->addColumn($account->name, 'number');
