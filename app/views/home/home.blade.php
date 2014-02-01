@@ -46,7 +46,7 @@
     </div>
 </div>
 @endif
-@if($transactionCount == 0)
+@if($transactionCount == 0 && $accountCount > 0)
 <div class="row">
     <div class="col-lg-6 coll-md-6 col-lg-offset-3 col-md-offset-3">
         <div class="alert alert-info">

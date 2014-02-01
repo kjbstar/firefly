@@ -39,9 +39,13 @@ class Toolkit
             $account = Auth::user()->accounts()->orderBy(
                 'openingbalancedate', 'ASC'
             )->first();
-            $date = $account->openingbalancedate;
+            if ($account) {
+                $date = $account->openingbalancedate;
+                Cache::forever('getEarliestEvent', $date);
+            } else {
+                $date = new Carbon;
+            }
 
-            Cache::forever('getEarliestEvent', $date);
 
             return $date;
         }
