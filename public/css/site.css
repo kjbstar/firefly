@@ -9,9 +9,32 @@
     font-family: 'Inconsolata', monospace, sans-serif;
 
 }
-.help-popover {cursor:help;}
+
+.help-popover {
+    cursor: help;
+}
 
 .animHeader {
     -webkit-animation-duration: 6s;
     -webkit-animation-delay: 1s;
+}
+
+.piggybankFill {
+    background: deeppink;
+    position: relative;
+}
+
+.piggybankEmpty {
+    background: #eee;
+    position: absolute;
+    z-index: 5;
+    left: 0px;
+    top: 0px;
+}
+
+.piggyBank {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 10
 }
