@@ -107,8 +107,7 @@ class HomeHelper
         foreach ($currentList as $obj) {
             if ($index < 10) {
                 $chart->addRow(
-                    ['f' => $obj['name'], 'v' => $obj['id']],
-                    $obj['amount']
+                    ['f' => $obj['name'], 'v' => $obj['id']], $obj['amount']
                 );
             }
             $index++;
@@ -159,7 +158,7 @@ class HomeHelper
                 }]
         )->inMonth($date);
 
-        if($type == 'budget') {
+        if ($type == 'budget') {
             $query->expenses();
         }
 
@@ -326,7 +325,7 @@ class HomeHelper
     {
 
         // some dates:
-        $realDay = new Carbon;
+        $realDay = new Carbon; // for the prediction.
 
         $date = Toolkit::parseDate($year, $month);
         $date->endOfMonth();
@@ -339,48 +338,35 @@ class HomeHelper
 
         // array holds balances.
         $balances = [];
+        // TODO not hard coded.
+        $account = Account::find(1);
 
-        // add accounts and set initial balance.
-        $accounts = Auth::user()->accounts()->notHidden()->get();
-        foreach ($accounts as $index => $account) {
-            $chart->addColumn($account->name, 'number');
-            $chart->addCertainty(($index + 1));
-            $balances[$account->id] = 0;
-        }
-        $row = 0;
+        // add columns to CHART:
+        $chart->addColumn($account->name, 'number');
+        $chart->addCertainty(1);
+        $chart->addInterval(1); // interval cheapest day $cheap
+        $chart->addInterval(1); // interval most expensive day. $max
+        $balance = $account->balanceOnDate($start);
         while ($start <= $date) {
             $current = clone $start;
+            // 0: $current.
 
-            $chart->addCell($row, 0, $current);
+            if ($current <= $realDay) {
+                $balance = $account->balanceOnDate($current);
+                $certainty = true;
 
-            $cell = 1;
-            foreach ($accounts as $account) {
-                // first row? set the balance from the calculation,
-                // prediction be damned!
-                if ($row === 0) {
-                    $balances[$account->id] = $account->balanceOnDate($current);
-                    $certainty = true;
-                }
+                $cheap = null;
+                $max = null;
+            } else {
+                $certainty = false;
+                $prediction = $account->predictOnDateNew($current);
+                $cheap = ($balance - $prediction['least']);
+                $max = ($balance - $prediction['most']);
 
-                // if were past the first row, we dare predict the balance:
-                if ($row > 0 && $current > $realDay) {
-                    $prediction = $account->predictOnDate($current);
-                    $balances[$account->id] -= $prediction['prediction'];
-                    $certainty = false;
-                }
-                // if we're past the first row we might not HAVE to predict.
-                if ($row > 0 && $current <= $realDay) {
-                    $balances[$account->id] = $account->balanceOnDate($current);
-                    $certainty = true;
-                }
-                // once we have all this, we set some data:
-                $chart->addCell($row, $cell, $balances[$account->id]);
-                $cell++;
+                $balance -= $prediction['prediction'];
 
-                $chart->addCell($row, $cell, $certainty);
-                $cell++;
             }
-            $row++;
+            $chart->addRow($current,$balance,$certainty,$cheap,$max);
             $start->addDay();
         }
 
