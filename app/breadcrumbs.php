@@ -12,6 +12,33 @@ Breadcrumbs::register(
         $breadcrumbs->push('Reports', route('reports'));
     }
 );
+/**
+ * PIGGY BANKS:
+ */
+Breadcrumbs::register('piggy',function($breadcrumbs) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push('Piggy banks', route('piggy'));
+    });
+
+Breadcrumbs::register('piggyselect',function($breadcrumbs) {
+        $breadcrumbs->parent('piggy');
+        $breadcrumbs->push('Select account', route('piggyselect'));
+    });
+
+Breadcrumbs::register('addpiggybank',function($breadcrumbs) {
+        $breadcrumbs->parent('piggy');
+        $breadcrumbs->push('Add new piggy bank', route('addpiggybank'));
+    });
+
+
+
+// route to edit stuff:
+Breadcrumbs::register(
+    'editpiggy', function ($breadcrumbs, Piggybank $pig) {
+        $breadcrumbs->parent('piggy');
+        $breadcrumbs->push('Edit ' .$pig->name, route('editpiggy', $pig->id));
+    }
+);
 
 
 Breadcrumbs::register(

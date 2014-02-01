@@ -26,6 +26,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface
         return $this->hasMany('Account');
     }
 
+    public function piggybanks()
+    {
+        return $this->hasMany('Piggybank');
+    }
+
     /**
      * Get the users settings.
      *

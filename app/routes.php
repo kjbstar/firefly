@@ -6,12 +6,13 @@ Route::when('/home*', 'auth');
 // models:
 Route::model('user', 'User');
 
-Route::bind('component', function ($value, $route) {return Auth::user()->components()->find($value);});
 Route::bind('account', function ($value, $route) {return Auth::user()->accounts()->find($value);});
-Route::bind('transaction', function ($value, $route) {return Auth::user()->transactions()->find($value);});
-
-Route::bind('transfer', function ($value, $route) {return Auth::user()->transfers()->find($value);});
+Route::bind('component', function ($value, $route) {return Auth::user()->components()->find($value);});
+Route::bind('piggybank', function ($value, $route) {return Auth::user()->piggybanks()->find($value);});
 Route::bind('setting', function ($value, $route) {return Auth::user()->settings()->find($value);});
+Route::bind('transaction', function ($value, $route) {return Auth::user()->transactions()->find($value);});
+Route::bind('transfer', function ($value, $route) {return Auth::user()->transfers()->find($value);});
+
 
 Route::bind('limit', function ($value, $route) {
         $limit = Limit::find($value);
@@ -96,8 +97,24 @@ foreach ($objects as $o) {
 /**
  * METACONTROLLER ROUTES (extra)
  */
-
 Route::get('/home/meta/piechart', ['uses' => 'MetaController@showPieChart']);
+
+/**
+ * PIGGY BANK CONTROLLER
+ */
+Route::get('/home/piggy',['uses' => 'PiggyController@index','as' => 'piggy']);
+Route::get('/home/piggy/add',['uses' => 'PiggyController@add','as' => 'addpiggybank']);
+Route::get('/home/piggy/select',['uses' => 'PiggyController@selectAccount','as' => 'piggyselect']);
+Route::get('/home/piggy/edit/{piggybank}',['uses' => 'PiggyController@edit','as' => 'editpiggy']);
+Route::get('/home/piggy/delete/{piggybank}',['uses' => 'PiggyController@delete','as' => 'deletepiggy']);
+Route::get('/home/piggy/amount/{piggybank}',['uses' => 'PiggyController@updateAmount','as' => 'piggyamount']);
+Route::post('/home/piggy/add',['uses' => 'PiggyController@postAdd','before' => 'csrf']);
+Route::post('/home/piggy/select',['uses' => 'PiggyController@postSelectAccount','before' => 'csrf']);
+Route::post('/home/piggy/edit/{piggybank}',['uses' => 'PiggyController@postEdit','before' => 'csrf']);
+Route::post('/home/piggy/delete/{piggybank}',['uses' => 'PiggyController@postDelete','before' => 'csrf']);
+Route::post('/home/piggy/amount/{piggybank}',['uses' => 'PiggyController@postUpdateAmount','before' => 'csrf']);
+
+
 
 /**
  * REPORTCONTROLLER
