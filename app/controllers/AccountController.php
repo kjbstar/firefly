@@ -149,7 +149,7 @@ class AccountController extends BaseController
     public function postDelete(Account $account)
     {
         $account->delete();
-
+        Session::flash('success','Account deleted.');
         return Redirect::to(Session::get('previous'));
     }
 
