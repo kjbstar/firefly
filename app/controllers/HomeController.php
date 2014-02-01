@@ -138,11 +138,14 @@ class HomeController extends BaseController
             case 'category':
             case 'budgets':
             case 'budget':
+
                 return Response::json(
                     HomeHelper::homeComponentChart($type, $year, $month)
                 );
                 break;
             case 'accounts':
+                // forced to be one account
+//                HomeHelper::homeAccountChart($year, $month);
                 return Response::json(
                     HomeHelper::homeAccountChart($year, $month)
                 );
