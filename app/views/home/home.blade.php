@@ -68,15 +68,20 @@
     </div>
 </div>
 @endif
+@if($accountCount > 0)
 
 <div class="row">
-    @if($accountCount > 0)
-    <div class="col-lg-3 col-md-3">
-        <h4>Accounts</h4>
+
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h3>Accounts</h3>
         <div id="home-accounts-chart"></div>
     </div>
-    <div class="col-lg-3 col-md-3">
-        <h4>&nbsp;</h4>
+</div>
+
+<div class="row">
+
+    <div class="col-lg-3 col-md-12 col-sm-12">
+        <h3>Balance</h3>
         <table class="table table-condensed table-bordered">
             @foreach($accounts as $account)
             <tr>
@@ -88,8 +93,9 @@
             @endforeach
         </table>
     </div>
-    <div class="col-lg-6 col-md-6">
-        <h4>General information</h4>
+
+    <div class="col-lg-9 col-md-12 col-sm-12">
+        <h3>General information</h3>
         <ul class="nav nav-tabs">
             @if($allowance['amount'] > 0)
             <li class="active"><a href="#budgeting-tab"
@@ -97,7 +103,7 @@
             <li><a href="#transactions-tab" data-toggle="tab">Transactions</a></li>
             @else
             <li class="active"><a href="#transactions-tab"
-                    data-toggle="tab">Transactions</a></li>
+                                  data-toggle="tab">Transactions</a></li>
             @endif
 
             <li><a href="#transfers-tab" data-toggle="tab">Transfers</a></li>
@@ -177,9 +183,9 @@
             </div>
             <div class="tab-pane" id="transfers-tab">
                 <table class="table table-condensed table-bordered">
-                @foreach($transfers as $t)
-                <tr>
-                    <td>
+                    @foreach($transfers as $t)
+                    <tr>
+                        <td>
                         <span class="visible-lg visible-md">
                             {{$t->date->format(Config::get('firefly.date_format'))}}
                             </span>
@@ -187,20 +193,20 @@
                             hidden-lg">
                             {{$t->date->format(Config::get('firefly.date_format_small'))}}
                             </span>
-                    </td>
-                    <td><a href="{{URL::Route('edittransfer',
+                        </td>
+                        <td><a href="{{URL::Route('edittransfer',
                 $t->id)}}">{{{$t->description}}}</a>
-                    </td>
-                    <td style="text-align: right;">{{mf($t->amount,false,
-                        true)}}
-                </tr>
-                @endforeach
+                        </td>
+                        <td style="text-align: right;">{{mf($t->amount,false,
+                            true)}}
+                    </tr>
+                    @endforeach
                 </table>
             </div>
         </div>
     </div>
-    @endif
 </div>
+@endif
 <div class="row">
     @if($accountCount > 0 && $transactionCount > 0)
     <div class="col-lg-4 col-md-4">
