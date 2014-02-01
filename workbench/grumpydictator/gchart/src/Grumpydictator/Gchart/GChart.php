@@ -83,7 +83,7 @@ class GChart
 
     public function addInterval($index)
     {
-        $this->_interval[] = $index;
+        $this->_interval[$index][] = true;
     }
 
     /**
@@ -116,20 +116,30 @@ class GChart
                                           'p'    => ['role' => 'annotationText']];
                 // add an annotation text column
             }
+            // add the intervals:
 
-            if (in_array($index, $this->_certainty)) {
-                // add a certainty column:
-                $this->_data['cols'][] = ['type' => 'boolean',
-                                          'p'    => ['role' => 'certainty']];
-            }
-            if (in_array($index, $this->_interval)) {
-                $this->_data['cols'][] = ['type' => 'number',
-                                          'p'    => ['role' => 'interval']];
+            if (isset($this->_interval[$index])) {
 
-                $this->_data['cols'][] = ['type' => 'number',
-                                          'p'    => ['role' => 'interval']];
+
+
+                if (in_array($index, $this->_certainty)) {
+                    // add a certainty column:
+                    $this->_data['cols'][] = ['type' => 'boolean',
+                                              'p'    => ['role' => 'certainty']];
+                }
+
+                // add intervals for each one found.
+                foreach($this->_interval[$index] as $nr => $bool) {
+                    $this->_data['cols'][] = ['type' => 'number',
+                                              'id' => 'i'.$index.$nr,
+                                              'p'    => ['role' => 'interval']];
+                }
+
             }
+
         }
+
+
 
         $this->_data['rows'] = [];
         foreach ($this->_rows as $rowindex => $row) {
@@ -164,6 +174,9 @@ class GChart
      */
     public function getData()
     {
+//        echo '<pre>';
+//        var_dump($this->_data);
+//        echo '</pre>';exit;
         return $this->_data;
     }
 
