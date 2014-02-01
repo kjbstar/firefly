@@ -338,7 +338,6 @@ class HomeHelper
 
         // array holds balances.
         $balances = [];
-        // TODO not hard coded.
         $frontpageAccounts = Setting::getSetting('frontpageAccounts');
         if($frontpageAccounts->value == '') {
             $account = Auth::user()->accounts()->first();
