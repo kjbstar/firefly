@@ -66,7 +66,8 @@
                 </p>
                 {{Form::select('frontpageAccounts[]',$accountList,
                 $selectedAccounts,
-                ['class' => 'form-control'])}}
+                ['class' => 'form-control','multiple' => 'multiple',
+                'size' => 4])}}
                 </div>
             </div>
 

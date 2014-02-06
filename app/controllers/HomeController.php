@@ -145,7 +145,6 @@ class HomeController extends BaseController
                 break;
             case 'accounts':
                 // forced to be one account
-//                HomeHelper::homeAccountChart($year, $month);
                 return Response::json(
                     HomeHelper::homeAccountChart($year, $month)
                 );

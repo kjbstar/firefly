@@ -21,11 +21,11 @@ function drawAllCharts() {
             var opt = {
                 legend: {position: 'none'},
                 series: {
-                    0: {type: "bars", targetAxisIndex: 1},
+                    0: {type: "bars"},
                     1: {type: "line", targetAxisIndex: 1},
                     2: {type: "bars"},
-                    3: {type: "line", targetAxisIndex: 1},
-                    4: {type: "bars"},
+                    3: {type: "line"},
+                    4: {type: "bars"}
                 },
                 interpolateNulls: true
 

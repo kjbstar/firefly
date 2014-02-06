@@ -64,7 +64,7 @@ class Account extends Eloquent
         } else {
             $remember = 7 * 24 * 60;
         }
-        if($date < $this->openingbalancedate) {
+        if ($date < $this->openingbalancedate) {
             $date = $this->openingbalancedate;
         }
 
@@ -112,59 +112,6 @@ class Account extends Eloquent
         $data['least'] = 0;
         $data['prediction'] = 0;
 
-        // Get all transactions on that day, grouped by
-        // the day of the month and the month:
-        $predictionStart = Setting::getSetting('predictionStart');
-        $predictionDate = new Carbon($predictionStart->value);
-
-        $list = $this->transactions()->expenses()->
-            where('date','>',$predictionStart->value)->
-            where(
-            'ignore', 0
-        )->onDayOfMonth($date)->groupBy('day')->get(
-                [DB::Raw('DATE_FORMAT(`date`,"%d-%m") as `day`'),
-                DB::Raw('SUM(`amount`) as `dayamount`')]
-            );
-        $diffInMonths = $predictionDate->diffInMonths($date);
-        Log::debug('Days for ' . $date->format('d-m-Y') . ': ' . $diffInMonths);
-        $sum = 0;
-        foreach ($list as $index => $entry) {
-            $amount = floatval($entry->dayamount) * -1;
-            $sum += $amount;
-
-            // more than the current 'most expensive day ever'?
-            if ($amount > $data['most']) {
-                $data['most'] = $amount;
-            }
-            // first entry is 'least' by default (otherwise it would stick at
-            // zero)
-            if ($index == 0) {
-                $data['least'] = $amount;
-            }
-            if ($amount < $data['least']) {
-                $data['least'] = $amount;
-            }
-        }
-        Log::debug('Total amount spent on this day: ' . $sum);
-
-        // the actual prediction:
-        $data['prediction'] = $diffInMonths > 1 ? $sum / $diffInMonths : $sum;
-
-        Log::debug(
-            'Prediction voor ' . $date->format('d-m-Y') . ': ' . print_r(
-                $data, true
-            )
-        );
-
-        return $data;
-    }
-
-    public function predictOnDateNew(Carbon $date) {
-        $data = [];
-        $data['most'] = 0;
-        $data['least'] = 0;
-        $data['prediction'] = 0;
-
         $predictionStart = Setting::getSetting('predictionStart');
         $predictionDate = new Carbon($predictionStart->value);
         Log::debug('Predicting for ' . $date->format('d-M-Y'));
@@ -177,17 +124,18 @@ class Account extends Eloquent
         $current = clone $date;
         $dateDay = $date->format('d');
         $days = [];
-        while($current >= $predictionDate) {
+        while ($current >= $predictionDate) {
 
             // if $current is in the same month as the
             // $date var, we skip it, because it's pretty pointless
             // to compare the current month with itself.
             // this happens on 31-mar, which jumps back to 1-mar.
             $currentDay = $current->format('d');
-            Log::debug('currentDay: ' . $currentDay .' vs dateDay: ' .
-                $dateDay);
+            Log::debug(
+                'currentDay: ' . $currentDay . ' vs dateDay: ' . $dateDay
+            );
 
-            if($current != $date && $dateDay == $currentDay) {
+            if ($current != $date && $dateDay == $currentDay) {
                 $days[] = clone $current;
                 Log::debug('Added to days[]: ' . $current->format('d-M-Y'));
             }
@@ -195,15 +143,20 @@ class Account extends Eloquent
         }
         // we need a prediction now, based on these dates:
         $sum = 0;
-        foreach($days as $index => $currentDay) {
-            $amount = floatval($this->transactions()->expenses()->
-                where('date','>',$predictionStart->value)->
-                where(
-                    'ignore', 0
-                )->onDay($currentDay)->sum('amount'));
+        foreach ($days as $index => $currentDay) {
+            $amount = floatval(
+                $this->transactions()->expenses()->where(
+                        'date', '>', $predictionStart->value
+                    )->where(
+                        'ignore', 0
+                    )->onDay($currentDay)->sum('amount')
+            );
             $amount = $amount * -1;
-            Log::debug('Amount for '.$currentDay->format('d-M-Y').': ' . mf
-                ($amount));
+            Log::debug(
+                'Amount for ' . $currentDay->format('d-M-Y') . ': ' . mf(
+                    $amount
+                )
+            );
 
             // use this amount to do the prediction:
             $sum += $amount;
@@ -224,6 +177,7 @@ class Account extends Eloquent
         // the actual prediction:
         $count = count($days);
         $data['prediction'] = $count > 1 ? $sum / $count : $sum;
+
         return $data;
 
 

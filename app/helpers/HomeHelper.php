@@ -245,7 +245,7 @@ class HomeHelper
             : $defaultAllowance;
 
         $amount = floatval($allowance->value);
-        $allowance = ['amount' => $amount, 'over' => false,'spent' => 0];
+        $allowance = ['amount' => $amount, 'over' => false, 'spent' => 0];
         $days = round(
             (intval($date->format('d')) / intval(
                     $date->format('t')
@@ -324,60 +324,83 @@ class HomeHelper
      */
     public static function homeAccountChart($year, $month)
     {
-
+        // start with some dates:
         // some dates:
         $realDay = new Carbon; // for the prediction.
 
-        $date = Toolkit::parseDate($year, $month);
-        $date->endOfMonth();
-        $start = clone $date;
+        $start = Toolkit::parseDate($year, $month);
         $start->startOfMonth();
+        $end = clone $start;
+        $end->endOfMonth();
         $start->subDay(); // also last day of previous month
 
+        // get the user's front page accounts:
+        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
+        $accounts = [];
+        if ($frontpageAccounts->value == '') {
+            $accounts[] = Auth::user()->accounts()->first();
+        } else {
+            $accounts = Auth::user()->accounts()->whereIn(
+                'id', explode(
+                    ',', $frontpageAccounts->value
+                )
+            )->get();
+        }
+
+        // create chart:
         $chart = App::make('gchart');
         $chart->addColumn('Day of the month', 'date');
 
-        // array holds balances.
-        $balances = [];
-        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
-        if($frontpageAccounts->value == '') {
-            $account = Auth::user()->accounts()->first();
-        } else {
-            $account = Auth::user()->accounts()->find
-                ($frontpageAccounts->value);
+
+        // add columns for all accounts:
+        foreach ($accounts as $account) {
+            $c = $chart->addColumn($account->name, 'number');
+            $account->balance = $account->balanceOnDate($start);
+            $chart->addCertainty($c);
+            $chart->addInterval($c); // interval cheapest day $cheap
+            $chart->addInterval($c); // interval most expensive day. $max
         }
 
-        // add columns to CHART:
-        $chart->addColumn($account->name, 'number');
-        $chart->addCertainty(1);
-        $chart->addInterval(1); // interval cheapest day $cheap
-        $chart->addInterval(1); // interval most expensive day. $max
-        $balance = $account->balanceOnDate($start);
-        while ($start <= $date) {
-            $current = clone $start;
-            // 0: $current.
+        // loop each day, then loop all accounts:
+        $current = clone $start;
+        $row = 0;
+        while ($current <= $end) {
+            $chart->addCell($row, 0, clone $current);
 
-            if ($current <= $realDay) {
-                $balance = $account->balanceOnDate($current);
-                $certainty = true;
+            // loop the accounts:
+            $cell = 1;
+            foreach ($accounts as $account) {
+                // some fake values:
 
-                $cheap = null;
-                $max = null;
-            } else {
-                $certainty = false;
-                $prediction = $account->predictOnDateNew($current);
-                $cheap = ($balance - $prediction['least']);
-                $max = ($balance - $prediction['most']);
+                if ($current <= $realDay) {
+                    $account->balance = $account->balanceOnDate($current);
+                    $certainty = true;
+                    $cheap = null;
+                    $max = null;
+                } else {
+                    $certainty = false;
+                    $prediction = $account->predictOnDate($current);
+                    $cheap = ($account->balance - $prediction['least']);
+                    $max = ($account->balance - $prediction['most']);
+                    $account->balance -= $prediction['prediction'];
+                }
 
-                $balance -= $prediction['prediction'];
-
+                $chart->addCell($row, $cell, $account->balance);
+                $cell++;
+                $chart->addCell($row, $cell, $certainty);
+                $cell++;
+                $chart->addCell($row, $cell, $cheap);
+                $cell++;
+                $chart->addCell($row, $cell, $max);
+                $cell++;
             }
-            $chart->addRow($current,$balance,$certainty,$cheap,$max);
-            $start->addDay();
+
+
+            $current->addDay();
+            $row++;
         }
 
         $chart->generate();
-
         return $chart->getData();
     }
 } 

@@ -39,6 +39,7 @@ class GChart
         }
         $this->_cols[] = ['name' => $name, 'type' => $type, 'role' => $role,
                           'id'   => \Str::slug($name)];
+        return (count($this->_cols) -1);
     }
 
     /**
