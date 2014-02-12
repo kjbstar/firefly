@@ -76,7 +76,10 @@ class TransactionController extends BaseController
         $data['date'] = Input::get('date');
         $data['account_id'] = Input::get('account_id');
         $data['user_id'] = Auth::user()->id;
-        $data['ignore'] = Input::get('ignore') == '1' ? 1 : 0;
+        $data['ignoreprediction'] = Input::get('ignoreprediction') == '1' ? 1 :
+            0;
+        $data['ignoreallowance'] = Input::get('ignoreallowance') == '1' ? 1 :
+            0;
         $data['mark'] = Input::get('mark') == '1' ? 1 : 0;
         $transaction = new Transaction($data);
 
@@ -146,7 +149,10 @@ class TransactionController extends BaseController
         $transaction->amount = floatval(Input::get('amount'));
         $transaction->date = Input::get('date');
         $transaction->account_id = intval(Input::get('account_id'));
-        $transaction->ignore = Input::get('ignore') == '1' ? 1 : 0;
+        $transaction->ignoreprediction = Input::get('ignoreprediction') == '1'
+            ? 1 : 0;
+        $transaction->ignoreallowance = Input::get('ignoreallowance') == '1'
+            ? 1 : 0;
         $transaction->mark = Input::get('mark') == '1' ? 1 : 0;
 
         // beneficiary and budget:

@@ -256,9 +256,7 @@ class HomeHelper
         if ($amount > 0) {
             $spent = floatval(
                     Auth::user()->transactions()->inMonth($date)->expenses()
-                        ->sum(
-                            'amount'
-                        )
+                        ->where('ignoreallowance', 0)->sum('amount')
                 ) * -1;
             $allowance['spent'] = $spent;
             // overspent this allowance:
@@ -273,6 +271,55 @@ class HomeHelper
         }
 
         return $allowance;
+    }
+
+    public static function getPredictionInfo(Carbon $date)
+    {
+        // predict today and tomorrow for the preferred account(s)
+        // in the prefs
+        // get the user's front page accounts:
+        $accounts = Toolkit::getFrontpageAccounts();
+
+        $eom = clone $date;
+        $eom = $eom->endOfMonth();
+        $current = clone $date;
+        // initial array:
+        //$p = ['ptdy' => null, 'ptmr' => null, 'stdy' => null,
+        //'stmr' => null];
+        $p = [];
+
+        // values!
+        while ($current <= $eom) {
+            // key = date:
+            $diff = $current->diffInDays($date);
+            switch ($diff) {
+                case 0:
+                    $key = 'Today';
+                    break;
+                case 1:
+                    $key = 'Tomorrow';
+                    break;
+                default:
+                    $key = $current->format('d F');
+                    break;
+            }
+            $spent = 0;
+            $predicted = 0;
+            foreach ($accounts as $account) {
+                // spent that day (usually 0)
+                $spent += floatval(
+                        Auth::user()->transactions()->expenses()->where(
+                                'ignoreallowance', 0
+                            )->onDay($current)->sum('amount')
+                    ) * -1;
+                $prediction = $account->predictOnDate($current);
+                $predicted += $prediction['prediction'];
+                unset($prediction);
+            }
+            $p[$key] = ['spent' => $spent,'predicted' => $predicted];
+            $current->addDay();
+        }
+        return $p;
     }
 
     /**
@@ -335,17 +382,7 @@ class HomeHelper
         $start->subDay(); // also last day of previous month
 
         // get the user's front page accounts:
-        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
-        $accounts = [];
-        if ($frontpageAccounts->value == '') {
-            $accounts[] = Auth::user()->accounts()->first();
-        } else {
-            $accounts = Auth::user()->accounts()->whereIn(
-                'id', explode(
-                    ',', $frontpageAccounts->value
-                )
-            )->get();
-        }
+        $accounts = Toolkit::getFrontpageAccounts();
 
         // create chart:
         $chart = App::make('gchart');
@@ -370,14 +407,18 @@ class HomeHelper
             // loop the accounts:
             $cell = 1;
             foreach ($accounts as $account) {
-                // some fake values:
 
+                // don't predict, just show
                 if ($current <= $realDay) {
+                    // by doing this the balance gets "reset"
+                    // and are the predicted balances.
                     $account->balance = $account->balanceOnDate($current);
+
                     $certainty = true;
                     $cheap = null;
                     $max = null;
                 } else {
+                    // predict:
                     $certainty = false;
                     $prediction = $account->predictOnDate($current);
                     $cheap = ($account->balance - $prediction['least']);
@@ -401,6 +442,7 @@ class HomeHelper
         }
 
         $chart->generate();
+
         return $chart->getData();
     }
 } 

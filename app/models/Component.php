@@ -64,7 +64,7 @@ class Component extends Eloquent
         while($start <= $date) {
             $current = clone $start;
             $sum += floatval($this->transactions()->inMonth($current)
-                    ->where('ignore',0)->expenses()->sum('amount')
+                    ->where('ignoreprediction',0)->expenses()->sum('amount')
                 *-1);
             $start->addMonth();
             $count++;

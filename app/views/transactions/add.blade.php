@@ -182,7 +182,8 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                <input type="checkbox" name="ignore" value="1"> Ignores this transaction in predictions.
+                <input type="checkbox" name="ignoreprediction" value="1">
+                        Ignores this transaction in predictions.
                     </label>
                 </div>
                 @if($count == 0)
@@ -192,6 +193,19 @@
                     accurate.
                 </span>
                 @endif
+            </div>
+        </div>
+
+        <!-- ignore in allowance (default is zero) -->
+        <div class="form-group">
+            <label for="inputIgnoreAllowance" class="col-sm-3
+            control-label">Allowance</label>
+            <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="ignoreallowance" value="1">
+                        Do not substract this transaction
+                        from the allowance (if set).</label></div>
             </div>
         </div>
         

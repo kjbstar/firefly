@@ -148,7 +148,7 @@ class Account extends Eloquent
                 $this->transactions()->expenses()->where(
                         'date', '>', $predictionStart->value
                     )->where(
-                        'ignore', 0
+                        'ignoreprediction', 0
                     )->onDay($currentDay)->sum('amount')
             );
             $amount = $amount * -1;

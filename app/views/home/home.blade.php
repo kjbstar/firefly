@@ -107,6 +107,7 @@
             @endif
 
             <li><a href="#transfers-tab" data-toggle="tab">Transfers</a></li>
+            <li><a href="#prediction-tab" data-toggle="tab">Prediction</a></li>
         </ul>
         <div class="tab-content" style="margin-top:10px;">
             @if($allowance['amount'] > 0)
@@ -155,8 +156,10 @@
                     @endif
 
                 </div>
-                &nbsp;&nbsp;{{mf($allowance['amount'])}} - {{mf($allowance['spent'])}}
-                = {{mf($allowance['amount'] - $allowance['spent'],true)}}
+                <p>
+                    {{mf($allowance['amount'])}} - {{mf
+                    ($allowance['spent'])}} = {{mf($allowance['amount'] - $allowance['spent'],true)}}
+                </p>
 
             </div>
             @endif
@@ -203,6 +206,32 @@
                     @endforeach
                 </table>
             </div>
+            <div class="tab-pane" id="prediction-tab">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th>Date</th>
+                        <th>Predicted</th>
+                        <th>Actual</th>
+                    </tr>
+                    @foreach($predictionInfo as $date => $info)
+                    <tr>
+                        <td>{{$date}}</td>
+                        <td>{{mf($info['predicted'])}}</td>
+                        <td>
+                            @if($info['spent'] <= $info['predicted'])
+                            <span class="text-success">
+                            @else
+                            <span class="text-danger">
+                            @endif
+                            {{mf($info['spent'])}}
+
+
+                                </span>
+                        </td>
+                    </tr>
+                    @endforeach
+                </table>
+                </div>
         </div>
     </div>
 </div>

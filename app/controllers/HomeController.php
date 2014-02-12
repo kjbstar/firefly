@@ -102,6 +102,9 @@ class HomeController extends BaseController
         // get some allowance information:
         $allowanceInfo = HomeHelper::getAllowanceInformation($today);
 
+        // get some extra prediction details:
+        // TODO naar helper.
+        $predictionInfo = HomeHelper::getPredictionInfo($today);
 
         return View::make('home.home')->with('title', 'Home')->with(
             'accounts', $accounts
@@ -117,7 +120,7 @@ class HomeController extends BaseController
                 'transactionCount', $transactionCount
             )->with(
                 'allowance', $allowanceInfo
-            );
+            )->with('predictionInfo', $predictionInfo);
     }
 
     /**

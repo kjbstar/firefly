@@ -67,15 +67,7 @@ function drawAccountChart() {
                 width: 1060,
                 height: 200
             },
-            intervals: { 'style':'line' }, // Use line intervals.
-            hAxis: {
-                //textPosition: 'none'
-            },
-            vAxes: {
-                //0: {textPosition: 'none'},
-                //1: {textPosition: 'none'}
-            }
-            //vaXis: {textPosition: 'none'}
+            intervals: { 'style':'line' } // Use line intervals.
         };
 
         gdata = new google.visualization.DataTable(data);

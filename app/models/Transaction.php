@@ -9,12 +9,13 @@ class Transaction extends Eloquent
 {
 
     public static $rules
-        = ['user_id'     => 'required|exists:users,id|numeric',
-           'account_id'  => 'required|integer|exists:accounts,id',
-           'date'        => 'required|before:2038-01-01|after:1980-01-01',
-           'description' => 'required|between:1,500',
-           'amount'      => 'required|numeric|between:-65536,65536|not_in:0',
-           'ignore'      => 'required|numeric|between:0,1'];
+        = ['user_id'          => 'required|exists:users,id|numeric',
+           'account_id'       => 'required|integer|exists:accounts,id',
+           'date'             => 'required|before:2038-01-01|after:1980-01-01',
+           'description'      => 'required|between:1,500',
+           'amount'           => 'required|numeric|between:-65536,65536|not_in:0',
+           'ignoreprediction' => 'required|numeric|between:0,1',
+           'ignoreallowance'  => 'required|numeric|between:0,1'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $appends = ['beneficiary', 'category', 'budget'];
 

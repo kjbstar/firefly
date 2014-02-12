@@ -117,18 +117,34 @@
             </div>
         </div>
 
-        <!-- ignore in transactions (default is zero) -->
+        <!-- ignore in predictions (default is zero) -->
         <div class="form-group">
             <label for="inputIgnore" class="col-sm-3 control-label">Ignore</label>
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                <input type="checkbox" name="ignore" value="1"
-                       @if($transaction->ignore == 1)
+                <input type="checkbox" name="ignoreprediction" value="1"
+                       @if($transaction->ignoreprediction == 1)
                        checked="checked"
                        @endif
-                       > Ignores this transaction in predictions
-                        .</label></div>
+                       > Ignores this transaction in predictions.
+                    </label></div>
+            </div>
+        </div>
+
+        <!-- ignore in allowance (default is zero) -->
+        <div class="form-group">
+            <label for="inputIgnoreAllowance" class="col-sm-3
+            control-label">Allowance</label>
+            <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="ignoreallowance" value="1"
+                        @if($transaction->ignoreallowance == 1)
+                        checked="checked"
+                        @endif
+                        > Do not substract this transaction
+                        from the allowance (if set).</label></div>
             </div>
         </div>
         

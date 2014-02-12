@@ -15,8 +15,12 @@
                 <td>{{$t->date->format(Config::get('firefly.date_format'))
                     }}</td>
                 <td>
-                    @if($t->ignore == 1)
+                    @if($t->ignoreprediction == 1)
                     <span class="glyphicon glyphicon-eye-close" title="Ignored in predictions"></span>
+                    @endif
+                    @if($t->ignoreallowance == 1)
+                    <span class="glyphicon glyphicon-gift" title="Ignored in
+                    allowance"></span>
                     @endif
                     @if($t->mark == 1)
                     <span class="glyphicon glyphicon-ok" title="Marked in charts"></span>
