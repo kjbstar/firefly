@@ -1,24 +1,7 @@
 <?php
-/**
- * File contains the TransferController
- *
- * PHP version 5.5.6
- *
- * @category Controllers
- * @package  Controllers
- * @author   Sander Dorigo <sander@dorigo.nl>
- * @license  GPL 3.0
- * @link     http://geld.nder.dev/
- */
 
 /**
  * Class TransferController
- *
- * @category AccountController
- * @package  Controllers
- * @author   Sander Dorigo <sander@dorigo.nl>
- * @license  GPL 3.0
- * @link     http://www.sanderdorigo.nl/
  */
 class TransferController extends BaseController
 {
@@ -65,23 +48,19 @@ class TransferController extends BaseController
      */
     public function postAdd()
     {
-        $transfer = new Transfer(['description' => Input::get(
-                'description'
-            ), 'amount'                         => floatval(
-            Input::get('amount')
-        ), 'accountfrom_id'                     => intval(
-            Input::get('accountfrom_id')
-        ), 'accountto_id'                       => intval(
-            Input::get('accountto_id')
-        ), 'date'                               => Input::get('date'),
-                                 'user_id'      => Auth::user()->id]);
+        $data = ['description' => Input::get('description'),
+                 'amount' => floatval(Input::get('amount')),
+                 'accountfrom_id' => intval(Input::get('accountfrom_id')),
+                 'accountto_id' => intval(Input::get('accountto_id')),
+                 'date' => Input::get('date'), 'user_id' => Auth::user()->id];
+        $transfer = new Transfer($data);
 
         // validate and save:
         $validator = Validator::make($transfer->toArray(), Transfer::$rules);
         if ($validator->fails()) {
             return Redirect::route('addtransfer')->withInput()->withErrors(
-                    $validator
-                );
+                $validator
+            );
         } else {
             $transfer->save();
             Session::flash('success', 'The transfer has been created.');
@@ -107,9 +86,7 @@ class TransferController extends BaseController
 
         return View::make('transfers.edit')->with('transfer', $transfer)->with(
             'accounts', $accounts
-        )->with(
-                'title', 'Edit transfer ' . $transfer->description
-            );
+        )->with('title', 'Edit transfer ' . $transfer->description);
     }
 
     /**
@@ -133,8 +110,9 @@ class TransferController extends BaseController
             $transfer->toArray(), Transfer::$rules
         );
         if ($validator->fails()) {
-            return Redirect::route('edittransfer',
-                $transfer->id)->withInput()->withErrors(
+            return Redirect::route(
+                'edittransfer', $transfer->id
+            )->withInput()->withErrors(
                     $validator
                 );
         } else {
@@ -155,6 +133,7 @@ class TransferController extends BaseController
     public function delete(Transfer $transfer)
     {
         Session::put('previous', URL::previous());
+
         return View::make('transfers.delete')->with('transfer', $transfer)
             ->with('title', 'Delete transfer ' . $transfer->description);
     }

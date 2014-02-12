@@ -13,7 +13,7 @@ class UserController extends BaseController
      */
     public function login()
     {
-        return View::make('user.login')->with('title','Login');
+        return View::make('user.login')->with('title', 'Login');
     }
 
     /**
@@ -55,7 +55,7 @@ class UserController extends BaseController
      */
     public function register()
     {
-        return View::make('user.register')->with('title','Register');
+        return View::make('user.register')->with('title', 'Register');
     }
 
     /**
@@ -79,7 +79,7 @@ class UserController extends BaseController
             sleep(4);
         }
 
-        return View::make('user.sentpw')->with('title','Activated');
+        return View::make('user.sentpw')->with('title', 'Activated');
 
     }
 
@@ -98,12 +98,12 @@ class UserController extends BaseController
         if ($validator->fails()) {
             return View::make('user.register')->with(
                 'warning', 'Invalid e-mail address.'
-            )->with('title','Register');
+            )->with('title', 'Register');
         } else {
             $user->sendRegistrationMail();
             $user->save();
 
-            return View::make('user.registered')->with('title','Registered!');
+            return View::make('user.registered')->with('title', 'Registered!');
         }
     }
 
@@ -114,7 +114,7 @@ class UserController extends BaseController
      */
     public function reset()
     {
-        return View::make('user.reset')->with('title','Reset password');
+        return View::make('user.reset')->with('title', 'Reset password');
     }
 
 
@@ -134,7 +134,8 @@ class UserController extends BaseController
         } else {
             sleep(4);
         }
-        return View::make('user.sent-reset')->with('title','Sent!');
+
+        return View::make('user.sent-reset')->with('title', 'Sent!');
 
     }
 
@@ -156,7 +157,7 @@ class UserController extends BaseController
             sleep(4);
         }
 
-        return View::make('user.sentpw')->with('title','Reset!');
+        return View::make('user.sentpw')->with('title', 'Reset!');
 
 
     }
