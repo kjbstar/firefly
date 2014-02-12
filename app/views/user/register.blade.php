@@ -1,31 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Firefly // Register</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="css/site.css" rel="stylesheet" media="screen">
-    <!--[if lt IE 9]>
-      <script src="bootstrap/assets/js/html5shiv.js"></script>
-      <script src="bootstrap/assets/js/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <h1>Firefly</h1>
-          <h2>Register</h2>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6 col-md-6">
-          @if(isset($warning))
-          <div class="alert alert-danger">
-            <strong>Nope!</strong> {{$warning}}
-          </div>
-          @endif
-
+@extends('layouts.user')
+@section('content')
+<div class="row">
+    <div class="col-lg-12">
           <p>
             To register, simply fill in your e-mail address. You will then receive an activation email message. Check your spam folder
             to be sure of its arrival.
@@ -44,6 +20,4 @@
           </ul>
         </div>
       </div>
-    </div>
-  </body>
-</html>
+@stop

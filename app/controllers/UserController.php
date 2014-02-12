@@ -1,26 +1,7 @@
 <?php
-/**
- * File contains the UserController.
- *
- * PHP version 5.5.6
- *
- * @category Controllers
- * @package  Ccontrollers
- * @author   Sander Dorigo <sander@dorigo.nl>
- * @license  GPL 3.0
- * @link     http://geld.nder.dev/
- */
 
 /**
- * Everything related to logging in and user stuff.
- *
  * Class UserController
- *
- * @category AccountController
- * @package  Controllers
- * @author   Sander Dorigo <sander@dorigo.nl>
- * @license  GPL 3.0
- * @link     http://www.sanderdorigo.nl/
  */
 class UserController extends BaseController
 {
@@ -32,7 +13,7 @@ class UserController extends BaseController
      */
     public function login()
     {
-        return View::make('user.login');
+        return View::make('user.login')->with('title','Login');
     }
 
     /**
@@ -40,11 +21,11 @@ class UserController extends BaseController
      *
      * @return View
      */
-    public function doLogin()
+    public function postLogin()
     {
         if (Auth::attempt(
-            ['email'   => Input::get('email'),
-            'password' => Input::get('password')], true
+            ['email'    => Input::get('email'),
+             'password' => Input::get('password')], true
         )
         ) {
             return Redirect::to('/home');
@@ -74,7 +55,7 @@ class UserController extends BaseController
      */
     public function register()
     {
-        return View::make('user.register');
+        return View::make('user.register')->with('title','Register');
     }
 
     /**
@@ -94,37 +75,35 @@ class UserController extends BaseController
             $user->sendPasswordMail();
             $user->activation = null;
             $user->save();
-
-            return View::make('user.sentpw');
+        } else {
+            sleep(4);
         }
 
-        App::abort(404);
+        return View::make('user.sentpw')->with('title','Activated');
 
-        return View::make("error.404");
     }
 
     /**
      * Process the registration.
      *
-     * TODO rename to "postRegister".
-     *
      * @return \Illuminate\View\View
      */
-    public function doRegister()
+    public function postRegister()
     {
-        $user = new User(['email'     => Input::get('email'),
-                         'activation' => Str::random(64),
-                         'password'   => Str::random(60)]);
+        $data = ['email'      => Input::get('email'),
+                 'activation' => Str::random(64),
+                 'password'   => Str::random(60)];
+        $user = new User($data);
         $validator = Validator::make($user->toArray(), User::$rules);
         if ($validator->fails()) {
             return View::make('user.register')->with(
                 'warning', 'Invalid e-mail address.'
-            );
+            )->with('title','Register');
         } else {
             $user->sendRegistrationMail();
             $user->save();
 
-            return View::make('user.registered');
+            return View::make('user.registered')->with('title','Registered!');
         }
     }
 
@@ -135,7 +114,7 @@ class UserController extends BaseController
      */
     public function reset()
     {
-        return View::make('user.reset');
+        return View::make('user.reset')->with('title','Reset password');
     }
 
 
@@ -144,7 +123,7 @@ class UserController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function doReset()
+    public function postReset()
     {
         $user = User::where('email', Input::get('email'))->whereNull('reset')
             ->first();
@@ -152,13 +131,11 @@ class UserController extends BaseController
             $user->reset = Str::random(64);
             $user->save();
             $user->sendResetMail();
-
-            return View::make('user.sent-reset');
+        } else {
+            sleep(4);
         }
+        return View::make('user.sent-reset')->with('title','Sent!');
 
-        return View::make('user.reset')->with(
-            'warning', 'Impossible or already reset.'
-        );
     }
 
     /**
@@ -175,13 +152,13 @@ class UserController extends BaseController
             $user->sendPasswordMail();
             $user->reset = null;
             $user->save();
-
-            return View::make('user.sentpw');
+        } else {
+            sleep(4);
         }
 
-        App::abort(404);
+        return View::make('user.sentpw')->with('title','Reset!');
 
-        return View::make('error.404');
+
     }
 
 }

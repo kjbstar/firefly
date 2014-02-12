@@ -1,37 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Firefly // Reset password</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-
-    <link href="css/site.css" rel="stylesheet" media="screen">
-    @yield('styles')
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="bootstrap/assets/js/html5shiv.js"></script>
-      <script src="bootstrap/assets/js/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <h1>Firefly</h1>
-          <h2>Reset password</h2>
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12">
-          @if(isset($warning))
-          <div class="alert alert-danger">
-              <strong>Nope!</strong> {{$warning}}
-          </div>
-          @endif
-
+@extends('layouts.user')
+@section('content')
+<div class="row">
+    <div class="col-lg-12">
           <p>
             To reset your password, simply enter your email address here.
           </p>
@@ -43,12 +13,10 @@
             </div>
             <button type="submit" class="btn btn-primary">Reset me</button>
           {{Form::close()}}
-          <p style="margin-top:40px;">
-            <a href="{{URL::route('login')}}" class="btn btn-info
-            btn-xs">Login</a>
-          </p>
+        <ul style="margin-top:40px;">
+            <li><a href="{{URL::route('login')}}">... or log in</a></li>
+            <li><a href="{{URL::route('register')}}">... or register</a></li>
+        </ul>
         </div>
       </div>
-    </div>
-  </body>
-</html>
+@stop

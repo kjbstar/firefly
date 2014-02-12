@@ -103,15 +103,50 @@ class App extends Illuminate\Support\Facades\App{
 	 }
 
 	/**
-	 * Register a service provider with the application.
+	 * Force register a service provider with the application.
 	 *
 	 * @param \Illuminate\Support\ServiceProvider|string  $provider
 	 * @param array  $options
 	 * @return \Illuminate\Support\ServiceProvider
 	 * @static 
 	 */
-	 public static function register($provider, $options = array()){
-		return Illuminate\Foundation\Application::register($provider, $options);
+	 public static function forgeRegister($provider, $options = array()){
+		return Illuminate\Foundation\Application::forgeRegister($provider, $options);
+	 }
+
+	/**
+	 * Register a service provider with the application.
+	 *
+	 * @param \Illuminate\Support\ServiceProvider|string  $provider
+	 * @param array  $options
+	 * @param bool   $force
+	 * @return \Illuminate\Support\ServiceProvider
+	 * @static 
+	 */
+	 public static function register($provider, $options = array(), $force = false){
+		return Illuminate\Foundation\Application::register($provider, $options, $force);
+	 }
+
+	/**
+	 * Get the registered service provider instnace if it exists.
+	 *
+	 * @param \Illuminate\Support\ServiceProvider|string  $provider
+	 * @return \Illuminate\Support\ServiceProvider|null
+	 * @static 
+	 */
+	 public static function getRegistered($provider){
+		return Illuminate\Foundation\Application::getRegistered($provider);
+	 }
+
+	/**
+	 * Resolve a service provider instance from the class name.
+	 *
+	 * @param string  $provider
+	 * @return \Illuminate\Support\ServiceProvider
+	 * @static 
+	 */
+	 public static function resolveProviderClass($provider){
+		return Illuminate\Foundation\Application::resolveProviderClass($provider);
 	 }
 
 	/**
@@ -192,6 +227,17 @@ class App extends Illuminate\Support\Facades\App{
 	 */
 	 public static function shutdown($callback = null){
 		 Illuminate\Foundation\Application::shutdown($callback);
+	 }
+
+	/**
+	 * Register a function for determining when to use array sessions.
+	 *
+	 * @param \Closure  $callback
+	 * @return void
+	 * @static 
+	 */
+	 public static function useArraySessions($callback){
+		 Illuminate\Foundation\Application::useArraySessions($callback);
 	 }
 
 	/**
@@ -444,6 +490,16 @@ class App extends Illuminate\Support\Facades\App{
 	 }
 
 	/**
+	 * Get the environment variables loader instance.
+	 *
+	 * @return \Illuminate\Config\EnvironmentVariablesLoaderInterface
+	 * @static 
+	 */
+	 public static function getEnvironmentVariablesLoader(){
+		return Illuminate\Foundation\Application::getEnvironmentVariablesLoader();
+	 }
+
+	/**
 	 * Get the service provider repository instance.
 	 *
 	 * @return \Illuminate\Foundation\ProviderRepository
@@ -451,27 +507,6 @@ class App extends Illuminate\Support\Facades\App{
 	 */
 	 public static function getProviderRepository(){
 		return Illuminate\Foundation\Application::getProviderRepository();
-	 }
-
-	/**
-	 * Get the current application locale.
-	 *
-	 * @return string
-	 * @static 
-	 */
-	 public static function getLocale(){
-		return Illuminate\Foundation\Application::getLocale();
-	 }
-
-	/**
-	 * Set the current application locale.
-	 *
-	 * @param string  $locale
-	 * @return void
-	 * @static 
-	 */
-	 public static function setLocale($locale){
-		 Illuminate\Foundation\Application::setLocale($locale);
 	 }
 
 	/**
@@ -526,6 +561,37 @@ class App extends Illuminate\Support\Facades\App{
 	 */
 	 public static function onRequest($method, $parameters = array()){
 		return Illuminate\Foundation\Application::onRequest($method, $parameters);
+	 }
+
+	/**
+	 * Get the current application locale.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function getLocale(){
+		return Illuminate\Foundation\Application::getLocale();
+	 }
+
+	/**
+	 * Set the current application locale.
+	 *
+	 * @param string  $locale
+	 * @return void
+	 * @static 
+	 */
+	 public static function setLocale($locale){
+		 Illuminate\Foundation\Application::setLocale($locale);
+	 }
+
+	/**
+	 * Register the core class aliases in the container.
+	 *
+	 * @return void
+	 * @static 
+	 */
+	 public static function registerCoreContainerAliases(){
+		 Illuminate\Foundation\Application::registerCoreContainerAliases();
 	 }
 
 	/**
@@ -1376,6 +1442,27 @@ class Auth extends Illuminate\Support\Facades\Auth{
 	 }
 
 	/**
+	 * Get the default authentication driver name.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function getDefaultDriver(){
+		return Illuminate\Auth\AuthManager::getDefaultDriver();
+	 }
+
+	/**
+	 * Set the default authentication driver name.
+	 *
+	 * @param string  $name
+	 * @return void
+	 * @static 
+	 */
+	 public static function setDefaultDriver($name){
+		 Illuminate\Auth\AuthManager::setDefaultDriver($name);
+	 }
+
+	/**
 	 * Create a new manager instance.
 	 *
 	 * @param \Illuminate\Foundation\Application  $app
@@ -1404,12 +1491,12 @@ class Auth extends Illuminate\Support\Facades\Auth{
 	 *
 	 * @param string   $driver
 	 * @param Closure  $callback
-	 * @return void
+	 * @return \Illuminate\Support\Manager|static
 	 * @static 
 	 */
 	 public static function extend($driver, $callback){
 		//Method inherited from Illuminate\Support\Manager
-		 Illuminate\Auth\AuthManager::extend($driver, $callback);
+		return Illuminate\Auth\AuthManager::extend($driver, $callback);
 	 }
 
 	/**
@@ -1697,6 +1784,16 @@ class Auth extends Illuminate\Support\Facades\Auth{
 	 }
 
 	/**
+	 * Get the last user we attempted to authenticate.
+	 *
+	 * @return \Illuminate\Auth\UserInterface
+	 * @static 
+	 */
+	 public static function getLastAttempted(){
+		return Illuminate\Auth\Guard::getLastAttempted();
+	 }
+
+	/**
 	 * Get a unique identifier for the auth session value.
 	 *
 	 * @return string
@@ -1882,6 +1979,38 @@ class Cache extends Illuminate\Support\Facades\Cache{
 	 }
 
 	/**
+	 * Set the cache "prefix" value.
+	 *
+	 * @param string  $name
+	 * @return void
+	 * @static 
+	 */
+	 public static function setPrefix($name){
+		 Illuminate\Cache\CacheManager::setPrefix($name);
+	 }
+
+	/**
+	 * Get the default cache driver name.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function getDefaultDriver(){
+		return Illuminate\Cache\CacheManager::getDefaultDriver();
+	 }
+
+	/**
+	 * Set the default cache driver name.
+	 *
+	 * @param string  $name
+	 * @return void
+	 * @static 
+	 */
+	 public static function setDefaultDriver($name){
+		 Illuminate\Cache\CacheManager::setDefaultDriver($name);
+	 }
+
+	/**
 	 * Create a new manager instance.
 	 *
 	 * @param \Illuminate\Foundation\Application  $app
@@ -1910,12 +2039,12 @@ class Cache extends Illuminate\Support\Facades\Cache{
 	 *
 	 * @param string   $driver
 	 * @param Closure  $callback
-	 * @return void
+	 * @return \Illuminate\Support\Manager|static
 	 * @static 
 	 */
 	 public static function extend($driver, $callback){
 		//Method inherited from Illuminate\Support\Manager
-		 Illuminate\Cache\CacheManager::extend($driver, $callback);
+		return Illuminate\Cache\CacheManager::extend($driver, $callback);
 	 }
 
 	/**
@@ -2102,6 +2231,18 @@ class Cache extends Illuminate\Support\Facades\Cache{
 	 */
 	 public static function offsetUnset($key){
 		 Illuminate\Cache\Repository::offsetUnset($key);
+	 }
+
+	/**
+	 * Register a macro with the Cache class.
+	 *
+	 * @param string $name
+	 * @param callable $callback
+	 * @return void
+	 * @static 
+	 */
+	 public static function macro($name, $callback){
+		 Illuminate\Cache\Repository::macro($name, $callback);
 	 }
 
 }
@@ -2385,6 +2526,17 @@ class Cookie extends Illuminate\Support\Facades\Cookie{
 	 */
 	 public static function forget($name){
 		return Illuminate\Cookie\CookieJar::forget($name);
+	 }
+
+	/**
+	 * Determine if a cookie has been queued.
+	 *
+	 * @param string  $key
+	 * @return bool
+	 * @static 
+	 */
+	 public static function hasQueued($key){
+		return Illuminate\Cookie\CookieJar::hasQueued($key);
 	 }
 
 	/**
@@ -3414,6 +3566,33 @@ class Eloquent extends Illuminate\Database\Eloquent\Model{
 	 }
 
 	/**
+	 * Add a basic where clause to the query.
+	 *
+	 * @param string  $column
+	 * @param string  $operator
+	 * @param mixed   $value
+	 * @param string  $boolean
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 * @static 
+	 */
+	 public static function where($column, $operator = null, $value = null, $boolean = 'and'){
+		return Illuminate\Database\Eloquent\Builder::where($column, $operator, $value, $boolean);
+	 }
+
+	/**
+	 * Add an "or where" clause to the query.
+	 *
+	 * @param string  $column
+	 * @param string  $operator
+	 * @param mixed   $value
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 * @static 
+	 */
+	 public static function orWhere($column, $operator = null, $value = null){
+		return Illuminate\Database\Eloquent\Builder::orWhere($column, $operator, $value);
+	 }
+
+	/**
 	 * Add a relationship count condition to the query.
 	 *
 	 * @param string  $relation
@@ -3544,6 +3723,17 @@ class Eloquent extends Illuminate\Database\Eloquent\Model{
 	 }
 
 	/**
+	 * Add a new "raw" select expression to the query.
+	 *
+	 * @param string  $expression
+	 * @return \Illuminate\Database\Query\Builder|static
+	 * @static 
+	 */
+	 public static function selectRaw($expression){
+		return Illuminate\Database\Query\Builder::selectRaw($expression);
+	 }
+
+	/**
 	 * Add a new select column to the query.
 	 *
 	 * @param mixed  $column
@@ -3635,34 +3825,6 @@ class Eloquent extends Illuminate\Database\Eloquent\Model{
 	 }
 
 	/**
-	 * Add a basic where clause to the query.
-	 *
-	 * @param string  $column
-	 * @param string  $operator
-	 * @param mixed   $value
-	 * @param string  $boolean
-	 * @return \Illuminate\Database\Query\Builder|static
-	 * @throws \InvalidArgumentException
-	 * @static 
-	 */
-	 public static function where($column, $operator = null, $value = null, $boolean = 'and'){
-		return Illuminate\Database\Query\Builder::where($column, $operator, $value, $boolean);
-	 }
-
-	/**
-	 * Add an "or where" clause to the query.
-	 *
-	 * @param string  $column
-	 * @param string  $operator
-	 * @param mixed   $value
-	 * @return \Illuminate\Database\Query\Builder|static
-	 * @static 
-	 */
-	 public static function orWhere($column, $operator = null, $value = null){
-		return Illuminate\Database\Query\Builder::orWhere($column, $operator, $value);
-	 }
-
-	/**
 	 * Add a raw where clause to the query.
 	 *
 	 * @param string  $sql
@@ -3749,6 +3911,18 @@ class Eloquent extends Illuminate\Database\Eloquent\Model{
 	 */
 	 public static function whereNested($callback, $boolean = 'and'){
 		return Illuminate\Database\Query\Builder::whereNested($callback, $boolean);
+	 }
+
+	/**
+	 * Add another query builder as a nested where to the query builder.
+	 *
+	 * @param \Illuminate\Database\Query\Builder|static $query
+	 * @param string  $boolean
+	 * @return \Illuminate\Database\Query\Builder|static
+	 * @static 
+	 */
+	 public static function addNestedWhereQuery($query, $boolean = 'and'){
+		return Illuminate\Database\Query\Builder::addNestedWhereQuery($query, $boolean);
 	 }
 
 	/**
@@ -3993,12 +4167,15 @@ class Eloquent extends Illuminate\Database\Eloquent\Model{
 	 }
 
 	/**
-	 * 
+	 * Add a raw "order by" clause to the query.
 	 *
+	 * @param string  $sql
+	 * @param array  $bindings
+	 * @return \Illuminate\Database\Query\Builder|static
 	 * @static 
 	 */
 	 public static function orderByRaw($sql, $bindings = array()){
-		 Illuminate\Database\Query\Builder::orderByRaw($sql, $bindings);
+		return Illuminate\Database\Query\Builder::orderByRaw($sql, $bindings);
 	 }
 
 	/**
@@ -4153,6 +4330,17 @@ class Eloquent extends Illuminate\Database\Eloquent\Model{
 	 */
 	 public static function cacheTags($cacheTags){
 		return Illuminate\Database\Query\Builder::cacheTags($cacheTags);
+	 }
+
+	/**
+	 * Indicate that the results, if cached, should use the given cache driver.
+	 *
+	 * @param string  $cacheDriver
+	 * @return \Illuminate\Database\Query\Builder|static
+	 * @static 
+	 */
+	 public static function cacheDriver($cacheDriver){
+		return Illuminate\Database\Query\Builder::cacheDriver($cacheDriver);
 	 }
 
 	/**
@@ -4445,14 +4633,14 @@ class Event extends Illuminate\Support\Facades\Event{
 	/**
 	 * Register an event listener with the dispatcher.
 	 *
-	 * @param string  $event
+	 * @param string|array  $event
 	 * @param mixed   $listener
 	 * @param int     $priority
 	 * @return void
 	 * @static 
 	 */
-	 public static function listen($event, $listener, $priority = 0){
-		 Illuminate\Events\Dispatcher::listen($event, $listener, $priority);
+	 public static function listen($events, $listener, $priority = 0){
+		 Illuminate\Events\Dispatcher::listen($events, $listener, $priority);
 	 }
 
 	/**
@@ -4603,17 +4791,6 @@ class File extends Illuminate\Support\Facades\File{
 	 */
 	 public static function get($path){
 		return Illuminate\Filesystem\Filesystem::get($path);
-	 }
-
-	/**
-	 * Get the contents of a remote file.
-	 *
-	 * @param string  $path
-	 * @return string
-	 * @static 
-	 */
-	 public static function getRemote($path){
-		return Illuminate\Filesystem\Filesystem::getRemote($path);
 	 }
 
 	/**
@@ -4921,6 +5098,17 @@ class Form extends Illuminate\Support\Facades\Form{
 	 */
 	 public static function model($model, $options = array()){
 		return Illuminate\Html\FormBuilder::model($model, $options);
+	 }
+
+	/**
+	 * Set the model instance on the form builder.
+	 *
+	 * @param mixed  $model
+	 * @return void
+	 * @static 
+	 */
+	 public static function setModel($model){
+		 Illuminate\Html\FormBuilder::setModel($model);
 	 }
 
 	/**
@@ -5642,6 +5830,16 @@ class Input extends Illuminate\Support\Facades\Input{
 	 }
 
 	/**
+	 * Get the current encoded path info for the request.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function decodedPath(){
+		return Illuminate\Http\Request::decodedPath();
+	 }
+
+	/**
 	 * Get a segment from the URI (1 based index).
 	 *
 	 * @param string  $index
@@ -5666,12 +5864,12 @@ class Input extends Illuminate\Support\Facades\Input{
 	/**
 	 * Determine if the current request URI matches a pattern.
 	 *
-	 * @param string  $pattern
+	 * @param dynamic  string
 	 * @return bool
 	 * @static 
 	 */
-	 public static function is($pattern){
-		return Illuminate\Http\Request::is($pattern);
+	 public static function is(){
+		return Illuminate\Http\Request::is();
 	 }
 
 	/**
@@ -5963,35 +6161,13 @@ class Input extends Illuminate\Support\Facades\Input{
 	 }
 
 	/**
-	 * Get the Illuminate session store implementation.
+	 * Get the session associated with the request.
 	 *
 	 * @return \Illuminate\Session\Store
-	 * @throws \RuntimeException
 	 * @static 
 	 */
-	 public static function getSessionStore(){
-		return Illuminate\Http\Request::getSessionStore();
-	 }
-
-	/**
-	 * Set the Illuminate session store implementation.
-	 *
-	 * @param \Illuminate\Session\Store  $session
-	 * @return void
-	 * @static 
-	 */
-	 public static function setSessionStore($session){
-		 Illuminate\Http\Request::setSessionStore($session);
-	 }
-
-	/**
-	 * Determine if the session store has been set.
-	 *
-	 * @return bool
-	 * @static 
-	 */
-	 public static function hasSessionStore(){
-		return Illuminate\Http\Request::hasSessionStore();
+	 public static function session(){
+		return Illuminate\Http\Request::session();
 	 }
 
 	/**
@@ -6423,14 +6599,14 @@ class Input extends Illuminate\Support\Facades\Input{
 	 }
 
 	/**
-	 * Returns the root url from which this request is executed.
+	 * Returns the root URL from which this request is executed.
 	 * 
 	 * The base URL never ends with a /.
 	 * 
 	 * This is similar to getBasePath(), except that it also includes the
 	 * script filename (e.g. index.php) if one exists.
 	 *
-	 * @return string The raw url (i.e. not urldecoded)
+	 * @return string The raw URL (i.e. not urldecoded)
 	 * @api 
 	 * @static 
 	 */
@@ -7106,6 +7282,27 @@ class Lang extends Illuminate\Support\Facades\Lang{
 	 }
 
 	/**
+	 * Set the fallback locale being used.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function getFallback(){
+		return Illuminate\Translation\Translator::getFallback();
+	 }
+
+	/**
+	 * Set the fallback locale being used.
+	 *
+	 * @param string  $fallback
+	 * @return void
+	 * @static 
+	 */
+	 public static function setFallback($fallback){
+		 Illuminate\Translation\Translator::setFallback($fallback);
+	 }
+
+	/**
 	 * Set the parsed value of a key.
 	 *
 	 * @param string  $key
@@ -7200,6 +7397,17 @@ class Log extends Illuminate\Support\Facades\Log{
 	 */
 	 public static function setEventDispatcher($dispatcher){
 		 Illuminate\Log\Writer::setEventDispatcher($dispatcher);
+	 }
+
+	/**
+	 * Dynamically pass log calls into the writer.
+	 *
+	 * @param dynamic (level, param, param)
+	 * @return mixed
+	 * @static 
+	 */
+	 public static function write(){
+		return Illuminate\Log\Writer::write();
 	 }
 
 	/**
@@ -7868,6 +8076,27 @@ class Queue extends Illuminate\Support\Facades\Queue{
 	 }
 
 	/**
+	 * Get the name of the default queue connection.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function getDefaultDriver(){
+		return Illuminate\Queue\QueueManager::getDefaultDriver();
+	 }
+
+	/**
+	 * Set the name of the default queue connection.
+	 *
+	 * @param string  $name
+	 * @return void
+	 * @static 
+	 */
+	 public static function setDefaultDriver($name){
+		 Illuminate\Queue\QueueManager::setDefaultDriver($name);
+	 }
+
+	/**
 	 * Get the full name for the given connection.
 	 *
 	 * @param string  $connection
@@ -8258,6 +8487,16 @@ class Request extends Illuminate\Support\Facades\Request{
 	 }
 
 	/**
+	 * Get the current encoded path info for the request.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function decodedPath(){
+		return Illuminate\Http\Request::decodedPath();
+	 }
+
+	/**
 	 * Get a segment from the URI (1 based index).
 	 *
 	 * @param string  $index
@@ -8282,12 +8521,12 @@ class Request extends Illuminate\Support\Facades\Request{
 	/**
 	 * Determine if the current request URI matches a pattern.
 	 *
-	 * @param string  $pattern
+	 * @param dynamic  string
 	 * @return bool
 	 * @static 
 	 */
-	 public static function is($pattern){
-		return Illuminate\Http\Request::is($pattern);
+	 public static function is(){
+		return Illuminate\Http\Request::is();
 	 }
 
 	/**
@@ -8579,35 +8818,13 @@ class Request extends Illuminate\Support\Facades\Request{
 	 }
 
 	/**
-	 * Get the Illuminate session store implementation.
+	 * Get the session associated with the request.
 	 *
 	 * @return \Illuminate\Session\Store
-	 * @throws \RuntimeException
 	 * @static 
 	 */
-	 public static function getSessionStore(){
-		return Illuminate\Http\Request::getSessionStore();
-	 }
-
-	/**
-	 * Set the Illuminate session store implementation.
-	 *
-	 * @param \Illuminate\Session\Store  $session
-	 * @return void
-	 * @static 
-	 */
-	 public static function setSessionStore($session){
-		 Illuminate\Http\Request::setSessionStore($session);
-	 }
-
-	/**
-	 * Determine if the session store has been set.
-	 *
-	 * @return bool
-	 * @static 
-	 */
-	 public static function hasSessionStore(){
-		return Illuminate\Http\Request::hasSessionStore();
+	 public static function session(){
+		return Illuminate\Http\Request::session();
 	 }
 
 	/**
@@ -9039,14 +9256,14 @@ class Request extends Illuminate\Support\Facades\Request{
 	 }
 
 	/**
-	 * Returns the root url from which this request is executed.
+	 * Returns the root URL from which this request is executed.
 	 * 
 	 * The base URL never ends with a /.
 	 * 
 	 * This is similar to getBasePath(), except that it also includes the
 	 * script filename (e.g. index.php) if one exists.
 	 *
-	 * @return string The raw url (i.e. not urldecoded)
+	 * @return string The raw URL (i.e. not urldecoded)
 	 * @api 
 	 * @static 
 	 */
@@ -9772,6 +9989,17 @@ class Route extends Illuminate\Support\Facades\Route{
 	 }
 
 	/**
+	 * Register a route matched event listener.
+	 *
+	 * @param callable  $callback
+	 * @return void
+	 * @static 
+	 */
+	 public static function matched($callback){
+		 Illuminate\Routing\Router::matched($callback);
+	 }
+
+	/**
 	 * Register a new "before" filter with the router.
 	 *
 	 * @param mixed  $callback
@@ -9815,6 +10043,19 @@ class Route extends Illuminate\Support\Facades\Route{
 	 */
 	 public static function when($pattern, $name, $methods = null){
 		 Illuminate\Routing\Router::when($pattern, $name, $methods);
+	 }
+
+	/**
+	 * Register a regular expression based filter with the router.
+	 *
+	 * @param string     $pattern
+	 * @param string     $name
+	 * @param array|null $methods
+	 * @return void
+	 * @static 
+	 */
+	 public static function whenRegex($pattern, $name, $methods = null){
+		 Illuminate\Routing\Router::whenRegex($pattern, $name, $methods);
 	 }
 
 	/**
@@ -9947,6 +10188,16 @@ class Route extends Illuminate\Support\Facades\Route{
 	 */
 	 public static function input($key, $default = null){
 		return Illuminate\Routing\Router::input($key, $default);
+	 }
+
+	/**
+	 * Get the currently dispatched route instance.
+	 *
+	 * @return \Illuminate\Routing\Route
+	 * @static 
+	 */
+	 public static function getCurrentRoute(){
+		return Illuminate\Routing\Router::getCurrentRoute();
 	 }
 
 	/**
@@ -10188,6 +10439,18 @@ class Schema extends Illuminate\Support\Facades\Schema{
 		return Illuminate\Database\Schema\MySqlBuilder::setConnection($connection);
 	 }
 
+	/**
+	 * Set the Schema Blueprint resolver callback.
+	 *
+	 * @param \Closure  $resolver
+	 * @return void
+	 * @static 
+	 */
+	 public static function blueprintResolver($resolver){
+		//Method inherited from Illuminate\Database\Schema\Builder
+		 Illuminate\Database\Schema\MySqlBuilder::blueprintResolver($resolver);
+	 }
+
 }
 
 class Seeder extends Illuminate\Database\Seeder{
@@ -10202,6 +10465,27 @@ class Session extends Illuminate\Support\Facades\Session{
 	 */
 	 public static function getSessionConfig(){
 		return Illuminate\Session\SessionManager::getSessionConfig();
+	 }
+
+	/**
+	 * Get the default session driver name.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function getDefaultDriver(){
+		return Illuminate\Session\SessionManager::getDefaultDriver();
+	 }
+
+	/**
+	 * Set the default session driver name.
+	 *
+	 * @param string  $name
+	 * @return void
+	 * @static 
+	 */
+	 public static function setDefaultDriver($name){
+		 Illuminate\Session\SessionManager::setDefaultDriver($name);
 	 }
 
 	/**
@@ -10233,12 +10517,12 @@ class Session extends Illuminate\Support\Facades\Session{
 	 *
 	 * @param string   $driver
 	 * @param Closure  $callback
-	 * @return void
+	 * @return \Illuminate\Support\Manager|static
 	 * @static 
 	 */
 	 public static function extend($driver, $callback){
 		//Method inherited from Illuminate\Support\Manager
-		 Illuminate\Session\SessionManager::extend($driver, $callback);
+		return Illuminate\Session\SessionManager::extend($driver, $callback);
 	 }
 
 	/**
@@ -10359,11 +10643,12 @@ class Session extends Illuminate\Support\Facades\Session{
 	/**
 	 * Generate a new session identifier.
 	 *
+	 * @param bool  $destroy
 	 * @return bool
 	 * @static 
 	 */
-	 public static function regenerate(){
-		return Illuminate\Session\Store::regenerate();
+	 public static function regenerate($destroy = false){
+		return Illuminate\Session\Store::regenerate($destroy);
 	 }
 
 	/**
@@ -10582,6 +10867,37 @@ class Session extends Illuminate\Support\Facades\Session{
 	 }
 
 	/**
+	 * Determine if the session contains the previous URL.
+	 *
+	 * @return bool
+	 * @static 
+	 */
+	 public static function hasPreviousUrl(){
+		return Illuminate\Session\Store::hasPreviousUrl();
+	 }
+
+	/**
+	 * Get the previous URL from the session.
+	 *
+	 * @return string|null
+	 * @static 
+	 */
+	 public static function getPreviousUrl(){
+		return Illuminate\Session\Store::getPreviousUrl();
+	 }
+
+	/**
+	 * Set the previous URL in the session.
+	 *
+	 * @param string  $url
+	 * @return void
+	 * @static 
+	 */
+	 public static function setPreviousUrl($url){
+		 Illuminate\Session\Store::setPreviousUrl($url);
+	 }
+
+	/**
 	 * Checks if the session was started.
 	 *
 	 * @return Boolean
@@ -10754,6 +11070,27 @@ class SSH extends Illuminate\Support\Facades\SSH{
 	 }
 
 	/**
+	 * Get the default connection name.
+	 *
+	 * @return string
+	 * @static 
+	 */
+	 public static function getDefaultConnection(){
+		return Illuminate\Remote\RemoteManager::getDefaultConnection();
+	 }
+
+	/**
+	 * Set the default connection name.
+	 *
+	 * @param string  $name
+	 * @return void
+	 * @static 
+	 */
+	 public static function setDefaultConnection($name){
+		 Illuminate\Remote\RemoteManager::setDefaultConnection($name);
+	 }
+
+	/**
 	 * Dynamically pass methods to the default connection.
 	 *
 	 * @param string  $method
@@ -10866,13 +11203,14 @@ class URL extends Illuminate\Support\Facades\URL{
 	 *
 	 * @param string  $name
 	 * @param mixed   $parameters
+	 * @param bool  $absolute
 	 * @param \Illuminate\Routing\Route  $route
 	 * @return string
 	 * @throws \InvalidArgumentException
 	 * @static 
 	 */
-	 public static function route($name, $parameters = array(), $route = null){
-		return Illuminate\Routing\UrlGenerator::route($name, $parameters, $route);
+	 public static function route($name, $parameters = array(), $absolute = true, $route = null){
+		return Illuminate\Routing\UrlGenerator::route($name, $parameters, $absolute, $route);
 	 }
 
 	/**
@@ -10952,7 +11290,7 @@ class Validator extends Illuminate\Support\Facades\Validator{
 	 * Register a custom validator extension.
 	 *
 	 * @param string  $rule
-	 * @param Closure|string  $extension
+	 * @param \Closure|string  $extension
 	 * @param string  $message
 	 * @return void
 	 * @static 
@@ -10965,13 +11303,25 @@ class Validator extends Illuminate\Support\Facades\Validator{
 	 * Register a custom implicit validator extension.
 	 *
 	 * @param string   $rule
-	 * @param Closure  $extension
+	 * @param \Closure|string  $extension
 	 * @param string  $message
 	 * @return void
 	 * @static 
 	 */
 	 public static function extendImplicit($rule, $extension, $message = null){
 		 Illuminate\Validation\Factory::extendImplicit($rule, $extension, $message);
+	 }
+
+	/**
+	 * Register a custom implicit validator message replacer.
+	 *
+	 * @param string   $rule
+	 * @param \Closure|string  $replacer
+	 * @return void
+	 * @static 
+	 */
+	 public static function replacer($rule, $replacer){
+		 Illuminate\Validation\Factory::replacer($rule, $replacer);
 	 }
 
 	/**
@@ -11033,7 +11383,7 @@ class View extends Illuminate\Support\Facades\View{
 	 }
 
 	/**
-	 * Get a evaluated view contents for the given view.
+	 * Get the evaluated view contents for the given view.
 	 *
 	 * @param string  $view
 	 * @param array   $data
@@ -11046,7 +11396,7 @@ class View extends Illuminate\Support\Facades\View{
 	 }
 
 	/**
-	 * Get a evaluated view contents for a named view.
+	 * Get the evaluated view contents for a named view.
 	 *
 	 * @param string $view
 	 * @param mixed $data
@@ -11116,6 +11466,17 @@ class View extends Illuminate\Support\Facades\View{
 	 */
 	 public static function creator($views, $callback){
 		return Illuminate\View\Environment::creator($views, $callback);
+	 }
+
+	/**
+	 * Register multiple view composers via an array.
+	 *
+	 * @param array  $composers
+	 * @return array
+	 * @static 
+	 */
+	 public static function composers($composers){
+		return Illuminate\View\Environment::composers($composers);
 	 }
 
 	/**
@@ -11293,6 +11654,18 @@ class View extends Illuminate\Support\Facades\View{
 	 }
 
 	/**
+	 * Prepend a new namespace to the loader.
+	 *
+	 * @param string  $namespace
+	 * @param string|array  $hints
+	 * @return void
+	 * @static 
+	 */
+	 public static function prependNamespace($namespace, $hints){
+		 Illuminate\View\Environment::prependNamespace($namespace, $hints);
+	 }
+
+	/**
 	 * Register a valid view extension and its engine.
 	 *
 	 * @param string   $extension
@@ -11427,6 +11800,153 @@ class View extends Illuminate\Support\Facades\View{
 	 */
 	 public static function getNames(){
 		return Illuminate\View\Environment::getNames();
+	 }
+
+}
+
+class Breadcrumbs extends DaveJamesMiller\Breadcrumbs\Facade{
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function __construct($environment, $router){
+		 DaveJamesMiller\Breadcrumbs\Manager::__construct($environment, $router);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function getView(){
+		 DaveJamesMiller\Breadcrumbs\Manager::getView();
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function setView($view){
+		 DaveJamesMiller\Breadcrumbs\Manager::setView($view);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function register($name, $callback){
+		 DaveJamesMiller\Breadcrumbs\Manager::register($name, $callback);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function exists($name = null){
+		 DaveJamesMiller\Breadcrumbs\Manager::exists($name);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function generate($name){
+		 DaveJamesMiller\Breadcrumbs\Manager::generate($name);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function generateArray($name, $params = array()){
+		 DaveJamesMiller\Breadcrumbs\Manager::generateArray($name, $params);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function generateIfExists($name){
+		 DaveJamesMiller\Breadcrumbs\Manager::generateIfExists($name);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function generateArrayIfExists($name, $params = array()){
+		 DaveJamesMiller\Breadcrumbs\Manager::generateArrayIfExists($name, $params);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function render($name = null){
+		 DaveJamesMiller\Breadcrumbs\Manager::render($name);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function renderIfExists($name = null){
+		 DaveJamesMiller\Breadcrumbs\Manager::renderIfExists($name);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function renderArray($name, $params = array()){
+		 DaveJamesMiller\Breadcrumbs\Manager::renderArray($name, $params);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function renderArrayIfExists($name = null){
+		 DaveJamesMiller\Breadcrumbs\Manager::renderArrayIfExists($name);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function setCurrentRoute($name){
+		 DaveJamesMiller\Breadcrumbs\Manager::setCurrentRoute($name);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function setCurrentRouteArray($name, $params = array()){
+		 DaveJamesMiller\Breadcrumbs\Manager::setCurrentRouteArray($name, $params);
+	 }
+
+	/**
+	 * 
+	 *
+	 * @static 
+	 */
+	 public static function clearCurrentRoute(){
+		 DaveJamesMiller\Breadcrumbs\Manager::clearCurrentRoute();
 	 }
 
 }
