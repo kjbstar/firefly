@@ -56,13 +56,13 @@ class HomeController extends BaseController
 
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
-        $transactions = HomeHelper::homeTransactionList($today);
-        $transfers = HomeHelper::homeTransferList($today);
+        $transactions = 0;//HomeHelper::homeTransactionList($today);
+        $transfers = 0;//HomeHelper::homeTransferList($today);
         $budgets = HomeHelper::homeComponentList('budget', $today);
         $categories = HomeHelper::homeComponentList('category', $today);
         $beneficiaries = HomeHelper::homeComponentList('beneficiary', $today);
-        $accountCount = Auth::user()->accounts()->count();
-        $transactionCount = Auth::user()->transactions()->count();
+        $accountCount = 0;//Auth::user()->accounts()->count();
+        $transactionCount = 0;//Auth::user()->transactions()->count();
 
         // resort the component lists:
         $amount = [];
@@ -103,7 +103,6 @@ class HomeController extends BaseController
         $allowanceInfo = HomeHelper::getAllowanceInformation($today);
 
         // get some extra prediction details:
-        // TODO naar helper.
         $predictionInfo = HomeHelper::getPredictionInfo($today);
 
         return View::make('home.home')->with('title', 'Home')->with(
@@ -147,7 +146,15 @@ class HomeController extends BaseController
                 );
                 break;
             case 'accounts':
-                // forced to be one account
+                if (Input::get('debug') == 'true'
+                    && Config::get('app.debug') == true
+                ) {
+                    echo '<pre>';
+                    var_dump(HomeHelper::homeAccountChart($year, $month));
+                    echo '</pre>';
+                    return;
+                }
+
                 return Response::json(
                     HomeHelper::homeAccountChart($year, $month)
                 );

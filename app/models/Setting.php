@@ -8,7 +8,7 @@ class Setting extends Eloquent
     public static $rules
         = ['name'    => 'required|between:1,500',
            'user_id' => 'required|exists:users,id', 'type' => 'in:date',
-            'value' => 'required'];
+           'value'   => 'required'];
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
     protected $fillable = ['user_id', 'name', 'type', 'value'];
 

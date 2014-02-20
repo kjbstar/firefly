@@ -16,7 +16,6 @@ class TransferTrigger
      */
     public function createTransfer(Transfer $transfer)
     {
-        Cache::flush();
         $accountFrom = $transfer->accountfrom()->first();
         $accountTo = $transfer->accountto()->first();
 

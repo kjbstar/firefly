@@ -10,7 +10,7 @@
         </h3>
         <div class="btn-group">
             <a href="{{URL::Route('addtransaction',[$account->id])}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
-            <a href="{{URL::Route('addtransfer',[$account->id])}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transfer</a>
+            <a href="{{URL::Route('addtransfer')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transfer</a>
         </div>
     </div>
 </div>

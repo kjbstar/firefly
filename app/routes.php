@@ -34,7 +34,6 @@ Route::pattern('otheryear', '20[0-9]{2}');
 /*
  * Misc new pages. TODO move.
  * */
-Route::get('/home/slow', ['uses' => 'SlowController@index', 'as' => 'slow']);
 Route::get('/home/reports/compared/{year}/{otheryear}',['as' => 'year_compare', 'uses' => 'ReportController@compareYears']);
 Route::get('/home/reports/compared/chart/{component}/{year}/{otheryear}',['as' => 'year_compare_chart','uses' => 'ReportController@compareComponentChart']);
 
@@ -160,7 +159,7 @@ Route::post('/home/transaction/add/{account?}',['uses' => 'TransactionController
 Route::get('/home/transfer',['uses' => 'TransferController@showIndex', 'as' => 'transfers']);
 Route::get('/home/transfer/{transfer}/edit',['uses' => 'TransferController@edit', 'as' => 'edittransfer']);
 Route::get('/home/transfer/{transfer}/delete',['uses' => 'TransferController@delete', 'as' => 'deletetransfer']);
-Route::get('/home/transfer/add/{account?}',['uses' => 'TransferController@add', 'as' => 'addtransfer']);
+Route::get('/home/transfer/add',['uses' => 'TransferController@add', 'as' => 'addtransfer']);
 Route::post('/home/transfer/{transfer}/edit',['uses' => 'TransferController@postEdit', 'before' => 'csrf']);
 Route::post('/home/transfer/{transfer}/delete',['uses' => 'TransferController@postDelete', 'before' => 'csrf']);
 Route::post('/home/transfer/add/{account?}',['uses' => 'TransferController@postAdd', 'before' => 'csrf']);

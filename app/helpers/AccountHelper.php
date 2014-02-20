@@ -8,6 +8,22 @@ class AccountHelper
 {
 
     /**
+     * Gets a list of accounts used in a account select list. Excludes hidden
+     * ones.
+     *
+     * @return array
+     */
+    public static function accountsAsSelectList()
+    {
+        $accounts = [];
+        foreach (Auth::user()->accounts()->notHidden()->get() as $a) {
+            $accounts[$a->id] = $a->name;
+        }
+
+        return $accounts;
+    }
+
+    /**
      * Generates a list of transactions in the month indicated by $date
      *
      * @param Account $account The account
@@ -55,7 +71,7 @@ class AccountHelper
             // transactions for this day:
             $entry['transactions'] = $account->transactions()->onDayOfMonth(
                 $now
-            )->expenses()->where('date','>=',$predictionStart->value)->get();
+            )->expenses()->where('date', '>=', $predictionStart->value)->get();
             $predictions[] = $entry;
             $now->addDay();
         }
@@ -121,6 +137,7 @@ class AccountHelper
 
     /**
      * Returns the transactions marked in this period. One per date max.
+     *
      * @param Account $account
      * @param Carbon  $start
      * @param Carbon  $end

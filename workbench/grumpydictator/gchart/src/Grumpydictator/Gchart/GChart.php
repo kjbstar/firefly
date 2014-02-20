@@ -65,6 +65,9 @@ class GChart
         $args = func_get_args();
         $this->_rows[] = $args;
     }
+    public function addRowArray($array) {
+        $this->_rows[] = $array;
+    }
 
     /**
      * Add certainty to a column. Count starts at zero!

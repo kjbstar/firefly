@@ -114,7 +114,12 @@ class Account extends Eloquent
 
         $predictionStart = Setting::getSetting('predictionStart');
         $predictionDate = new Carbon($predictionStart->value);
-        Log::debug('Predicting for ' . $date->format('d-M-Y'));
+        Log::debug('---------------------------------------------');
+        Log::debug(
+            'START: Predicting for ' . $this->name . ' on ' . $date->format(
+                'd-M-Y'
+            )
+        );
 
         // between $predictionDate and $date
         // there are X occurences of the day $date
@@ -124,39 +129,39 @@ class Account extends Eloquent
         $current = clone $date;
         $dateDay = $date->format('d');
         $days = [];
+        Log::debug('====');
+        Log::debug('Days loop debug.');
         while ($current >= $predictionDate) {
-
+            Log::debug($current->format('d-M-Y'));
             // if $current is in the same month as the
             // $date var, we skip it, because it's pretty pointless
             // to compare the current month with itself.
             // this happens on 31-mar, which jumps back to 1-mar.
             $currentDay = $current->format('d');
-            Log::debug(
-                'currentDay: ' . $currentDay . ' vs dateDay: ' . $dateDay
-            );
+
 
             if ($current != $date && $dateDay == $currentDay) {
                 $days[] = clone $current;
-                Log::debug('Added to days[]: ' . $current->format('d-M-Y'));
             }
+            // submonth jumps the wrong way
             $current->subMonth();
+        }
+        Log::debug('====');
+        // debug: the collected days:
+        Log::debug('Collected days:');
+        foreach ($days as $d) {
+            Log::debug($d->format('d-M-Y'));
         }
         // we need a prediction now, based on these dates:
         $sum = 0;
         foreach ($days as $index => $currentDay) {
             $amount = floatval(
-                $this->transactions()->expenses()->where(
+                    $this->transactions()->expenses()->where(
                         'date', '>', $predictionStart->value
                     )->where(
-                        'ignoreprediction', 0
-                    )->onDay($currentDay)->sum('amount')
-            );
-            $amount = $amount * -1;
-            Log::debug(
-                'Amount for ' . $currentDay->format('d-M-Y') . ': ' . mf(
-                    $amount
-                )
-            );
+                            'ignoreprediction', 0
+                        )->onDay($currentDay)->sum('amount')
+                ) * -1;
 
             // use this amount to do the prediction:
             $sum += $amount;
@@ -173,7 +178,14 @@ class Account extends Eloquent
             if ($amount < $data['least']) {
                 $data['least'] = $amount;
             }
+            Log::debug($currentDay->format('d-M-Y').': Most/least/sum: ' .
+            $data['most']
+            .'/'.$data['least'].'/'
+                .$sum.' [amount: '.$amount.']');
         }
+        Log::debug('Done looping these days.');
+        Log::debug('Most/least/sum: ' . $data['most'].'/'.$data['least'].'/'
+            .$sum);
         // the actual prediction:
         $count = count($days);
         $data['prediction'] = $count > 1 ? $sum / $count : $sum;

@@ -1,5 +1,6 @@
 <?php
 use Carbon\Carbon as Carbon;
+
 /**
  * Class Component
  */
@@ -31,7 +32,6 @@ class Component extends Eloquent
         if (!($strpos === false)) {
             $name = substr($name, ($strpos + 1));
         }
-
         $componentID = null;
         if (Auth::check()) {
             foreach (
@@ -42,9 +42,9 @@ class Component extends Eloquent
                 }
             }
             if (is_null($componentID)) {
-                $component = new Component(['name'   => $name,
-                                           'user_id' => Auth::user()->id,
-                                           'type'    => $type]);
+                $component = new Component(['name'    => $name,
+                                            'user_id' => Auth::user()->id,
+                                            'type'    => $type]);
                 $component->save();
                 if (isset($component->id)) {
                     return $component;
@@ -55,21 +55,24 @@ class Component extends Eloquent
         return null;
     }
 
-    public function predictForMonth(Carbon $date) {
+    public function predictForMonth(Carbon $date)
+    {
         $predictionStart = Setting::getSetting('predictionStart');
         $start = new Carbon($predictionStart->value);
         $date->subMonth();
         $count = 0;
         $sum = 0;
-        while($start <= $date) {
+        while ($start <= $date) {
             $current = clone $start;
-            $sum += floatval($this->transactions()->inMonth($current)
-                    ->where('ignoreprediction',0)->expenses()->sum('amount')
-                *-1);
+            $sum += floatval(
+                $this->transactions()->inMonth($current)->where(
+                    'ignoreprediction', 0
+                )->expenses()->sum('amount') * -1
+            );
             $start->addMonth();
             $count++;
         }
-        if($count > 1) {
+        if ($count > 1) {
             return $sum / $count;
         } else {
             return $sum;
@@ -145,7 +148,11 @@ class Component extends Eloquent
      */
     public function setNameAttribute($value)
     {
-        $this->attributes['name'] = Crypt::encrypt($value);
+        if (strlen($value) > 0) {
+            $this->attributes['name'] = Crypt::encrypt($value);
+        } else {
+            $this->attributes['name'] = null;
+        }
     }
 
     /**

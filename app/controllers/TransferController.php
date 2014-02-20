@@ -1,5 +1,7 @@
 <?php
 
+include_once(app_path() . '/helpers/AccountHelper.php');
+
 /**
  * Class TransferController
  */
@@ -23,39 +25,33 @@ class TransferController extends BaseController
     /**
      * Add a transfer (to an account)
      *
-     * @param Account $account The account
-     *
      * @return View
      */
-    public function add(Account $account = null)
+    public function add()
     {
         Session::put('previous', URL::previous());
-        $accounts = [];
-        foreach (Auth::user()->accounts()->where('hidden', 0)->get() as $a) {
-            $accounts[$a->id] = $a->name;
-        }
+        $accounts = AccountHelper::accountsAsSelectList();
 
-        return View::make('transfers.add')->with('title', 'Add a transfers')
-            ->with('account', $account)->with('accounts', $accounts)->with(
-                'id', $account ? $account->id : null
-            );
+        return View::make('transfers.add')->with(
+            'title', 'Add a transfers'
+        )->with('accounts', $accounts);
     }
 
     /**
-     * Post process a new transfer
+     * Post process a new transfer.
      *
      * @return Redirect
      */
     public function postAdd()
     {
-        $data = ['description' => Input::get('description'),
-                 'amount' => floatval(Input::get('amount')),
+        $data = ['description'    => Input::get('description'),
+                 'amount'         => floatval(Input::get('amount')),
                  'accountfrom_id' => intval(Input::get('accountfrom_id')),
-                 'accountto_id' => intval(Input::get('accountto_id')),
-                 'date' => Input::get('date'), 'user_id' => Auth::user()->id];
+                 'accountto_id'   => intval(Input::get('accountto_id')),
+                 'date'           => Input::get('date'),
+                 'user_id'        => Auth::user()->id];
         $transfer = new Transfer($data);
 
-        // validate and save:
         $validator = Validator::make($transfer->toArray(), Transfer::$rules);
         if ($validator->fails()) {
             return Redirect::route('addtransfer')->withInput()->withErrors(
@@ -79,10 +75,7 @@ class TransferController extends BaseController
     public function edit(Transfer $transfer)
     {
         Session::put('previous', URL::previous());
-        $accounts = [];
-        foreach (Auth::user()->accounts()->where('hidden', 0)->get() as $a) {
-            $accounts[$a->id] = $a->name;
-        }
+        $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transfers.edit')->with('transfer', $transfer)->with(
             'accounts', $accounts
@@ -98,23 +91,29 @@ class TransferController extends BaseController
      */
     public function postEdit(Transfer $transfer)
     {
+        $fromAccount = Auth::user()->accounts()->find(
+            intval(Input::get('accountfrom_id'))
+        );
+        $toAccount = Auth::user()->accounts()->find(
+            intval(Input::get('accountto_id'))
+        );
 
         $transfer->description = Input::get('description');
         $transfer->amount = floatval(Input::get('amount'));
         $transfer->date = Input::get('date');
-        $transfer->accountto_id = intval(Input::get('accountto_id'));
-        $transfer->accountfrom_id = intval(Input::get('accountfrom_id'));
-
+        if ($fromAccount) {
+            $transfer->accountfrom()->associate($fromAccount);
+        }
+        if ($toAccount) {
+            $transfer->accountto()->associate($toAccount);
+        }
 
         $validator = Validator::make(
             $transfer->toArray(), Transfer::$rules
         );
         if ($validator->fails()) {
-            return Redirect::route(
-                'edittransfer', $transfer->id
-            )->withInput()->withErrors(
-                    $validator
-                );
+            return Redirect::route('edittransfer', $transfer->id)->withInput()
+                ->withErrors($validator);
         } else {
             $transfer->save();
             Session::flash('success', 'The transfer has been edited.');

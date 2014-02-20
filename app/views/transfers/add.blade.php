@@ -5,9 +5,6 @@
     <div class="col-lg-12">
         <h3>
             Add a new transfer
-            @if($account)
-            going from {{{$account->name}}}
-            @endif
         </h3>
     </div>
 </div>
@@ -75,7 +72,7 @@
              ">
             <label for="inputAccountfrom" class="col-sm-3 control-label">Account from</label>
             <div class="col-sm-9">
-                {{Form::select('accountfrom_id',$accounts,$id ? $id : Input::old('accountfrom_id'),['class' => 'form-control'])}}
+                {{Form::select('accountfrom_id',$accounts,Input::old('accountfrom_id'),['class' => 'form-control'])}}
                 @if($errors->has('accountfrom_id'))
                 <span class="text-danger">{{$errors->first('accountfrom_id')}}</span>
                 @endif

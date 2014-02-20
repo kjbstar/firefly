@@ -5,9 +5,6 @@
     <div class="col-lg-12">
         <h3>
             Add a new transaction
-            @if($account)
-            to {{{$account->name}}}
-            @endif
         </h3>
         @if($count == 0)
         <div class="alert alert-info">
@@ -112,7 +109,8 @@
              ">
             <label for="inputAccount" class="col-sm-3 control-label">Account</label>
             <div class="col-sm-9">
-                {{Form::select('account_id',$accounts,$id ? $id : Input::old('account_id'),['class' => 'form-control'])}}
+                {{Form::select('account_id',$accounts,null,
+                ['class' => 'form-control'])}}
                 @if($errors->has('date'))
                 <span class="text-danger">{{$errors->first('account_id')
                     }}</span><br />
@@ -240,10 +238,7 @@
     <div class="col-lg-3 col-lg-offset-0" style="margin-top:20px;">
         <input type="submit" name="submit" value="Save new transaction" class="btn btn-default btn-info btn-lg" />
     </div>
-    <div class="col-lg-9 col-lg-offset-0" style="margin-top:20px;">
-        <label><input name="another" value="1" type="checkbox"> Add another
-            transaction</label>
-    </div>
+
 </div>
 
 {{Form::close()}}   

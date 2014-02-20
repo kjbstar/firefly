@@ -309,16 +309,17 @@ class HomeHelper
                 // spent that day (usually 0)
                 $spent += floatval(
                         Auth::user()->transactions()->expenses()->where(
-                                'ignoreallowance', 0
-                            )->onDay($current)->sum('amount')
+                            'ignoreallowance', 0
+                        )->onDay($current)->sum('amount')
                     ) * -1;
                 $prediction = $account->predictOnDate($current);
                 $predicted += $prediction['prediction'];
                 unset($prediction);
             }
-            $p[$key] = ['spent' => $spent,'predicted' => $predicted];
+            $p[$key] = ['spent' => $spent, 'predicted' => $predicted];
             $current->addDay();
         }
+
         return $p;
     }
 
@@ -370,6 +371,102 @@ class HomeHelper
      * @return string
      */
     public static function homeAccountChart($year, $month)
+    {
+        $realDay = new Carbon; // for the prediction.
+        $start = Toolkit::parseDate($year, $month);
+        $start->startOfMonth();
+        $end = clone $start;
+        $end->endOfMonth();
+        $start->subDay(); // also last day of previous month
+
+
+        // get the user's front page accounts:
+        $accounts = Toolkit::getFrontpageAccounts();
+
+        // create chart:
+        $chart = App::make('gchart');
+        $chart->addColumn('Day of the month', 'date');
+
+        // create chart & columns for each chart:
+        foreach ($accounts as $account) {
+            // column for account X:
+            $c = $chart->addColumn($account->name . ' balance', 'number');
+            $account->balance = $account->balanceOnDate($start);
+            $account->balanceMost = $account->balance;
+            $account->balanceLeast = $account->balance;
+            $chart->addCertainty($c); // whether or not we're certain
+            $chart->addInterval($c); // interval cheapest day $cheap
+            $chart->addInterval($c); // interval most expensive day. $max
+
+            // column for original prediction of account X:
+            $chart->addColumn(
+                $account->name . ' original prediction', 'number'
+            );
+        }
+
+        // loop for each day of the month:
+        $current = clone $start;
+        while ($current <= $end) {
+            // add the current date:
+            $row = [];
+            $row[] = clone $current;
+
+            // now start generating numbers for each account:
+            $todayOrPast = $current < $realDay;
+            $future = !$todayOrPast;
+            $fom = $current->format('d') == '1'; // first of month
+
+            foreach ($accounts as $account) {
+                if ($todayOrPast) {
+                    // simply get the current balance, put it in chart.
+                    $account->balance = $account->balanceOnDate($current);
+
+                    // update the least/most balances:
+                    $account->balanceMost = $account->balance;
+                    $account->balanceLeast = $account->balance;
+
+                    $row[] = $account->balance;
+                    $row[] = true; // certainty
+                    // we ignore the rest
+                    $row[] = null; // cheapest
+                    $row[] = null; // expensive
+                }
+                if ($future) {
+                    // get a prediction:
+                    $prediction = $account->predictOnDate($current);
+
+                    // set the balances:
+                    // update values:
+                    $account->balance -= $prediction['prediction'];
+                    $account->balanceLeast -= $prediction['least'];
+                    $account->balanceMost -= $prediction['most'];
+
+                    // add balance - predictions and certainty
+                    $row[] = $account->balance;
+                    $row[] = false; // certainty
+                    $row[] = $account->balanceLeast;
+                    $row[] = $account->balanceMost;
+
+
+                }
+                $row[] = null; // original prediction
+
+            }
+
+
+            $chart->addRowArray($row);
+            $current->addDay();
+        }
+
+
+        $chart->generate();
+
+        return $chart->getData();
+
+    }
+
+
+    public static function homeAccountChartOld($year, $month)
     {
         // start with some dates:
         // some dates:

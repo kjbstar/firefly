@@ -363,6 +363,57 @@ class Transaction extends Eloquent
     }
 
     /**
+     * Set the ignoreprediction value no matter its input:
+     *
+     * @param $value
+     */
+    public function setIgnorepredictionAttribute($value)
+    {
+        if ($value == 1 || $value == '1' || $value == true
+            || $value == 'true'
+        ) {
+            $this->attributes['ignoreprediction'] = 1;
+        } else {
+            $this->attributes['ignoreprediction'] = 0;
+        }
+
+    }
+
+    /**
+     * Set the ignoreallowance value no matter its input:
+     *
+     * @param $value
+     */
+    public function setIgnoreallowanceAttribute($value)
+    {
+        if ($value == 1 || $value == '1' || $value == true
+            || $value == 'true'
+        ) {
+            $this->attributes['ignoreallowance'] = 1;
+        } else {
+            $this->attributes['ignoreallowance'] = 0;
+        }
+
+    }
+
+    /**
+     * Set the ignoreallowance value no matter its input:
+     *
+     * @param $value
+     */
+    public function setMarkAttribute($value)
+    {
+        if ($value == 1 || $value == '1' || $value == true
+            || $value == 'true'
+        ) {
+            $this->attributes['mark'] = 1;
+        } else {
+            $this->attributes['mark'] = 0;
+        }
+
+    }
+
+    /**
      * These date/time fields must be Carbon objects.
      *
      * @return array
