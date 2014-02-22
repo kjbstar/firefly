@@ -98,7 +98,7 @@ function mf($n, $coloured = false, $list = false)
         return '<span class="text-danger">&#8364;' . $string . '</span>';
     }
 
-    return '<span>&#8364; ' . $string . '</span>';
+    return '&#8364; ' . $string;
 }
 
 require app_path() . '/filters.php';

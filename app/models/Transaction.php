@@ -294,6 +294,16 @@ class Transaction extends Eloquent
         );
     }
 
+    public function scopeWithLimitInMonth($query, Carbon $date)
+    {
+        return $query->with(
+            ['components.limits' => function ($query) use ($date) {
+                    return $query->inMonth($date);
+                }]
+        );
+
+    }
+
     /**
      * Scope for a full year
      *

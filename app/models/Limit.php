@@ -48,5 +48,10 @@ class Limit extends Eloquent
         return ['created_at', 'updated_at', 'date', 'deleted_at'];
     }
 
+    public function getAmountAttribute($value)
+    {
+        return floatval($value);
+    }
+
 
 }

@@ -12,3 +12,18 @@ var accountChartOptions = {
     },
     intervals: { 'style': 'line' }
 };
+
+var gaugeOptions = {
+    width: 150,
+    height: 150,
+    redFrom: -300,
+    redTo: -50,
+    yellowFrom: -50,
+    yellowTo: 50,
+    greenFrom: 50,
+    greenTo: 300,
+    max: 300,
+    min: -300,
+    minorTicks: 5
+
+};

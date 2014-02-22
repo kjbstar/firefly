@@ -24,6 +24,8 @@
     position: relative;
 }
 
+.gauge table {margin:0 auto !important;}
+
 .piggybankEmpty {
     background: #eee;
     position: absolute;
@@ -38,3 +40,4 @@
     top: 0px;
     z-index: 10
 }
+

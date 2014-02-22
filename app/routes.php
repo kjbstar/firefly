@@ -28,6 +28,7 @@ Route::bind('limit', function ($value, $route) {
 // some common patterns:
 Route::pattern('id', '[0-9]+');
 Route::pattern('month', '[0-9]+');
+Route::pattern('day', '[0-9]+');
 Route::pattern('year', '20[0-9]{2}');
 Route::pattern('otheryear', '20[0-9]{2}');
 
@@ -42,7 +43,9 @@ Route::get('/home/reports/compared/chart/{component}/{year}/{otheryear}',['as' =
  */
 Route::get('/', ['uses' => 'HomeController@showIndex', 'as' => 'index']);
 Route::get('/home/{year?}/{month?}',['uses' => 'HomeController@showHome', 'as' => 'home']);
-Route::get('/home/charts/{chart}/{year?}/{month?}',['uses' => 'HomeController@showChart', 'as' => 'homechart']);
+Route::get('/home/chart/accounts/{year}/{month}',['uses' => 'HomeController@showAccountChart', 'as' => 'homeaccountchart']);
+Route::get('/home/gauge/{year}/{month}/{day}',['uses' => 'HomeController@showGauge', 'as' => 'homegauge']);
+Route::get('/home/table/{chart}/{year?}/{month?}',['uses' => 'HomeController@showTable', 'as' => 'hometable']);
 Route::get('/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']);
 
 

@@ -56,32 +56,6 @@ class HomeController extends BaseController
 
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
-        $transactions = 0;//HomeHelper::homeTransactionList($today);
-        $transfers = 0;//HomeHelper::homeTransferList($today);
-        $budgets = HomeHelper::homeComponentList('budget', $today);
-        $categories = HomeHelper::homeComponentList('category', $today);
-        $beneficiaries = HomeHelper::homeComponentList('beneficiary', $today);
-        $accountCount = 0;//Auth::user()->accounts()->count();
-        $transactionCount = 0;//Auth::user()->transactions()->count();
-
-        // resort the component lists:
-        $amount = [];
-        foreach ($budgets as $key => $row) {
-            $amount[$key] = $row['amount'];
-        }
-        array_multisort($amount, SORT_ASC, $budgets);
-
-        $amount = [];
-        foreach ($categories as $key => $row) {
-            $amount[$key] = $row['amount'];
-        }
-        array_multisort($amount, SORT_ASC, $categories);
-
-        $amount = [];
-        foreach ($beneficiaries as $key => $row) {
-            $amount[$key] = $row['amount'];
-        }
-        array_multisort($amount, SORT_ASC, $beneficiaries);
 
         // build a history:
         $history = [];
@@ -99,72 +73,78 @@ class HomeController extends BaseController
             $now->subMonth();
         }
 
-        // get some allowance information:
-        $allowanceInfo = HomeHelper::getAllowanceInformation($today);
-
-        // get some extra prediction details:
-        $predictionInfo = HomeHelper::getPredictionInfo($today);
-
         return View::make('home.home')->with('title', 'Home')->with(
             'accounts', $accounts
         )->with('today', $today)->with(
-                'budgets', $budgets
-            )->with('transactions', $transactions)->with(
-                'transfers', $transfers
-            )->with('beneficiaries', $beneficiaries)->with(
-                'categories', $categories
-            )->with(
                 'history', $history
-            )->with('accountCount', $accountCount)->with(
-                'transactionCount', $transactionCount
-            )->with(
-                'allowance', $allowanceInfo
-            )->with('predictionInfo', $predictionInfo);
+            );
     }
 
     /**
      * Displays the chart on the homepage for the indicated type
      *
-     * @param string $type
-     * @param int    $year
-     * @param int    $month
+     * @param int $year
+     * @param int $month
      *
      * @return string
      */
-    public function showChart($type, $year = null, $month = null)
+    public function showAccountChart($year = null, $month = null)
     {
-        switch ($type) {
-            case 'beneficiaries':
-            case 'beneficiary':
-            case 'categories':
-            case 'category':
-            case 'budgets':
-            case 'budget':
+        $debug
+            = Config::get('app.debug') == true && Input::get('debug') == 'true';
+        if ($debug) {
+            $r = HomeHelper::homeAccountChart($year, $month);
+            echo '<pre>';
+            print_r($r);
+            echo '</pre>';
 
-                return Response::json(
-                    HomeHelper::homeComponentChart($type, $year, $month)
-                );
-                break;
-            case 'accounts':
-                if (Input::get('debug') == 'true'
-                    && Config::get('app.debug') == true
-                ) {
-                    echo '<pre>';
-                    var_dump(HomeHelper::homeAccountChart($year, $month));
-                    echo '</pre>';
-                    return;
-                }
-
-                return Response::json(
-                    HomeHelper::homeAccountChart($year, $month)
-                );
-                break;
-            default:
-                return Response::json(false);
-                break;
+            return;
         }
 
+        return Response::json(HomeHelper::homeAccountChart($year, $month));
+    }
 
+    public function showGauge($year, $month, $day)
+    {
+        $date = new Carbon($year . '-' . $month . '-' . $day);
+
+        $debug
+            = Config::get('app.debug') == true && Input::get('debug') == 'true';
+        if ($debug) {
+            $r = HomeHelper::homeGauge($date);
+            echo '<pre>';
+            print_r($r);
+            echo '</pre>';
+
+            return;
+        }
+
+        return Response::json(HomeHelper::homeGauge($date));
+    }
+
+    public function showTable($type, $year = null, $month = null)
+    {
+        $date = new Carbon($year . '-' . $month . '-01');
+        switch ($type) {
+            default:
+                return '<p><span class="text-danger">No case for ' . $type
+                . '</span></p>';
+                break;
+            case 'budgets':
+            case 'beneficiaries':
+            case 'categories':
+                return HomeHelper::componentTable($type, $date);
+                break;
+            case 'transactions':
+                return HomeHelper::transactionTable($date);
+                break;
+            case 'transfers':
+                return HomeHelper::transferTable($date);
+                break;
+            case 'predictions':
+                return HomeHelper::predictionTable($date);
+                break;
+        }
     }
 
 }
