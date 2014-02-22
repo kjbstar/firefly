@@ -44,12 +44,31 @@ function drawGaugeForDay(date, holder) {
 $(function () {
     // click trigger for all X blocks
     $('a[rel="collapse-objects"]').click(collapseList);
+    // check cookies for each object and click them if they're there.
+    $.each($('a[rel="collapse-objects"]'), function (i, v) {
+        var cookieName = $(v).attr('href').substring(1);
+        if (readCookie(cookieName) == 'false') {
+            // simulate click on element
+            $(v).click();
+        }
+        console.log(cookieName);
+    });
+
 });
 
 function collapseList(ev) {
     var ID = $(ev.target).attr('href');
     var holder = $(ID);
     $(holder).on('show.bs.collapse', respondToCollapse);
+    // set relevant cookies:
+    $(holder).on('shown.bs.collapse', function(ev) {
+        console.log($(ev.target).attr('id') + ' shown');
+        createCookie($(ev.target).attr('id'),'false',7);
+    });
+    $(holder).on('hidden.bs.collapse', function(ev) {
+        console.log($(ev.target).attr('id') + ' collapsed');
+        createCookie($(ev.target).attr('id'),'true',7);
+    });
     holder.collapse('toggle');
     return false;
 }
@@ -67,6 +86,8 @@ function respondToCollapse(ev) {
                 holder.empty();
                 holder.append($(data));
                 holder.addClass('loaded');
+                // set cookie to false, element should not be collapsed
+                // next time.
             }).fail(function () {
                 holder.empty();
                 holder.addClass('load-error');

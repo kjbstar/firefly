@@ -215,8 +215,6 @@ class ReportController extends BaseController
         return View::make('reports.compared')->with(
             'components', $components
         )->with('first', $first)->with('second', $second);
-
-        return 1;
     }
 
     public function compareComponentChart(

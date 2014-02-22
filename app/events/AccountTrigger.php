@@ -71,9 +71,10 @@ class AccountTrigger
         $oldDate = new Carbon($account->getOriginal('openingbalancedate'));
         $end = clone $oldDate;
         $end->subDay();
+        $current = clone $start;
 
-        while ($start <= $end) {
-            $current = clone $start;
+        while ($current <= $end) {
+
             //echo 'Now at ' . $current->format('d-m-y');
             // delete if exists. should not exist!
             $account->balancemodifiers()->onDay($current)->delete();
@@ -88,7 +89,7 @@ class AccountTrigger
             }
             $balanceModifier->account()->associate($account);
             $balanceModifier->save();
-            $start->addDay();
+            $current->addDay();
         }
         unset($balanceModifier);
         $end->addDay();

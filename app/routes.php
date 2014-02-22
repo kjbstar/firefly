@@ -174,7 +174,7 @@ Route::get('/login', ['uses' => 'UserController@login', 'as' => 'login']);
 Route::get('/logout', 'UserController@logout');
 Route::get('/reset', ['uses' => 'UserController@reset', 'as' => 'reset']);
 Route::get('/register', ['uses' => 'UserController@register', 'as' => 'register']);
-Route::get('/activate/{code}', 'UserController@activate');
+Route::get('/activate/{code}', ['uses' => 'UserController@activate','activate']);
 Route::get('/resetme/{code}', 'UserController@resetme');
 Route::post('/reset', ['uses' => 'UserController@postReset', 'before' => 'csrf']);
 Route::post('/login', ['uses' => 'UserController@postLogin', 'before' => 'csrf']);

@@ -4,6 +4,20 @@ use Carbon\Carbon as Carbon;
 
 /**
  * Class Transfer
+ *
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $user_id
+ * @property integer $accountfrom_id
+ * @property integer $accountto_id
+ * @property string $description
+ * @property float $amount
+ * @property string $date
+ * @property-read \Account $accountfrom
+ * @property-read \Account $accountto
+ * @property-read \User $user
+ * @method static Transfer inMonth($date) 
  */
 class Transfer extends Eloquent
 {
@@ -64,7 +78,6 @@ class Transfer extends Eloquent
             DB::Raw('DATE_FORMAT(`date`,"%m-%Y")'), '=', $date->format('m-Y')
         );
     }
-
 
 
     /**

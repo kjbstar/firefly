@@ -17,7 +17,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * Process is a thin wrapper around proc_* functions to ease
+ * Process is a thin wrapper around proc_* functions to easily
  * start independent PHP processes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -1081,6 +1081,10 @@ class Process
     {
         if (null !== self::$sigchild) {
             return self::$sigchild;
+        }
+
+        if (!function_exists('phpinfo')) {
+            return self::$sigchild = false;
         }
 
         ob_start();

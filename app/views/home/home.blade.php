@@ -54,6 +54,27 @@
     </div>
 
 </div>
+<!-- ALLOWANCE BAR -->
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-4 col-md-12 col-sm-12">
+        @if($allowance['amount'] > 0)
+        <div class="tab-pane active" id="budgeting-tab">
+            <div class="progress progress-striped"style="margin-bottom:0;height:10px;"><div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{$allowance['days']}}" aria-valuemin="0" aria-valuemax="100" style="width:{{$allowance['days']}}%;"><span class="sr-only">{{$allowance['days']}}% Complete</span></div></div>
+            <div class="progress progress-striped">
+                @if($allowance['over'])
+                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{$allowance['pct']}}" aria-valuemin="0" aria-valuemax="100" style="width:{{$allowance['pct']}}%;"><span class="sr-only">{{$allowance['pct']}}% Complete</span></div>
+                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{$allowance['pct']}}" aria-valuemin="0" aria-valuemax="100" style="width: {{100-$allowance['pct']}}%;"><span class="sr-only">{{$allowance['pct']}}% Complete</span></div>
+                @else
+                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{$allowance['pct']}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$allowance['pct']}}%;"><span class="sr-only">{{$allowance['pct']}}% Complete</span></div>
+                @endif
+            </div>
+            <p>
+                {{mf($allowance['amount'])}} - {{mf ($allowance['spent'])}} = {{mf($allowance['amount'] - $allowance['spent'],true)}} </p>
+        </div>
+        @endif
+
+    </div>
+</div>
 
 
 <div class="row">
@@ -179,6 +200,7 @@
 
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script src="js/home-cookies.js"></script>
 <script src="js/home-settings.js"></script>
 <script src="js/home.js"></script>
 @stop

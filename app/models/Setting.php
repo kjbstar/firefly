@@ -2,6 +2,16 @@
 
 /**
  * Class Setting
+ *
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $user_id
+ * @property string $type
+ * @property string $name
+ * @property string $date
+ * @property string $value
+ * @property-read \User $user
  */
 class Setting extends Eloquent
 {

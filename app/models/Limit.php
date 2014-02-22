@@ -3,6 +3,16 @@ use Carbon\Carbon as Carbon;
 
 /**
  * Class Limit
+ *
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $deleted_at
+ * @property integer $component_id
+ * @property float $amount
+ * @property string $date
+ * @property-read \Component $component
+ * @method static Limit inMonth($date) 
  */
 class Limit extends Eloquent
 {
@@ -23,14 +33,6 @@ class Limit extends Eloquent
         return $this->belongsTo('Component');
     }
 
-    /**
-     * Makes the scope for the month given in $date
-     *
-     * @param        $query The query
-     * @param Carbon $date  The date
-     *
-     * @return mixed
-     */
     public function scopeInMonth($query, Carbon $date)
     {
         return $query->where(

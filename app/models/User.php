@@ -5,6 +5,21 @@ use Illuminate\Auth\UserInterface;
 
 /**
  * Class User
+ *
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $deleted_at
+ * @property string $email
+ * @property string $password
+ * @property string $activation
+ * @property string $reset
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Account[] $accounts
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Piggybank[] $piggybanks
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Setting[] $settings
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfers
  */
 class User extends Eloquent implements UserInterface, RemindableInterface
 {
@@ -84,6 +99,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     /**
      * Get some kind of key.
      *
+     * TODO: remove?
+     *
      * @return mixed
      */
     public function getAuthIdentifier()
@@ -94,6 +111,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     /**
      * Get the user's password.
      *
+     * TODO: remove?
+     *
      * @return string
      */
     public function getAuthPassword()
@@ -103,6 +122,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
     /**
      * Get the user's email address.
+     *
+     * TODO: remove?
      *
      * @return string
      */
@@ -118,8 +139,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
      */
     public function sendRegistrationMail()
     {
-        $data['url']
-            = Config::get('app.url') . '/activate/' . $this->activation;
+        $data['url'] = URL::Route('activate', $this->activation);
         $email = $this->email;
         Mail::send(
             ['email.register.html', 'email.register.text'], $data,

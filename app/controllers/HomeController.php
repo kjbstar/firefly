@@ -56,6 +56,7 @@ class HomeController extends BaseController
 
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
+        $allowance = HomeHelper::getAllowance($today);
 
         // build a history:
         $history = [];
@@ -77,7 +78,7 @@ class HomeController extends BaseController
             'accounts', $accounts
         )->with('today', $today)->with(
                 'history', $history
-            );
+            )->with('allowance',$allowance);
     }
 
     /**
@@ -98,7 +99,7 @@ class HomeController extends BaseController
             print_r($r);
             echo '</pre>';
 
-            return;
+            return null;
         }
 
         return Response::json(HomeHelper::homeAccountChart($year, $month));
@@ -116,7 +117,7 @@ class HomeController extends BaseController
             print_r($r);
             echo '</pre>';
 
-            return;
+            return null;
         }
 
         return Response::json(HomeHelper::homeGauge($date));

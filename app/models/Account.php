@@ -4,6 +4,22 @@ use Carbon\Carbon as Carbon;
 
 /**
  * Class Account
+ *
+ * @property integer $id
+ * @property integer $user_id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property string $name
+ * @property float $openingbalance
+ * @property Carbon $openingbalancedate
+ * @property float $currentbalance
+ * @property boolean $hidden
+ * @property-read \User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersto
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersfrom
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
+ * @method static Account notHidden() 
  */
 class Account extends Eloquent
 {

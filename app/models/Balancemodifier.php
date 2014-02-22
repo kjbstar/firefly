@@ -3,6 +3,16 @@ use Carbon\Carbon as Carbon;
 
 /**
  * Class Balancemodifier
+ *
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $account_id
+ * @property string $date
+ * @property float $balance
+ * @property-read \Account $account
+ * @method static Balancemodifier onDay($date) 
+ * @method static Balancemodifier beforeDay($date) 
  */
 class Balancemodifier extends Eloquent
 {

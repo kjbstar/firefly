@@ -4,6 +4,35 @@ use Carbon\Carbon as Carbon;
 
 /**
  * Class Transaction
+ *
+ * @property integer $id
+ * @property integer $user_id
+ * @property integer $account_id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property string $description
+ * @property float $amount
+ * @property string $date
+ * @property boolean $ignoreprediction
+ * @property boolean $ignoreallowance
+ * @property boolean $mark
+ * @property-read mixed $beneficiary
+ * @property-read mixed $category
+ * @property-read mixed $budget
+ * @property-read \Account $account
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
+ * @property-read \User $user
+ * @method static Transaction inMonth($date) 
+ * @method static Transaction onDay($date) 
+ * @method static Transaction onDayOfMonth($date) 
+ * @method static Transaction betweenDates($start, $end) 
+ * @method static Transaction expenses() 
+ * @method static Transaction hasComponentType($component) 
+ * @method static Transaction hasComponent($component) 
+ * @method static Transaction withLimitInMonth($date) 
+ * @method static Transaction inYear($date) 
+ * @method static Transaction afterDate($date) 
+ * @method static Transaction incomes() 
  */
 class Transaction extends Eloquent
 {

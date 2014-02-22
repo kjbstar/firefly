@@ -359,4 +359,44 @@ class HomeHelper
 
         return $view->render();
     }
+
+        public static function getAllowance(Carbon $date)
+    {
+        // default values and array
+        $defaultAllowance = Setting::getSetting('defaultAllowance');
+        $specificAllowance = Auth::user()->settings()->where(
+            'name', 'specificAllowance'
+        )->where('date', $date->format('Y-m') . '-01')->first();
+        $allowance = !is_null($specificAllowance) ? $specificAllowance
+            : $defaultAllowance;
+
+        $amount = floatval($allowance->value);
+        $allowance = ['amount' => $amount, 'over' => false, 'spent' => 0];
+        $days = round(
+            (intval($date->format('d')) / intval(
+                    $date->format('t')
+                )) * 100
+        );
+        $allowance['days'] = $days;
+        // start!
+        if ($amount > 0) {
+            $spent = floatval(
+                    Auth::user()->transactions()->inMonth($date)->expenses()
+                        ->where('ignoreallowance', 0)->sum('amount')
+                ) * -1;
+            $allowance['spent'] = $spent;
+            // overspent this allowance:
+            if ($spent > $amount) {
+                $allowance['over'] = true;
+                $allowance['pct'] = round(($amount / $spent) * 100);
+            }
+            // did not overspend this allowance.
+            if ($spent <= $amount) {
+                $allowance['pct'] = round(($spent / $amount) * 100);
+            }
+        }
+
+        return $allowance;
+    }
+
 }
