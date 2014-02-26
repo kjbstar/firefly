@@ -7,6 +7,13 @@
  * @property \Carbon\Carbon                                             $created_at
  * @property-read \User                                                 $user
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $user_id
+ * @property string $description
+ * @property float $amount
+ * @property integer $dom
+ * @property integer $pct
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
  */
 class Predictable extends Eloquent
 {

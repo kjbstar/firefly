@@ -22,6 +22,7 @@ use Illuminate\Auth\UserInterface;
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfers
  * @property string $username
  * @property string $origin
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
  */
 class User extends Eloquent implements UserInterface, RemindableInterface
 {

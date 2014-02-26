@@ -483,12 +483,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/Seldaek/monolog.git",
-            "reference": "6b81ac8153be8ae33a877a79be3f61809f1448d9"
+            "reference": "7085f3e424dfbaba98461a433f6c55fec3229355"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/Seldaek/monolog/zipball/6b81ac8153be8ae33a877a79be3f61809f1448d9",
-            "reference": "6b81ac8153be8ae33a877a79be3f61809f1448d9",
+            "url": "https://api.github.com/repos/Seldaek/monolog/zipball/7085f3e424dfbaba98461a433f6c55fec3229355",
+            "reference": "7085f3e424dfbaba98461a433f6c55fec3229355",
             "shasum": ""
         },
         "require": {
@@ -512,7 +512,7 @@
             "raven/raven": "Allow sending log messages to a Sentry server",
             "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
         },
-        "time": "2014-02-23 15:06:45",
+        "time": "2014-02-25 22:48:41",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1924,63 +1924,6 @@
         "homepage": "http://symfony.com"
     },
     {
-        "name": "symfony/dom-crawler",
-        "version": "2.4.x-dev",
-        "version_normalized": "2.4.9999999.9999999-dev",
-        "target-dir": "Symfony/Component/DomCrawler",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/DomCrawler.git",
-            "reference": "f0b3d9f4b4bb8ec4b5fa57e8cb6bd8ff4e972b19"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/DomCrawler/zipball/f0b3d9f4b4bb8ec4b5fa57e8cb6bd8ff4e972b19",
-            "reference": "f0b3d9f4b4bb8ec4b5fa57e8cb6bd8ff4e972b19",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "symfony/css-selector": "~2.0"
-        },
-        "suggest": {
-            "symfony/css-selector": ""
-        },
-        "time": "2014-02-18 15:41:06",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.4-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\DomCrawler\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com",
-                "homepage": "http://fabien.potencier.org",
-                "role": "Lead Developer"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony DomCrawler Component",
-        "homepage": "http://symfony.com"
-    },
-    {
         "name": "symfony/dependency-injection",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
@@ -2556,18 +2499,75 @@
         "homepage": "http://symfony.com"
     },
     {
+        "name": "symfony/dom-crawler",
+        "version": "2.4.x-dev",
+        "version_normalized": "2.4.9999999.9999999-dev",
+        "target-dir": "Symfony/Component/DomCrawler",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/DomCrawler.git",
+            "reference": "e82baa333252166ab411240e6bd898023d7568ba"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/DomCrawler/zipball/e82baa333252166ab411240e6bd898023d7568ba",
+            "reference": "e82baa333252166ab411240e6bd898023d7568ba",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "symfony/css-selector": "~2.0"
+        },
+        "suggest": {
+            "symfony/css-selector": ""
+        },
+        "time": "2014-02-18 16:29:54",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.4-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\DomCrawler\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com",
+                "homepage": "http://fabien.potencier.org",
+                "role": "Lead Developer"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony DomCrawler Component",
+        "homepage": "http://symfony.com"
+    },
+    {
         "name": "laravel/framework",
         "version": "4.1.x-dev",
         "version_normalized": "4.1.9999999.9999999-dev",
         "source": {
             "type": "git",
             "url": "https://github.com/laravel/framework.git",
-            "reference": "a92ecc702c4c4a4cfa3cbb8ea63106d73d0aed1c"
+            "reference": "f7935afc541fc15324efc8538c60866e593ee447"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/laravel/framework/zipball/a92ecc702c4c4a4cfa3cbb8ea63106d73d0aed1c",
-            "reference": "a92ecc702c4c4a4cfa3cbb8ea63106d73d0aed1c",
+            "url": "https://api.github.com/repos/laravel/framework/zipball/f7935afc541fc15324efc8538c60866e593ee447",
+            "reference": "f7935afc541fc15324efc8538c60866e593ee447",
             "shasum": ""
         },
         "require": {
@@ -2635,7 +2635,7 @@
         "suggest": {
             "doctrine/dbal": "Allow renaming columns and dropping SQLite columns."
         },
-        "time": "2014-02-23 22:16:09",
+        "time": "2014-02-25 22:33:32",
         "type": "library",
         "extra": {
             "branch-alias": {
