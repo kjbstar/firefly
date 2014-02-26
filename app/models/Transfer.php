@@ -17,7 +17,7 @@ use Carbon\Carbon as Carbon;
  * @property-read \Account $accountfrom
  * @property-read \Account $accountto
  * @property-read \User $user
- * @method static Transfer inMonth($date) 
+ * @method static Transfer inMonth($date)
  */
 class Transfer extends Eloquent
 {

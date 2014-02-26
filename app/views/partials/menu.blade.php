@@ -54,7 +54,9 @@
               glyphicon-list"></span> Budgets</a></li>
               <li><a href="{{URL::Route('categories')}}"><span class="glyphicon
               glyphicon-list"></span> Categories</a></li>
-              <li><a href="{{URL::Route('transactions')}}"><span class="glyphicon
+                <li><a href="{{URL::Route('predictables')}}"><span class="glyphicon
+              glyphicon-list"></span> Predictables</a></li>
+                <li><a href="{{URL::Route('transactions')}}"><span class="glyphicon
               glyphicon-list"></span> Transactions</a></li>
               <li><a href="{{URL::Route('transfers')}}"><span class="glyphicon
               glyphicon-list"></span> Transfers</a></li>

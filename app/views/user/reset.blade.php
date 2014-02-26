@@ -3,13 +3,13 @@
 <div class="row">
     <div class="col-lg-12">
           <p>
-            To reset your password, simply enter your email address here.
+            To reset your password, simply enter your email address or username here.
           </p>
 
           {{Form::open(array('class' => 'form-inline'))}}
             <div class="form-group">
-              <label class="sr-only" for="inputEmail">Email address</label>
-              <input type="email" autocomplete="off" class="form-control" id="inputEmail" name="email" placeholder="Email">
+              <label class="sr-only" for="inputUsername">Username</label>
+              <input type="text" autocomplete="off" class="form-control" id="inputUsername" name="username" placeholder="Username">
             </div>
             <button type="submit" class="btn btn-primary">Reset me</button>
           {{Form::close()}}

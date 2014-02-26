@@ -12,7 +12,7 @@ use Carbon\Carbon as Carbon;
  * @property float $amount
  * @property string $date
  * @property-read \Component $component
- * @method static Limit inMonth($date) 
+ * @method static Limit inMonth($date)
  */
 class Limit extends Eloquent
 {

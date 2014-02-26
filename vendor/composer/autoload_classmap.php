@@ -1295,6 +1295,8 @@ return array(
     'Patchwork\\Utf8\\Bootup' => $vendorDir . '/patchwork/utf8/class/Patchwork/Utf8/Bootup.php',
     'PiggyController' => $baseDir . '/app/controllers/PiggyController.php',
     'Piggybank' => $baseDir . '/app/models/Piggybank.php',
+    'Predictable' => $baseDir . '/app/models/Predictable.php',
+    'PredictionController' => $baseDir . '/app/controllers/PredictionController.php',
     'Predis\\Autoloader' => $vendorDir . '/predis/predis/lib/Predis/Autoloader.php',
     'Predis\\BasicClientInterface' => $vendorDir . '/predis/predis/lib/Predis/BasicClientInterface.php',
     'Predis\\Client' => $vendorDir . '/predis/predis/lib/Predis/Client.php',

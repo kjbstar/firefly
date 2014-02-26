@@ -63,6 +63,10 @@ class ReportController extends BaseController
 
         $budgets = Auth::user()->components()->where('type', 'budget')->get();
 
+        // allowance comparision:
+        $allowanceDetails = ReportHelper::allowanceDetails($end);
+
+
         return View::make('reports.year')->with(
             'start', $start
         )->with('end', $end)->with(
@@ -73,7 +77,7 @@ class ReportController extends BaseController
                 'fans', $fans
             )->with('spentMostCategories', $spentMostCategories)->with(
                 'title', 'Report for ' . $year
-            )->with('budgets', $budgets);
+            )->with('budgets', $budgets)->with('allowance',$allowanceDetails);
     }
 
     public function objectOverviewChart($year, Component $component)

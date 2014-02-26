@@ -21,3 +21,7 @@
     @endif
     @endforeach
 </table>
+
+<p>
+    View more predictions for <a href="{{URL::route('predict',[$date->format('Y'),$date->format('m')])}}" title="{{$date->format('F Y')}}">{{$date->format('F Y')}}</a>.
+</p>

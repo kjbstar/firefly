@@ -11,18 +11,13 @@
             @if($data['totalDiff'] > 0)
                 In {{$end->format('Y')}} you have earned {{mf($data['totalDiff'],true)}},
             @elseif($data['totalDiff'] < 0)
-                In {{$end->format('Y')}} you have spent <span
-                class="text-danger">{{mf
-            ($data['totalDiff']*-1)}}</span>,
+                In {{$end->format('Y')}} you have spent <span class="text-danger">{{mf($data['totalDiff']*-1)}}</span>,
             @else
-            In {{$end->format('Y')}} you balanced the books (<span
-                style="color:#999">{{mf
-            ($data['totalDiff']*-1)}}</span>),
+                In {{$end->format('Y')}} you balanced the books (<span style="color:#999">{{mf($data['totalDiff']*-1)}}</span>),
             @endif
 
             @if($accounts['netWorthDifference'] > 0 && $data['totalDiff'] > 0)
-                and increased your net worth to {{mf($accounts['netWorthEnd'],
-            true)}}.
+                and increased your net worth to {{mf($accounts['netWorthEnd'],true)}}.
             @endif
 
             @if($accounts['netWorthDifference'] < 0 && $data['totalDiff'] < 0)
@@ -30,9 +25,7 @@
             @endif
 
             @if($accounts['netWorthDifference'] == 0)
-            and kept your net worth equal at {{mf
-            ($accounts['netWorthDifference'],
-            true)}}
+                and kept your net worth equal at {{mf($accounts['netWorthDifference'],true)}}
             @endif
         </p>
     </div>
@@ -152,6 +145,64 @@
         </table>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h4>Allowance comparisions</h4>
+    </div>
+    </div>
+
+@foreach($allowance as $month)
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <h5>{{$month['date']}}</h5>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h6>Within allowance</h6>
+            <table class="table table-condensed table-bordered table-striped">
+                <tr>
+                    <td colspan="3" style="text-align: right";>Sum: <strong>{{mf($month['inside_sum'],true)}}</strong></td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            @foreach($month['inside'] as $entry)
+                <tr>
+                    <td><small>{{$entry->date->format('D dS')}}</small></td>
+                    <td>{{$entry->description}}</td>
+                    <td>{{mf($entry->amount,true)}}</td>
+                </tr>
+
+            @endforeach
+            </table>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h6>Outside of allowance</h6>
+            <table class="table table-condensed table-bordered table-striped">
+                <tr>
+                    <td colspan="3" style="text-align: right";>Sum: <strong>{{mf($month['outside_sum'],true)}}</strong></td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+                @foreach($month['outside'] as $entry)
+                <tr>
+                    <td><small>{{$entry->date->format('D dS')}}</small></td>
+                    <td>{{$entry->description}}</td>
+                    <td>{{mf($entry->amount,true)}}</td>
+                </tr>
+
+                @endforeach
+            </table>
+        </div>
+    </div>
+    @endforeach
+
+
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <h3>Budgets</h3>
@@ -168,8 +219,6 @@
     </div>
 </div>
 @endforeach
-
-
 
 @endsection
 @section('scripts')

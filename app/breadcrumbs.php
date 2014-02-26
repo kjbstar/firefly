@@ -30,6 +30,9 @@ Breadcrumbs::register('addpiggybank',function($breadcrumbs) {
         $breadcrumbs->push('Add new piggy bank', route('addpiggybank'));
     });
 
+/**
+ * PREDICTABLES:
+ */
 
 
 // route to edit stuff:
@@ -78,7 +81,7 @@ Breadcrumbs::register(
 //category (fake)
 
 $objects = ['account', 'beneficiary', 'transaction', 'budget', 'transfer',
-            'category'];
+            'category','predictable'];
 
 
 foreach ($objects as $object) {

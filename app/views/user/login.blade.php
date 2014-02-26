@@ -6,9 +6,9 @@
 
 {{Form::open(array('class' => 'form-inline'))}}
 <div class="form-group">
-    <label class="sr-only" for="inputEmail">Email address</label>
-    <input type="email" autocomplete="off" class="form-control" id="inputEmail"
-           name="email" placeholder="Email">
+    <label class="sr-only" for="inputUsername">Username</label>
+    <input type="text" autocomplete="off" class="form-control" id="inputUsername"
+           name="username" placeholder="Username">
 </div>
 <div class="form-group">
     <label class="sr-only" for="inputPassword">Password</label>

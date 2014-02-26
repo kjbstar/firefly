@@ -1,5 +1,5 @@
 <?php
-
+use Carbon\Carbon as Carbon;
 /**
  * Class Setting
  *
@@ -49,6 +49,33 @@ class Setting extends Eloquent
         }
 
         return $userSetting;
+    }
+
+    /**
+     * Gets the description as a decrypted string.
+     *
+     * @param $value
+     *
+     * @return null|string
+     */
+    public function getValueAttribute($value)
+    {
+        if($this->attributes['type'] == 'date') {
+            return new Carbon($value);
+        } else {
+            return $value;
+        }
+
+    }
+
+    /**
+     * Set the description as an encrypted string.
+     *
+     * @param $value
+     */
+    public function setValueAttribute($value)
+    {
+        $this->attributes['description'] = Crypt::encrypt($value);
     }
 
     /**

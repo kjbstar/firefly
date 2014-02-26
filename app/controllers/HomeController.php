@@ -33,7 +33,9 @@ class HomeController extends BaseController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function showIndex()
+
     {
+
         if (Auth::check()) {
             return Redirect::to('/home');
         } else {
@@ -62,6 +64,7 @@ class HomeController extends BaseController
         $history = [];
         $now = new Carbon;
         $now->addMonth();
+
         while ($now > $earliest) {
 
             $url = URL::Route(

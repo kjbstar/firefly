@@ -34,11 +34,10 @@ class HomeHelper
             $entry = [];
             $entry['name'] = $account->name;
             $entry['url'] = $url;
-            $entry['balance'] = $account->balanceOnDate($start);
             $entry['current'] = $account->balanceOnDate($date);
-            $entry['diff'] = $entry['current'] - $entry['current'];
             $accounts[] = $entry;
         }
+
         unset($query, $entry);
 
         return $accounts;
@@ -60,6 +59,9 @@ class HomeHelper
         $end = clone $start;
         $end->endOfMonth();
         $start->subDay(); // also last day of previous month
+
+        // are we predicting for a month that has not started yet?
+        $futureMonth = $realDay < $start;
 
 
         // get the user's front page accounts:
@@ -355,7 +357,7 @@ class HomeHelper
         $view
             = View::make('tables.predictions')->with('rows', $rows)->with(
             'today', $realDay
-        );
+        )->with('date',$date);
 
         return $view->render();
     }

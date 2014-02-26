@@ -5,7 +5,7 @@
                 <small>{{strtolower($r->date->format('D d-M'))}}</small>
             </td>
         <td>
-                <a href="{{URL::Route('edittransaction',$r->id)}}"
+                <a href="{{URL::Route('edittransfer',$r->id)}}"
                     title="{{$r->accountfrom->name}} &gt; {{$r->accountto->name}}">{{$r->description}}</a>
         </td>
             <td style="width:80px;">

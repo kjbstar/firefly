@@ -12,6 +12,7 @@ Route::bind('piggybank', function ($value, $route) {return Auth::user()->piggyba
 Route::bind('setting', function ($value, $route) {return Auth::user()->settings()->find($value);});
 Route::bind('transaction', function ($value, $route) {return Auth::user()->transactions()->find($value);});
 Route::bind('transfer', function ($value, $route) {return Auth::user()->transfers()->find($value);});
+Route::bind('predictable', function ($value, $route) {return Auth::user()->predictables()->find($value);});
 
 
 Route::bind('limit', function ($value, $route) {
@@ -47,6 +48,7 @@ Route::get('/home/chart/accounts/{year}/{month}',['uses' => 'HomeController@show
 Route::get('/home/gauge/{year}/{month}/{day}',['uses' => 'HomeController@showGauge', 'as' => 'homegauge']);
 Route::get('/home/table/{chart}/{year?}/{month?}',['uses' => 'HomeController@showTable', 'as' => 'hometable']);
 Route::get('/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']);
+Route::get('/home/flush', ['uses' => 'PageController@flush', 'as' => 'flushs']);
 
 
 /**
@@ -115,6 +117,33 @@ Route::post('/home/piggy/select',['uses' => 'PiggyController@postSelectAccount',
 Route::post('/home/piggy/edit/{piggybank}',['uses' => 'PiggyController@postEdit','before' => 'csrf']);
 Route::post('/home/piggy/delete/{piggybank}',['uses' => 'PiggyController@postDelete','before' => 'csrf']);
 Route::post('/home/piggy/amount/{piggybank}',['uses' => 'PiggyController@postUpdateAmount','before' => 'csrf']);
+
+/**
+ * PREDICTION CONTROLLER
+ */
+Route::get('/home/predictions',['uses' => 'PredictionController@index','as' => 'predictions']);
+Route::get('/home/predictions/{year}/{month}',['uses' => 'PredictionController@prediction','as' => 'predict']);
+
+
+
+
+/**
+ * PREDICTABLE CONTROLLER
+ */
+Route::get('/home/predictable',['uses' => 'PredictableController@index', 'as' => 'predictables']);
+Route::get('/home/predictable/{predictable}/edit',['uses' => 'PredictableController@edit', 'as' => 'editpredictable']);
+Route::get('/home/predictable/{predictable}/delete',['uses' => 'PredictableController@delete', 'as' => 'deletepredictable']);
+Route::get('/home/predictable/add',['uses' => 'PredictableController@add', 'as' => 'addpredictable']);
+Route::get('/home/predictable/add/{transaction}',['uses' => 'PredictableController@addByTransaction','as' => 'addpredictablebytransaction']);
+Route::get('/home/predictable/{predictable}/overview',['uses' => 'PredictableController@overview','as'   =>'predictableoverview']);
+Route::get('/home/predictable/{prediction}/rescan',['uses' => 'PredictableController@rescan', 'as' => 'rescanpredictable']);
+Route::get('/home/predictable/{prediction}/rescan-all',['uses' => 'PredictableController@rescanAll', 'as' => 'rescanallpredictable']);
+
+
+Route::post('/home/predictable/{predictable}/edit',['uses' => 'PredictableController@postEdit', 'before' => 'csrf']);
+Route::post('/home/predictable/{predictable}/delete',['uses' => 'PredictableController@postDelete', 'before' => 'csrf']);
+Route::post('/home/predictable/add',['uses' => 'PredictableController@postAdd', 'before' => 'csrf']);
+Route::post('/home/predictable/add/{transaction}',['uses' => 'PredictableController@postAddByTransaction','before' => 'csrf']);
 
 
 

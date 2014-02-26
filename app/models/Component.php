@@ -17,6 +17,7 @@ use Carbon\Carbon as Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection|\Limit[] $limits
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
  * @property-read \User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
  */
 class Component extends Eloquent
 {
@@ -131,6 +132,16 @@ class Component extends Eloquent
     public function transactions()
     {
         return $this->belongsToMany('Transaction');
+    }
+
+    /**
+     * Get the predictables belonging to this component.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function predictables()
+    {
+        return $this->belongsToMany('Predictable');
     }
 
     /**

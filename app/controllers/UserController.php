@@ -24,7 +24,7 @@ class UserController extends BaseController
     public function postLogin()
     {
         if (Auth::attempt(
-            ['email'    => Input::get('email'),
+            ['username' => Input::get('username'),
              'password' => Input::get('password')], true
         )
         ) {
@@ -90,9 +90,12 @@ class UserController extends BaseController
      */
     public function postRegister()
     {
-        $data = ['email'      => Input::get('email'),
+        $data = ['username' => Input::get('username'),
                  'activation' => Str::random(64),
-                 'password'   => Str::random(60)];
+                 'password' => Str::random(60),
+                 'origin' => 'Firefly'
+
+        ];
         $user = new User($data);
         $validator = Validator::make($user->toArray(), User::$rules);
         if ($validator->fails()) {
@@ -125,8 +128,9 @@ class UserController extends BaseController
      */
     public function postReset()
     {
-        $user = User::where('email', Input::get('email'))->whereNull('reset')
-            ->first();
+        $user = User::where('username', Input::get('username'))->whereNull(
+            'reset'
+        )->first();
         if ($user) {
             $user->reset = Str::random(64);
             $user->save();

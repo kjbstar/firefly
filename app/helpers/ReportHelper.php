@@ -42,7 +42,7 @@ class ReportHelper
      *
      * @return array
      */
-    public static function accountInformation(Carbon $start,Carbon $end)
+    public static function accountInformation(Carbon $start, Carbon $end)
     {
 
         $accounts = [];
@@ -79,7 +79,7 @@ class ReportHelper
         $amount = [];
         foreach ($objects as $object) {
             $query = $object->transactions()->inYear($date);
-            if($sortFlag == SORT_ASC) {
+            if ($sortFlag == SORT_ASC) {
                 $query->expenses();
             } else {
                 $query->incomes();
@@ -89,10 +89,10 @@ class ReportHelper
                     'amount'
                 )
             );
-            if($sum != 0.0) {
+            if ($sum != 0.0) {
 
-            $rawData[] = ['id'  => $object->id, 'name' => $object->name,
-                          'sum' => $sum];
+                $rawData[] = ['id'  => $object->id, 'name' => $object->name,
+                              'sum' => $sum];
             }
         }
 
@@ -111,6 +111,40 @@ class ReportHelper
         }
 
         return $finalData;
+
+    }
+
+    public static function allowanceDetails(Carbon $start)
+    {
+        $start->startOfYear();
+        $end = clone $start;
+        $end = $end->endOfYear();
+        $current = clone $start;
+        $result = [];
+
+        while ($current <= $end) {
+            $entry['date'] = $current->format('F Y');
+            $entry['inside'] = [];
+            $entry['outside'] = [];
+
+            $entry['inside'] = Auth::user()->transactions()->expenses()
+                ->inMonth($current)->where('ignoreallowance', 0)->get();
+            $entry['inside_sum'] = Auth::user()->transactions()->expenses()
+                ->inMonth($current)->where('ignoreallowance', 0)->sum('amount');
+
+
+            $entry['outside'] = Auth::user()->transactions()->expenses()
+                ->inMonth($current)->where('ignoreallowance', 1)->get();
+            $entry['outside_sum'] = Auth::user()->transactions()->expenses()
+                ->inMonth($current)->where('ignoreallowance', 1)->sum('amount');
+
+            if (floatval($entry['outside_sum']) != 0) {
+                $result[] = $entry;
+            }
+            $current->addMonth();
+        }
+
+        return $result;
 
     }
 }

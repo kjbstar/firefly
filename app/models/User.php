@@ -20,13 +20,15 @@ use Illuminate\Auth\UserInterface;
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfers
+ * @property string $username
+ * @property string $origin
  */
 class User extends Eloquent implements UserInterface, RemindableInterface
 {
 
     public static $rules
-        = ['email' => 'required|email|unique:users,email'];
-    protected $fillable = ['email', 'activation', 'password', 'reset'];
+        = ['username' => 'required|unique:users,username'];
+    protected $fillable = ['username', 'activation', 'password', 'reset','origin'];
     protected $softDelete = true;
     protected $table = 'users';
     protected $hidden = ['password'];
@@ -39,6 +41,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     public function accounts()
     {
         return $this->hasMany('Account');
+    }
+    /**
+     * Get the user's accounts.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function predictables()
+    {
+        return $this->hasMany('Predictable');
     }
 
     public function piggybanks()

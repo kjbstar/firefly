@@ -45,6 +45,11 @@ class PageController extends BaseController
     }
     */
 
+    public function flush() {
+        Cache::flush();
+        return Redirect::route('recalc');
+    }
+
     /**
      * Recalculated EVERY balancemodifier.
      */

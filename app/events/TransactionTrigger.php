@@ -34,7 +34,14 @@ class TransactionTrigger
         }
         $balanceModifier->balance += floatval($transaction->amount);
         $balanceModifier->save();
+
+        // loop all predictables:
+        foreach (Auth::user()->predictables()->get() as $pred) {
+            Queue::push('PredictableQueue@processPredictable', $pred);
+        }
+
         Cache::flush();
+
 
         return true;
     }
@@ -120,6 +127,8 @@ class TransactionTrigger
         ) {
             $this->triggerAmountChanged($transaction);
         }
+        // loop all predictables:
+        Queue::push('PredictableQueue@processTransaction', $transaction);
 
         return true;
     }

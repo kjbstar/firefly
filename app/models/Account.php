@@ -5,21 +5,21 @@ use Carbon\Carbon as Carbon;
 /**
  * Class Account
  *
- * @property integer $id
- * @property integer $user_id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property string $name
- * @property float $openingbalance
- * @property Carbon $openingbalancedate
- * @property float $currentbalance
- * @property boolean $hidden
- * @property-read \User $user
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersto
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersfrom
+ * @property integer                                                          $id
+ * @property integer                                                          $user_id
+ * @property \Carbon\Carbon                                                   $created_at
+ * @property \Carbon\Carbon                                                   $updated_at
+ * @property string                                                           $name
+ * @property float                                                            $openingbalance
+ * @property Carbon                                                           $openingbalancedate
+ * @property float                                                            $currentbalance
+ * @property boolean                                                          $hidden
+ * @property-read \User                                                       $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]        $transfersto
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]        $transfersfrom
  * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @method static Account notHidden() 
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[]     $transactions
+ * @method static Account notHidden()
  */
 class Account extends Eloquent
 {
@@ -172,11 +172,11 @@ class Account extends Eloquent
         $sum = 0;
         foreach ($days as $index => $currentDay) {
             $amount = floatval(
-                    $this->transactions()->expenses()->where(
-                        'date', '>', $predictionStart->value
+                    $this->transactions()->expenses()->afterDate(
+                        $predictionDate
                     )->where(
-                            'ignoreprediction', 0
-                        )->onDay($currentDay)->sum('amount')
+                        'ignoreprediction', 0
+                    )->onDay($currentDay)->sum('amount')
                 ) * -1;
 
             // use this amount to do the prediction:
@@ -194,14 +194,17 @@ class Account extends Eloquent
             if ($amount < $data['least']) {
                 $data['least'] = $amount;
             }
-            Log::debug($currentDay->format('d-M-Y').': Most/least/sum: ' .
-            $data['most']
-            .'/'.$data['least'].'/'
-                .$sum.' [amount: '.$amount.']');
+            Log::debug(
+                $currentDay->format('d-M-Y') . ': Most/least/sum: '
+                . $data['most'] . '/' . $data['least'] . '/' . $sum
+                . ' [amount: ' . $amount . ']'
+            );
         }
         Log::debug('Done looping these days.');
-        Log::debug('Most/least/sum: ' . $data['most'].'/'.$data['least'].'/'
-            .$sum);
+        Log::debug(
+            'Most/least/sum: ' . $data['most'] . '/' . $data['least'] . '/'
+            . $sum
+        );
         // the actual prediction:
         $count = count($days);
         $data['prediction'] = $count > 1 ? $sum / $count : $sum;

@@ -22,17 +22,17 @@ use Carbon\Carbon as Carbon;
  * @property-read \Account $account
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
  * @property-read \User $user
- * @method static Transaction inMonth($date) 
- * @method static Transaction onDay($date) 
- * @method static Transaction onDayOfMonth($date) 
- * @method static Transaction betweenDates($start, $end) 
- * @method static Transaction expenses() 
- * @method static Transaction hasComponentType($component) 
- * @method static Transaction hasComponent($component) 
- * @method static Transaction withLimitInMonth($date) 
- * @method static Transaction inYear($date) 
- * @method static Transaction afterDate($date) 
- * @method static Transaction incomes() 
+ * @method static Transaction inMonth($date)
+ * @method static Transaction onDay($date)
+ * @method static Transaction onDayOfMonth($date)
+ * @method static Transaction betweenDates($start, $end)
+ * @method static Transaction expenses()
+ * @method static Transaction hasComponentType($component)
+ * @method static Transaction hasComponent($component)
+ * @method static Transaction withLimitInMonth($date)
+ * @method static Transaction inYear($date)
+ * @method static Transaction afterDate($date)
+ * @method static Transaction incomes()
  */
 class Transaction extends Eloquent
 {
@@ -357,6 +357,13 @@ class Transaction extends Eloquent
         );
     }
 
+    public function scopeBeforeDate($query, Carbon $date)
+    {
+        return $query->where(
+            'date', '<', $date->format('Y-m-d')
+        );
+    }
+
     /**
      * Limits the scope to incomes only.
      *
@@ -370,6 +377,18 @@ class Transaction extends Eloquent
     }
 
     /**
+     * Limits the scope to incomes only.
+     *
+     * @param $query
+     *
+     * @return mixed
+     */
+    public function scopeFromAccount($query, Account $account)
+    {
+        return $query->where('account_id', '=', $account->id);
+    }
+
+    /**
      * Returns the user this transaction belongs to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -377,6 +396,16 @@ class Transaction extends Eloquent
     public function user()
     {
         return $this->belongsTo('User');
+    }
+
+    /**
+     * Returns the predictable this transaction belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function predictable()
+    {
+        return $this->belongsTo('Predictable');
     }
 
     /**

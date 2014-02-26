@@ -105,4 +105,5 @@ require app_path() . '/filters.php';
 require app_path() . '/events/TransactionTrigger.php';
 require app_path() . '/events/TransferTrigger.php';
 require app_path() . '/events/AccountTrigger.php';
+require app_path() . '/queue/PredictableQueue.php';
 require app_path() . '/extensions/AuthenticatedCacheStore.php';
