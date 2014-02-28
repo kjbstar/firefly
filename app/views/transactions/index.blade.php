@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
     <div class="col-lg-12">
-        <h3>All transactions</h3>
+        <h2>All transactions</h2>
         <p>
             <a href="{{URL::Route('addtransaction')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
         </p>
@@ -12,6 +12,9 @@
         </p>
         @include('list.transactions')
         {{$transactions->links()}}
+        <p>
+            <a href="{{URL::Route('addtransaction')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
+        </p>
     </div>
 </div>  
 

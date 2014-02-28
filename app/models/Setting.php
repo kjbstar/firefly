@@ -17,7 +17,7 @@ class Setting extends Eloquent
 {
     public static $rules
         = ['name'    => 'required|between:1,500',
-           'user_id' => 'required|exists:users,id', 'type' => 'in:date',
+           'user_id' => 'required|exists:users,id', 'type' => 'in:date,float,string,int',
            'value'   => 'required'];
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
     protected $fillable = ['user_id', 'name', 'type', 'value'];
@@ -60,7 +60,7 @@ class Setting extends Eloquent
      */
     public function getValueAttribute($value)
     {
-        if($this->attributes['type'] == 'date') {
+        if(isset($this->attributes['type']) && $this->attributes['type'] == 'date') {
             return new Carbon($value);
         } else {
             return $value;
@@ -75,7 +75,7 @@ class Setting extends Eloquent
      */
     public function setValueAttribute($value)
     {
-        $this->attributes['description'] = Crypt::encrypt($value);
+        $this->attributes['value'] = $value;
     }
 
     /**

@@ -69,9 +69,9 @@ foreach ($objects as $o) {
      */
     Route::group(
         ['before' => 'meta|csrf', 'prefix' => 'home/' . $o], function () {
-            Route::post('/{component}/edit', ['uses' => 'MetaController@postEdit']);
-            Route::post('/{component}/delete', ['uses' => 'MetaController@postDelete']);
-            Route::post('/add', ['uses' => 'MetaController@postAdd']);
+            Route::post('/{component}/edit', ['uses' => 'ComponentController@postEdit']);
+            Route::post('/{component}/delete', ['uses' => 'ComponentController@postDelete']);
+            Route::post('/add', ['uses' => 'ComponentController@postAdd']);
             Route::post('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@postAddLimit']);
             Route::post('/limit/edit/{limit}',['uses' => 'LimitController@postEditLimit']);
             Route::post('/limit/delete/{limit}',['uses' => 'LimitController@postDeleteLimit']);
@@ -82,15 +82,15 @@ foreach ($objects as $o) {
      */
     Route::group(
         ['before' => 'meta', 'prefix' => 'home/' . $o], function () use ($o) {
-            Route::get('',['uses' => 'MetaController@showIndex', 'as' => Str::plural($o)]);
-            Route::get('/add', ['uses' => 'MetaController@add', 'as' => 'add' . $o]);
-            Route::get('/empty/{year?}/{month?}',['uses' => 'MetaController@showEmpty', 'as' => 'empty' . $o]);
-            Route::get('/index/average', ['uses' => 'MetaController@showAverageChart']);
-            Route::get('/typeahead', ['uses' => 'MetaController@typeahead']);
-            Route::get('/{component}/edit',['uses' => 'MetaController@edit', 'as' => 'edit' . $o]);
-            Route::get('/{component}/delete',['uses' => 'MetaController@delete', 'as' => 'delete' . $o]);
-            Route::get('/{component}/overview/chart/{year?}/{month?}',['uses' => 'MetaController@showOverviewChart','as'   => $o . 'overviewchart']);
-            Route::get('/{component}/overview/{year?}/{month?}',['uses' => 'MetaController@showOverview','as'   => $o . 'overview']);
+            Route::get('',['uses' => 'ComponentController@showIndex', 'as' => Str::plural($o)]);
+            Route::get('/add', ['uses' => 'ComponentController@add', 'as' => 'add' . $o]);
+            Route::get('/empty/{year?}/{month?}',['uses' => 'ComponentController@showEmpty', 'as' => 'empty' . $o]);
+            Route::get('/index/average', ['uses' => 'ComponentController@showAverageChart']);
+            Route::get('/typeahead', ['uses' => 'ComponentController@typeahead']);
+            Route::get('/{component}/edit',['uses' => 'ComponentController@edit', 'as' => 'edit' . $o]);
+            Route::get('/{component}/delete',['uses' => 'ComponentController@delete', 'as' => 'delete' . $o]);
+            Route::get('/{component}/overview/chart/{year?}/{month?}',['uses' => 'ComponentController@showOverviewChart','as'   => $o . 'overviewchart']);
+            Route::get('/{component}/overview/{year?}/{month?}',['uses' => 'ComponentController@showOverview','as'   => $o . 'overview']);
             Route::get('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@addLimit','as'   => 'add' . $o . 'limit']);
             Route::get('/limit/edit/{limit}', ['uses' => 'LimitController@editLimit','as'   => 'edit' . $o . 'limit']);
             Route::get('/limit/delete/{limit}',['uses' => 'LimitController@deleteLimit','as'   => 'delete' . $o . 'limit']);
@@ -99,9 +99,9 @@ foreach ($objects as $o) {
 }
 
 /**
- * METACONTROLLER ROUTES (extra)
+ * ComponentController ROUTES (extra)
  */
-Route::get('/home/meta/piechart', ['uses' => 'MetaController@showPieChart']);
+Route::get('/home/meta/piechart', ['uses' => 'ComponentController@showPieChart']);
 
 /**
  * PIGGY BANK CONTROLLER
@@ -133,17 +133,15 @@ Route::get('/home/predictions/{year}/{month}',['uses' => 'PredictionController@p
 Route::get('/home/predictable',['uses' => 'PredictableController@index', 'as' => 'predictables']);
 Route::get('/home/predictable/{predictable}/edit',['uses' => 'PredictableController@edit', 'as' => 'editpredictable']);
 Route::get('/home/predictable/{predictable}/delete',['uses' => 'PredictableController@delete', 'as' => 'deletepredictable']);
-Route::get('/home/predictable/add',['uses' => 'PredictableController@add', 'as' => 'addpredictable']);
-Route::get('/home/predictable/add/{transaction}',['uses' => 'PredictableController@addByTransaction','as' => 'addpredictablebytransaction']);
+Route::get('/home/predictable/add/{transaction?}',['uses' => 'PredictableController@add', 'as' => 'addpredictable']);
 Route::get('/home/predictable/{predictable}/overview',['uses' => 'PredictableController@overview','as'   =>'predictableoverview']);
-Route::get('/home/predictable/{prediction}/rescan',['uses' => 'PredictableController@rescan', 'as' => 'rescanpredictable']);
-Route::get('/home/predictable/{prediction}/rescan-all',['uses' => 'PredictableController@rescanAll', 'as' => 'rescanallpredictable']);
+Route::get('/home/predictable/{predictable}/rescan',['uses' => 'PredictableController@rescan', 'as' => 'rescanpredictable']);
+Route::get('/home/predictable/{predictable}/rescan-all',['uses' => 'PredictableController@rescanAll', 'as' => 'rescanallpredictable']);
 
 
 Route::post('/home/predictable/{predictable}/edit',['uses' => 'PredictableController@postEdit', 'before' => 'csrf']);
 Route::post('/home/predictable/{predictable}/delete',['uses' => 'PredictableController@postDelete', 'before' => 'csrf']);
-Route::post('/home/predictable/add',['uses' => 'PredictableController@postAdd', 'before' => 'csrf']);
-Route::post('/home/predictable/add/{transaction}',['uses' => 'PredictableController@postAddByTransaction','before' => 'csrf']);
+Route::post('/home/predictable/add/{transaction?}',['uses' => 'PredictableController@postAdd', 'before' => 'csrf']);
 
 
 
@@ -203,7 +201,7 @@ Route::get('/login', ['uses' => 'UserController@login', 'as' => 'login']);
 Route::get('/logout', 'UserController@logout');
 Route::get('/reset', ['uses' => 'UserController@reset', 'as' => 'reset']);
 Route::get('/register', ['uses' => 'UserController@register', 'as' => 'register']);
-Route::get('/activate/{code}', ['uses' => 'UserController@activate','activate']);
+Route::get('/activate/{code}', ['uses' => 'UserController@activate','as' => 'activate']);
 Route::get('/resetme/{code}', 'UserController@resetme');
 Route::post('/reset', ['uses' => 'UserController@postReset', 'before' => 'csrf']);
 Route::post('/login', ['uses' => 'UserController@postLogin', 'before' => 'csrf']);

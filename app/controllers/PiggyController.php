@@ -13,17 +13,6 @@ class PiggyController extends BaseController
         if (intval($piggyAccount->value) == 0) {
             return Redirect::route('piggyselect');
         }
-
-
-        // make first piggy banks
-        $pig = new Piggybank();
-        $pig->user()->associate(Auth::user());
-        $pig->amount = 0;
-        $pig->name = 'Test-' . Str::random(4);
-//        $pig->save();
-//
-
-
         // get piggy banks:
         $piggies = Auth::user()->piggybanks()->get();
         // get account:

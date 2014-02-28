@@ -10,7 +10,8 @@
         an amount of {{mf($transaction->amount,true)}}?
     </p>
     <div class="form-group">
-      <button type="submit" class="btn btn-danger btn-default">YES</button>
+      <button type="submit" class="btn btn-danger">YES</button>
+        <a href="{{URL::previous()}}" class="btn btn-default">Never mind</a>
     </div>
 
     {{Form::close()}}

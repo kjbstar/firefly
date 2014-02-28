@@ -33,6 +33,9 @@
                     <li><a href="{{URL::Route('addcategory')}}"><span
                                 class="glyphicon glyphicon-plus"></span>
                             Add category</a></li>
+                    <li><a href="{{URL::Route('addpredictable')}}"><span
+                                class="glyphicon glyphicon-plus"></span>
+                            Add predictable</a></li>
                     <li><a href="{{URL::Route('addtransaction')}}"><span
                                 class="glyphicon glyphicon-plus"></span>
                             Add transaction</a></li>

@@ -10,8 +10,9 @@
         Transactions related to this {{OBJ}} will lose this connection.
     </p>
     <div class="form-group">
-      <button type="submit" class="btn btn-danger btn-default">Delete
+      <button type="submit" class="btn btn-danger">Delete
           {{{$object->name}}}</button>
+        <a href="{{URL::previous()}}" class="btn btn-default">Never mind</a>
     </div>
 
     {{Form::close()}}

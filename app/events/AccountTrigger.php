@@ -31,15 +31,13 @@ class AccountTrigger
      */
     public function editAccount(Account $account)
     {
-        Cache::forget('homeAccountList');
+        if($this->validateAccountName($account)) {
         $originalDate = new Carbon($account->getOriginal('openingbalancedate'));
         if ($account->openingbalancedate < $originalDate) {
             $this->triggerAccountDateToPast($account);
-            Cache::forget('getEarliestEvent');
         } else {
             if ($account->openingbalancedate > $originalDate) {
                 $this->triggerAccountDateToFuture($account);
-                Cache::forget('getEarliestEvent');
             }
         }
         if (floatval($account->openingbalance) != floatval(
@@ -48,8 +46,11 @@ class AccountTrigger
         ) {
             $this->triggerAccountAmountChanged($account);
         }
+        } else {
+            return false;
+        }
 
-        return true;
+
     }
 
     /**
@@ -147,10 +148,14 @@ class AccountTrigger
         $balanceModifier = $account->balancemodifiers()->onDay(
             $account->openingbalancedate
         )->first();
+        // update the account itself, add the difference of
+        // this change:
+
+
+        // THERE SHOULD BE A BALANCE MODIFIER
         if (is_null($balanceModifier)) {
             App::abort(500);
         } else {
-
             $balanceModifier->balance += $difference;
             $balanceModifier->save();
         }
@@ -178,6 +183,24 @@ class AccountTrigger
         Cache::forget('homeAccountList');
     }
 
+    public function validateAccountName(Account $account)
+    {
+        if (is_null($account->id)) {
+            $accounts = Auth::user()->accounts()->get();
+        } else {
+            $accounts = Auth::user()->accounts()->where('id','!=', $account->id)
+                ->get();
+        }
+
+        foreach ($accounts as $dbAccount) {
+            if ($dbAccount->name == $account->name) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Make the triggers.
      *
@@ -190,6 +213,10 @@ class AccountTrigger
         );
         $events->listen(
             'eloquent.updating: Account', 'AccountTrigger@editAccount'
+        );
+        // validate the name of the (new) account:
+        $events->listen(
+            'eloquent.creating: Account', 'AccountTrigger@validateAccountName'
         );
     }
 

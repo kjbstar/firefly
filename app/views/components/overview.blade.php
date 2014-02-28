@@ -9,63 +9,13 @@
         <h3>General overview for {{OBJ}} "{{{$component->name}}}" in
             {{$date->format
             ('F Y')}}</h3>
-
         @endif
         @if($parent)
         <h4>Child of {{{$parent->name}}}</h4>
         @endif
       </div>
   </div>
-<div class="row">
-  <div class="col-lg-6 col-md-6">
-
-        <table class="table">
-            <tr>
-                <td>Average amount per transaction</td>
-                @if(isset($date))
-              <td>{{mf($component->transactions()->where(DB::Raw('DATE_FORMAT(`date`,"%m-%Y")'), '=', $date->format('m-Y'))->avg('amount'),true)}}</td>
-                @else
-                  <td>{{mf($component->transactions()->avg('amount'),true,true)}}</td>
-                @endif
-            </tr>
-            <tr>
-                <td>Total amount</td>
-              @if(isset($date))
-              <td>{{mf($component->transactions()->where(DB::Raw('DATE_FORMAT(`date`,"%m-%Y")'), '=', $date->format('m-Y'))->sum('amount'),true)}}</td>
-              @else
-                <td>{{mf($component->transactions()->sum('amount'),true,true
-                    )}}</td>
-              @endif
-            </tr>
-            <tr>
-                <td>Total transactions</td>
-              @if(isset($date))
-              <td>{{$component->transactions()->where(DB::Raw('DATE_FORMAT(`date`,"%m-%Y")'), '=', $date->format('m-Y'))->count()}}</td>
-              @else
-              <td>{{$component->transactions()->count()}}</td>
-              @endif
-            </tr>
-        </table>
-    </div>
-</div>
-<div class="row">
-  @foreach($allObjects as $compare)
-  @if($compare != OBJ)
-  <div class="col-lg-6 col-md-6">
-    <h4>{{ucfirst(Str::plural($compare))}} for this {{OBJ}}</h4>
-    <div class="compare-piechart" id="{{Str::random(6)}}" data-object="{{OBJ}}" data-compare="{{$compare}}"></div>
-  </div>
-  @endif
-  @endforeach
-</div>
-
-<div class="row">
-    <div class="col-lg-12">
-        <h4>Overview chart</h4>
-        <div id="overview-chart"></div>
-    </div>
-</div>
-@if(is_null($date))
+@if($display == 'months')
 <div class="row">
     <div class="col-lg-12">
         <h4>Months</h4>
@@ -73,7 +23,6 @@
             <tr>
                 <th>Month</th>
                 <th>Total transactions</th>
-                <th>Average transaction amount</th>
                 <th colspan="2">Limit</th>
                 <th>Total amount</th>
             </tr>
@@ -82,7 +31,6 @@
                 <td><a href="{{$m['url']}}"
                        title="{{$m['month']}}">{{$m['title']}}</a></td>
                 <td>{{$m['count']}}</td>
-                <td>{{mf($m['avg'],true,true)}}</td>
                 @if(isset($m['limit']))
                 <td>{{mf($m['limit'],false,true)}}</td>
                 <td>
@@ -110,7 +58,8 @@
         </table>
     </div>
 </div>
-@else
+@endif
+@if($display == 'transactions')
 <div class="row">
   <div class="col-lg-12">
     <h4>Transactions</h4>

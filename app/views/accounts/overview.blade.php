@@ -9,7 +9,7 @@
             @endif
         </h3>
         <div class="btn-group">
-            <a href="{{URL::Route('addtransaction',[$account->id])}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
+            <a href="{{URL::Route('addtransaction')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
             <a href="{{URL::Route('addtransfer')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transfer</a>
         </div>
     </div>
@@ -27,31 +27,15 @@
     <div class="col-lg-12">
         @if(is_null($date))
         <h4>Months</h4>
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped">
             <tr>
                 <th>Month</th>
                 <th>Balance at start of month</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>Difference</th>
-                <th>Balance at end of month</th>
             </tr>
             @foreach($transactions as $m)
-            <tr
-                @if($m['diff'] < 500 && $m['diff'] > 0)
-                class="warning"
-                @elseif($m['diff'] < 0)
-                class="danger"
-                @elseif($m['diff'] > 1000)
-                class="success"
-                @endif
-                ><!--  class="success", warning, danger-->
+            <tr>
                 <td><a href="{{$m['url']}}">{{$m['title']}}</a></td>
                 <td>{{mf($m['balance_start'],true,true)}}</td>
-                <td>{{mf($m['in'],true,true)}}</td>
-                <td>{{mf($m['out'],true,true)}}</td>
-                <td>{{mf($m['diff'],true,true)}}</td>
-                <td>{{mf($m['balance_end'],true,true)}}</td>
             </tr>
             @endforeach
         </table>
@@ -62,33 +46,6 @@
         @endif
     </div>
 </div>
-
-@if(!is_null($predictions))
-<div class="row">
-    <div class="col-lg-12">
-        <h4>Predictions</h4>
-        <table class="table table-bordered">
-            <tr>
-                <th>Day</th>
-                <th>Predicted start balance</th>
-                <th>Predicted expenses</th>
-                <th># of transactions</th>
-                <th>Predicted end balance</th>
-            </tr>
-            @foreach($predictions as $p)
-            <tr>
-                <td>{{$p['date']}}</td>
-                <td>{{mf($p['balance'],true)}}</td>
-                <td>{{mf($p['prediction'],true)}}</td>
-                <td>{{count($p['transactions'])}}</td>
-                <td>{{mf($p['end-balance'],true)}}</td>
-            </tr>
-            @endforeach
-        </table>
-        </div>
-    </div>
-
-@endif
 
 @stop
 @section('scripts')

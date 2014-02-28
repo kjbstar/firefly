@@ -21,8 +21,7 @@ class HomeHelper
     {
         $start = clone $date;
         $start->startOfMonth();
-        $query = Auth::user()->accounts()->remember('homeAccountList', 1440)
-            ->notHidden()->get();
+        $query = Auth::user()->accounts()->notHidden()->get();
         $accounts = [];
 
         foreach ($query as $account) {
@@ -41,6 +40,33 @@ class HomeHelper
         unset($query, $entry);
 
         return $accounts;
+    }
+
+    public static function predictableTable(Carbon $date)
+    {
+        // grab all predictables with NO transactions
+        // in this month:
+        /**
+         * select p.*,COUNT(t.id) as ct from predictables p
+         * left join transactions t on t.predictable_id = p.id
+         * WHERE 1
+         * AND DATE_FORMAT(t.date,"%m-%Y") = "02-2014"
+         * group by p.id
+         */
+        $predictables = Auth::user()->predictables()->get();
+        $list = [];
+        $sum = 0;
+        foreach ($predictables as $p) {
+            $count = $p->transactions()->inMonth($date)->count();
+            if ($count == 0) {
+                $list[] = $p;
+                $sum += $p->amount;
+            }
+        }
+        $view = View::make('tables.predictables')->with('rows', $list)->with('sum',$sum);
+
+        return $view->render();
+
     }
 
     /**
@@ -63,6 +89,9 @@ class HomeHelper
         // are we predicting for a month that has not started yet?
         $futureMonth = $realDay < $start;
 
+        // get the allowance.
+
+
 
         // get the user's front page accounts:
         $accounts = Toolkit::getFrontpageAccounts();
@@ -82,11 +111,10 @@ class HomeHelper
             $chart->addInterval($c); // interval cheapest day $cheap
             $chart->addInterval($c); // interval most expensive day. $max
 
-            // column for original prediction of account X:
-            $chart->addColumn(
-                $account->name . ' original prediction', 'number'
-            );
         }
+        // add column for predictables:
+        $chart->addColumn('predictables','number');
+
 
         // loop for each day of the month:
         $current = clone $start;
@@ -114,6 +142,8 @@ class HomeHelper
                     // we ignore the rest
                     $row[] = null; // cheapest
                     $row[] = null; // expensive
+                    // predictable:
+                    $row[] = 1000;
                 }
                 if ($future) {
                     // get a prediction:
@@ -131,10 +161,10 @@ class HomeHelper
                     $row[] = false; // certainty
                     $row[] = $account->balanceLeast;
                     $row[] = $account->balanceMost;
+                    $row[] = 2000;
 
 
                 }
-                $row[] = null; // original prediction
 
             }
 
@@ -211,7 +241,7 @@ class HomeHelper
                   'url'   => URL::Route('empty' . $type, [$year, $month])];
 
         // got to find them all!
-        $query = Auth::user()->transactions()->hasComponentType($type)->inMonth(
+        $query = Auth::user()->transactions()->inMonth(
             $date
         );
 
@@ -220,7 +250,7 @@ class HomeHelper
         }
         $transactions = $query->get();
 
-        $ids = []; // we need dis
+        $ids = [0]; // we need dis
 
         foreach ($transactions as $t) {
             $component = $t->getComponentByType($type);
@@ -230,6 +260,7 @@ class HomeHelper
                 $empty['amount'] += $t->amount;
                 continue;
             }
+
             $ids[] = $component->id;
             // object already exists for table:
             if (isset($rows[$component->id])) {
@@ -243,6 +274,17 @@ class HomeHelper
 
             $c = ['url'    => $url, 'title' => $component->name,
                   'amount' => floatval($t->amount)];
+
+            // find parent:
+            $parent = $component->parentComponent()->first();
+            if (!is_null($parent)) {
+                $parentURL = URL::Route(
+                    $type . 'overview', [$parent->id, $year, $month]
+                );
+                $c['parent'] = ['id'  => $parent->id, 'name' => $parent->name,
+                                'url' => $parentURL];
+            }
+
             $rows[$component->id] = $c;
         }
         // get the limits we might have for this month:
@@ -357,12 +399,12 @@ class HomeHelper
         $view
             = View::make('tables.predictions')->with('rows', $rows)->with(
             'today', $realDay
-        )->with('date',$date);
+        )->with('date', $date);
 
         return $view->render();
     }
 
-        public static function getAllowance(Carbon $date)
+    public static function getAllowance(Carbon $date)
     {
         // default values and array
         $defaultAllowance = Setting::getSetting('defaultAllowance');

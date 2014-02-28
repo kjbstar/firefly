@@ -145,9 +145,8 @@ class HomeController extends BaseController
             case 'transfers':
                 return HomeHelper::transferTable($date);
                 break;
-            case 'predictions':
-                return HomeHelper::predictionTable($date);
-                break;
+            case 'predictables':
+                return HomeHelper::predictableTable($date);
         }
     }
 

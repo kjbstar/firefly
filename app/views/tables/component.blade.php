@@ -6,7 +6,10 @@
         <tr>
     @endif
         <td>
-                <a href="{{$r['url']}}">{{$r['title']}}</a>
+            @if(isset($r['parent']))
+               <a href="{{$r['parent']['url']}}">{{$r['parent']['name']}}</a> /
+            @endif
+            <a href="{{$r['url']}}">{{$r['title']}}</a>
         </td>
         <td>
             {{mf($r['amount'],true)}}

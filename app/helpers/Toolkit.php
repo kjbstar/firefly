@@ -31,7 +31,8 @@ class Toolkit
         return $default;
     }
 
-    public static function getFrontpageAccounts() {
+    public static function getFrontpageAccounts()
+    {
         $frontpageAccounts = Setting::getSetting('frontpageAccounts');
         $accounts = [];
         if ($frontpageAccounts->value == '') {
@@ -43,26 +44,20 @@ class Toolkit
                 )
             )->get();
         }
+
         return $accounts;
     }
 
     public static function getEarliestEvent()
     {
-        if (Cache::has('getEarliestEvent')) {
-            return Cache::get('getEarliestEvent');
+        $account = Auth::user()->accounts()->orderBy(
+            'openingbalancedate', 'ASC'
+        )->first();
+        if ($account) {
+            $date = $account->openingbalancedate;
         } else {
-            $account = Auth::user()->accounts()->orderBy(
-                'openingbalancedate', 'ASC'
-            )->first();
-            if ($account) {
-                $date = $account->openingbalancedate;
-                Cache::forever('getEarliestEvent', $date);
-            } else {
-                $date = new Carbon;
-            }
-
-
-            return $date;
+            $date = new Carbon;
         }
+        return $date;
     }
 }

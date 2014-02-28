@@ -65,9 +65,9 @@
                 <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
                 <td>{{mf($t->amount)}}</td>
                 @if(is_null($t->predictable))
-                <td><a href="{{URL::Route('addpredictablebytransaction',$t->id)}}" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-repeat"></span> Predictable</a></td>
+                <td><a href="{{URL::Route('addpredictable',$t->id)}}" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-repeat"></span> Predictable</a></td>
                 @else
-                <td>#{{$t->predictable->id}}: <em>{{$t->predictable->description}}</em></td>
+                <td><a href="{{URL::Route('predictableoverview',$t->predictable->id)}}">{{$t->predictable->description}}</a></td>
                 @endif
             </tr>
             @endforeach

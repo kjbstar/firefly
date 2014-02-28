@@ -19,9 +19,7 @@
 
     <div class="form-group">
       <label for="inputParent" class="col-sm-4 control-label help-popover"
-             title="Set a parent {{OBJ}}" data-content="With a parent
-             {{OBJ}}, you can further finetune your finances."
-          >Parent
+             title="Set a parent {{OBJ}}">Parent
           {{OBJ}}
           <small>(optional)</small>
       </label>

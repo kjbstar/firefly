@@ -4,14 +4,6 @@
 <div class="row">
   <div class="col-lg-12 col-md-12">
     <h3>Add a new account</h3>
-      @if($count == 0)
-      <div class="alert alert-info">
-          <p>
-              <strong>Your first account</strong>
-          </p>
-      </div>
-      @endif
-      </div>
     </div>
 <div class="row">
     <div class="col-lg-6 col-md-12">
@@ -34,13 +26,6 @@
                 <span class="text-danger">{{$errors->first('name')
                     }}</span><br />
                 @endif
-                @if($count == 0)
-                <span class="text-info">
-                        Use a name that you'll recognize instantly. So no "test" or
-                        "first" or something like that. Rather,
-                        use something like "[your-bank-name] checking account".
-                    </span>
-                @endif
             </div>
         </div>
     
@@ -62,13 +47,6 @@
                 @if($errors->has('openingbalance'))
                 <span class="text-danger">{{$errors->first('openingbalance')}}</span>
                 @endif
-                @if($count == 0)
-                <span class="text-info">
-                        Take a look at your bank statements and find an
-                    account's balance and the date of that balance. Fill in
-                    the balance here.
-                    </span>
-                @endif
             </div>
         </div>
         
@@ -89,13 +67,6 @@
                 @if($errors->has('openingbalancedate'))
                 <span class="text-danger">{{$errors->first
                     ('openingbalancedate')}}</span><br />
-                @endif
-                @if($count == 0)
-                    <span class="text-info">
-                        Take a look at your bank statements and find an
-                    account's balance and the date of that balance. Fill in
-                    the date here.
-                    </span>
                 @endif
             </div>
         </div>

@@ -1,6 +1,7 @@
 <?php
-require_once(app_path() . '/helpers/MetaHelper.php');
+require_once(app_path() . '/helpers/ComponentHelper.php');
 require_once(app_path() . '/helpers/Toolkit.php');
+
 /**
  * File contains the MetaController
  *
@@ -28,7 +29,7 @@ require_once(app_path() . '/helpers/Toolkit.php');
  * @license  GPL 3.0
  * @link     http://www.sanderdorigo.nl/
  */
-class MetaController extends BaseController
+class ComponentController extends BaseController
 {
 
     /**
@@ -58,7 +59,7 @@ class MetaController extends BaseController
                 $child = [];
                 $names[] = $c->name;
                 $child['id'] = $c->id;
-                $child['name'] = $obj->name . '/' . $c->name;
+                $child['name'] = $c->name;
                 $child['count'] = $c->transactions()->count();
                 // add to array:
                 $current['children'][] = $child;
@@ -70,9 +71,10 @@ class MetaController extends BaseController
 
         array_multisort($parents, SORT_STRING, $result);
 
-        return View::make('meta.index')->with('title', 'All ' . OBJS)->with(
-            'objects', $result
-        );
+        return View::make('components.index')->with('title', 'All ' . OBJS)
+            ->with(
+                'objects', $result
+            );
     }
 
     /**
@@ -87,9 +89,9 @@ class MetaController extends BaseController
     {
         $date = Toolkit::parseDate($year, $month);
 
-        $list = MetaHelper::transactionsWithoutComponent(OBJ, $date);
+        $list = ComponentHelper::transactionsWithoutComponent(OBJ, $date);
 
-        return View::make('meta.empty')->with(
+        return View::make('components.empty')->with(
             'title', 'Transactions without a ' . OBJ
         )->with(
                 'transactions', $list
@@ -142,11 +144,12 @@ class MetaController extends BaseController
     public function add()
     {
         Session::put('previous', URL::previous());
-        $parents = MetaHelper::getParentList(OBJ);
+        $parents = ComponentHelper::getParentList(OBJ);
 
-        return View::make('meta.add')->with('title', 'Add new ' . OBJ)->with(
-            'parents', $parents
-        );
+        return View::make('components.add')->with('title', 'Add new ' . OBJ)
+            ->with(
+                'parents', $parents
+            );
     }
 
     /**
@@ -173,9 +176,22 @@ class MetaController extends BaseController
             return Redirect::route('add' . OBJ)->withErrors($validator)
                 ->withInput();
         } else {
-            $object->save();
+            $result = $object->save();
+            if ($result) {
+                Session::flash(
+                    'success', 'The new ' . OBJ . ' has been saved.'
+                );
 
-            return Redirect::to(Session::get('previous'));
+                return Redirect::to(Session::get('previous'));
+            } else {
+                Session::flash(
+                    'error',
+                    'Could not save the new '.OBJ.'. Is the name unique?'
+                );
+
+                return Redirect::route('add'.OBJ)->withErrors($validator)
+                    ->withInput();
+            }
         }
     }
 
@@ -189,7 +205,7 @@ class MetaController extends BaseController
     public function edit(Component $component)
     {
         Session::put('previous', URL::previous());
-        $parents = MetaHelper::getParentList(OBJ);
+        $parents = ComponentHelper::getParentList(OBJ,$component);
         $component->parent_component_id = is_null(
             $component->parent_component_id
         )
@@ -198,7 +214,7 @@ class MetaController extends BaseController
                 $component->parent_component_id
             );
 
-        return View::make('meta.edit')->with('object', $component)->with(
+        return View::make('components.edit')->with('object', $component)->with(
             'parents', $parents
         )->with('title', 'Edit ' . OBJ . ' ' . $component->name);
     }
@@ -223,9 +239,20 @@ class MetaController extends BaseController
                 $validator
             )->withInput();
         } else {
-            $component->save();
+            $result = $component->save();
+            if($result) {
+                Session::flash('success', 'The '.OBJ.' has been updated.');
+                return Redirect::to(Session::get('previous'));
+            } else {
+                Session::flash(
+                    'error',
+                    'Could not save the '.OBJ.'. Is the name unique?'
+                );
+                return Redirect::route('edit'.OBJ, $component->id)->withInput()
+                    ->withErrors($validator);
+            }
 
-            return Redirect::to(Session::get('previous'));
+
         }
     }
 
@@ -240,9 +267,10 @@ class MetaController extends BaseController
     {
         Session::put('previous', URL::previous());
 
-        return View::make('meta.delete')->with('object', $component)->with(
-            'title', 'Delete ' . OBJ . ' ' . $component->name
-        );
+        return View::make('components.delete')->with('object', $component)
+            ->with(
+                'title', 'Delete ' . OBJ . ' ' . $component->name
+            );
     }
 
     /**
@@ -276,10 +304,20 @@ class MetaController extends BaseController
             : $component->parentComponent()->first();
 
         // switch on the presence of a date:
+        $display = 'transactions';
         if (is_null($date)) {
-            $entries = MetaHelper::generateOverviewOfMonths($component);
+            // count the list of transactions:
+            $count = $component->transactions()->count();
+            if ($count > 50) {
+                $display = 'months';
+                $entries = ComponentHelper::generateOverviewOfMonths(
+                    $component
+                );
+            } else {
+                $entries = $component->transactions()->orderBy('date','DESC')->get();
+            }
         } else {
-            $entries = MetaHelper::generateTransactionListByMonth(
+            $entries = ComponentHelper::generateTransactionListByMonth(
                 $component, $date
             );
         }
@@ -289,13 +327,11 @@ class MetaController extends BaseController
         }
 
 
-        // entries is renamed to transactions to be compatible with the
-        //list view
-        return View::make('meta.overview')->with('title', $title)->with(
+        return View::make('components.overview')->with('title', $title)->with(
             'component', $component
         )->with('transactions', $entries)->with('parent', $parent)->with(
-                'allObjects', ['beneficiary', 'budget', 'category']
-            )->with('date', $date);
+                'date', $date
+            )->with('display', $display);
     }
 
     /**
@@ -314,10 +350,10 @@ class MetaController extends BaseController
         $date = Toolkit::parseDate($year, $month);
 
         if (is_null($date)) {
-            $results = MetaHelper::chartDataForYear($component);
+            $results = ComponentHelper::chartDataForYear($component);
         } else {
             // use date, do overview for days.
-            $results = MetaHelper::chartDataForMonth($component, $date);
+            $results = ComponentHelper::chartDataForMonth($component, $date);
         }
 
         // make the chart:

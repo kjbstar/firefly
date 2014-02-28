@@ -12,8 +12,8 @@
             </tr>
             @foreach($transactions as $t)
             <tr>
-                <td>{{$t->date->format(Config::get('firefly.date_format'))
-                    }}</td>
+                <td><small>{{$t->date->format(Config::get('firefly.date_format'))
+                    }}</small></td>
                 <td>
                     @if($t->ignoreprediction == 1)
                     <span class="glyphicon glyphicon-eye-close" title="Ignored in predictions"></span>

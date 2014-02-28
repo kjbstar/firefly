@@ -68,6 +68,9 @@ return array(
 	),
 	"unique"           => "The :attribute has already been taken.",
 	"url"              => "The :attribute format is invalid.",
+    'accountname' => 'The account name must be unique.',
+    'componentname' => 'The component name must be unique.',
+    'predictabledescription' => 'The description must be unique',
 
 	/*
 	|--------------------------------------------------------------------------

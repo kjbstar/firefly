@@ -111,7 +111,7 @@
             <div class="col-sm-9">
                 {{Form::select('account_id',$accounts,null,
                 ['class' => 'form-control'])}}
-                @if($errors->has('date'))
+                @if($errors->has('account_id'))
                 <span class="text-danger">{{$errors->first('account_id')
                     }}</span><br />
                 @endif
@@ -245,7 +245,7 @@
 @stop
 @section('scripts')
 <script src="js/typeahead.min.js"></script>
-<script src="js/transactions.js"></script>
+<script src="../../../public/js/predictables.js"></script>
 @stop
 @section('styles')
 <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">

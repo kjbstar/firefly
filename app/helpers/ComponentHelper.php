@@ -7,7 +7,7 @@ use Carbon\Carbon as Carbon;
 /**
  * Class MetaHelper
  */
-class MetaHelper
+class ComponentHelper
 {
     /**
      * Generate an array containing all months starting one
@@ -100,11 +100,19 @@ class MetaHelper
      *
      * @return array
      */
-    public static function getParentList($type)
+    public static function getParentList($type,Component $component = null)
     {
+
         $parents = [0 => 'No parent'];
-        $data = Auth::user()->components()->whereNull('parent_component_id')
-            ->where('type', $type)->get();
+        $query =  Auth::user()->components()->whereNull('parent_component_id')
+            ->where('type', $type);
+        if(!is_null($component)) {
+            if($component->childrenComponents()->count() > 0) {
+                return $parents;
+            }
+            $query->where('id','!=',$component->id);
+        }
+        $data = $query->get();
 
         foreach ($data as $b) {
             $parents[$b->id] = $b->name;

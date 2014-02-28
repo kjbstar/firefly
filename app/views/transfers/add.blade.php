@@ -109,7 +109,7 @@
 @stop
 @section('scripts')
 <script src="js/typeahead.min.js"></script>
-<script src="js/transactions.js"></script>
+<script src="../../../public/js/predictables.js"></script>
 @stop
 @section('styles')
 <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">

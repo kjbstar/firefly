@@ -4,19 +4,19 @@ use Carbon\Carbon as Carbon;
 /**
  * Class Component
  *
- * @property integer $id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon $deleted_at
- * @property integer $parent_component_id
- * @property string $type
- * @property string $name
- * @property integer $user_id
- * @property-read \Component $parentComponent
- * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $childrenComponents
- * @property-read \Illuminate\Database\Eloquent\Collection|\Limit[] $limits
+ * @property integer                                                      $id
+ * @property \Carbon\Carbon                                               $created_at
+ * @property \Carbon\Carbon                                               $updated_at
+ * @property \Carbon\Carbon                                               $deleted_at
+ * @property integer                                                      $parent_component_id
+ * @property string                                                       $type
+ * @property string                                                       $name
+ * @property integer                                                      $user_id
+ * @property-read \Component                                              $parentComponent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[]   $childrenComponents
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Limit[]       $limits
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @property-read \User $user
+ * @property-read \User                                                   $user
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
  */
 class Component extends Eloquent
@@ -163,6 +163,9 @@ class Component extends Eloquent
      */
     public function getNameAttribute($value)
     {
+        if(is_null($value)) {
+            return null;
+        }
         return Crypt::decrypt($value);
     }
 

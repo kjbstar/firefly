@@ -90,10 +90,10 @@ class UserController extends BaseController
      */
     public function postRegister()
     {
-        $data = ['username' => Input::get('username'),
-                 'activation' => Str::random(64),
-                 'password' => Str::random(60),
-                 'origin' => 'Firefly'
+        $data = ['email'      => Input::get('email'),
+                 'username'   => Input::get('email'),
+                 'activation' => Str::random(64), 'password' => Str::random(60),
+                 'origin'     => 'Firefly'
 
         ];
         $user = new User($data);

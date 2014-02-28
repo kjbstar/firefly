@@ -2,33 +2,42 @@
 @section('breadcrumbs', Breadcrumbs::render('accounts'))
 @section('content')
 <div class="row">
-    <div class="col-lg-8">
-        <h3>All accounts</h3>
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h2>All accounts</h2>
         
         <p>
-            <a href="{{URL::Route('addaccount')}}" class="btn btn-info"><span class="glyphicon glyphicon-plus-sign"></span> Add new account</a>
+            <a href="{{URL::Route('addaccount')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add new account</a>
         </p>
 
-        <ul class="list-group">
-            @foreach($accounts as $account)
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Name</th>
+                <th>Current balance</th>
+                <th>&nbsp;</th>
+            </tr>
+            @foreach($accounts as $a)
+            @if($a->hidden == 1)
+            <tr class="warning">
+            @else
+            <tr>
+            @endif
+                @if($a->hidden == 1)
+                <td>{{$a->name}}</td>
+                @else
+                <td><a href="{{URL::Route('accountoverview',$a->id)}}" title="{{$a->name}}">{{$a->name}}</a></td>
+                @endif
+                <td>{{mf($a->today,true)}}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{{URL::Route('editaccount',$a->id)}}" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span></a> <a href="{{URL::Route('deleteaccount',[$a->id])}}" class="btn btn-default btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                    </div>
+                </td>
+            </tr>
 
-            <li class="list-group-item">
-                <span class="badge">{{mf($account->currentbalance)}}</span>
-                <a href="{{URL::Route('accountoverview',array($account->id))}}"
-                   @if($account->hidden == 1)
-                   class="text-warning"
-                   @endif
-                   >{{{$account->name}}}</a>
-                <div class="btn-group pull-right">
-                    <a href="{{URL::Route('editaccount',[$account->id])}}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a> <a href="{{URL::Route('deleteaccount',[$account->id])}}" class="btn btn-default btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;&nbsp;
-                </div>
-            </li>
             @endforeach
-        </ul>
-        <p class="well">
-            <span class="text-warning">These accounts</span> are hidden and generally not useable.
+        </table>
         <p>
-            <a href="{{URL::Route('addaccount')}}" class="btn btn-info"><span class="glyphicon glyphicon-plus-sign"></span> Add new account</a>
+            <a href="{{URL::Route('addaccount')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add new account</a>
         </p>
         @stop
         @section('scripts')

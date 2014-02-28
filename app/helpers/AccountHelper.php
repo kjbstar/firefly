@@ -95,39 +95,14 @@ class AccountHelper
         while ($end >= $start) {
 
             // money in:
-            $amountIn = floatval(
-                    $account->transactions()->inMonth($end)->incomes()->sum(
-                        'amount'
-                    )
-                ) + floatval(
-                    $account->transfersto()->inMonth($end)->sum('amount')
-                );
-            $amountOut = floatval(
-                    $account->transactions()->inMonth($end)->expenses()->sum(
-                        'amount'
-                    )
-                ) - floatval(
-                    $account->transfersfrom()->inMonth($end)->sum(
-                        'amount'
-                    )
-                );
-
-            $parameters = [$account->id, $end->format('Y'), $end->format('m')];
             $url = URL::Route(
-                'accountoverview', $parameters
+                'accountoverview',
+                [$account->id, $end->format('Y'), $end->format('m')]
             );
             $entry = [];
             $entry['url'] = $url;
             $entry['title'] = $end->format('F Y');
             $entry['balance_start'] = $account->balanceOnDate($end);
-            $entry['balance_end'] = $account->balanceOnDate(
-                $end->endOfMonth()
-            );
-            $entry['in'] = $amountIn;
-            $entry['out'] = $amountOut;
-            $entry['diff'] = ($amountIn + $amountOut);
-
-            $end->startOfMonth();
             $end->subMonth();
             $list[] = $entry;
         }

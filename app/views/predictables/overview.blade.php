@@ -9,6 +9,19 @@
         {{mf($predictable->amount*(1-($predictable->pct/100)),true)}}
          and {{mf($predictable->amount*(1+($predictable->pct/100)),true)}} and will occur on or around the {{$predictable->dom_display}}.
         </p>
+        <p>
+            @if($predictable->components()->count() > 0)
+            @foreach($predictable->components()->get() as $c)
+                {{ucfirst($c->type)}}: <a href="{{URL::Route($c->type.'overview',$c->id)}}">{{$c->name}}</a><br />
+            @endforeach
+            @endif
+        </p>
+        <p>
+            <div class="btn-group">
+                <a href="{{URL::Route('editpredictable',[$predictable->id])}}" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+                <a href="{{URL::Route('deletepredictable',[$predictable->id])}}" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+            </div>
+        </p>
         <h4>Transactions</h4>
 
         <table class="table table-bordered table-striped">
@@ -32,8 +45,8 @@
         @endforeach
         </table>
         <div class="btn-group">
-            <a href="#" class="btn btn-default">(re)scan transactions</a>
-            <a href="#" class="btn btn-default">(re)scan ALL transactions</a>
+            <a href="{{URL::Route('rescanpredictable',$predictable->id)}}" class="btn btn-default">(re)scan transactions</a>
+            <a href="{{URL::Route('rescanallpredictable',$predictable->id)}}" class="btn btn-default">(re)scan ALL transactions</a>
         </div>
         <p>
             <small>

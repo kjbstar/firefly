@@ -162,16 +162,16 @@
         </div>
     </div>
     <div class="col-lg-4 col-md-12 col-sm-12">
-        <!-- PREDICTIONS IN COLLAPSEABLE -->
+        <!-- PREDICTABES IN COLLAPSEABLE -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a href="#collapse-predictions" rel="collapse-objects">
-                        Predictions
+                    <a href="#collapse-predictables" rel="collapse-objects">
+                        Expected in {{$today->format('F Y')}}
                     </a>
                 </h4>
             </div>
-            <div id="collapse-predictions" class="panel-collapse collapse">
+            <div id="collapse-predictables" class="panel-collapse collapse">
                 <div class="panel-body">
                 </div>
             </div>

@@ -1,30 +1,8 @@
 <?php
 require_once(app_path() . '/helpers/AccountHelper.php');
 require_once(app_path() . '/helpers/Toolkit.php');
-/**
- * AccountController for Mosquito.
- *
- * PHP version 5
- *
- * @category Controllers
- * @package  Controllers
- * @author   Sander Dorigo <sander@dorigo.nl>
- * @license  GPL 3.0
- * @version  GIT: geld.nder.dev
- * @link     http://www.sanderdorigo.nl/
- *
- */
 use Carbon\Carbon as Carbon;
 
-/**
- * This class handles all Account related actions.
- *
- * @category AccountController
- * @package  Controllers
- * @author   Sander Dorigo <sander@dorigo.nl>
- * @license  GPL 3.0
- * @link     http://www.sanderdorigo.nl/
- */
 class AccountController extends BaseController
 {
 
@@ -35,7 +13,11 @@ class AccountController extends BaseController
      */
     public function showIndex()
     {
-        $accounts = Auth::user()->accounts()->get();
+        $accounts = Auth::user()->accounts()->get()->each(
+            function ($account) {
+                $account->today = $account->balanceOnDate(new Carbon);
+            }
+        );
 
         return View::make('accounts.index')->with('accounts', $accounts)->with(
             'title', 'All accounts'
@@ -49,10 +31,11 @@ class AccountController extends BaseController
      */
     public function add()
     {
-        $count = Auth::user()->accounts()->count();
         Session::put('previous', URL::previous());
-        return View::make('accounts.add')->with('title',
-            'Add account')->with('count',$count);
+
+        return View::make('accounts.add')->with(
+            'title', 'Add account'
+        );
     }
 
     /**
@@ -77,9 +60,20 @@ class AccountController extends BaseController
             return Redirect::route('addaccount')->withErrors($validator)
                 ->withInput();
         }
-        $account->save();
+        $result = $account->save();
+        if ($result) {
+            Session::flash('success', 'The changes has been saved.');
 
-        return Redirect::to(Session::get('previous'));
+            return Redirect::to(Session::get('previous'));
+        } else {
+            Session::flash(
+                'error',
+                'Could not save the new account. Is the account name unique?'
+            );
+
+            return Redirect::route('addaccount')->withErrors($validator)
+                ->withInput();
+        }
     }
 
     /**
@@ -92,6 +86,7 @@ class AccountController extends BaseController
     public function edit(Account $account)
     {
         Session::put('previous', URL::previous());
+
         return View::make('accounts.edit')->with(
             'title', 'Edit account ' . $account->name
         )->with('account', $account);
@@ -118,10 +113,22 @@ class AccountController extends BaseController
             return Redirect::route('editaccount', $account->id)->withInput()
                 ->withErrors($validator);
         }
-        $account->save();
-        Session::flash('success', 'The account has been saved.');
+        $result = $account->save();
 
-        return Redirect::to(Session::get('previous'));
+        if ($result) {
+            Session::flash('success', 'The account has been updated.');
+            return Redirect::to(Session::get('previous'));
+        } else {
+            Session::flash(
+                'error',
+                'Could not save the account. Is the account name unique?'
+            );
+            return Redirect::route('editaccount', $account->id)->withInput()
+                ->withErrors($validator);
+        }
+
+
+
     }
 
     /**
@@ -134,9 +141,10 @@ class AccountController extends BaseController
     public function delete(Account $account)
     {
         Session::put('previous', URL::previous());
+
         return View::make('accounts.delete')->with('account', $account)->with(
-            'title', 'Delete account ' . $account->name
-        );
+                'title', 'Delete account ' . $account->name
+            );
     }
 
     /**
@@ -149,7 +157,8 @@ class AccountController extends BaseController
     public function postDelete(Account $account)
     {
         $account->delete();
-        Session::flash('success','Account deleted.');
+        Session::flash('success', 'Account deleted.');
+
         return Redirect::to(Session::get('previous'));
     }
 
@@ -168,18 +177,16 @@ class AccountController extends BaseController
             $entries = AccountHelper::generateTransactionListByMonth(
                 $account, $date
             );
-            $predictions = AccountHelper::generatePredictions($account);
         } else {
             $entries = AccountHelper::generateOverviewOfMonths($account);
-            $predictions = null;
 
         }
 
         return View::make('accounts.overview')->with('account', $account)->with(
-            'title', 'Overview for ' . $account->name
-        )->with(
+                'title', 'Overview for ' . $account->name
+            )->with(
                 'transactions', $entries
-            )->with('date', $date)->with('predictions', $predictions);
+            )->with('date', $date);
     }
 
     /**
@@ -199,6 +206,7 @@ class AccountController extends BaseController
 
         if ($date === $default) {
             $period = 2; // two months
+            $date->addDays(2);
         } else {
             $period = 1; // one month
             $date->lastOfMonth();
@@ -217,7 +225,9 @@ class AccountController extends BaseController
         $past->subMonths($period);
 
         // get transactions with a marker
-        $marked = AccountHelper::getMarkedTransactions($account, $past, $date);
+        $marked = AccountHelper::getMarkedTransactions(
+            $account, $past, $date
+        );
 
         $balance = $account->balanceOnDate($past);
 
@@ -257,6 +267,7 @@ class AccountController extends BaseController
             $past->addDay();
         }
         $chart->generate();
+
         return Response::json($chart->getData());
     }
 }

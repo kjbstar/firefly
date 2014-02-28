@@ -138,6 +138,7 @@ class SettingsController extends BaseController
     {
         $defaultAllowance = Setting::getSetting('defaultAllowance');
         $defaultAllowance->value = floatval(Input::get('defaultAllowance'));
+        $defaultAllowance->type = 'float';
         $defaultAllowance->save();
         Session::flash('success', 'Default allowance saved!');
 
@@ -161,6 +162,7 @@ class SettingsController extends BaseController
         $setting->user()->associate(Auth::user());
         $setting->date = $date;
         $setting->value = $amount;
+        $setting->type = 'float';
         $setting->name = 'specificAllowance';
         // validate
         $validator = Validator::make($setting->toArray(), Setting::$rules);

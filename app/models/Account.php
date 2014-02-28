@@ -25,7 +25,7 @@ class Account extends Eloquent
 {
 
     public static $rules
-        = ['name'               => 'required|between:1,50',
+        = ['name'               => 'required|between:1,500',
            'openingbalance'     => 'required|numeric',
            'openingbalancedate' => 'required|date|after:1950-01-01',
            'hidden'             => 'required|between:0,1',
@@ -75,11 +75,6 @@ class Account extends Eloquent
     public function balanceOnDate(Carbon $date)
     {
         // first two days, remember for 60 minutes
-        if ($date->diffInDays($date) < 3) {
-            $remember = 60;
-        } else {
-            $remember = 7 * 24 * 60;
-        }
         if ($date < $this->openingbalancedate) {
             $date = $this->openingbalancedate;
         }
@@ -87,7 +82,7 @@ class Account extends Eloquent
         return floatval(
             $this->balancemodifiers()->where(
                 'date', '<=', $date->format('Y-m-d')
-            )->remember($remember)->sum('balance')
+            )->sum('balance')
         );
     }
 
@@ -175,8 +170,8 @@ class Account extends Eloquent
                     $this->transactions()->expenses()->afterDate(
                         $predictionDate
                     )->where(
-                        'ignoreprediction', 0
-                    )->onDay($currentDay)->sum('amount')
+                            'ignoreprediction', 0
+                        )->onDay($currentDay)->sum('amount')
                 ) * -1;
 
             // use this amount to do the prediction:
@@ -233,6 +228,9 @@ class Account extends Eloquent
      */
     public function getNameAttribute($value)
     {
+        if(is_null($value)) {
+            return null;
+        }
         return Crypt::decrypt($value);
     }
 
@@ -243,7 +241,11 @@ class Account extends Eloquent
      */
     public function setNameAttribute($value)
     {
-        $this->attributes['name'] = Crypt::encrypt($value);
+        if (strlen($value) > 0) {
+            $this->attributes['name'] = Crypt::encrypt($value);
+        } else {
+            $this->attributes['name'] = null;
+        }
     }
 
     /**

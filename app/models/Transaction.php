@@ -413,25 +413,32 @@ class Transaction extends Eloquent
     }
 
     /**
-     * Gets the description as a decrypted string.
+     * Get the component name decrypted.
      *
      * @param $value
      *
-     * @return null|string
+     * @return string
      */
     public function getDescriptionAttribute($value)
     {
-        return is_null($value) ? null : Crypt::decrypt($value);
+        if(is_null($value)) {
+            return null;
+        }
+        return Crypt::decrypt($value);
     }
 
     /**
-     * Set the description as an encrypted string.
+     * Encrypt the name while setting it.
      *
      * @param $value
      */
     public function setDescriptionAttribute($value)
     {
-        $this->attributes['description'] = Crypt::encrypt($value);
+        if (strlen($value) > 0) {
+            $this->attributes['description'] = Crypt::encrypt($value);
+        } else {
+            $this->attributes['description'] = null;
+        }
     }
 
     /**

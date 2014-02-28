@@ -18,11 +18,12 @@
 class Predictable extends Eloquent
 {
     public static $rules
-        = ['description' => 'required|between:1,400',
+        = ['description' => 'required|between:1,500',
            'user_id'     => 'required|exists:users,id',
-           'dom'         => 'required|numeric|between:1,31'];
+           'dom'         => 'required|numeric|between:1,31',
+        'amount' => 'required|numeric|not_in:0'];
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
-    protected $fillable = ['description', 'user_id', 'dom'];
+    protected $fillable = ['description', 'user_id', 'dom','amount'];
 
     /**
      * Return the user this Predictable belongs to.
@@ -32,6 +33,56 @@ class Predictable extends Eloquent
     public function user()
     {
         return $this->belongsTo('User');
+    }
+
+    /**
+     * Get the beneficiary.
+     *
+     * @return Component|null
+     */
+    public function getBeneficiaryAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'beneficiary') {
+                return $component;
+            }
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Get the category
+     *
+     * @return Component|null
+     */
+    public function getCategoryAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'category') {
+                return $component;
+            }
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Get the budget
+     *
+     * @return Component|null
+     */
+    public function getBudgetAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'budget') {
+                return $component;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -55,25 +106,32 @@ class Predictable extends Eloquent
     }
 
     /**
-     * Gets the description as a decrypted string.
+     * Get the component name decrypted.
      *
      * @param $value
      *
-     * @return null|string
+     * @return string
      */
     public function getDescriptionAttribute($value)
     {
-        return is_null($value) ? null : Crypt::decrypt($value);
+        if(is_null($value)) {
+            return null;
+        }
+        return Crypt::decrypt($value);
     }
 
     /**
-     * Set the description as an encrypted string.
+     * Encrypt the name while setting it.
      *
      * @param $value
      */
     public function setDescriptionAttribute($value)
     {
-        $this->attributes['description'] = Crypt::encrypt($value);
+        if (strlen($value) > 0) {
+            $this->attributes['description'] = Crypt::encrypt($value);
+        } else {
+            $this->attributes['description'] = null;
+        }
     }
 
     /**

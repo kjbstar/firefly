@@ -10,8 +10,9 @@
         it's smarter to just hide it.
     </p>
     <div class="form-group">
-      <button type="submit" class="btn btn-danger btn-default">Yes,
+      <button type="submit" class="btn btn-danger">Yes,
           delete it</button>
+        <a href="{{URL::previous()}}" class="btn btn-default">Never mind</a>
     </div>
 
     {{Form::close()}}

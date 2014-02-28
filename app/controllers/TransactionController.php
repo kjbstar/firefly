@@ -45,7 +45,9 @@ class TransactionController extends BaseController
      */
     public function postAdd()
     {
-        $account = Auth::user()->find(Input::get('account_id'));
+        $account = Auth::user()->accounts()->find(
+            intval(Input::get('account_id'))
+        );
         if (is_null($account)) {
             Session::flash('warning', 'Invalid account selected.');
 
@@ -65,13 +67,36 @@ class TransactionController extends BaseController
         $transaction->ignoreallowance = Input::get('ignoreallowance');
         $transaction->mark = Input::get('mark');
 
-        // save and / or create the beneficiary:
-        $ben = Component::findOrCreate(
-            'beneficiary', Input::get('beneficiary')
-        );
-        $bud = Component::findOrCreate('budget', Input::get('budget'));
-        $cat = Component::findOrCreate('category', Input::get('category'));
+        // explode every object at the / and see if there is one.
+        // more than one? return to Transaction:
+        foreach (['beneficiary', 'category', 'budget'] as $comp) {
+            $input = Input::get($comp);
+            $parts = explode('/', $input);
+            if (count($parts) > 2) {
+                Session::flash(
+                    'warning',
+                    'Use forward slashes to indicate parent ' . Str::plural(
+                        $comp
+                    ) . '. Please don\'t use more than one.'
+                );
 
+                return Redirect::route('addtransaction')->withInput();
+            }
+            // count is one? that's the object!
+            if (count($parts) == 1) {
+                $$comp = Component::findOrCreate($comp, Input::get($comp));
+            }
+            // count is two? parent + child.
+            if(count($parts) == 2) {
+                $parent = Component::findOrCreate($comp, $parts[0]);
+                $$comp = Component::findOrCreate($comp, $parts[1]);
+                $$comp->parent_component_id = $parent->id;
+                $$comp->save();
+
+            }
+        }
+
+        // save and / or create the beneficiary:
         $validator = Validator::make(
             $transaction->toArray(), Transaction::$rules
         );
@@ -83,9 +108,12 @@ class TransactionController extends BaseController
         $transaction->save();
 
         // attach the beneficiary, if it is set:
-        $transaction->attachComponent($ben);
-        $transaction->attachComponent($bud);
-        $transaction->attachComponent($cat);
+        /** @var $beneficiary Component */
+        $transaction->attachComponent($beneficiary);
+        /** @var $budget Component */
+        $transaction->attachComponent($budget);
+        /** @var $category Component */
+        $transaction->attachComponent($category);
         Session::flash('success', 'The transaction has been created.');
 
         return Redirect::to(Session::get('previous'));
@@ -106,8 +134,8 @@ class TransactionController extends BaseController
         return View::make('transactions.edit')->with(
             'transaction', $transaction
         )->with('accounts', $accounts)->with(
-            'title', 'Edit transaction ' . $transaction->description
-        );
+                'title', 'Edit transaction ' . $transaction->description
+            );
     }
 
     /**
@@ -170,7 +198,7 @@ class TransactionController extends BaseController
 
         return View::make('transactions.delete')->with(
             'transaction', $transaction
-        )->with('title', 'Delete transaction ' . $transaction->title);
+        )->with('title', 'Delete transaction ' . $transaction->description);
     }
 
     /**
@@ -183,7 +211,7 @@ class TransactionController extends BaseController
     public function postDelete(Transaction $transaction)
     {
         $transaction->delete();
-        Session::flash('success','Transaction deleted.');
+        Session::flash('success', 'Transaction deleted.');
 
         return Redirect::to(Session::get('previous'));
     }
