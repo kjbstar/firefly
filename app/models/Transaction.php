@@ -35,8 +35,8 @@ use Carbon\Carbon as Carbon;
  * @method static Transaction incomes()
  * @property integer $predictable_id
  * @property-read \Predictable $predictable
- * @method static Transaction beforeDate($date) 
- * @method static Transaction fromAccount($account) 
+ * @method static Transaction beforeDate($date)
+ * @method static Transaction fromAccount($account)
  */
 class Transaction extends Eloquent
 {

@@ -14,6 +14,9 @@
  * @property integer $dom
  * @property integer $pct
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
+ * @property-read mixed $beneficiary
+ * @property-read mixed $category
+ * @property-read mixed $budget
  */
 class Predictable extends Eloquent
 {
