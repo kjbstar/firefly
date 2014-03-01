@@ -6,22 +6,22 @@ use Illuminate\Auth\UserInterface;
 /**
  * Class User
  *
- * @property integer $id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon $deleted_at
- * @property string $email
- * @property string $password
- * @property string $activation
- * @property string $reset
- * @property-read \Illuminate\Database\Eloquent\Collection|\Account[] $accounts
- * @property-read \Illuminate\Database\Eloquent\Collection|\Piggybank[] $piggybanks
- * @property-read \Illuminate\Database\Eloquent\Collection|\Setting[] $settings
- * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
+ * @property integer                                                      $id
+ * @property \Carbon\Carbon                                               $created_at
+ * @property \Carbon\Carbon                                               $updated_at
+ * @property \Carbon\Carbon                                               $deleted_at
+ * @property string                                                       $email
+ * @property string                                                       $password
+ * @property string                                                       $activation
+ * @property string                                                       $reset
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Account[]     $accounts
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Piggybank[]   $piggybanks
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Setting[]     $settings
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[]   $components
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfers
- * @property string $username
- * @property string $origin
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]    $transfers
+ * @property string                                                       $username
+ * @property string                                                       $origin
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
  */
 class User extends Eloquent implements UserInterface, RemindableInterface
@@ -29,7 +29,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
     public static $rules
         = ['username' => 'required|unique:users,username'];
-    protected $fillable = ['username','email', 'activation', 'password', 'reset','origin'];
+    protected $fillable
+        = ['username', 'email', 'activation', 'password', 'reset', 'origin'];
     protected $softDelete = true;
     protected $table = 'users';
     protected $hidden = ['password'];
@@ -43,6 +44,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     {
         return $this->hasMany('Account');
     }
+
     /**
      * Get the user's accounts.
      *
@@ -111,7 +113,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     /**
      * Get some kind of key.
      *
-     * TODO: remove?
      *
      * @return mixed
      */
@@ -123,7 +124,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     /**
      * Get the user's password.
      *
-     * TODO: remove?
      *
      * @return string
      */
@@ -135,7 +135,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     /**
      * Get the user's email address.
      *
-     * TODO: remove?
      *
      * @return string
      */
