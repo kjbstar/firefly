@@ -166,16 +166,23 @@ class Account extends Eloquent
         // we need a prediction now, based on these dates:
         $sum = 0;
         foreach ($days as $index => $currentDay) {
+            // this is the predicted amount, except predictables.
             $amount = floatval(
                     $this->transactions()->expenses()->afterDate(
                         $predictionDate
                     )->where(
                             'ignoreprediction', 0
-                        )->onDay($currentDay)->sum('amount')
+                        )->whereNull('predictable_id')
+
+                        ->onDay($currentDay)->sum('amount')
                 ) * -1;
+            // now substract possible predictables from this prediction:
+            $singleDay = intval($currentDay->format('d'));
+            $predicted = Auth::user()->predictables()->where('dom', $singleDay)
+                ->sum('amount');
 
             // use this amount to do the prediction:
-            $sum += $amount;
+            $sum += $amount + ($predicted*-1);
 
             // more than the current 'most expensive day ever'?
             if ($amount > $data['most']) {
@@ -228,9 +235,10 @@ class Account extends Eloquent
      */
     public function getNameAttribute($value)
     {
-        if(is_null($value)) {
+        if (is_null($value)) {
             return null;
         }
+
         return Crypt::decrypt($value);
     }
 
