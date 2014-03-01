@@ -28,7 +28,7 @@
 
                 <p>
                     <input type="date" name="predictionStart"
-                           value="{{$predictionStart->value}}"
+                           value="{{$predictionStart->value->format('Y-m-d')}}"
                            class="form-control"/>
                 </p>
 
