@@ -16,7 +16,6 @@ class PiggyController extends BaseController
         // get piggy banks:
         $piggies = Auth::user()->piggybanks()->get();
         // get account:
-        $piggyAccount = Setting::getSetting('piggyAccount');
         $account = Auth::user()->accounts()->find($piggyAccount->value);
         $balance = $account->balanceOnDate(new Carbon);
 

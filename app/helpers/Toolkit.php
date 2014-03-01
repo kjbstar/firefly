@@ -31,23 +31,6 @@ class Toolkit
         return $default;
     }
 
-    public static function getFrontpageAccounts()
-    {
-        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
-        $accounts = [];
-        if ($frontpageAccounts->value == '') {
-            $accounts[] = Auth::user()->accounts()->first();
-        } else {
-            $accounts = Auth::user()->accounts()->whereIn(
-                'id', explode(
-                    ',', $frontpageAccounts->value
-                )
-            )->get();
-        }
-
-        return $accounts;
-    }
-
     public static function getFrontpageAccount()
     {
         $frontpageAccount = Setting::getSetting('frontpageAccounts');

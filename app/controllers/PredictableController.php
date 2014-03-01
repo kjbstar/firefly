@@ -1,5 +1,6 @@
 <?php
 use Carbon\Carbon as Carbon;
+/** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/PredictableHelper.php');
 
 class PredictableController extends BaseController
