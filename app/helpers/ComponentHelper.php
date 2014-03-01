@@ -74,12 +74,13 @@ class ComponentHelper
      *
      * @return array
      */
-    public static function transactionsWithoutComponent($type,
-        Carbon $date = null)
-    {
-        $query = Auth::user()->transactions()->orderBy('date','DESC')->with
-        ('components');
-        if(!is_null($date)) {
+    public static function transactionsWithoutComponent(
+        $type, Carbon $date = null
+    ) {
+        $query = Auth::user()->transactions()->orderBy('date', 'DESC')->with(
+                'components'
+            );
+        if (!is_null($date)) {
             $query->inMonth($date);
         }
         $list = [];
@@ -100,17 +101,17 @@ class ComponentHelper
      *
      * @return array
      */
-    public static function getParentList($type,Component $component = null)
+    public static function getParentList($type, Component $component = null)
     {
 
         $parents = [0 => 'No parent'];
-        $query =  Auth::user()->components()->whereNull('parent_component_id')
+        $query = Auth::user()->components()->whereNull('parent_component_id')
             ->where('type', $type);
-        if(!is_null($component)) {
-            if($component->childrenComponents()->count() > 0) {
+        if (!is_null($component)) {
+            if ($component->childrenComponents()->count() > 0) {
                 return $parents;
             }
-            $query->where('id','!=',$component->id);
+            $query->where('id', '!=', $component->id);
         }
         $data = $query->get();
 
@@ -122,94 +123,4 @@ class ComponentHelper
         return $parents;
     }
 
-    /**
-     * Get the chart data for a yearly chart.
-     *
-     * @param Component $component
-     *
-     * @return array
-     */
-    public static function chartDataForYear(Component $component)
-    {
-        $data = [];
-        $start = new Carbon;
-        $end = clone $start;
-        $start->startOfMonth()->subYear();
-
-        while ($start < $end) {
-            $current = clone $start;
-            $transactions = $component->transactions()->inMonth($current);
-            $average = floatval($transactions->avg('amount'));
-            $total = floatval($transactions->sum('amount'));
-            $set = [];
-            $set['date'] = clone $current;
-            $set['average_spent'] = null;
-            $set['average_earned'] = null;
-            if ($average < 0) {
-                $set['average_spent'] = $average * -1;
-            } else {
-                $set['average_earned'] = $average;
-            }
-
-            $set['total_spent'] = null;
-            $set['total_earned'] = null;
-            if ($total < 0) {
-                $set['total_spent'] = $total * -1;
-            } else {
-                $set['total_earned'] = $total;
-            }
-            $set['count'] = intval($transactions->count());
-
-            $data[] = $set;
-            $start->addMonth();
-        }
-
-        return $data;
-    }
-
-    /**
-     * Get the chart data for a specific component.
-     *
-     * @param Component $component
-     * @param Carbon    $start
-     *
-     * @return array
-     */
-    public static function chartDataForMonth(
-        Component $component, Carbon $start
-    ) {
-        $data = [];
-        $end = clone $start;
-        $end->endOfMonth();
-
-        while ($start < $end) {
-            $current = clone $start;
-            $transactions = $component->transactions()->onDay($current);
-            $average = floatval($transactions->avg('amount'));
-            $total = floatval($transactions->sum('amount'));
-            $set = [];
-            $set['date'] = clone $current;
-            $set['average_spent'] = null;
-            $set['average_earned'] = null;
-            if ($average < 0) {
-                $set['average_spent'] = $average * -1;
-            } else {
-                $set['average_earned'] = $average;
-            }
-
-            $set['total_spent'] = null;
-            $set['total_earned'] = null;
-            if ($total < 0) {
-                $set['total_spent'] = $total * -1;
-            } else {
-                $set['total_earned'] = $total;
-            }
-            $set['count'] = intval($transactions->count());
-
-            $data[] = $set;
-            $start->addDay();
-        }
-
-        return $data;
-    }
-} 
+}
