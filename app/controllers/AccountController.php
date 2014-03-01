@@ -63,7 +63,6 @@ class AccountController extends BaseController
         $result = $account->save();
         if ($result) {
             Session::flash('success', 'The changes has been saved.');
-
             return Redirect::to(Session::get('previous'));
         } else {
             Session::flash(
@@ -101,7 +100,7 @@ class AccountController extends BaseController
      */
     public function postEdit(Account $account)
     {
-        // update the transaction:
+        // update the account:
         $account->name = Input::get('name');
         $account->openingbalance = floatval(Input::get('openingbalance'));
         $account->openingbalancedate = Input::get('openingbalancedate');

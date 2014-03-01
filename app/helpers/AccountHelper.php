@@ -39,47 +39,6 @@ class AccountHelper
     }
 
     /**
-     * Tries to predict the expenses for this account.
-     *
-     * @param Account $account The account
-     *
-     * @return array
-     */
-    public static function generatePredictions(Account $account)
-    {
-        // starting NOW to the end of the month.
-        $now = new Carbon;
-        $now->addDay();
-        $now->startOfMonth();
-        $eom = clone $now;
-        $eom->endOfMonth();
-        $predictions = [];
-        $balance = $account->balanceOnDate($now);
-        $predictionStart = Setting::getSetting('predictionStart');
-        while ($now < $eom) {
-            // get the predicted value:
-            $entry = [];
-            $entry['transactions'] = [];
-            $entry['balance'] = $balance;
-            $entry['date'] = $now->format('l d F Y');
-            $data = $account->predictOnDate($now);
-            $entry['prediction'] = $data['prediction'];
-            $balance -= $data['prediction'];
-
-            $entry['end-balance'] = $balance;
-
-            // transactions for this day:
-            $entry['transactions'] = $account->transactions()->onDayOfMonth(
-                $now
-            )->expenses()->where('date', '>=', $predictionStart->value)->get();
-            $predictions[] = $entry;
-            $now->addDay();
-        }
-
-        return $predictions;
-    }
-
-    /**
      * Generates a list of months and the balances during that month.
      *
      * @param Account $account The account.
