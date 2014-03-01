@@ -33,28 +33,14 @@ Route::pattern('day', '[0-9]+');
 Route::pattern('year', '20[0-9]{2}');
 Route::pattern('otheryear', '20[0-9]{2}');
 
-/*
- * Misc new pages. TODO move.
- * */
-Route::get('/home/reports/compared/{year}/{otheryear}',['as' => 'year_compare', 'uses' => 'ReportController@compareYears']);
-Route::get('/home/reports/compared/chart/{component}/{year}/{otheryear}',['as' => 'year_compare_chart','uses' => 'ReportController@compareComponentChart']);
-
 /**
  * HOMECONTROLLER
  */
 Route::get('/', ['uses' => 'HomeController@showIndex', 'as' => 'index']);
 Route::get('/home/{year?}/{month?}',['uses' => 'HomeController@showHome', 'as' => 'home']);
-Route::get('/home/chart/accounts/{year}/{month}',['uses' => 'HomeController@showAccountChart', 'as' => 'homeaccountchart']);
-Route::get('/home/gauge/{year}/{month}/{day}',['uses' => 'HomeController@showGauge', 'as' => 'homegauge']);
-Route::get('/home/table/{chart}/{year?}/{month?}',['uses' => 'HomeController@showTable', 'as' => 'hometable']);
 Route::get('/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']);
-Route::get('/home/flush', ['uses' => 'PageController@flush', 'as' => 'flushs']);
 
 
-/**
- * LIST CONTROLLER ROUTES
- */
-Route::get('/home/list/{id}/{year}/{month}/{type}',['uses' => 'ListController@showList']);
 
 /**
  * ALL META ROUTES:
@@ -119,15 +105,6 @@ Route::post('/home/piggy/delete/{piggybank}',['uses' => 'PiggyController@postDel
 Route::post('/home/piggy/amount/{piggybank}',['uses' => 'PiggyController@postUpdateAmount','before' => 'csrf']);
 
 /**
- * PREDICTION CONTROLLER
- */
-Route::get('/home/predictions',['uses' => 'PredictionController@index','as' => 'predictions']);
-Route::get('/home/predictions/{year}/{month}',['uses' => 'PredictionController@prediction','as' => 'predict']);
-
-
-
-
-/**
  * PREDICTABLE CONTROLLER
  */
 Route::get('/home/predictable',['uses' => 'PredictableController@index', 'as' => 'predictables']);
@@ -144,15 +121,6 @@ Route::post('/home/predictable/{predictable}/delete',['uses' => 'PredictableCont
 Route::post('/home/predictable/add/{transaction?}',['uses' => 'PredictableController@postAdd', 'before' => 'csrf']);
 
 
-
-/**
- * REPORTCONTROLLER
- */
-Route::get('/home/reports', ['uses' => 'ReportController@showIndex', 'as' => 'reports']);
-Route::get('/home/report/{year}',['uses' => 'ReportController@showYearlyReport', 'as' => 'yearreport']);
-Route::get('/home/report/{year}/networth', ['uses' => 'ReportController@netWorthChart']);
-Route::get('/home/report/{year}/chart/overview/{component}',['uses' => 'ReportController@objectOverviewChart']);
-Route::get('/home/report/{year}/chart/{type}/{sort}',['uses' => 'ReportController@objectChart']);
 
 
 /**
