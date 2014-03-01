@@ -58,27 +58,35 @@ class PredictableQueue
 
     public function processTransaction($job, Transaction $transaction)
     {
+
         if (!is_null($transaction->predictable()->first())) {
             return;
         }
+
         // will this one fit in any of the predictables?
         foreach (Auth::user()->predictables()->get() as $predictable) {
-            $lowLimit = $predictable->amount * 0.9;
-            $highLimit = $predictable->amount * 1.1;
+            Log::debug('Checking ' . $predictable->description);
+            $lowLimit = $predictable->amount*(1-($predictable->pct/100));
+            $highLimit = $predictable->amount*(1+($predictable->pct/100));
             $requiredComponents = [];
             foreach ($predictable->components as $c) {
                 $requiredComponents[] = $c->id;
             }
             sort($requiredComponents);
+            Log::debug('Required components: ' . print_r($requiredComponents,true));
 
             $components = [];
-            foreach ($transaction->components as $c) {
+            foreach ($transaction->components()->get() as $c) {
                 $components[] = $c->id;
             }
             sort($components);
+            Log::debug('Found components: ' . print_r($components,true));
             if ($components === $requiredComponents
                 && $transaction->description === $predictable->description
+                && $transaction->amount >= $highLimit &&
+                $transaction->amount <= $lowLimit
             ) {
+                Log::debug('match!');
                 // update transaction
                 $transaction->predictable()->associate($predictable);
                 $transaction->save();

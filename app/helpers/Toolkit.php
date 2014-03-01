@@ -48,6 +48,16 @@ class Toolkit
         return $accounts;
     }
 
+    public static function getFrontpageAccount()
+    {
+        $frontpageAccount = Setting::getSetting('frontpageAccounts');
+        if($frontpageAccount->value == '') {
+            return Auth::user()->accounts()->first();
+        } else {
+            return Auth::user()->accounts()->find($frontpageAccount->value);
+        }
+    }
+
     public static function getEarliestEvent()
     {
         $account = Auth::user()->accounts()->orderBy(

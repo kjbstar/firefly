@@ -63,7 +63,9 @@ class HomeHelper
                 $sum += $p->amount;
             }
         }
-        $view = View::make('tables.predictables')->with('rows', $list)->with('sum',$sum);
+        $view = View::make('tables.predictables')->with('rows', $list)->with(
+            'sum', $sum
+        );
 
         return $view->render();
 
@@ -92,29 +94,18 @@ class HomeHelper
         // get the allowance.
 
 
-
         // get the user's front page accounts:
-        $accounts = Toolkit::getFrontpageAccounts();
+        $account = Toolkit::getFrontpageAccount();
+        $account->balance = $account->balanceOnDate($start);
 
         // create chart:
         $chart = App::make('gchart');
         $chart->addColumn('Day of the month', 'date');
 
         // create chart & columns for each chart:
-        foreach ($accounts as $account) {
-            // column for account X:
-            $c = $chart->addColumn($account->name . ' balance', 'number');
-            $account->balance = $account->balanceOnDate($start);
-            $account->balanceMost = $account->balance;
-            $account->balanceLeast = $account->balance;
-            $chart->addCertainty($c); // whether or not we're certain
-            $chart->addInterval($c); // interval cheapest day $cheap
-            $chart->addInterval($c); // interval most expensive day. $max
-
-        }
-        // add column for predictables:
-        $chart->addColumn('predictables','number');
-
+        // column for account X:
+        $c = $chart->addColumn($account->name . ' balance', 'number');
+        $chart->addCertainty(1); // whether or not we're certain
 
         // loop for each day of the month:
         $current = clone $start;
@@ -128,48 +119,29 @@ class HomeHelper
             $future = !$todayOrPast;
             $fom = $current->format('d') == '1'; // first of month
 
-            foreach ($accounts as $account) {
-                if ($todayOrPast) {
-                    // simply get the current balance, put it in chart.
-                    $account->balance = $account->balanceOnDate($current);
+            if ($todayOrPast) {
+                // simply get the current balance, put it in chart.
+                $account->balance = $account->balanceOnDate($current);
+                $certainty=true;
+                // we ignore the rest
+            }
+            if ($future) {
+                // get a prediction:
+                Log::debug('Balance just now: ' . $account->balance);
+                $prediction = $account->predictOnDate($current);
 
-                    // update the least/most balances:
-                    $account->balanceMost = $account->balance;
-                    $account->balanceLeast = $account->balance;
+                // set the balances:
+                // update values:
+                $account->balance -= $prediction['prediction'];
 
-                    $row[] = $account->balance;
-                    $row[] = true; // certainty
-                    // we ignore the rest
-                    $row[] = null; // cheapest
-                    $row[] = null; // expensive
-                    // predictable:
-                    $row[] = 1000;
-                }
-                if ($future) {
-                    // get a prediction:
-                    Log::debug('Balance just now: ' . $account->balance);
-                    $prediction = $account->predictOnDate($current);
-
-                    // set the balances:
-                    // update values:
-                    $account->balance -= $prediction['prediction'];
-                    $account->balanceLeast -= $prediction['least'];
-                    $account->balanceMost -= $prediction['most'];
-
-                    // add balance - predictions and certainty
-                    $row[] = $account->balance;
-                    $row[] = false; // certainty
-                    $row[] = $account->balanceLeast;
-                    $row[] = $account->balanceMost;
-                    $row[] = 2000;
-
-
-                }
+                // add balance - predictions and certainty
+                $row[] = $account->balance;
+                $certainty=false;
 
             }
 
 
-            $chart->addRowArray($row);
+            $chart->addRow(clone $current, $account->balance,$certainty);
             $current->addDay();
         }
 

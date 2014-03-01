@@ -1,7 +1,7 @@
 var accountChartOptions = {
     height: 250,
     legend: {position: 'none'},
-    lineWidth: 1,
+    lineWidth: 2,
     curveType: 'function',
     axisTitlesPosition: 'none',
     chartArea: {
@@ -10,7 +10,6 @@ var accountChartOptions = {
         width: 1060,
         height: 200
     },
-    intervals: { 'style': 'line' }
 };
 
 var gaugeOptions = {

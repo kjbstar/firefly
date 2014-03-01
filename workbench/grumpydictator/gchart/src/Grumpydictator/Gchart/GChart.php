@@ -122,15 +122,15 @@ class GChart
             }
             // add the intervals:
 
+            if (in_array($index, $this->_certainty)) {
+                // add a certainty column:
+                $this->_data['cols'][] = ['type' => 'boolean',
+                                          'p'    => ['role' => 'certainty']];
+            }
+
             if (isset($this->_interval[$index])) {
 
 
-
-                if (in_array($index, $this->_certainty)) {
-                    // add a certainty column:
-                    $this->_data['cols'][] = ['type' => 'boolean',
-                                              'p'    => ['role' => 'certainty']];
-                }
 
                 // add intervals for each one found.
                 foreach($this->_interval[$index] as $nr => $bool) {

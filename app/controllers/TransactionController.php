@@ -114,6 +114,8 @@ class TransactionController extends BaseController
         $transaction->attachComponent($budget);
         /** @var $category Component */
         $transaction->attachComponent($category);
+        Log::debug('save');
+        Queue::push('PredictableQueue@processTransaction', $transaction);
         Session::flash('success', 'The transaction has been created.');
 
         return Redirect::to(Session::get('previous'));

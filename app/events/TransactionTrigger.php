@@ -36,10 +36,6 @@ class TransactionTrigger
         $balanceModifier->save();
 
         // loop all predictables:
-        foreach (Auth::user()->predictables()->get() as $pred) {
-            Queue::push('PredictableQueue@processPredictable', $pred);
-        }
-
         Cache::flush();
 
 
