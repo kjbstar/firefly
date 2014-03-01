@@ -74,9 +74,6 @@
                     <li><a href="{{URL::Route('allowances')}}"><span
                                 class="glyphicon glyphicon-euro"></span>
                             Allowances</a></li>
-                    <li><a href="{{URL::Route('reports')}}"><span
-                                class="glyphicon glyphicon-euro"></span>
-                            Reports</a></li>
                     <li><a href="{{URL::Route('piggy')}}"><span
                                 class="glyphicon glyphicon-time"></span>
                             Piggy banks</a></li>
