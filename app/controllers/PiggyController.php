@@ -54,6 +54,7 @@ class PiggyController extends BaseController
     public function postAdd()
     {
         $piggy = new Piggybank;
+        /** @noinspection PhpParamsInspection */
         $piggy->user()->associate(Auth::user());
         $piggy->name = Input::get('name');
         $piggy->amount = 0;

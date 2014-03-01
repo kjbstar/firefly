@@ -1,6 +1,5 @@
 <?php
 use Illuminate\Cache\Repository;
-use Carbon\Carbon as Carbon;
 
 class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     implements Illuminate\Cache\StoreInterface
@@ -22,7 +21,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
             $key = Auth::user()->id . '-' . $key;
         }
 
-        return parent::put($key, $value, $minutes);
+        parent::put($key, $value, $minutes);
     }
 
     public function increment($key, $value = 1)
@@ -31,7 +30,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
             $key = Auth::user()->id . '-' . $key;
         }
 
-        return parent::increment($key, $value);
+        parent::increment($key, $value);
     }
 
     public function decrement($key, $value = 1)
@@ -40,7 +39,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
             $key = Auth::user()->id . '-' . $key;
         }
 
-        return parent::increment($key, $value);
+        parent::increment($key, $value);
     }
 
     public function forever($key, $value)
@@ -49,7 +48,7 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
             $key = Auth::user()->id . '-' . $key;
         }
 
-        return parent::forever($key, $value);
+        parent::forever($key, $value);
     }
 
     public function forget($key)
@@ -58,24 +57,26 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
             $key = Auth::user()->id . '-' . $key;
         }
 
-        return parent::forget($key);
+        parent::forget($key);
     }
 
     public function flush()
     {
-        return parent::flush();
+        parent::flush();
     }
 
     public function getPrefix()
     {
-        return parent::getPrefix();
+        parent::getPrefix();
 
     }
 
-    public function has($key) {
-        if(self::get($key)) {
+    public function has($key)
+    {
+        if (self::get($key)) {
             return true;
         }
+
         return false;
     }
 
@@ -88,6 +89,7 @@ Cache::extend(
 
         $config = $app['config']['cache.connection'];
 
+        /** @noinspection PhpUndefinedMethodInspection */
         $connection = $app['db']->connection($config);
 
         return new Repository(new AuthenticatedCacheStore($connection, $encrypter, $table));

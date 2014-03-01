@@ -6,51 +6,38 @@ Breadcrumbs::register(
         $breadcrumbs->push('Home', route('home'));
     }
 );
-Breadcrumbs::register(
-    'reports', function ($breadcrumbs) {
-        $breadcrumbs->parent('home');
-        $breadcrumbs->push('Reports', route('reports'));
-    }
-);
 /**
  * PIGGY BANKS:
  */
-Breadcrumbs::register('piggy',function($breadcrumbs) {
+Breadcrumbs::register(
+    'piggy', function ($breadcrumbs) {
         $breadcrumbs->parent('home');
         $breadcrumbs->push('Piggy banks', route('piggy'));
-    });
+    }
+);
 
-Breadcrumbs::register('piggyselect',function($breadcrumbs) {
+Breadcrumbs::register(
+    'piggyselect', function ($breadcrumbs) {
         $breadcrumbs->parent('piggy');
         $breadcrumbs->push('Select account', route('piggyselect'));
-    });
+    }
+);
 
-Breadcrumbs::register('addpiggybank',function($breadcrumbs) {
+Breadcrumbs::register(
+    'addpiggybank', function ($breadcrumbs) {
         $breadcrumbs->parent('piggy');
         $breadcrumbs->push('Add new piggy bank', route('addpiggybank'));
-    });
-
-/**
- * PREDICTABLES:
- */
-
+    }
+);
 
 // route to edit stuff:
 Breadcrumbs::register(
     'editpiggy', function ($breadcrumbs, Piggybank $pig) {
         $breadcrumbs->parent('piggy');
-        $breadcrumbs->push('Edit ' .$pig->name, route('editpiggy', $pig->id));
+        $breadcrumbs->push('Edit ' . $pig->name, route('editpiggy', $pig->id));
     }
 );
 
-
-Breadcrumbs::register(
-    'report', function ($breadcrumbs,$year) {
-        $breadcrumbs->parent('reports');
-
-        $breadcrumbs->push($year, route('yearreport',$year));
-    }
-);
 
 Breadcrumbs::register(
 
@@ -81,7 +68,7 @@ Breadcrumbs::register(
 //category (fake)
 
 $objects = ['account', 'beneficiary', 'transaction', 'budget', 'transfer',
-            'category','predictable'];
+            'category', 'predictable'];
 
 
 foreach ($objects as $object) {
@@ -98,17 +85,17 @@ foreach ($objects as $object) {
 
     // route for empty object
     Breadcrumbs::register(
-        'empty'.$object, function ($breadcrumbs,$date) use ($object) {
+        'empty' . $object, function ($breadcrumbs, $date) use ($object) {
             $breadcrumbs->parent('home');
             $breadcrumbs->push(
-                'Transactions without a ' . $object,
-                route('empty'.$object)
+                'Transactions without a ' . $object, route('empty' . $object)
             );
-            if(!is_null($date)) {
+            if (!is_null($date)) {
                 $breadcrumbs->push(
-                    $date->format('F Y'),
-                    route('empty'.$object,[$date->format('Y'),
-                                          $date->format('m')])
+                    $date->format('F Y'), route(
+                        'empty' . $object,
+                        [$date->format('Y'), $date->format('m')]
+                    )
                 );
             }
         }
@@ -169,13 +156,13 @@ foreach ($objects as $object) {
 
             $breadcrumbs->push(
                 $name, route(
-                    $object.'overview', $obj->id
+                    $object . 'overview', $obj->id
                 )
             );
             if ($date) {
                 $breadcrumbs->push(
                     $date->format('F Y'), route(
-                        $object.'overview', $obj->id, $date->format('Y'),
+                        $object . 'overview', $obj->id, $date->format('Y'),
                         $date->format('m')
                     )
                 );

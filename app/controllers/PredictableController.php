@@ -60,6 +60,7 @@ class PredictableController extends BaseController
                  'amount'      => floatval(Input::get('amount'))];
 
         $predictable = new Predictable($data);
+        /** @noinspection PhpParamsInspection */
         $predictable->user()->associate(Auth::user());
 
         // we use drop downs to select these components:
@@ -185,9 +186,9 @@ class PredictableController extends BaseController
     }
 
     /**
-     * Shows the view to delete a certain transaction.
+     * Shows the view to delete a certain predictable.
      *
-     * @param Transaction $transaction The transaction
+     * @param Predictable $predictable The predictable
      *
      * @return \Illuminate\View\View
      */
@@ -203,7 +204,7 @@ class PredictableController extends BaseController
     /**
      * Process the actual deleting.
      *
-     * @param Transaction $transaction The transaction
+     * @param Predictable $predictable The predictable
      *
      * @return \Illuminate\Http\RedirectResponse
      */

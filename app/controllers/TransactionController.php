@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/AccountHelper.php');
 
 /**
@@ -63,6 +64,7 @@ class TransactionController extends BaseController
         $transaction->amount = floatval(Input::get('amount'));
         $transaction->date = Input::get('date');
         $transaction->account()->associate($account);
+        /** @noinspection PhpParamsInspection */
         $transaction->user()->associate(Auth::user());
         $transaction->ignoreprediction = Input::get('ignoreprediction');
         $transaction->ignoreallowance = Input::get('ignoreallowance');

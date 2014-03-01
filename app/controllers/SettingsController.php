@@ -159,6 +159,7 @@ class SettingsController extends BaseController
         $amount = floatval(Input::get('amount'));
 
         $setting = new Setting;
+        /** @noinspection PhpParamsInspection */
         $setting->user()->associate(Auth::user());
         $setting->date = $date;
         $setting->value = $amount;

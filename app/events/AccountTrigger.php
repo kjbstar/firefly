@@ -49,6 +49,7 @@ class AccountTrigger
         } else {
             return false;
         }
+        return true;
 
 
     }

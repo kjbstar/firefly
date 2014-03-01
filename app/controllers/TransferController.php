@@ -1,5 +1,6 @@
 <?php
 
+/** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/AccountHelper.php');
 
 /**

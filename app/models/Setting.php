@@ -43,6 +43,7 @@ class Setting extends Eloquent
                 $userSetting->name = $name;
                 $userSetting->type = $configInfo['type'];
                 $userSetting->value = $configInfo['value'];
+                /** @noinspection PhpParamsInspection */
                 $userSetting->user()->associate(Auth::user());
                 $userSetting->save();
             }

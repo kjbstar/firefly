@@ -67,7 +67,8 @@ class ComponentHelper
     /**
      * Get transactions without components of type X.
      *
-     * @param $type
+     * @param        $type
+     * @param Carbon $date
      *
      * @return array
      */
@@ -115,7 +116,8 @@ class ComponentHelper
     /**
      * Get a parent list for components of type.
      *
-     * @param $type
+     * @param           $type
+     * @param Component $component
      *
      * @return array
      */
