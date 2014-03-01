@@ -70,30 +70,6 @@ class Component extends Eloquent
         return null;
     }
 
-    public function predictForMonth(Carbon $date)
-    {
-        $predictionStart = Setting::getSetting('predictionStart');
-        $start = new Carbon($predictionStart->value);
-        $date->subMonth();
-        $count = 0;
-        $sum = 0;
-        while ($start <= $date) {
-            $current = clone $start;
-            $sum += floatval(
-                $this->transactions()->inMonth($current)->where(
-                    'ignoreprediction', 0
-                )->expenses()->sum('amount') * -1
-            );
-            $start->addMonth();
-            $count++;
-        }
-        if ($count > 1) {
-            return $sum / $count;
-        } else {
-            return $sum;
-        }
-    }
-
     /**
      * Gets the parent component.
      *

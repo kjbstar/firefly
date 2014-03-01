@@ -28,7 +28,7 @@ class HomeController extends BaseController
     /**
      * Show the homepage. Can be for another month.
      *
-     * @param int $year  The year
+     * @param int $year The year
      * @param int $month The month
      *
      * @return View
@@ -42,6 +42,11 @@ class HomeController extends BaseController
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
         $allowance = HomeHelper::getAllowance($today);
+        // budget overview.
+        $budgets = HomeHelper::bugetOverview($today);
+        $transactions = Auth::user()->transactions()->take(5)->orderBy(
+            'date', 'DESC'
+        )->inMonth($today)->get();
 
         // build a history:
         $history = [];
@@ -64,6 +69,8 @@ class HomeController extends BaseController
             'accounts', $accounts
         )->with('today', $today)->with(
                 'history', $history
-            )->with('allowance', $allowance)->with('fpAccount', $fpAccount);
+            )->with('allowance', $allowance)->with(
+                'transactions', $transactions
+            )->with('fpAccount', $fpAccount)->with('budgets',$budgets);
     }
 }

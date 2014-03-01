@@ -15,7 +15,8 @@ class TransactionController extends BaseController
     public function showIndex()
     {
         $transactions = Auth::user()->transactions()->orderBy('date', 'DESC')
-            ->orderBy('id', 'DESC')->paginate(50);
+            ->orderBy('id', 'DESC')->paginate(25);
+
 
         return View::make('transactions.index')->with(
             'title', 'All transactions'

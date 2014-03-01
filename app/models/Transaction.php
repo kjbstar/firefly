@@ -113,35 +113,6 @@ class Transaction extends Eloquent
     }
 
     /**
-     * "Fake" method to get the beneficiary.
-     * TODO this process must be optimized.
-     *
-     * @return mixed
-     */
-//    public function beneficiary()
-//    {
-//        return $this->_getComponent('beneficiary');
-//    }
-
-    /**
-     * Returns the object of $type (Component) if there is any.
-     * TODO optimize, because the current three objects might be extended.
-     *
-     * @param $type
-     *
-     * @return mixed
-     */
-//    private function _getComponent($type)
-//    {
-//        $var = '_' . $type;
-//        if (is_null($this->$var)) {
-//            $this->$var = $this->components()->where('type', $type)->first();
-//        }
-//
-//        return $this->$var;
-//    }
-
-    /**
      * Add the component to the transaction.
      *
      * @param Component $component
@@ -163,58 +134,6 @@ class Transaction extends Eloquent
     {
         return $this->belongsToMany('Component');
     }
-
-    /**
-     * Returns true when the transaction is bound to a budget.
-     *
-     * @return bool
-     */
-//    public function hasBudget()
-//    {
-//        return $this->hasComponent('budget');
-//    }
-
-    /**
-     * Returns true if this transaction has a beneficiary
-     * TODO better structure.
-     *
-     * @return bool
-     */
-//    public function hasBeneficiary()
-//    {
-//        return $this->hasComponent('beneficiary');
-//    }
-
-    /**
-     * Returns true if the transaction has a category
-     * TODO fix this.
-     *
-     * @return bool
-     */
-//    public function hasCategory()
-//    {
-//        return $this->hasComponent('category');
-//    }
-
-    /**
-     * Get the component of type 'category'
-     *
-     * @return mixed
-     */
-//    public function category()
-//    {
-//        return $this->_getComponent('category');
-//    }
-
-    /**
-     * Get the component of type 'budget'
-     *
-     * @return mixed
-     */
-//    public function budget()
-//    {
-//        return $this->_getComponent('budget');
-//    }
 
     /**
      * Limits the scope to a certain month.
@@ -247,21 +166,6 @@ class Transaction extends Eloquent
     }
 
     /**
-     * Limits the scope to a day in the month.
-     *
-     * @param        $query
-     * @param Carbon $date
-     *
-     * @return mixed
-     */
-    public function scopeOnDayOfMonth($query, Carbon $date)
-    {
-        return $query->where(
-            DB::Raw('DATE_FORMAT(`date`,"%d")'), '=', $date->format('d')
-        );
-    }
-
-    /**
      * Limits the scope to between two dates.
      *
      * @param        $query
@@ -290,81 +194,10 @@ class Transaction extends Eloquent
     {
         return $query->where('amount', '<', 0.0);
     }
-
-    /**
-     * Limits the scope to only transactions with a component of type
-     * $component.
-     *
-     * @param $query
-     * @param $component
-     *
-     * @return mixed
-     */
-    public function scopeHasComponentType($query, $component)
-    {
-        return $query->with(
-            ['components' => function ($query) use ($component) {
-                    $query->where('components.type', $component);
-                }]
-        );
-    }
-
-    /**
-     * Limits the scope to only transactions with a component of type
-     * $component.
-     *
-     * @param $query
-     * @param $component
-     *
-     * @return mixed
-     */
-    public function scopeHasComponent($query, Component $component)
-    {
-        return $query->with(
-            ['components' => function ($query) use ($component) {
-                    $query->where('components.id', $component->id);
-                }]
-        );
-    }
-
-    public function scopeWithLimitInMonth($query, Carbon $date)
-    {
-        return $query->with(
-            ['components.limits' => function ($query) use ($date) {
-                    return $query->inMonth($date);
-                }]
-        );
-
-    }
-
-    /**
-     * Scope for a full year
-     *
-     * @param        $query
-     * @param Carbon $date
-     *
-     * @return mixed
-     */
-    public function scopeInYear($query, Carbon $date)
-    {
-        return $query->where(
-            'date', '>=', $date->format('Y') . '-01-01'
-        )->where(
-                'date', '<=', $date->format('Y') . '-12-31'
-            );
-    }
-
     public function scopeAfterDate($query, Carbon $date)
     {
         return $query->where(
             'date', '>=', $date->format('Y-m-d')
-        );
-    }
-
-    public function scopeBeforeDate($query, Carbon $date)
-    {
-        return $query->where(
-            'date', '<', $date->format('Y-m-d')
         );
     }
 
@@ -378,18 +211,6 @@ class Transaction extends Eloquent
     public function scopeIncomes($query)
     {
         return $query->where('amount', '>', 0.0);
-    }
-
-    /**
-     * Limits the scope to incomes only.
-     *
-     * @param $query
-     *
-     * @return mixed
-     */
-    public function scopeFromAccount($query, Account $account)
-    {
-        return $query->where('account_id', '=', $account->id);
     }
 
     /**
@@ -501,40 +322,4 @@ class Transaction extends Eloquent
     {
         return ['created_at', 'updated_at', 'date'];
     }
-
-    /**
-     * Find component of type X.
-     *
-     * @param $type
-     *
-     * @return Component|null
-     */
-    public function getComponentByType($type)
-    {
-        foreach ($this->components as $component) {
-            if ($component->type == $type) {
-                return $component;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Check if the transaction has a component of type $type.
-     *
-     * @param $type
-     *
-     * @return bool
-     */
-//    private function hasComponent($type)
-//    {
-//        foreach ($this->components()->get() as $comp) {
-//            if ($comp->type === $type) {
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
 }

@@ -40,6 +40,54 @@ class HomeHelper
         return $accounts;
     }
 
+    public static function bugetOverview(Carbon $date)
+    {
+        $budgets = [];
+        $transactions = Auth::user()->transactions()->expenses()->inMonth($date)
+            ->get();
+        foreach ($transactions as $t) {
+            // get the budget
+            if ($t->budget) {
+                // basic budget info:
+                $id = $t->budget->id;
+                if (isset($budgets[$id])) {
+                    // only add information
+                    $budgets[$id]['spent'] += ($t->amount * -1);
+                } else {
+                    // create new one:
+                    $budgets[$id] = ['name' => $t->budget->name,
+                                     'spent' => ($t->amount * -1)];
+                    // limit:
+                    $limit = $t->budget->limits()->inMonth($date)->first();
+                    if ($limit) {
+                        $budgets[$id]['limit'] = $limit->amount;
+                    }
+
+                }
+
+            }
+        }
+        // loop budgets for percentages:
+        foreach ($budgets as $id => $budget) {
+            if (isset($budget['limit'])
+                && $budget['limit'] < $budget['spent']
+            ) {
+                // overspent:
+                $budgets[$id]['pct'] = ceil(($budget['limit'] / $budget['spent'])*100);
+
+            } elseif (isset($budget['limit'])
+                && $budget['limit'] >= $budget['spent']
+            ) {
+                $budgets[$id]['pct'] = ceil(($budget['spent'] / $budget['limit'])*100);
+
+            }
+        }
+
+        // let's do some percentages:
+        return $budgets;
+
+    }
+
     public static function getAllowance(Carbon $date)
     {
         // default values and array

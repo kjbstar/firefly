@@ -180,9 +180,11 @@ class Account extends Eloquent
             $singleDay = intval($currentDay->format('d'));
             $predicted = Auth::user()->predictables()->where('dom', $singleDay)
                 ->sum('amount');
+            // this is the amount, plus the predictables:
+            $amount += ($predicted*-1);
 
             // use this amount to do the prediction:
-            $sum += $amount + ($predicted*-1);
+            $sum += $amount;
 
             // more than the current 'most expensive day ever'?
             if ($amount > $data['most']) {

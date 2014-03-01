@@ -66,10 +66,50 @@
     <!-- ALL BUDGETS IN COLLAPSE. -->
     <div class="col-lg-6 col-md-12 col-sm-12">
 
-    </div>
-    <!-- TRANSACTIONS IN COLLAPSEABLE -->
-    <div class="col-lg-6 col-md-12 col-sm-12">
 
+
+        <table class="table">
+        @foreach($budgets as $id => $budget)
+        <tr>
+            <th><a href="{{URL::Route('budgetoverview',$id)}}" title="Overview for {{$budget['name']}}">{{$budget['name']}}</a></th>
+        </tr>
+        <tr>
+            <td>
+                @if(isset($budget['limit']) && $budget['limit'] < $budget['spent'])
+                <!-- overspent bar -->
+                <div class="progress">
+                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{$budget['pct']}}%;"></div>
+                    <div class="progress-bar progress-bar-danger" role="progressbar" style="width: {{100-$budget['pct']}}%;"></div>
+                </div>
+                @elseif(isset($budget['limit']) && $budget['limit'] >= $budget['spent'])
+                <!-- normal bar -->
+                <div class="progress">
+                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{$budget['pct']}}%;"></div>
+
+                </div>
+                @elseif(!isset($budget['limit']))
+                <!-- full blue bar -->
+                <div class="progress">
+                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%;"></div>
+                </div>
+                @endif
+            </td>
+         </tr>
+        @endforeach
+        </table>
+
+    </div>
+    <!-- TRANSACTIONS -->
+    <div class="col-lg-6 col-md-12 col-sm-12">
+        <table class="table table-striped table-condensed">
+            @foreach($transactions as $t)
+            <tr>
+                <td>{{$t->date->format('j-M')}}</td>
+                <td><a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit {{$t->description}}">{{$t->description}}</a></td>
+                <td>{{mf($t->amount,true)}}</td>
+            </tr>
+            @endforeach
+        </table>
     </div>
 </div>
 <div class="row">

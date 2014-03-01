@@ -1,7 +1,4 @@
 <?php
-require_once(app_path() . '/helpers/ListHelper.php');
-
-
 use Carbon\Carbon as Carbon;
 
 /**
@@ -78,14 +75,14 @@ class ComponentHelper
         $type, Carbon $date = null
     ) {
         $query = Auth::user()->transactions()->orderBy('date', 'DESC')->with(
-                'components'
-            );
+            'components'
+        );
         if (!is_null($date)) {
             $query->inMonth($date);
         }
         $list = [];
         foreach ($query->get() as $tr) {
-            if (!ListHelper::hasComponent($tr, $type)) {
+            if (!self::hasComponent($tr, $type)) {
                 $list[] = $tr;
             }
         }
@@ -93,6 +90,27 @@ class ComponentHelper
         return $list;
 
     }
+
+    /**
+     * Does the transaction have a component of type X?
+     *
+     * @param Transaction $transaction
+     * @param             $type
+     *
+     * @return bool
+     */
+
+    public static function hasComponent(Transaction $transaction, $type)
+    {
+        foreach ($transaction->components()->get() as $component) {
+            if ($component->type === $type) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * Get a parent list for components of type.
