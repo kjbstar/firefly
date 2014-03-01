@@ -13,7 +13,14 @@
         @if($parent)
         <h4>Child of {{{$parent->name}}}</h4>
         @endif
+
+        @if(is_null($date) && $display == 'transactions')
+        <p>
+            <a href="{{URL::Route(OBJ.'overview',$component->id)}}?monthly=true" class="btn btn-default"><span class="glyphicon glyphicon-time"></span> Force montly overview</a>
+        </p>
+        @endif
       </div>
+
   </div>
 @if($display == 'months')
 <div class="row">

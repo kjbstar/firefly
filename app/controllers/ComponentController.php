@@ -235,6 +235,7 @@ class ComponentController extends BaseController
     public function showOverview(
         Component $component, $year = null, $month = null
     ) {
+        $forceMontly = Input::get('monthly') == 'true' ? true : false;
         $date = Toolkit::parseDate($year, $month);
         $parent = is_null($component->parent_component_id) ? null
             : $component->parentComponent()->first();
@@ -244,7 +245,7 @@ class ComponentController extends BaseController
         if (is_null($date)) {
             // count the list of transactions:
             $count = $component->transactions()->count();
-            if ($count > 50) {
+            if ($count > 50 || $forceMontly) {
                 $display = 'months';
                 $entries = ComponentHelper::generateOverviewOfMonths(
                     $component
