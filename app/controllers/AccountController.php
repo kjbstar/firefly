@@ -222,6 +222,7 @@ class AccountController extends BaseController
 
         $past = clone $date;
         $past->subMonths($period);
+        $past->startOfMonth();
 
         // get transactions with a marker
         $marked = AccountHelper::getMarkedTransactions(

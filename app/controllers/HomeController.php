@@ -33,7 +33,6 @@ class HomeController extends BaseController
      * @return \Illuminate\Http\RedirectResponse
      */
     public function showIndex()
-
     {
 
         if (Auth::check()) {
@@ -55,6 +54,7 @@ class HomeController extends BaseController
     {
         $earliest = Toolkit::getEarliestEvent();
         $today = Toolkit::parseDate($year, $month, new Carbon);
+        $fpAccount = Toolkit::getFrontpageAccount();
 
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
@@ -81,73 +81,6 @@ class HomeController extends BaseController
             'accounts', $accounts
         )->with('today', $today)->with(
                 'history', $history
-            )->with('allowance',$allowance);
+            )->with('allowance', $allowance)->with('fpAccount',$fpAccount);
     }
-
-    /**
-     * Displays the chart on the homepage for the indicated type
-     *
-     * @param int $year
-     * @param int $month
-     *
-     * @return string
-     */
-    public function showAccountChart($year = null, $month = null)
-    {
-        $debug
-            = Config::get('app.debug') == true && Input::get('debug') == 'true';
-        if ($debug) {
-            $r = HomeHelper::homeAccountChart($year, $month);
-            echo '<pre>';
-            print_r($r);
-            echo '</pre>';
-
-            return null;
-        }
-
-        return Response::json(HomeHelper::homeAccountChart($year, $month));
-    }
-
-    public function showGauge($year, $month, $day)
-    {
-        $date = new Carbon($year . '-' . $month . '-' . $day);
-
-        $debug
-            = Config::get('app.debug') == true && Input::get('debug') == 'true';
-        if ($debug) {
-            $r = HomeHelper::homeGauge($date);
-            echo '<pre>';
-            print_r($r);
-            echo '</pre>';
-
-            return null;
-        }
-
-        return Response::json(HomeHelper::homeGauge($date));
-    }
-
-    public function showTable($type, $year = null, $month = null)
-    {
-        $date = new Carbon($year . '-' . $month . '-01');
-        switch ($type) {
-            default:
-                return '<p><span class="text-danger">No case for ' . $type
-                . '</span></p>';
-                break;
-            case 'budgets':
-            case 'beneficiaries':
-            case 'categories':
-                return HomeHelper::componentTable($type, $date);
-                break;
-            case 'transactions':
-                return HomeHelper::transactionTable($date);
-                break;
-            case 'transfers':
-                return HomeHelper::transferTable($date);
-                break;
-            case 'predictables':
-                return HomeHelper::predictableTable($date);
-        }
-    }
-
 }

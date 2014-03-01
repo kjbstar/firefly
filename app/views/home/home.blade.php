@@ -99,8 +99,7 @@
     var day = {{$today->format('d')}};
     var month = {{$today->format('n')}};
     var year = {{$today->format('Y')}};
-    var tomorrow = "{{$today->addDay()->format('Y/m/d')}}";
-    var eom = "{{$today->subDay()->endOfMonth()->format('Y/m/d')}}";
+    var fpAccount = {{$fpAccount->id}};
 
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>

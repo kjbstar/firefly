@@ -5,13 +5,12 @@ google.setOnLoadCallback(drawCharts);
 
 function drawCharts() {
     drawAccountChart();
-    drawGaugeForTomorrow();
-    drawGaugeForEOM();
 }
 
 
 function drawAccountChart() {
-    $.getJSON('home/chart/accounts/' + year + '/' + month).success(function (data) {
+
+    $.getJSON('/home/account/'+fpAccount+'/overview/chart/' + year + '/' + month).success(function (data) {
         gdata = new google.visualization.DataTable(data);
         var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
         for (i = 1; i < gdata.getNumberOfColumns(); i++) {

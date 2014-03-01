@@ -10,6 +10,7 @@ var accountChartOptions = {
         width: 1060,
         height: 200
     },
+    intervals: { 'style': 'area' }
 };
 
 var gaugeOptions = {
