@@ -61,6 +61,9 @@ class HomeController extends BaseController
             $entry = [];
             $entry['url'] = $url;
             $entry['title'] = $now->format('F Y');
+            if($now->format('m') == '1') {
+                $entry['newline'] = true;
+            }
             $history[] = $entry;
             $now->subMonth();
         }

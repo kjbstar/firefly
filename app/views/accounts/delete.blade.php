@@ -2,7 +2,7 @@
 @section('content')
 <div class="row">
   <div class="col-md-6">
-    <h3>Delete {{{$account->name}}}</h3>
+    <h2>Delete {{{$account->name}}}</h2>
     {{Form::open()}}
     <p>
         Are you sure you want to delete this account? All related

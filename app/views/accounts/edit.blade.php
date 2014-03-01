@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
   <div class="col-lg-6">
-    <h3>Edit {{{$account->name}}}</h3>
+    <h2>Edit {{{$account->name}}}</h2>
 
     {{Form::open(['class' => 'form-horizontal'])}}
     

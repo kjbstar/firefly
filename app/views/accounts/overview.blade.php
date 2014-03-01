@@ -3,11 +3,11 @@
 @section('content')
 <div class="row">
     <div class="col-lg-6">
-        <h3>Overview for {{{$account->name}}}
+        <h2>Overview for {{{$account->name}}}
             @if(!is_null($date))
             in {{$date->format('F Y')}}
             @endif
-        </h3>
+        </h2>
         <div class="btn-group">
             <a href="{{URL::Route('addtransaction')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
             <a href="{{URL::Route('addtransfer')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transfer</a>

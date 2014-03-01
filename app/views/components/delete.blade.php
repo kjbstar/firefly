@@ -2,7 +2,7 @@
 @section('content')
 <div class="row">
   <div class="col-lg-6 col-md-12">
-    <h3>Delete {{OBJ}} "{{{$object->name}}}"</h3>
+    <h2>Delete {{OBJ}} "{{{$object->name}}}"</h2>
 
     {{Form::open()}}
     <p>

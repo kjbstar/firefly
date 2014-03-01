@@ -4,14 +4,14 @@
 <div class="row">
     <div class="col-lg-12">
         @if(is_null($date))
-        <h3>General overview for {{OBJ}} "{{{$component->name}}}"</h3>
+        <h2>General overview for {{OBJ}} "{{{$component->name}}}"</h2>
         @else
-        <h3>General overview for {{OBJ}} "{{{$component->name}}}" in
+        <h2>General overview for {{OBJ}} "{{{$component->name}}}" in
             {{$date->format
-            ('F Y')}}</h3>
+            ('F Y')}}</h2>
         @endif
         @if($parent)
-        <h4>Child of {{{$parent->name}}}</h4>
+        <h3>Child of {{{$parent->name}}}</h3>
         @endif
 
         @if(is_null($date) && $display == 'transactions')

@@ -6,7 +6,7 @@ var accountChartOptions = {
     axisTitlesPosition: 'none',
     chartArea: {
         left: 60,
-        top: 5,
+        top: 10,
         width: 1060,
         height: 200
     },

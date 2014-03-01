@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
   <div class="col-lg-6 col-md-12">
-    <h3>Edit {{OBJ}} "{{$object->name}}"</h3>
+    <h2>Edit {{OBJ}} "{{$object->name}}"</h2>
 
       {{Form::open(['class' => 'form-horizontal'])}}
     <div class="form-group">
