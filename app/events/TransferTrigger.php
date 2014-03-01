@@ -79,7 +79,6 @@ class TransferTrigger
      */
     public function editTransfer(Transfer $transfer)
     {
-        Cache::flush();
         $accountFrom = $transfer->accountfrom()->first();
         $accountTo = $transfer->accountto()->first();
         $oldDate = new Carbon($transfer->getOriginal('date'));
@@ -502,7 +501,6 @@ class TransferTrigger
      */
     public function deleteTransfer(Transfer $transfer)
     {
-        Cache::flush();
         $accountFrom = $transfer->accountfrom()->first();
         $accountTo = $transfer->accountto()->first();
         // add amounts back and from the relevant accounts

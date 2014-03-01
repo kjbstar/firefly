@@ -10,7 +10,6 @@ class PageController extends BaseController
      */
     public function recalculate()
     {
-        Cache::flush();
         $accounts = Auth::user()->accounts()->get();
 
         foreach ($accounts as $account) {

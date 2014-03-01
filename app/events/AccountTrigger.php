@@ -180,8 +180,6 @@ class AccountTrigger
         $balanceModifier->account()->associate($account);
         $balanceModifier->balance = $account->openingbalance;
         $balanceModifier->save();
-        Cache::forget('getEarliestEvent');
-        Cache::forget('homeAccountList');
     }
 
     public function validateAccountName(Account $account)

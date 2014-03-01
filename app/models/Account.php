@@ -74,7 +74,6 @@ class Account extends Eloquent
      */
     public function balanceOnDate(Carbon $date)
     {
-        // first two days, remember for 60 minutes
         if ($date < $this->openingbalancedate) {
             $date = $this->openingbalancedate;
         }
@@ -181,7 +180,7 @@ class Account extends Eloquent
             $predicted = Auth::user()->predictables()->where('dom', $singleDay)
                 ->sum('amount');
             // this is the amount, plus the predictables:
-            $amount += ($predicted*-1);
+            $amount += ($predicted * -1);
 
             // use this amount to do the prediction:
             $sum += $amount;
