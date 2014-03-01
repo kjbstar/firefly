@@ -1,5 +1,7 @@
 <?php
+/** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/AccountHelper.php');
+/** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/Toolkit.php');
 use Carbon\Carbon as Carbon;
 
@@ -51,10 +53,11 @@ class AccountController extends BaseController
         $data['openingbalance'] = floatval(Input::get('openingbalance'));
         $data['currentbalance'] = floatval(Input::get('openingbalance'));
         $data['openingbalancedate'] = Input::get('openingbalancedate');
-        $data['user_id'] = Auth::user()->id;
         $data['hidden'] = Input::get('hidden') == '1' ? 1 : 0;
 
         $account = new Account($data);
+        /** @noinspection PhpParamsInspection */
+        $account->user()->associate(Auth::user());
         $validator = Validator::make($account->toArray(), Account::$rules);
         if ($validator->fails()) {
             return Redirect::route('addaccount')->withErrors($validator)

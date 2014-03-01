@@ -1,28 +1,11 @@
 <?php
+/** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/HomeHelper.php');
+/** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/Toolkit.php');
-/**
- * File contains the HomeController.
- *
- * PHP version 5.5.6
- *
- * @category Controllers
- * @package  Controllers
- * @author   Sander Dorigo <sander@dorigo.nl>
- * @license  GPL 3.0
- * @link     http://geld.nder.dev/
- */
+
 use Carbon\Carbon as Carbon;
 
-/**
- * Class HomeController
- *
- * @category AccountController
- * @package  Controllers
- * @author   Sander Dorigo <sander@dorigo.nl>
- * @license  GPL 3.0
- * @link     http://www.sanderdorigo.nl/
- */
 class HomeController extends BaseController
 {
 
@@ -81,6 +64,6 @@ class HomeController extends BaseController
             'accounts', $accounts
         )->with('today', $today)->with(
                 'history', $history
-            )->with('allowance', $allowance)->with('fpAccount',$fpAccount);
+            )->with('allowance', $allowance)->with('fpAccount', $fpAccount);
     }
 }

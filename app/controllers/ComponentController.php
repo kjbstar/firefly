@@ -1,5 +1,7 @@
 <?php
+/** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/ComponentHelper.php');
+/** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/Toolkit.php');
 
 class ComponentController extends BaseController
