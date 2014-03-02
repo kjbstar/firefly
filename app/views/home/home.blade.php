@@ -65,9 +65,7 @@
 <div class="row">
     <!-- ALL BUDGETS IN COLLAPSE. -->
     <div class="col-lg-6 col-md-12 col-sm-12">
-
-
-
+        <h4>Budgets</h4>
         <table class="table">
         @foreach($budgets as $id => $budget)
         <tr>
@@ -101,6 +99,7 @@
     </div>
     <!-- TRANSACTIONS -->
     <div class="col-lg-6 col-md-12 col-sm-12">
+        <h4>Transactions</h4>
         <table class="table table-striped table-condensed">
             @foreach($transactions as $t)
             <tr>
@@ -115,10 +114,25 @@
 <div class="row">
     <!-- TRANSFERS IN COLLAPSEABLE -->
     <div class="col-lg-6 col-md-12 col-sm-12">
+        <h4>Transfers</h4>
+        <table class="table table-condensed table-striped">
+            @foreach($transfers as $t)
+            <tr>
+                <td>{{$t->date->format('j-M')}}</td>
+                <td><a href="{{URL::Route('edittransfer',$t->id)}}" title="Edit {{$t->description}}">{{$t->description}}</a></td>
+                <td>
+                    <a href="{{URL::Route('accountoverview',$t->accountfrom->id)}}" title="Overview for {{$t->accountfrom->name}}">{{$t->accountfrom->name}}</a> &rarr;
+                    <a href="{{URL::Route('accountoverview',$t->accountto->id)}}" title="Overview for {{$t->accountto->name}}">{{$t->accountto->name}}</a>
+                </td>
+                <td>{{mf($t->amount,true)}}</td>
+            </tr>
+            @endforeach
+        </table>
 
     </div>
     <!-- PREDICTABES -->
     <div class="col-lg-6 col-md-12 col-sm-12">
+        <h4>Predictables</h4>
         <table class="table table-condensed table-striped">
             <?php $sum=0; ?>
             @foreach($predictables as $p)
