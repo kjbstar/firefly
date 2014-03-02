@@ -51,13 +51,15 @@ class ReportController extends BaseController
             ->take(5)
             ->get(['components.name',DB::Raw('SUM(`transactions`.`amount`) as `total`')]);
 
-        // resort:
+        // total income, total expenses
+        $totalIncome = Auth::user()->transactions()->incomes()->inYear($start)->sum('amount');
+        $totalExpenses = Auth::user()->transactions()->expenses()->inYear($start)->sum('amount');
 
 
         return View::make('reports.year')->with('title', 'Report for ' . $year)
             ->with('year', $year)->with('startNetWorth', $startNetWorth)->with(
                 'endNetWorth', $endNetWorth
-            )->with('expenses', $expenses)->with('fans', $result);
+            )->with('expenses', $expenses)->with('fans', $result)->with('totalIncome',$totalIncome)->with('totalExpenses',$totalExpenses);
     }
 
     public function yearIeChart($year)
