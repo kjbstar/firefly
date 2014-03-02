@@ -26,8 +26,38 @@ class ReportController extends BaseController
 
     public function year($year)
     {
+        // get net worth at start of year.
+        $start = new Carbon($year . '-01-01');
+        $end = new Carbon($year . '-12-31');
+        $startNetWorth = 0;
+        $endNetWorth = 0;
+        foreach (Auth::user()->accounts()->get() as $account) {
+            $startNetWorth += $account->balanceOnDate($start);
+            $endNetWorth += $account->balanceOnDate($end);
+        }
+
+        // get the 10 biggest expenses:
+        $expenses = Auth::user()->transactions()->inYear($start)->expenses()
+            ->orderBy('amount', 'ASC')->take(5)->get();
+
+        // get the 10 biggest fans
+        $result = Auth::user()->components()
+            ->leftJoin('component_transaction','component_transaction.component_id','=','components.id')
+            ->leftJoin('transactions','component_transaction.transaction_id','=','transactions.id')
+            ->where('components.type','beneficiary')
+            ->where(DB::Raw('DATE_FORMAT(transactions.date,"%Y")'),$year)
+            ->groupBy('components.id')
+            ->orderBy('total')
+            ->take(5)
+            ->get(['components.name',DB::Raw('SUM(`transactions`.`amount`) as `total`')]);
+
+        // resort:
+
+
         return View::make('reports.year')->with('title', 'Report for ' . $year)
-            ->with('year', $year);
+            ->with('year', $year)->with('startNetWorth', $startNetWorth)->with(
+                'endNetWorth', $endNetWorth
+            )->with('expenses', $expenses)->with('fans', $result);
     }
 
     public function yearIeChart($year)
@@ -43,22 +73,33 @@ class ReportController extends BaseController
         $chart->addColumn('Income', 'number');
         $chart->addColumn('Expenses', 'number');
 
+        // query + array for all expenses:
+        $result = Auth::user()->transactions()->groupBy('month')->expenses()->get([DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),DB::Raw('SUM(`amount`) as `total`')]);
+        $expenses = [];
+        foreach($result as $row) {
+            $expenses[$row->month] = floatval($row->total)*-1;
+        }
+        unset($result);
+
+        // same for all incomes:
+        $result = Auth::user()->transactions()->groupBy('month')->incomes()->get([DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),DB::Raw('SUM(`amount`) as `total`')]);
+        $incomes = [];
+        foreach($result as $row) {
+            $incomes[$row->month] = floatval($row->total);
+        }
+        unset($result);
+
+
         while ($start <= $end) {
-            $income = floatval(
-                Auth::user()->transactions()->incomes()->inMonth($start)->sum(
-                    'amount'
-                )
-            );
-            $expenses = floatval(
-                    Auth::user()->transactions()->expenses()->inMonth($start)
-                        ->sum('amount')
-                ) * -1;
-            $chart->addRow(clone $start, $income, $expenses);
+            $date = $start->format('m-Y');
+            $income = isset($incomes[$date]) ? $incomes[$date] : 0;
+            $expense = isset($expenses[$date]) ? $expenses[$date] : 0;
+
+            $chart->addRow(clone $start, $income, $expense);
             $start->addMonth();
         }
 
         $chart->generate();
-
         return Response::json($chart->getData());
     }
 }

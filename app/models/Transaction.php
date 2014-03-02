@@ -151,6 +151,21 @@ class Transaction extends Eloquent
     }
 
     /**
+     * Limits the scope to a certain year.
+     *
+     * @param        $query
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
+    public function scopeInYear($query, Carbon $date)
+    {
+        return $query->where(
+            DB::Raw('DATE_FORMAT(`date`,"%Y")'), '=', $date->format('Y')
+        );
+    }
+
+    /**
      * Limits the scope to a certain day.
      *
      * @param        $query
