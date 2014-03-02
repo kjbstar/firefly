@@ -72,6 +72,13 @@ Breadcrumbs::register(
     }
 );
 
+Breadcrumbs::register(
+    'report_year', function ($breadcrumbs,$year) {
+        $breadcrumbs->parent('reports');
+        $breadcrumbs->push('Report for '.$year, route('yearreport',$year));
+    }
+);
+
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),
 //category (fake)
