@@ -50,6 +50,10 @@ class HomeController extends BaseController
         $transactions = Auth::user()->transactions()->take(5)->orderBy(
             'date', 'DESC'
         )->orderBy('id', 'DESC')->inMonth($today)->get();
+        $transfers = Auth::user()->transfers()->take(5)->orderBy(
+            'date', 'DESC'
+        )->orderBy('id', 'DESC')->inMonth($today)->get();
+
 
         // build a history:
         $history = [];
@@ -79,6 +83,6 @@ class HomeController extends BaseController
                 'transactions', $transactions
             )->with('fpAccount', $fpAccount)->with('budgets', $budgets)->with(
                 'predictables', $predictables
-            );
+            )->with('transfers',$transfers);
     }
 }
