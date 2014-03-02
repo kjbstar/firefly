@@ -16,6 +16,4 @@
         @endif
     </div>
 </div>
-
-
 @stop
