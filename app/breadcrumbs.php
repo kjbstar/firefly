@@ -62,6 +62,15 @@ Breadcrumbs::register(
     }
 );
 
+/**
+ * REPORTS
+ */
+Breadcrumbs::register(
+    'reports', function ($breadcrumbs) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push('Reports', route('reports'));
+    }
+);
 
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),
