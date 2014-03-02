@@ -23,4 +23,10 @@ class ReportController extends BaseController
             'years', $years
         );
     }
+
+    public function year($year)
+    {
+        return View::make('reports.year')->with('title', 'Report for ' . $year)
+            ->with('year', $year);
+    }
 }
