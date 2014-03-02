@@ -18,8 +18,6 @@ function drawOverviewChart() {
             var gdata = new google.visualization.DataTable(data);
             var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
             money.format(gdata, 1);
-            money.format(gdata, 5);
-            money.format(gdata, 6);
             var chart = new google.visualization.ComboChart(document.getElementById('account-overview-chart'));
             chart.draw(gdata, opt);
         }).fail(function () {

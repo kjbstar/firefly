@@ -33,12 +33,18 @@ class Toolkit
 
     public static function getFrontpageAccount()
     {
-        $frontpageAccount = Setting::getSetting('frontpageAccounts');
+        $frontpageAccount = Setting::getSetting('frontpageAccount');
         if($frontpageAccount->value == '') {
             return Auth::user()->accounts()->first();
         } else {
             return Auth::user()->accounts()->find($frontpageAccount->value);
         }
+    }
+
+    public static function getPredictionStart() {
+        $setting = Setting::getSetting('predictionStart');
+        return $setting->value;
+
     }
 
     public static function getEarliestEvent()

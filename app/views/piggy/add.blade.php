@@ -61,7 +61,3 @@
 
 
 @stop
-@section('scripts')
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script src="js/accounts.js"></script>
-@stop

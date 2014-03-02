@@ -1,26 +1,35 @@
 <?php
 use Carbon\Carbon as Carbon;
+
 /**
  * Class Setting
  *
- * @property integer $id
+ * @property integer        $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property integer $user_id
- * @property string $type
- * @property string $name
- * @property string $date
- * @property string $value
- * @property-read \User $user
+ * @property integer        $user_id
+ * @property string         $type
+ * @property string         $name
+ * @property string         $date
+ * @property string         $value
+ * @property-read \User     $user
  */
 class Setting extends Eloquent
 {
     public static $rules
-        = ['name'    => 'required|between:1,500',
-           'user_id' => 'required|exists:users,id', 'type' => 'in:date,float,string,int',
-           'value'   => 'required'];
+        = ['name' => 'required|between:1,500',
+           'user_id' => 'required|exists:users,id',
+           'type' => 'in:date,float,string,int', 'value' => 'required'];
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
     protected $fillable = ['user_id', 'name', 'type', 'value'];
+
+    public static function findSetting($name)
+    {
+        return Auth::user()->settings()->where(
+            'name', $name
+        )->first();
+
+    }
 
     /**
      * Return a setting by name.
@@ -61,7 +70,9 @@ class Setting extends Eloquent
      */
     public function getValueAttribute($value)
     {
-        if(isset($this->attributes['type']) && $this->attributes['type'] == 'date') {
+        if (isset($this->attributes['type'])
+            && $this->attributes['type'] == 'date'
+        ) {
             return new Carbon($value);
         } else {
             return $value;

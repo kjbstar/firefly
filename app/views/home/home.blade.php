@@ -117,9 +117,24 @@
     <div class="col-lg-6 col-md-12 col-sm-12">
 
     </div>
-    <!-- PREDICTABES IN COLLAPSEABLE -->
+    <!-- PREDICTABES -->
     <div class="col-lg-6 col-md-12 col-sm-12">
-
+        <table class="table table-condensed table-striped">
+            <?php $sum=0; ?>
+            @foreach($predictables as $p)
+            <?php $sum += $p->amount; ?>
+            <tr>
+                <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{$p->description}}</a></td>
+                <td>{{mf($p->amount,true)}}</td>
+                <td>{{$p->date->format('jS')}}</td>
+            </tr>
+            @endforeach
+            <tr>
+                <td>Sum</td>
+                <td><strong>{{mf($sum,true)}}</strong></td>
+                <td></td>
+            </tr>
+        </table>
     </div>
 </div>
 
@@ -146,7 +161,6 @@
 
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script src="js/home-cookies.js"></script>
 <script src="js/home-settings.js"></script>
 <script src="js/home.js"></script>
 @stop

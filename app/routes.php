@@ -121,6 +121,10 @@ Route::post('/home/predictable/{predictable}/delete',['uses' => 'PredictableCont
 Route::post('/home/predictable/add/{transaction?}',['uses' => 'PredictableController@postAdd', 'before' => 'csrf']);
 
 
+/**
+ * REPORTSCONTROLLER
+ */
+
 
 
 /**

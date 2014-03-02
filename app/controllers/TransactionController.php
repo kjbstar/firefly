@@ -33,11 +33,10 @@ class TransactionController extends BaseController
     {
         Session::put('previous', URL::previous());
         $accounts = AccountHelper::accountsAsSelectList();
-        $count = Auth::user()->transactions()->count();
 
         return View::make('transactions.add')->with(
             'title', 'Add a transaction'
-        )->with('accounts', $accounts)->with('count', $count);
+        )->with('accounts', $accounts);
     }
 
     /**

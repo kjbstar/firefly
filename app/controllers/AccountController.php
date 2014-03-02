@@ -256,6 +256,8 @@ class AccountController extends BaseController
             } else {
                 $certain = true;
                 $balance = $account->balanceOnDate($current);
+                $intervalAbove = $balance;
+                $intervalBelow = $balance;
             }
 
             // find a marker

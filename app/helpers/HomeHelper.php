@@ -128,4 +128,17 @@ class HomeHelper
         return $allowance;
     }
 
+    public static function getPredictables(Carbon $date) {
+        $predictables = Auth::user()->predictables()->orderBy('dom','ASC')->get();
+        $list = [];
+        foreach($predictables as $p) {
+            $count = $p->transactions()->inMonth($date)->count();
+            if($count == 0) {
+                $p->date = new Carbon($date->format('Y-m-').$p->dom);
+                $list[] = $p;
+            }
+        }
+        return $list;
+    }
+
 }

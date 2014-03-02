@@ -100,7 +100,7 @@
         <div class="form-group">
             <label for="inputBeneficiary" class="col-sm-3 control-label">Required beneficiary</label>
             <div class="col-sm-9">
-                {{Form::select('beneficiary_id',$components['beneficiary'],Input::old('beneficiary_id') ? Input::old('beneficiary_id') : $transaction->beneficiary_id ? $transaction->beneficiary_id : null,['class' => 'form-control'])}}
+                {{Form::select('beneficiary_id',$components['beneficiary'],Input::old('beneficiary_id') ? Input::old('beneficiary_id') : $transaction && $transaction->beneficiary_id ? $transaction->beneficiary_id : null,['class' => 'form-control'])}}
             </div>
         </div>
         
@@ -108,7 +108,7 @@
         <div class="form-group">
             <label for="inputCategory" class="col-sm-3 control-label">Required category</label>
             <div class="col-sm-9">
-                {{Form::select('category_id',$components['category'],Input::old('category_id') ? Input::old('category_id') : $transaction->category_id ? $transaction->category_id : null,['class' => 'form-control'])}}
+                {{Form::select('category_id',$components['category'],Input::old('category_id') ? Input::old('category_id') : $transaction && $transaction->category_id ? $transaction->category_id : null,['class' => 'form-control'])}}
 
             </div>
         </div>
@@ -117,7 +117,7 @@
         <div class="form-group">
             <label for="inputBudget" class="col-sm-3 control-label">Required budget</label>
             <div class="col-sm-9">
-                {{Form::select('budget_id',$components['budget'],Input::old('budget_id') ? Input::old('budget_id') : $transaction->budget_id ? $transaction->budget_id : null,['class' => 'form-control'])}}
+                {{Form::select('budget_id',$components['budget'],Input::old('budget_id') ? Input::old('budget_id') : $transaction && $transaction->budget_id ? $transaction->budget_id : null,['class' => 'form-control'])}}
             </div>
         </div>
 

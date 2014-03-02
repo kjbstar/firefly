@@ -76,22 +76,3 @@
 </div>
 @endif
 @stop
-@section('scripts')
-<script type="text/javascript">
-    var object = "{{OBJ}}";
-    var objects = "{{OBJS}}";
-    var id = {{$component->id}};
-  @if(isset($date))
-      var month = {{intval($date->format('m'))}};
-    var year = {{intval($date->format('Y'))}};
-    @else
-    var month = null;
-    var year = null;
-    @endif
-
-</script>
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script src="js/meta.js"></script>
-@stop
-@section('styles')
-@stop

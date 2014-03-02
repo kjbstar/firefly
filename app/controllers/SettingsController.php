@@ -1,6 +1,10 @@
 <?php
 use Carbon\Carbon as Carbon;
 
+/** @noinspection PhpIncludeInspection */
+require_once(app_path() . '/helpers/Toolkit.php');
+
+
 /**
  * Class SettingsController
  */
@@ -16,31 +20,12 @@ class SettingsController extends BaseController
     {
         Session::put('previous', URL::previous());
 
-        // let's grab the only setting that might be available.
-        $predictionStart = Setting::getSetting('predictionStart');
-
-        // let's also grab the 'extendedReporting' setting that
-        // contains components for comparision.
-        $extendedReporting = Setting::getSetting('extendedReporting');
-        $selectedComponents = explode(',', $extendedReporting->value);
-        $componentList = [];
-
-        $components = Auth::user()->components()->get();
-        foreach ($components as $component) {
-            $type = ucfirst(Str::plural($component->type));
-            $componentList[$type] = isset($componentList[$type])
-                ? $componentList[$type] : [];
-
-            $componentList[$type][$component->id] = $component->name;
-        }
-        asort($componentList['Beneficiaries'], SORT_STRING);
-        asort($componentList['Budgets'], SORT_STRING);
-        asort($componentList['Categories'], SORT_STRING);
+        // let's grab the settings that might be available.
+        $predictionStart = Toolkit::getPredictionStart();
+        $frontpageAccount = Toolkit::getFrontpageAccount();
 
         // and the setting that controls which accounts (and
         // subsequent predictions) you want to see on the front page:
-        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
-        $selectedAccounts = explode(',', $frontpageAccounts->value);
         $accountList = [];
         foreach (Auth::user()->accounts()->get() as $a) {
             $accountList[$a->id] = $a->name;
@@ -49,13 +34,9 @@ class SettingsController extends BaseController
 
         return View::make('settings.index')->with('title', 'Settings')->with(
             'predictionStart', $predictionStart
-        )->with('extendedReporting', $extendedReporting)->with(
-                'componentList', $componentList
-            )->with('selectedComponents', $selectedComponents)->with(
+        )->with(
                 'accountList', $accountList
-            )->with(
-                'selectedAccounts', $selectedAccounts
-            );
+            )->with('frontpageAccount',$frontpageAccount);
 
     }
 
@@ -67,37 +48,15 @@ class SettingsController extends BaseController
     public function postIndex()
     {
         // save all settings. For now, just the predictionStart one.
-        $predictionStart = Setting::getSetting('predictionStart');
+        $predictionStart = Setting::findSetting('predictionStart');
+        $frontpageAccount = Setting::findSetting('frontpageAccount');
+
         $predictionStart->value = Input::get('predictionStart');
+        $frontpageAccount->value = Input::get('frontpageAccount');
+
         $predictionStart->save();
+        $frontpageAccount->save();
 
-
-        $inputComponents = is_array(Input::get('extendedReporting'))
-            ? Input::get('extendedReporting') : [];
-        $selectedComponents = [];
-        foreach ($inputComponents as $id) {
-            if (Auth::user()->components()->find($id)) {
-                $selectedComponents[] = $id;
-            }
-        }
-
-        $inputAccounts = is_array(Input::get('frontpageAccounts')) ? Input::get(
-            'frontpageAccounts'
-        ) : [];
-        $selectedAccounts = [];
-        foreach ($inputAccounts as $id) {
-            if (Auth::user()->accounts()->find($id)) {
-                $selectedAccounts[] = $id;
-            }
-        }
-
-        $extendedReporting = Setting::getSetting('extendedReporting');
-        $extendedReporting->value = join(',', $selectedComponents);
-        $extendedReporting->save();
-
-        $frontpageAccounts = Setting::getSetting('frontpageAccounts');
-        $frontpageAccounts->value = join(',', $selectedAccounts);
-        $frontpageAccounts->save();
 
         Session::flash('success', 'Settings saved!');
 

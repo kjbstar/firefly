@@ -42,11 +42,14 @@ class HomeController extends BaseController
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
         $allowance = HomeHelper::getAllowance($today);
+        $predictables = HomeHelper::getPredictables($today);
         // budget overview.
         $budgets = HomeHelper::bugetOverview($today);
+
+        // TODO move to homehelper
         $transactions = Auth::user()->transactions()->take(5)->orderBy(
             'date', 'DESC'
-        )->inMonth($today)->get();
+        )->orderBy('id', 'DESC')->inMonth($today)->get();
 
         // build a history:
         $history = [];
@@ -61,7 +64,7 @@ class HomeController extends BaseController
             $entry = [];
             $entry['url'] = $url;
             $entry['title'] = $now->format('F Y');
-            if($now->format('m') == '1') {
+            if ($now->format('m') == '1') {
                 $entry['newline'] = true;
             }
             $history[] = $entry;
@@ -74,6 +77,8 @@ class HomeController extends BaseController
                 'history', $history
             )->with('allowance', $allowance)->with(
                 'transactions', $transactions
-            )->with('fpAccount', $fpAccount)->with('budgets',$budgets);
+            )->with('fpAccount', $fpAccount)->with('budgets', $budgets)->with(
+                'predictables', $predictables
+            );
     }
 }

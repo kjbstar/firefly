@@ -28,7 +28,7 @@
 
                 <p>
                     <input type="date" name="predictionStart"
-                           value="{{$predictionStart->value->format('Y-m-d')}}"
+                           value="{{$predictionStart->format('Y-m-d')}}"
                            class="form-control"/>
                 </p>
 
@@ -37,35 +37,14 @@
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Extended reporting</h3>
+                <h3 class="panel-title">Frontpage account</h3>
             </div>
             <div class="panel-body">
                 <p>
-                    Some pages can report extra on budgets,
-                    categories or beneficiaries which have your interest.
-                    Pick them.
+                    The chart on the frontpage can contain any account you wish.
                 </p>
-                <p>
-                    {{Form::select('extendedReporting[]',$componentList,
-                    $selectedComponents,
-                    ['multiple' => true,'class' => 'form-control',
-                    'size' => 20])}}
-                </p>
-            </div>
-
-        </div>
-
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h3 class="panel-title">Frontpage account list</h3>
-            </div>
-            <div class="panel-body">
-                <p>
-                    The chart on the frontpage can contain any account (or
-                    combination thereof) you wish.
-                </p>
-                {{Form::select('frontpageAccounts[]',$accountList,
-                $selectedAccounts,
+                {{Form::select('frontpageAccount',$accountList,
+                $frontpageAccount->id,
                 ['class' => 'form-control',
                 ])}}
                 </div>

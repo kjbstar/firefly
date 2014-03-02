@@ -6,21 +6,6 @@
         <h3>
             Add a new transaction
         </h3>
-        @if($count == 0)
-        <div class="alert alert-info">
-            <p>
-                <strong>Add your first transaction</strong>
-            </p>
-            <p>
-                Transactions are usually expenses paid (with a debit or
-                credit card). They can also be incomes such as salary.
-            </p>
-            <p>
-                The fields on the right are "free fields"; once you've
-                entered something they'll auto-suggest it next time.
-            </p>
-        </div>
-        @endif
 
     </div>
 </div>
@@ -46,12 +31,6 @@
                 <span class="text-danger">{{$errors->first('description')
                     }}</span><br />
                 @endif
-                @if($count == 0)
-                <span class="text-info">What best describes the
-                    transaction? Avoid using the store's name or general
-                    descriptions such as "groceries".
-                </span>
-                @endif
             </div>
         </div>
 
@@ -71,12 +50,6 @@
                 <span class="text-danger">{{$errors->first('amount')
                     }}</span><br />
                 @endif
-                @if($count == 0)
-                <span class="text-info">
-                    If the transaction is an expense, enter a negative amount.
-                    Otherwise, enter a positive amount.
-                </span>
-                @endif
             </div>
         </div>
 
@@ -92,11 +65,6 @@
                 @if($errors->has('date'))
                 <span class="text-danger">{{$errors->first('date')
                     }}</span><br />
-                @endif
-                @if($count == 0)
-                <span class="text-info">Enter the date this transaction
-                    occured. This date cannot be before the date the
-                    account (below) was opened.</span>
                 @endif
             </div>
         </div>
@@ -115,10 +83,6 @@
                 <span class="text-danger">{{$errors->first('account_id')
                     }}</span><br />
                 @endif
-                @if($count == 0)
-                <span class="text-info">Select the account this
-                    transaction is relevant to.</span>
-                @endif
             </div>
         </div>
 
@@ -134,12 +98,6 @@
                 <input type="text" value="{{{Input::old('beneficiary')}}}"
                        name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
                 <br />
-                @if($count == 0)
-                <span class="text-info">
-                    Enter the beneficiary, such as the store's name in case
-                    of an expense or the company who paid you.
-                </span>
-                @endif
             </div>
         </div>
         
@@ -150,12 +108,6 @@
                 <input type="text" value="{{{Input::old('category')}}}"
                        name="category" class="form-control"
                        id="inputCategory" autocomplete="off" /><br />
-                @if($count == 0)
-                <span class="text-info">
-                    Under which category is this transaction best filed?
-                    Think "house" or "personal".
-                </span>
-                @endif
             </div>
         </div>
 
@@ -166,11 +118,6 @@
                 <input type="text" value="{{{Input::old('budget')}}}"
                        name="budget" class="form-control" id="inputBudget"
                        autocomplete="off" /><br />
-                @if($count == 0)
-                <span class="text-info">
-                    If you're budgeting, use this free field.
-                </span>
-                @endif
             </div>
         </div>
 
@@ -184,13 +131,6 @@
                         Ignores this transaction in predictions.
                     </label>
                 </div>
-                @if($count == 0)
-                <span class="text-info">
-                    Large (one time) transactions can skew the predictions.
-                    So, use this check to make sure your predictions stay
-                    accurate.
-                </span>
-                @endif
             </div>
         </div>
 
@@ -216,13 +156,6 @@
                 <input type="checkbox" name="mark" value="1">Marks
                     this transaction in certain charts.
                     </label>
-                @if($count == 0)
-
-                    <br />
-                <span class="text-info">
-                    Like it says.
-                </span>
-                @endif
                     </div>
             </div>
         </div>
