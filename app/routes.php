@@ -124,7 +124,7 @@ Route::post('/home/predictable/add/{transaction?}',['uses' => 'PredictableContro
 /**
  * REPORTSCONTROLLER
  */
-
+Route::get('/home/reports',['uses' => 'ReportController@index', 'as' => 'reports']);
 
 
 /**
