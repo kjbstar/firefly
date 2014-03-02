@@ -62,7 +62,3 @@
 
 
 @stop
-@section('scripts')
-@stop
-@section('styles')
-@stop
