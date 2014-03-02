@@ -126,6 +126,7 @@ Route::post('/home/predictable/add/{transaction?}',['uses' => 'PredictableContro
  */
 Route::get('/home/reports',['uses' => 'ReportController@index', 'as' => 'reports']);
 Route::get('/home/reports/year/{year}',['uses' => 'ReportController@year', 'as' => 'yearreport']);
+Route::get('/home/reports/year/{year}/ie',['uses' => 'ReportController@yearIeChart']);
 
 
 /**
