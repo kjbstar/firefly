@@ -1,13 +1,13 @@
 // load google
 google.load('visualization', '1.0', {'packages': ['corechart']});
-google.setOnLoadCallback(drawCharts);
+google.setOnLoadCallback(drawCharts)
 
 function drawCharts() {
     drawIEchart();
 }
 
 var ieChartSettings = {
-  colors: ['#01DF01','#DF0101'],
+    colors: ['#01DF01', '#DF0101'],
 };
 
 

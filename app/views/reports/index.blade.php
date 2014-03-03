@@ -6,13 +6,14 @@
         <h2>Reports</h2>
 
         <h3>Yearly overview</h3>
-
         @if(count($years) > 0)
-        <ul>
         @foreach($years as $year)
-            <li><a href="{{URL::Route('yearreport',$year)}}" title="Report for {{$year}}">Report for {{$year}}</a></li>
+            <h4>{{$year}}</h4>
+            <ul>
+                <li><a href="{{URL::Route('yearreport',$year)}}" title="Report for {{$year}}">Report for {{$year}}</a></li>
+            </ul>
         @endforeach
-        </ul>
+
         @endif
     </div>
 </div>

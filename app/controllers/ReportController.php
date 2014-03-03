@@ -41,26 +41,35 @@ class ReportController extends BaseController
             ->orderBy('amount', 'ASC')->take(5)->get();
 
         // get the 10 biggest fans
-        $result = Auth::user()->components()
-            ->leftJoin('component_transaction','component_transaction.component_id','=','components.id')
-            ->leftJoin('transactions','component_transaction.transaction_id','=','transactions.id')
-            ->where('components.type','beneficiary')
-            ->where(DB::Raw('DATE_FORMAT(transactions.date,"%Y")'),$year)
-            ->groupBy('components.id')
-            ->orderBy('total')
-            ->take(5)
-            ->get(['components.name',DB::Raw('SUM(`transactions`.`amount`) as `total`')]);
+        $result = Auth::user()->components()->leftJoin(
+            'component_transaction', 'component_transaction.component_id', '=',
+            'components.id'
+        )->leftJoin(
+                'transactions', 'component_transaction.transaction_id', '=',
+                'transactions.id'
+            )->where('components.type', 'beneficiary')->where(
+                DB::Raw('DATE_FORMAT(transactions.date,"%Y")'), $year
+            )->groupBy('components.id')->orderBy('total')->take(5)->get(
+                ['components.name',
+                 DB::Raw('SUM(`transactions`.`amount`) as `total`')]
+            );
 
         // total income, total expenses
-        $totalIncome = Auth::user()->transactions()->incomes()->inYear($start)->sum('amount');
-        $totalExpenses = Auth::user()->transactions()->expenses()->inYear($start)->sum('amount');
+        $totalIncome = Auth::user()->transactions()->incomes()->inYear($start)
+            ->sum('amount');
+        $totalExpenses = Auth::user()->transactions()->expenses()->inYear(
+            $start
+        )->sum('amount');
 
 
         return View::make('reports.year')->with('title', 'Report for ' . $year)
             ->with('year', $year)->with('startNetWorth', $startNetWorth)->with(
                 'endNetWorth', $endNetWorth
-            )->with('expenses', $expenses)->with('fans', $result)->with('totalIncome',$totalIncome)->with('totalExpenses',$totalExpenses);
+            )->with('expenses', $expenses)->with('fans', $result)->with(
+                'totalIncome', $totalIncome
+            )->with('totalExpenses', $totalExpenses);
     }
+
 
     public function yearIeChart($year)
     {
@@ -76,17 +85,25 @@ class ReportController extends BaseController
         $chart->addColumn('Expenses', 'number');
 
         // query + array for all expenses:
-        $result = Auth::user()->transactions()->groupBy('month')->expenses()->get([DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),DB::Raw('SUM(`amount`) as `total`')]);
+        $result = Auth::user()->transactions()->groupBy('month')->expenses()
+            ->get(
+                [DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),
+                 DB::Raw('SUM(`amount`) as `total`')]
+            );
         $expenses = [];
-        foreach($result as $row) {
-            $expenses[$row->month] = floatval($row->total)*-1;
+        foreach ($result as $row) {
+            $expenses[$row->month] = floatval($row->total) * -1;
         }
         unset($result);
 
         // same for all incomes:
-        $result = Auth::user()->transactions()->groupBy('month')->incomes()->get([DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),DB::Raw('SUM(`amount`) as `total`')]);
+        $result = Auth::user()->transactions()->groupBy('month')->incomes()
+            ->get(
+                [DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),
+                 DB::Raw('SUM(`amount`) as `total`')]
+            );
         $incomes = [];
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $incomes[$row->month] = floatval($row->total);
         }
         unset($result);
@@ -102,6 +119,7 @@ class ReportController extends BaseController
         }
 
         $chart->generate();
+
         return Response::json($chart->getData());
     }
 }
