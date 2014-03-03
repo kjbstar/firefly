@@ -4,35 +4,43 @@
 class PredictableQueue
 {
 
-    public function scan($job, Predictable $predictable) {
+    public function scan($job, Predictable $predictable)
+    {
         $query = Auth::user()->transactions()->whereNull('predictable_id');
-        $this->processPredictable($job,$predictable,$query);
-    }
-    public function scanAll($job, Predictable $predictable) {
-        $query = Auth::user()->transactions();
-        $this->processPredictable($job,$predictable,$query);
+        $this->processPredictable($job, $predictable, $query);
     }
 
-    public function processPredictable($job, Predictable $predictable,Illuminate\Database\Eloquent\Relations\HasMany $set)
+    public function scanAll($job, Predictable $predictable)
     {
+        $query = Auth::user()->transactions();
+        $this->processPredictable($job, $predictable, $query);
+    }
+
+    public function processPredictable(
+        $job, Predictable $predictable,
+        Illuminate\Database\Eloquent\Relations\HasMany $set
+    ) {
         Log::debug('Looking for ' . $predictable->description);
         // find transactions in the range of this predictable:
 
 
-        $lowLimit = $predictable->amount*(1-($predictable->pct/100));
-        $highLimit = $predictable->amount*(1+($predictable->pct/100));
+        $lowLimit = $predictable->amount * (1 - ($predictable->pct / 100));
+        $highLimit = $predictable->amount * (1 + ($predictable->pct / 100));
         $requiredComponents = [];
         foreach ($predictable->components as $c) {
             $requiredComponents[] = $c->id;
         }
         sort($requiredComponents);
-        Log::debug('Required components: ' . print_r($requiredComponents,true));
+        Log::debug(
+            'Required components: ' . print_r($requiredComponents, true)
+        );
 
-        $transactions = $set
-            ->where('amount', '>=', $highLimit)->where(
+        $transactions = $set->where('amount', '>=', $highLimit)->where(
                 'amount', '<=', $lowLimit
             )->get();
-        Log::debug('Found ' . $transactions->count() .' possible transactions');
+        Log::debug(
+            'Found ' . $transactions->count() . ' possible transactions'
+        );
 
         foreach ($transactions as $t) {
             $components = [];
@@ -40,8 +48,8 @@ class PredictableQueue
                 $components[] = $c->id;
             }
             sort($components);
-            Log::debug('Found components: ' . print_r($components,true));
-            if($components == $requiredComponents) {
+            Log::debug('Found components: ' . print_r($components, true));
+            if ($components == $requiredComponents) {
                 Log::debug('Match on components!');
             }
 
@@ -66,25 +74,27 @@ class PredictableQueue
         // will this one fit in any of the predictables?
         foreach (Auth::user()->predictables()->get() as $predictable) {
             Log::debug('Checking ' . $predictable->description);
-            $lowLimit = $predictable->amount*(1-($predictable->pct/100));
-            $highLimit = $predictable->amount*(1+($predictable->pct/100));
+            $lowLimit = $predictable->amount * (1 - ($predictable->pct / 100));
+            $highLimit = $predictable->amount * (1 + ($predictable->pct / 100));
             $requiredComponents = [];
             foreach ($predictable->components as $c) {
                 $requiredComponents[] = $c->id;
             }
             sort($requiredComponents);
-            Log::debug('Required components: ' . print_r($requiredComponents,true));
+            Log::debug(
+                'Required components: ' . print_r($requiredComponents, true)
+            );
 
             $components = [];
             foreach ($transaction->components()->get() as $c) {
                 $components[] = $c->id;
             }
             sort($components);
-            Log::debug('Found components: ' . print_r($components,true));
+            Log::debug('Found components: ' . print_r($components, true));
             if ($components === $requiredComponents
                 && $transaction->description === $predictable->description
-                && $transaction->amount >= $highLimit &&
-                $transaction->amount <= $lowLimit
+                && $transaction->amount >= $highLimit
+                && $transaction->amount <= $lowLimit
             ) {
                 Log::debug('match!');
                 // update transaction
