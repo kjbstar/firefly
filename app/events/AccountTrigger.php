@@ -180,6 +180,7 @@ class AccountTrigger
         $balanceModifier->account()->associate($account);
         $balanceModifier->balance = $account->openingbalance;
         $balanceModifier->save();
+        return true;
     }
 
     public function validateAccountName(Account $account)
