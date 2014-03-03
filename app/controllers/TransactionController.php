@@ -29,16 +29,17 @@ class TransactionController extends BaseController
      *
      * @return View
      */
-    public function add()
+    public function add(Predictable $predictable = null)
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
+
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transactions.add')->with(
             'title', 'Add a transaction'
-        )->with('accounts', $accounts);
+        )->with('accounts', $accounts)->with('predictable', $predictable);
     }
 
     /**
@@ -91,7 +92,7 @@ class TransactionController extends BaseController
                 $$comp = Component::findOrCreate($comp, Input::get($comp));
             }
             // count is two? parent + child.
-            if(count($parts) == 2) {
+            if (count($parts) == 2) {
                 $parent = Component::findOrCreate($comp, $parts[0]);
                 $$comp = Component::findOrCreate($comp, $parts[1]);
                 $$comp->parent_component_id = $parent->id;

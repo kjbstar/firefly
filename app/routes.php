@@ -152,7 +152,7 @@ Route::post('/home/settings', ['uses' => 'SettingsController@postIndex']);
 Route::get('/home/transaction',['uses' => 'TransactionController@showIndex', 'as' => 'transactions']);
 Route::get('/home/transaction/{transaction}/edit',['uses' => 'TransactionController@edit', 'as' => 'edittransaction']);
 Route::get('/home/transaction/{transaction}/delete',['uses' => 'TransactionController@delete', 'as' => 'deletetransaction']);
-Route::get('/home/transaction/add/{account?}',['uses' => 'TransactionController@add', 'as' => 'addtransaction']);
+Route::get('/home/transaction/add/{predictable?}',['uses' => 'TransactionController@add', 'as' => 'addtransaction']);
 Route::post('/home/transaction/{transaction}/edit',['uses' => 'TransactionController@postEdit', 'before' => 'csrf']);
 Route::post('/home/transaction/{transaction}/delete',['uses' => 'TransactionController@postDelete', 'before' => 'csrf']);
 Route::post('/home/transaction/add/{account?}',['uses' => 'TransactionController@postAdd', 'before' => 'csrf']);
