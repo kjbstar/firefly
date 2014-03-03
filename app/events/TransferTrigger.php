@@ -25,8 +25,8 @@ class TransferTrigger
         $accountTo->save();
 
         // update or create balancemodifier for TO account.
-        $balanceModifier = $accountTo->balancemodifiers()->where(
-            'date', $transfer->date
+        $balanceModifier = $accountTo->balancemodifiers()->onDay(
+            $transfer->date
         )->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier;
@@ -40,8 +40,8 @@ class TransferTrigger
         unset($balanceModifier);
 
         // update or create balancemodifier for FROM account:
-        $balanceModifierFrom = $accountFrom->balancemodifiers()->where(
-            'date', $transfer->date
+        $balanceModifierFrom = $accountFrom->balancemodifiers()->onDay(
+            $transfer->date
         )->first();
         if (is_null($balanceModifierFrom)) {
             $balanceModifierFrom = new Balancemodifier;
@@ -347,9 +347,7 @@ class TransferTrigger
         $accountTo->save();
 
         // update or create balancemodifier for TO account.
-        $balanceModifier = $accountTo->balancemodifiers()->where(
-            'date', $transfer->date
-        )->first();
+        $balanceModifier = $accountTo->balancemodifiers()->onDay($transfer->date)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier;
             $balanceModifier->account()->associate($accountTo);
@@ -362,8 +360,7 @@ class TransferTrigger
         unset($balanceModifier);
 
         // update or create balancemodifier for FROM account:
-        $bmf = $accountFrom->balancemodifiers()->where('date', $transfer->date)
-            ->first();
+        $bmf = $accountFrom->balancemodifiers()->onDay($transfer->date)->first();
         if (is_null($bmf)) {
             $bmf = new Balancemodifier;
             $bmf->account()->associate($accountFrom);
@@ -395,7 +392,3 @@ class TransferTrigger
     }
 
 }
-
-$subscriber = new TransferTrigger;
-
-Event::subscribe($subscriber);

@@ -31,24 +31,27 @@ class AccountTrigger
      */
     public function editAccount(Account $account)
     {
-        if($this->validateAccountName($account)) {
-        $originalDate = new Carbon($account->getOriginal('openingbalancedate'));
-        if ($account->openingbalancedate < $originalDate) {
-            $this->triggerAccountDateToPast($account);
-        } else {
-            if ($account->openingbalancedate > $originalDate) {
-                $this->triggerAccountDateToFuture($account);
+        if ($this->validateAccountName($account)) {
+            $originalDate = new Carbon($account->getOriginal(
+                'openingbalancedate'
+            ));
+            if ($account->openingbalancedate < $originalDate) {
+                $this->triggerAccountDateToPast($account);
+            } else {
+                if ($account->openingbalancedate > $originalDate) {
+                    $this->triggerAccountDateToFuture($account);
+                }
             }
-        }
-        if (floatval($account->openingbalance) != floatval(
-                $account->getOriginal('openingbalance')
-            )
-        ) {
-            $this->triggerAccountAmountChanged($account);
-        }
+            if (floatval($account->openingbalance) != floatval(
+                    $account->getOriginal('openingbalance')
+                )
+            ) {
+                $this->triggerAccountAmountChanged($account);
+            }
         } else {
             return false;
         }
+
         return true;
 
 
@@ -77,7 +80,6 @@ class AccountTrigger
 
         while ($current <= $end) {
 
-            //echo 'Now at ' . $current->format('d-m-y');
             // delete if exists. should not exist!
             $account->balancemodifiers()->onDay($current)->delete();
 
@@ -180,6 +182,7 @@ class AccountTrigger
         $balanceModifier->account()->associate($account);
         $balanceModifier->balance = $account->openingbalance;
         $balanceModifier->save();
+
         return true;
     }
 
@@ -188,8 +191,9 @@ class AccountTrigger
         if (is_null($account->id)) {
             $accounts = Auth::user()->accounts()->get();
         } else {
-            $accounts = Auth::user()->accounts()->where('id','!=', $account->id)
-                ->get();
+            $accounts = Auth::user()->accounts()->where(
+                'id', '!=', $account->id
+            )->get();
         }
 
         foreach ($accounts as $dbAccount) {
@@ -221,6 +225,3 @@ class AccountTrigger
     }
 
 }
-
-$subscriber = new AccountTrigger;
-Event::subscribe($subscriber);

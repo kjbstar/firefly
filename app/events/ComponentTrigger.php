@@ -67,6 +67,3 @@ class ComponentTrigger
     }
 
 }
-
-$subscriber = new ComponentTrigger;
-Event::subscribe($subscriber);

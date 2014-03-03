@@ -103,10 +103,8 @@ if (!function_exists('mf')) {
 }
 
 require app_path() . '/filters.php';
-//require app_path() . '/events/TransactionTrigger.php';
-//require app_path() . '/events/TransferTrigger.php';
-//require app_path() . '/events/ComponentTrigger.php';
-//require app_path() . '/events/PredictableTrigger.php';
-//require app_path() . '/events/AccountTrigger.php';
-//require app_path() . '/queue/PredictableQueue.php';
-//require app_path() . '/extensions/AuthenticatedCacheStore.php';
+Event::subscribe(new AccountTrigger);
+Event::subscribe(new ComponentTrigger);
+Event::subscribe(new PredictableTrigger);
+Event::subscribe(new TransactionTrigger);
+Event::subscribe(new TransferTrigger);

@@ -53,8 +53,8 @@ class TransactionTrigger
 
 
         // update or create balancemodifier
-        $balanceModifier = $account->balancemodifiers()->where(
-            'date', $transaction->date
+        $balanceModifier = $account->balancemodifiers()->onDay(
+            $transaction->date
         )->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier;
@@ -259,7 +259,3 @@ class TransactionTrigger
     }
 
 }
-
-$subscriber = new TransactionTrigger;
-
-Event::subscribe($subscriber);

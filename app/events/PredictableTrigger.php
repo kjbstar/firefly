@@ -37,6 +37,3 @@ class PredictableTrigger
     }
 
 }
-
-$subscriber = new PredictableTrigger;
-Event::subscribe($subscriber);
