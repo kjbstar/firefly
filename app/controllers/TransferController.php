@@ -30,7 +30,9 @@ class TransferController extends BaseController
      */
     public function add()
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transfers.add')->with(
@@ -75,7 +77,9 @@ class TransferController extends BaseController
      */
     public function edit(Transfer $transfer)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transfers.edit')->with('transfer', $transfer)->with(
@@ -132,7 +136,9 @@ class TransferController extends BaseController
      */
     public function delete(Transfer $transfer)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('transfers.delete')->with('transfer', $transfer)
             ->with('title', 'Delete transfer ' . $transfer->description);

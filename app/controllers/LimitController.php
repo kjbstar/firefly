@@ -20,7 +20,9 @@ class LimitController extends BaseController
      */
     public function addLimit(Component $component, $year, $month)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $date = Toolkit::parseDate($year, $month);
         if ($date) {
             return View::make('meta-limit.add')->with(
@@ -77,7 +79,9 @@ class LimitController extends BaseController
      */
     public function editLimit(Limit $limit)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $object = Auth::user()->components()->find($limit->component_id);
         if ($object) {
             return View::make('meta-limit.edit')->with('object', $object)->with(
@@ -129,7 +133,9 @@ class LimitController extends BaseController
      */
     public function deleteLimit(Limit $limit)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $object = Auth::user()->components()->find($limit->component_id);
         if ($object) {
             return View::make('meta-limit.delete')->with('object', $object)

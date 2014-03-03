@@ -42,7 +42,9 @@ class PiggyController extends BaseController
 
     public function add()
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $piggyAccount = Setting::getSetting('piggyAccount');
         if (intval($piggyAccount->value) == 0) {
             return Redirect::route('piggyselect');
@@ -78,7 +80,9 @@ class PiggyController extends BaseController
     }
 
     public function delete(Piggybank $pig) {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         return View::make('piggy.delete')->with('piggy', $pig)->with(
             'title', 'Delete piggy bank ' . $pig->name
         );
@@ -119,7 +123,9 @@ class PiggyController extends BaseController
 
     public function edit(Piggybank $pig)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('piggy.edit')->with('pig', $pig)->with(
             'title', 'Edit piggy bank "' . $pig->name . '"'
@@ -150,7 +156,9 @@ class PiggyController extends BaseController
     {
         // calculate the amount of money left to devide:
         $piggies = Auth::user()->piggybanks()->get();
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         // get account:
         $piggyAccount = Setting::getSetting('piggyAccount');
         $account = Auth::user()->accounts()->find($piggyAccount->value);

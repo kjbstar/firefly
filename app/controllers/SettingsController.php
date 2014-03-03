@@ -18,7 +18,9 @@ class SettingsController extends BaseController
      */
     public function index()
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         // let's grab the settings that might be available.
         $predictionStart = Toolkit::getPredictionStart();
@@ -71,7 +73,9 @@ class SettingsController extends BaseController
      */
     public function allowances()
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         Cache::flush();
         $defaultAllowance = Setting::getSetting('defaultAllowance');
         $defaultAllowance->value = floatval($defaultAllowance->value);
@@ -107,7 +111,9 @@ class SettingsController extends BaseController
 
     public function addAllowance()
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('settings.add-allowance');
     }
@@ -144,7 +150,9 @@ class SettingsController extends BaseController
 
     public function editAllowance(Setting $setting)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('settings.edit-allowance')->with(
             'setting', $setting
@@ -165,7 +173,9 @@ class SettingsController extends BaseController
 
     public function deleteAllowance(Setting $setting)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('settings.delete-allowance')->with(
             'setting', $setting

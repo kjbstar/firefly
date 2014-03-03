@@ -31,7 +31,9 @@ class TransactionController extends BaseController
      */
     public function add()
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transactions.add')->with(
@@ -132,7 +134,9 @@ class TransactionController extends BaseController
      */
     public function edit(Transaction $transaction)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transactions.edit')->with(
@@ -198,7 +202,9 @@ class TransactionController extends BaseController
      */
     public function delete(Transaction $transaction)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('transactions.delete')->with(
             'transaction', $transaction

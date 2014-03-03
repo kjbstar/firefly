@@ -32,7 +32,9 @@ class PredictableController extends BaseController
 
     public function add(Transaction $transaction = null)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $list = PredictableHelper::componentList();
         // if transaction, preset some fields:
         if (!is_null($transaction) && !is_null($transaction->beneficiary)) {
@@ -112,7 +114,9 @@ class PredictableController extends BaseController
 
     public function edit(Predictable $predictable)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $list = PredictableHelper::componentList();
 
         // set some id's
@@ -194,7 +198,9 @@ class PredictableController extends BaseController
      */
     public function delete(Predictable $predictable)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('predictables.delete')->with(
             'predictable', $predictable

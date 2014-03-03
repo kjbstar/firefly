@@ -33,7 +33,10 @@ class AccountController extends BaseController
      */
     public function add()
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
+
 
         return View::make('accounts.add')->with(
             'title', 'Add account'
@@ -66,6 +69,7 @@ class AccountController extends BaseController
         $result = $account->save();
         if ($result) {
             Session::flash('success', 'The changes has been saved.');
+
             return Redirect::to(Session::get('previous'));
         } else {
             Session::flash(
@@ -87,7 +91,9 @@ class AccountController extends BaseController
      */
     public function edit(Account $account)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('accounts.edit')->with(
             'title', 'Edit account ' . $account->name
@@ -119,16 +125,17 @@ class AccountController extends BaseController
 
         if ($result) {
             Session::flash('success', 'The account has been updated.');
+
             return Redirect::to(Session::get('previous'));
         } else {
             Session::flash(
                 'error',
                 'Could not save the account. Is the account name unique?'
             );
+
             return Redirect::route('editaccount', $account->id)->withInput()
                 ->withErrors($validator);
         }
-
 
 
     }
@@ -142,11 +149,13 @@ class AccountController extends BaseController
      */
     public function delete(Account $account)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('accounts.delete')->with('account', $account)->with(
-                'title', 'Delete account ' . $account->name
-            );
+            'title', 'Delete account ' . $account->name
+        );
     }
 
     /**
@@ -185,8 +194,8 @@ class AccountController extends BaseController
         }
 
         return View::make('accounts.overview')->with('account', $account)->with(
-                'title', 'Overview for ' . $account->name
-            )->with(
+            'title', 'Overview for ' . $account->name
+        )->with(
                 'transactions', $entries
             )->with('date', $date);
     }

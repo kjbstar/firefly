@@ -77,7 +77,9 @@ class ComponentController extends BaseController
      */
     public function add()
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $parents = ComponentHelper::getParentList(OBJ);
 
         return View::make('components.add')->with('title', 'Add new ' . OBJ)
@@ -138,7 +140,9 @@ class ComponentController extends BaseController
      */
     public function edit(Component $component)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
         $parents = ComponentHelper::getParentList(OBJ, $component);
         $component->parent_component_id = is_null(
             $component->parent_component_id
@@ -201,7 +205,9 @@ class ComponentController extends BaseController
      */
     public function delete(Component $component)
     {
-        Session::put('previous', URL::previous());
+        if (!Input::old()) {
+            Session::put('previous', URL::previous());
+        }
 
         return View::make('components.delete')->with('object', $component)
             ->with(
