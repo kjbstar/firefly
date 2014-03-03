@@ -36,20 +36,22 @@ class ReportController extends BaseController
             $endNetWorth += $account->balanceOnDate($end);
         }
 
-        // get the 10 biggest expenses:
+        // get the X biggest expenses:
         $expenses = Auth::user()->transactions()->inYear($start)->expenses()
-            ->orderBy('amount', 'ASC')->take(5)->get();
+            ->orderBy('amount', 'ASC')->whereNull('predictable_id')->take(10)->get();
 
-        // get the 10 biggest fans
+        // get the X biggest fans
         $result = Auth::user()->components()->leftJoin(
             'component_transaction', 'component_transaction.component_id', '=',
             'components.id'
         )->leftJoin(
                 'transactions', 'component_transaction.transaction_id', '=',
                 'transactions.id'
-            )->where('components.type', 'beneficiary')->where(
+            )->whereNull('transactions.predictable_id')->where(
+                'components.type', 'beneficiary'
+            )->where(
                 DB::Raw('DATE_FORMAT(transactions.date,"%Y")'), $year
-            )->groupBy('components.id')->orderBy('total')->take(5)->get(
+            )->groupBy('components.id')->orderBy('total')->take(10)->get(
                 ['components.name',
                  DB::Raw('SUM(`transactions`.`amount`) as `total`')]
             );

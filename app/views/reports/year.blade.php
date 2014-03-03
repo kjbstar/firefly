@@ -82,19 +82,17 @@
     @endif
     @if(count($fans) > 0)
     <div class="col-lg-6 col-md-6 col-sm-12">
-        <h5>Your biggest fans</h5>
+        <h5>Your biggest fans<br /><small>Without predictable transactions</small></h5>
         <table class="table">
             <tr>
                 <th>Name</th>
                 <th>Total amount</th>
             </tr>
             @foreach($fans as $index => $f)
-            @if($index < 5)
             <tr>
                 <td>{{$f->name}}</td>
                 <td>{{mf($f->total,true)}}</td>
             </tr>
-            @endif
             @endforeach
         </table>
     </div>
