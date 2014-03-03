@@ -1,5 +1,6 @@
 <?php
 use Carbon\Carbon as Carbon;
+
 /** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/PredictableHelper.php');
 
@@ -35,30 +36,48 @@ class PredictableController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
-        $list = PredictableHelper::componentList();
-        // if transaction, preset some fields:
-        if (!is_null($transaction) && !is_null($transaction->beneficiary)) {
-            $transaction->beneficiary_id = $transaction->beneficiary->id;
-        }
-        if (!is_null($transaction) && !is_null($transaction->category)) {
-            $transaction->category_id = $transaction->category->id;
-        }
-        if (!is_null($transaction) && !is_null($transaction->budget)) {
-            $transaction->budget_id = $transaction->budget->id;
+        // do something easy for the prefilled values so the
+        // view will be easier to manage:
+
+        $prefilled = ['description' => '', 'amount' => 0, 'leeway' => 10,
+                      'dom'  => 1, 'beneficiary' => 0, 'category' => 0,
+                      'budget'      => 0,'inactive' => false];
+
+        if(!is_null($transaction)) {
+            $prefilled = ['description' => $transaction->description,
+                          'amount'      => floatval($transaction->amount),
+                          'dom'  => intval($transaction->date->format('d')),
+                          'beneficiary' => is_null($transaction->beneficiary) ? 0 : $transaction->beneficiary->id,
+                          'category' => is_null($transaction->category) ? 0 : $transaction->category->id,
+                          'budget' => is_null($transaction->budget) ? 0 : $transaction->budget->id];
         }
 
+        if (Input::old()) {
+            $prefilled = ['description' => Input::old('description'),
+                          'amount'      => floatval(Input::old('amount')),
+                          'leeway'      => intval(Input::old('leeway')),
+                          'dom'  => intval(Input::old('dom')),
+                          'beneficiary' => intval(Input::old('beneficiary_id')),
+                          'category'    => intval(Input::old('category_id')),
+                          'budget'      => intval(Input::old('budget_id')),
+                          'inactive' => intval(Input::old('inactive')) == 1 ? true : false
+
+            ];
+        }
+
+
+        $list = PredictableHelper::componentList();
         return View::make('predictables.add')->with(
             'title', 'Add a predictable'
-        )->with('components', $list)->with('transaction', $transaction);
+        )->with('components', $list)->with('prefilled', $prefilled);
     }
 
-    public function postAdd()
+    public function postAdd(Transaction $transaction = null)
     {
-
-
         $data = ['description' => Input::get('description'),
                  'dom'         => intval(Input::get('dom')),
                  'pct'         => intval(Input::get('pct')),
+                 'inactive'    => Input::get('inactive') == '1' ? 1 : 0,
                  'amount'      => floatval(Input::get('amount'))];
 
         $predictable = new Predictable($data);
@@ -82,7 +101,7 @@ class PredictableController extends BaseController
         );
         if ($validator->fails()) {
             return Redirect::route('addpredictable')->withErrors($validator)
-                ->withInput();
+                ->withInput()->with('transaction', $transaction);
         }
         $result = $predictable->save();
         if ($result) {
@@ -98,7 +117,7 @@ class PredictableController extends BaseController
             }
 
             Session::flash('success', 'The predictable has been saved.');
-            Queue::push('PredictableQueue@scan',$predictable);
+            Queue::push('PredictableQueue@scan', $predictable);
 
             return Redirect::to(Session::get('previous'));
         } else {
@@ -108,12 +127,13 @@ class PredictableController extends BaseController
             );
 
             return Redirect::route('addpredictable')->withErrors($validator)
-                ->withInput();
+                ->withInput()->with('transaction', $transaction);
         }
     }
 
     public function edit(Predictable $predictable)
     {
+        // TODO do the prefilled thing just like add()
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
@@ -132,15 +152,18 @@ class PredictableController extends BaseController
 
         return View::make('predictables.edit')->with(
             'title', 'Edit predictable "' . $predictable->description . '"'
-        )->with('predictable', $predictable)->with('components',$list);
+        )->with('predictable', $predictable)->with('components', $list);
     }
 
-    public function postEdit(Predictable $predictable) {
+    public function postEdit(Predictable $predictable)
+    {
+
 
         $predictable->description = Input::get('description');
         $predictable->amount = floatval(Input::get('amount'));
         $predictable->dom = intval(Input::get('dom'));
         $predictable->pct = intval(Input::get('pct'));
+        $predictable->inactive = intval(Input::get('inactive')) == 1 ? 1 : 0;
 
         // we use drop downs to select these components:
         $ben = Auth::user()->components()->where('type', 'beneficiary')->find(
@@ -157,8 +180,8 @@ class PredictableController extends BaseController
             $predictable->toArray(), Predictable::$rules
         );
         if ($validator->fails()) {
-            return Redirect::route('editpredictable',$predictable->id)->withErrors($validator)
-                ->withInput();
+            return Redirect::route('editpredictable', $predictable->id)
+                ->withErrors($validator)->withInput();
         }
         $result = $predictable->save();
         if ($result) {
@@ -173,8 +196,11 @@ class PredictableController extends BaseController
                 $predictable->components()->save($cat);
             }
 
-            Session::flash('success', 'The changed predictable has been saved.');
-            Queue::push('PredictableQueue@scan',$predictable);
+            Session::flash(
+                'success', 'The changed predictable has been saved.'
+            );
+            Queue::push('PredictableQueue@scan', $predictable);
+
             return Redirect::to(Session::get('previous'));
         } else {
             Session::flash(
@@ -182,8 +208,8 @@ class PredictableController extends BaseController
                 'Could not save the changed predictable. Is the predictable name unique?'
             );
 
-            return Redirect::route('editpredictable',$predictable->id)->withErrors($validator)
-                ->withInput();
+            return Redirect::route('editpredictable', $predictable->id)
+                ->withErrors($validator)->withInput();
         }
 
 
@@ -222,13 +248,17 @@ class PredictableController extends BaseController
         return Redirect::to(Session::get('previous'));
     }
 
-    public function rescan(Predictable $predictable) {
-        Queue::push('PredictableQueue@scan',$predictable);
-        return Redirect::route('predictableoverview',$predictable->id);
+    public function rescan(Predictable $predictable)
+    {
+        Queue::push('PredictableQueue@scan', $predictable);
+
+        return Redirect::route('predictableoverview', $predictable->id);
     }
 
-    public function rescanAll(Predictable $predictable) {
-        Queue::push('PredictableQueue@scanAll',$predictable);
-        return Redirect::route('predictableoverview',$predictable->id);
+    public function rescanAll(Predictable $predictable)
+    {
+        Queue::push('PredictableQueue@scanAll', $predictable);
+
+        return Redirect::route('predictableoverview', $predictable->id);
     }
 }

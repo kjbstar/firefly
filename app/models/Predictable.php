@@ -3,20 +3,20 @@
 /**
  * An Eloquent Model: 'Predictable'
  *
- * @property integer                                                    $id
- * @property \Carbon\Carbon                                             $created_at
- * @property-read \User                                                 $user
- * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
- * @property \Carbon\Carbon $updated_at
- * @property integer $user_id
- * @property string $description
- * @property float $amount
- * @property integer $dom
- * @property integer $pct
+ * @property integer                                                      $id
+ * @property \Carbon\Carbon                                               $created_at
+ * @property-read \User                                                   $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[]   $components
+ * @property \Carbon\Carbon                                               $updated_at
+ * @property integer                                                      $user_id
+ * @property string                                                       $description
+ * @property float                                                        $amount
+ * @property integer                                                      $dom
+ * @property integer                                                      $pct
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @property-read mixed $beneficiary
- * @property-read mixed $category
- * @property-read mixed $budget
+ * @property-read mixed                                                   $beneficiary
+ * @property-read mixed                                                   $category
+ * @property-read mixed                                                   $budget
  */
 class Predictable extends Eloquent
 {
@@ -24,9 +24,11 @@ class Predictable extends Eloquent
         = ['description' => 'required|between:1,500',
            'user_id'     => 'required|exists:users,id',
            'dom'         => 'required|numeric|between:1,31',
-        'amount' => 'required|numeric|not_in:0'];
+           'amount'      => 'required|numeric|not_in:0',
+           'inactive'    => 'required|numeric|between:0,1'];
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
-    protected $fillable = ['description', 'user_id', 'dom','amount'];
+    protected $fillable
+        = ['description', 'inactive', 'user_id', 'dom', 'amount'];
 
     /**
      * Return the user this Predictable belongs to.
@@ -36,6 +38,18 @@ class Predictable extends Eloquent
     public function user()
     {
         return $this->belongsTo('User');
+    }
+
+    /**
+     * Limits the scope to a active predictables.
+     *
+     * @param        $query
+     *
+     * @return mixed
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('inactive', 0);
     }
 
     /**
@@ -117,9 +131,10 @@ class Predictable extends Eloquent
      */
     public function getDescriptionAttribute($value)
     {
-        if(is_null($value)) {
+        if (is_null($value)) {
             return null;
         }
+
         return Crypt::decrypt($value);
     }
 

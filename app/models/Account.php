@@ -177,7 +177,7 @@ class Account extends Eloquent
                 ) * -1;
             // now substract possible predictables from this prediction:
             $singleDay = intval($currentDay->format('d'));
-            $predicted = Auth::user()->predictables()->where('dom', $singleDay)
+            $predicted = Auth::user()->predictables()->active()->where('dom', $singleDay)
                 ->sum('amount');
             // this is the amount, plus the predictables:
             $amount += ($predicted * -1);

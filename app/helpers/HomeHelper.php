@@ -129,7 +129,7 @@ class HomeHelper
     }
 
     public static function getPredictables(Carbon $date) {
-        $predictables = Auth::user()->predictables()->orderBy('dom','ASC')->get();
+        $predictables = Auth::user()->predictables()->active()->orderBy('dom','ASC')->get();
         $list = [];
         foreach($predictables as $p) {
             $count = $p->transactions()->inMonth($date)->count();

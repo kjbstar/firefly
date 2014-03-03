@@ -121,6 +121,23 @@
             </div>
         </div>
 
+        <!-- inactive predictable (default is zero) -->
+        <div class="form-group">
+            <label for="inputInactive" class="col-sm-3 control-label">Inactive</label>
+            <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        @if($predictable->inactive == 1)
+                        <input type="checkbox" name="inactive" checked="checked" value="1">
+                        @else
+                        <input type="checkbox" name="inactive" value="1">
+                        @endif
+                        This predictable should not actually catch transactions.
+                    </label>
+                </div>
+            </div>
+        </div>
+
 
     </div>
 

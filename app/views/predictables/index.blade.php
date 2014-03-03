@@ -16,7 +16,11 @@
                 <th>&nbsp;</th>
             </tr>
             @foreach($predictables as $p)
+            @if($p->inactive == 1)
+            <tr class="warning">
+            @else
             <tr>
+            @endif
                 <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{$p->description}}</a> <span class="label label-info">{{$p->transactions()->count()}}</span></td>
                 <td>
                     @foreach($p->components as $c)

@@ -24,7 +24,7 @@
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
                 <input type="text" name="description" class="form-control"
-                       value="{{{Input::old('description') ? Input::old('description') : $transaction ? $transaction->description : ''}}}"
+                       value="{{$prefilled['description']}}"
                        id="inputDescription" placeholder="Description">
                 @if($errors->has('description'))
                 <span class="text-danger">{{$errors->first('description')
@@ -44,7 +44,7 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{Input::old('amount') ? Input::old('amount') : $transaction ? $transaction->amount : 0}}" name="amount" step="any" class="form-control" id="inputAmount">
+                    <input type="number" value="{{$prefilled['amount']}}" name="amount" step="any" class="form-control" id="inputAmount">
                 </div>
                 @if($errors->has('amount'))
                 <span class="text-danger">{{$errors->first('amount')
@@ -72,7 +72,7 @@
             <div class="col-sm-3">
                 <div id="highAmount"></div>
             </div>
-            <input type="hidden" name="pct" value="10" id="inputLeeway" />
+            <input type="hidden" name="pct" value="{{$prefilled['leeway']}}" id="inputLeeway" />
         </div>
 
         <!-- the day of month -->
@@ -83,7 +83,7 @@
              ">
             <label for="inputDom" class="col-sm-3 control-label">Day of month</label>
             <div class="col-sm-9">
-                <input type="number" min="1" max="31" value="{{Input::old('dom') ? Input::old('dom') : $transaction ? $transaction->date->format('j') : 0}}" name="dom" step="any" class="form-control" id="inputDom">
+                <input type="number" min="1" max="31" value="{{$prefilled['dom']}}" name="dom" step="any" class="form-control" id="inputDom">
                 @if($errors->has('dom'))
                 <span class="text-danger">{{$errors->first('dom')
                     }}</span><br />
@@ -100,7 +100,7 @@
         <div class="form-group">
             <label for="inputBeneficiary" class="col-sm-3 control-label">Required beneficiary</label>
             <div class="col-sm-9">
-                {{Form::select('beneficiary_id',$components['beneficiary'],Input::old('beneficiary_id') ? Input::old('beneficiary_id') : $transaction && $transaction->beneficiary_id ? $transaction->beneficiary_id : null,['class' => 'form-control'])}}
+                {{Form::select('beneficiary_id',$components['beneficiary'],$prefilled['beneficiary'],['class' => 'form-control'])}}
             </div>
         </div>
         
@@ -108,7 +108,7 @@
         <div class="form-group">
             <label for="inputCategory" class="col-sm-3 control-label">Required category</label>
             <div class="col-sm-9">
-                {{Form::select('category_id',$components['category'],Input::old('category_id') ? Input::old('category_id') : $transaction && $transaction->category_id ? $transaction->category_id : null,['class' => 'form-control'])}}
+                {{Form::select('category_id',$components['category'],$prefilled['category'],['class' => 'form-control'])}}
 
             </div>
         </div>
@@ -117,7 +117,24 @@
         <div class="form-group">
             <label for="inputBudget" class="col-sm-3 control-label">Required budget</label>
             <div class="col-sm-9">
-                {{Form::select('budget_id',$components['budget'],Input::old('budget_id') ? Input::old('budget_id') : $transaction && $transaction->budget_id ? $transaction->budget_id : null,['class' => 'form-control'])}}
+                {{Form::select('budget_id',$components['budget'],$prefilled['budget'],['class' => 'form-control'])}}
+            </div>
+        </div>
+
+        <!-- inactive predictable (default is zero) -->
+        <div class="form-group">
+            <label for="inputInactive" class="col-sm-3 control-label">Inactive</label>
+            <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        @if($prefilled['inactive'] == true)
+                        <input type="checkbox" name="inactive" checked="checked" value="1">
+                        @else
+                        <input type="checkbox" name="inactive" value="1">
+                        @endif
+                        This predictable should not actually catch transactions.
+                    </label>
+                </div>
             </div>
         </div>
 
