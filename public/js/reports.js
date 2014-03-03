@@ -7,7 +7,11 @@ function drawCharts() {
 }
 
 var ieChartSettings = {
-    colors: ['#01DF01', '#DF0101'],
+    isStacked: true,
+    seriesType: "bars",
+    series: {0: {type: "line"}},
+    colors: ['#a00','#ccc','#0a0'],
+    legend: {position:'none'}
 };
 
 

@@ -2,6 +2,8 @@
 
 /** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/Toolkit.php');
+/** @noinspection PhpIncludeInspection */
+include_once(app_path() . '/helpers/ReportHelper.php');
 
 use Carbon\Carbon as Carbon;
 
@@ -38,7 +40,8 @@ class ReportController extends BaseController
 
         // get the X biggest expenses:
         $expenses = Auth::user()->transactions()->inYear($start)->expenses()
-            ->orderBy('amount', 'ASC')->whereNull('predictable_id')->take(10)->get();
+            ->orderBy('amount', 'ASC')->whereNull('predictable_id')->take(10)
+            ->get();
 
         // get the X biggest fans
         $result = Auth::user()->components()->leftJoin(
@@ -84,39 +87,26 @@ class ReportController extends BaseController
         $chart = App::make('gchart');
         $chart->addColumn('Month', 'date');
         $chart->addColumn('Income', 'number');
-        $chart->addColumn('Expenses', 'number');
+        $chart->addColumn('Expenses (predictable)', 'number');
+        $chart->addColumn('Expenses (not predictable)', 'number');
 
-        // query + array for all expenses:
-        $result = Auth::user()->transactions()->groupBy('month')->expenses()
-            ->get(
-                [DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),
-                 DB::Raw('SUM(`amount`) as `total`')]
-            );
-        $expenses = [];
-        foreach ($result as $row) {
-            $expenses[$row->month] = floatval($row->total) * -1;
-        }
-        unset($result);
-
-        // same for all incomes:
-        $result = Auth::user()->transactions()->groupBy('month')->incomes()
-            ->get(
-                [DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),
-                 DB::Raw('SUM(`amount`) as `total`')]
-            );
-        $incomes = [];
-        foreach ($result as $row) {
-            $incomes[$row->month] = floatval($row->total);
-        }
-        unset($result);
+        // all data sets:
+        $inPredList = ReportHelper::ieList('incomes', null);
+        $outPredList = ReportHelper::ieList('expenses', true);
+        $outNoPredList = ReportHelper::ieList('expenses', false);
 
 
         while ($start <= $end) {
             $date = $start->format('m-Y');
-            $income = isset($incomes[$date]) ? $incomes[$date] : 0;
-            $expense = isset($expenses[$date]) ? $expenses[$date] : 0;
+            $income = isset($inPredList[$date]) ? $inPredList[$date] : 0;
 
-            $chart->addRow(clone $start, $income, $expense);
+            $outPred = isset($outPredList[$date]) ? $outPredList[$date] : 0;
+            $outNoPred = isset($outNoPredList[$date]) ? $outNoPredList[$date]
+                : 0;
+
+            $chart->addRow(clone $start, $income, $outPred, $outNoPred);
+
+
             $start->addMonth();
         }
 

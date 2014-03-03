@@ -63,7 +63,7 @@
 <div class="row">
     @if(count($expenses) > 0)
     <div class="col-lg-6 col-md-6 col-sm-12">
-        <h5>Biggest single expenses</h5>
+        <h5>Biggest single expenses<br /><small>Without predictable transactions</small></h5>
         <table class="table">
         <tr>
             <th>Date</th>
