@@ -14,8 +14,8 @@
 ClassLoader::addDirectories(
     array(
 
-    app_path() . '/commands', app_path() . '/controllers',
-    app_path() . '/models', app_path() . '/database/seeds',
+        app_path() . '/commands', app_path() . '/controllers',
+        app_path() . '/models', app_path() . '/database/seeds',
 
 
     )
@@ -82,30 +82,31 @@ App::down(
 | definitions instead of putting them all in the main routes file.
 |
 */
-function mf($n, $coloured = false, $list = false)
-{
-    $n = floatval($n);
-    $string = number_format($n, 2, ',', '.');
+if (!function_exists('mf')) {
+    function mf($n, $coloured = false, $list = false)
+    {
+        $n = floatval($n);
+        $string = number_format($n, 2, ',', '.');
 
-    if ($coloured === true && $n === 0.0) {
-        return '<span style="color:#999">&#8364;' . $string .
-        '</span>';
-    }
-    if ($coloured === true && $n > 0) {
-        return '<span class="text-success">&#8364; ' . $string . '</span>';
-    }
-    if ($coloured === true && $n < 0) {
-        return '<span class="text-danger">&#8364;' . $string . '</span>';
-    }
+        if ($coloured === true && $n === 0.0) {
+            return '<span style="color:#999">&#8364;' . $string . '</span>';
+        }
+        if ($coloured === true && $n > 0) {
+            return '<span class="text-success">&#8364; ' . $string . '</span>';
+        }
+        if ($coloured === true && $n < 0) {
+            return '<span class="text-danger">&#8364;' . $string . '</span>';
+        }
 
-    return '&#8364; ' . $string;
+        return '&#8364; ' . $string;
+    }
 }
 
 require app_path() . '/filters.php';
-require app_path() . '/events/TransactionTrigger.php';
-require app_path() . '/events/TransferTrigger.php';
-require app_path() . '/events/ComponentTrigger.php';
-require app_path() . '/events/PredictableTrigger.php';
-require app_path() . '/events/AccountTrigger.php';
-require app_path() . '/queue/PredictableQueue.php';
-require app_path() . '/extensions/AuthenticatedCacheStore.php';
+//require app_path() . '/events/TransactionTrigger.php';
+//require app_path() . '/events/TransferTrigger.php';
+//require app_path() . '/events/ComponentTrigger.php';
+//require app_path() . '/events/PredictableTrigger.php';
+//require app_path() . '/events/AccountTrigger.php';
+//require app_path() . '/queue/PredictableQueue.php';
+//require app_path() . '/extensions/AuthenticatedCacheStore.php';
