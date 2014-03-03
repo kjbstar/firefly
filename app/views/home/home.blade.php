@@ -141,6 +141,7 @@
                 <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{$p->description}}</a></td>
                 <td>{{mf($p->amount,true)}}</td>
                 <td>{{$p->date->format('jS')}}</td>
+                <td><a href="{{URL::Route('addtransaction',$p->id)}}" class="btn btn-default btn-xs" title="Add transaction from predictable"><span class="glyphicon glyphicon-plus-sign"></span></a></td>
             </tr>
             @endforeach
             <tr>
