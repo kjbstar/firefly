@@ -281,7 +281,65 @@ class AccountController extends BaseController
             $past->addDay();
         }
         $chart->generate();
+        if(Input::get('debug') == 'true') {
+            echo '<pre>';
+            var_dump($chart->getData());
+            echo '</pre>';
+            return;
+        }
 
         return Response::json($chart->getData());
+    }
+
+    public function showChartAllOverview($year, $month)
+    {
+        $start = Toolkit::parseDate($year, $month);
+        $end = clone $start;
+        $end->endOfMonth();
+
+        // make chart
+        $chart = App::make('gchart');
+        $chart->addColumn('Day', 'date');
+
+        $marked = [];
+        $balances = [];
+        $accounts = Auth::user()->accounts()->notHidden()->where(
+            'openingbalancedate', '<=', $start->format('Y-m-d')
+        )->get();
+        foreach ($accounts as $account) {
+            $x = $chart->addColumn($account->name . ' Balance', 'number');
+            $chart->addAnnotation($x);
+            $marked[$account->id] = AccountHelper::getMarkedTransactions(
+                $account, $start, $end
+            );
+            $balances[$account->id] = $account->balanceOnDate($start);
+        }
+        // loop again for data:
+        $current = clone $start;
+
+        while ($current <= $end) {
+            $row = [];
+            $row[] = clone $current;
+
+            foreach ($accounts as $account) {
+                $balances[$account->id] = $account->balanceOnDate($current);
+                $annotation = isset($marked[$account->id][$current->format(
+                    'Y-m-d'
+                )]) ? $marked[$account->id][$current->format('Y-m-d')] : null;
+                // add to row:
+                $row[] = $balances[$account->id];
+                $row[] = $annotation[0];
+                $row[] = $annotation[1];
+
+            }
+            $chart->addRowArray($row);
+
+
+            $current->addDay();
+        }
+        $chart->generate();
+
+        return Response::json($chart->getData());
+
     }
 }
