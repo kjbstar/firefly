@@ -32,6 +32,7 @@ Route::pattern('month', '[0-9]+');
 Route::pattern('day', '[0-9]+');
 Route::pattern('year', '20[0-9]{2}');
 Route::pattern('otheryear', '20[0-9]{2}');
+Route::pattern('type', 'beneficiaries|categories|budgets');
 
 /**
  * HOMECONTROLLER
@@ -125,9 +126,11 @@ Route::post('/home/predictable/add/{transaction?}',['uses' => 'PredictableContro
  * REPORTSCONTROLLER
  */
 Route::get('/home/reports',['uses' => 'ReportController@index', 'as' => 'reports']);
-Route::get('/home/reports/year/{year}',['uses' => 'ReportController@year', 'as' => 'yearreport']);
+Route::get('/home/reports/period/{year}',['uses' => 'ReportController@year', 'as' => 'yearreport']);
+Route::get('/home/reports/period/{year}/{month}',['uses' => 'ReportController@month', 'as' => 'monthreport']);
 
 Route::get('/home/reports/year/{year}/ie',['uses' => 'ReportController@yearIeChart']);
+Route::get('/home/reports/year/{year}/{type}',['uses' => 'ReportController@yearComponentPie']);
 
 /**
  * SETTINGSCONTROLLER (and allowances)
@@ -155,7 +158,7 @@ Route::get('/home/transaction/{transaction}/delete',['uses' => 'TransactionContr
 Route::get('/home/transaction/add/{predictable?}',['uses' => 'TransactionController@add', 'as' => 'addtransaction']);
 Route::post('/home/transaction/{transaction}/edit',['uses' => 'TransactionController@postEdit', 'before' => 'csrf']);
 Route::post('/home/transaction/{transaction}/delete',['uses' => 'TransactionController@postDelete', 'before' => 'csrf']);
-Route::post('/home/transaction/add/{account?}',['uses' => 'TransactionController@postAdd', 'before' => 'csrf']);
+Route::post('/home/transaction/add/{predictable?}',['uses' => 'TransactionController@postAdd', 'before' => 'csrf']);
 
 /**
  * TRANSFER CONTROLLER
@@ -191,6 +194,7 @@ Route::get('/home/account/{account}/edit',['uses' => 'AccountController@edit', '
 Route::get('/home/account/{account}/delete',['uses' => 'AccountController@delete', 'as' => 'deleteaccount']);
 Route::get('/home/account/{account}/overview/{year?}/{month?}',['uses' => 'AccountController@showOverview', 'as' => 'accountoverview']);
 Route::get('/home/account/{account}/overview/chart/{year?}/{month?}',['uses' => 'AccountController@showChartOverview','as'   => 'accountoverviewchart']);
+Route::get('/home/account/overview/chart/{year?}/{month?}',['uses' => 'AccountController@showChartAllOverview','as'   => 'allaccountoverviewchart']);
 Route::post('/home/account/add',['uses' => 'AccountController@postAdd', 'before' => 'csrf']);
 Route::post('/home/account/{account}/edit',['uses' => 'AccountController@postEdit', 'before' => 'csrf']);
 Route::post('/home/account/{account}/delete',['uses' => 'AccountController@postDelete', 'before' => 'csrf']);
