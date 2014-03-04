@@ -158,7 +158,6 @@ class PredictableController extends BaseController
     public function postEdit(Predictable $predictable)
     {
 
-
         $predictable->description = Input::get('description');
         $predictable->amount = floatval(Input::get('amount'));
         $predictable->dom = intval(Input::get('dom'));
