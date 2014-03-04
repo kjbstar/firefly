@@ -108,3 +108,16 @@ Event::subscribe(new ComponentTrigger);
 Event::subscribe(new PredictableTrigger);
 Event::subscribe(new TransactionTrigger);
 Event::subscribe(new TransferTrigger);
+Cache::extend(
+    'authcache', function ($app) {
+        $encrypter = $app['encrypter'];
+        $table = $app['config']['cache.table'];
+
+        $config = $app['config']['cache.connection'];
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $connection = $app['db']->connection($config);
+
+        return new Illuminate\Cache\Repository(new AuthenticatedCacheStore($connection, $encrypter, $table));
+    }
+);
