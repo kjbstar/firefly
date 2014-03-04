@@ -81,17 +81,3 @@ class AuthenticatedCacheStore extends Illuminate\Cache\DatabaseStore
     }
 
 }
-
-Cache::extend(
-    'authcache', function ($app) {
-        $encrypter = $app['encrypter'];
-        $table = $app['config']['cache.table'];
-
-        $config = $app['config']['cache.connection'];
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $connection = $app['db']->connection($config);
-
-        return new Repository(new AuthenticatedCacheStore($connection, $encrypter, $table));
-    }
-);
