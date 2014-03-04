@@ -79,6 +79,13 @@ Breadcrumbs::register(
     }
 );
 
+Breadcrumbs::register(
+    'report_month', function ($breadcrumbs,Carbon $date) {
+        $breadcrumbs->parent('report_year',$date->format('Y'));
+        $breadcrumbs->push('Report for '.$date->format('F, Y'), route('monthreport',[$date->format('Y'),$date->format('m')]));
+    }
+);
+
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),
 //category (fake)

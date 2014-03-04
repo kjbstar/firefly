@@ -10,7 +10,7 @@ var ieChartSettings = {
     isStacked: true,
     seriesType: "bars",
     series: {0: {type: "line"}},
-    colors: ['#a00','#ccc','#0a0'],
+    colors: ['#0a0','#500','#a00'],
     legend: {position:'none'}
 };
 

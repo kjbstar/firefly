@@ -16,7 +16,12 @@ class ReportController extends BaseController
         $first->startOfYear();
         $years = [];
         while ($first <= $today) {
-            $years[] = $first->format('Y');
+            $year = $first->format('Y');
+            $years[$year] = ['01' => 'January', '02' => 'February',
+                             '03' => 'March', '04' => 'April', '05' => 'May',
+                             '06' => 'June', '07' => 'July', '08' => 'August',
+                             '09' => 'September', '10' => 'October',
+                             '11' => 'November', '12' => 'December',];
             $first->addYear();
         }
 
@@ -24,6 +29,68 @@ class ReportController extends BaseController
         return View::make('reports.index')->with('title', 'Reports')->with(
             'years', $years
         );
+    }
+
+    public function month($year, $month)
+    {
+        $start = new Carbon($year . '-' . $month . '-01');
+        $end = clone $start;
+        $end->endOfMonth();
+
+        // transactions
+        $predicted = Auth::user()->transactions()->expenses()->inMonth($start)
+            ->whereNotNull('predictable_id')->orderBy('date', 'ASC')->get();
+        $predictedSum = Auth::user()->transactions()->inMonth($start)
+            ->whereNotNull('predictable_id')->expenses()->orderBy('date', 'ASC')
+            ->sum('amount');
+        $notPredicted = Auth::user()->transactions()->expenses()->orderBy(
+            'date', 'ASC'
+        )->inMonth($start)->whereNull('predictable_id')->get();
+        $notPredictedSum = Auth::user()->transactions()->inMonth($start)
+            ->whereNull('predictable_id')->expenses()->orderBy('date', 'ASC')
+            ->sum('amount');
+
+        // sums:
+        $sumOut = $notPredictedSum + $predictedSum;
+        $sumIn
+            = Auth::user()->transactions()->inMonth($start)->orderBy(
+                'date', 'ASC'
+            )->incomes()->sum('amount');
+
+        $sums = ['sumIn' => $sumIn, 'sumOut' => $sumOut];
+
+        // net worth:
+        $startNetWorth = 0;
+        $endNetWorth = 0;
+        foreach (Auth::user()->accounts()->get() as $a) {
+            $startNetWorth += $a->balanceOnDate($start);
+            $endNetWorth += $a->balanceOnDate($end);
+        }
+        $netWorth = ['start' => $startNetWorth, 'end' => $endNetWorth];
+
+        // incomes:
+        $incomes = [];
+        $incomes['transactions'] = Auth::user()->transactions()->incomes()
+            ->orderBy(
+                'date', 'ASC'
+            )->inMonth($start)->whereNull('predictable_id')->get();
+        $incomes['sum'] = Auth::user()->transactions()->incomes()->orderBy(
+                'date', 'ASC'
+            )->inMonth($start)->whereNull('predictable_id')->sum('amount');
+
+
+        $transactions = ['predicted'       => $predicted,
+                         'predictedSum'    => $predictedSum,
+                         'notPredicted'    => $notPredicted,
+                         'notPredictedSum' => $notPredictedSum];
+
+        return View::make('reports.month')->with(
+            'title', 'Report for ' . $start->format('F Y')
+        )->with('start', $start)->with('transactions', $transactions)->with(
+                'sums', $sums
+            )->with('netWorth', $netWorth)->with('end', $end)->with(
+                'incomes', $incomes
+            );
     }
 
     public function year($year)
