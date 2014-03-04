@@ -17,6 +17,7 @@ function updateAmountFromInput(ev) {
 
     var low = amount * (1-(pct/100));
     var high = amount * (1+(pct/100));
+    console.log(pct + '%');
 
     var lowText = '&euro; ' +  Math.round(low*100)/100;
     var highText = '&euro; ' +  Math.round(high*100)/100;
@@ -37,6 +38,7 @@ function updateAmounts(event,ui) {
     var high = amount * (1+(ui.value/100));
 
     $('#inputLeeway').val(ui.value);
+    console.log(ui.value + '%');
 
     var lowText = '&euro; ' +  Math.round(low*100)/100;
     var highText = '&euro; ' +  Math.round(high*100)/100;
