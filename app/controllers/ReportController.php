@@ -26,6 +26,8 @@ class ReportController extends BaseController
         }
 
 
+
+
         return View::make('reports.index')->with('title', 'Reports')->with(
             'years', $years
         );
@@ -84,6 +86,8 @@ class ReportController extends BaseController
                          'notPredicted'    => $notPredicted,
                          'notPredictedSum' => $notPredictedSum];
 
+
+
         return View::make('reports.month')->with(
             'title', 'Report for ' . $start->format('F Y')
         )->with('start', $start)->with('transactions', $transactions)->with(
@@ -133,13 +137,25 @@ class ReportController extends BaseController
             $start
         )->sum('amount');
 
+        // buttons:
+        $current = clone $start;
+        $buttons = [];
+        while($current <= $end) {
+            $buttons[] = [
+                'month' => $current->format('m'),
+                'year' => $current->format('Y'),
+                'date' => $current->format('F Y')
+            ];
+            $current->addMonth();
+        }
+
 
         return View::make('reports.year')->with('title', 'Report for ' . $year)
             ->with('year', $year)->with('startNetWorth', $startNetWorth)->with(
                 'endNetWorth', $endNetWorth
             )->with('expenses', $expenses)->with('fans', $result)->with(
                 'totalIncome', $totalIncome
-            )->with('totalExpenses', $totalExpenses);
+            )->with('totalExpenses', $totalExpenses)->with('buttons',$buttons);
     }
 
 
@@ -180,5 +196,73 @@ class ReportController extends BaseController
         $chart->generate();
 
         return Response::json($chart->getData());
+    }
+
+    public function yearComponentPie($year,$type) {
+        $predictables = Input::get('predictables') == 'true' ? true : false;
+        $key = $predictables ? $year.'-'.$type.'-predictables-pie' : $year.'-'.$type.'-pie';
+        $date = new Carbon($year.'-01-01');
+        $type = Str::singular($type);
+
+        if(Cache::has($key . 'abc')) {
+            return Response::json(Cache::get($key));
+        } else {
+            $query = Auth::user()->transactions()->expenses()->inYear($date);
+            if($predictables) {
+                $query->whereNotNull('predictable_id');
+            }
+            $transactions = $query->get();
+            $data = [];
+
+            $data[0] = [
+                'name' => '(empty '.$type.')',
+                'amount' => 0
+            ];
+            foreach($transactions as $t) {
+                if(!is_null($t->$type)) {
+                    $id = $t->$type->id;
+                    $name = $t->$type->name;
+                    if(!isset($data[$id])) {
+                        // fill new one
+                        $data[$id] = [
+                            'name' => $name,
+                            'amount' => $t->amount*-1
+                        ];
+                    } else {
+                        // add to existing.
+                        $data[$id]['amount'] += ($t->amount*-1);
+                    }
+                } else {
+                    // add to empty one:
+                    $data[0]['amount'] += ($t->amount*-1);
+                }
+            }
+            // done. Do a loop to get final amounts
+            $amounts = [];
+            foreach($data as $id => $row) {
+                $amounts[] = $row['amount'];
+            }
+            array_multisort($amounts,SORT_DESC,$data);
+            // loop again to get rid of the rest:
+            $count = 0;
+            foreach($data as $id => $row) {
+                if($count > 15) {
+                    unset($data[$id]);
+                }
+                $count++;
+            }
+
+
+            // done
+            $chart = App::make('gchart');
+            $chart->addColumn(ucfirst($type),'string');
+            $chart->addColumn('Amount','number');
+            foreach($data as $row) {
+                $chart->addRow($row['name'],$row['amount']);
+            }
+            $chart->generate();
+            Cache::put($key,$chart->getData(),1440);
+            return Response::json($chart->getData());
+        }
     }
 }
