@@ -32,7 +32,6 @@ Route::pattern('month', '[0-9]+');
 Route::pattern('day', '[0-9]+');
 Route::pattern('year', '20[0-9]{2}');
 Route::pattern('otheryear', '20[0-9]{2}');
-Route::pattern('type', 'beneficiaries|categories|budgets');
 
 /**
  * HOMECONTROLLER
@@ -130,7 +129,6 @@ Route::get('/home/reports/period/{year}',['uses' => 'ReportController@year', 'as
 Route::get('/home/reports/period/{year}/{month}',['uses' => 'ReportController@month', 'as' => 'monthreport']);
 
 Route::get('/home/reports/year/{year}/ie',['uses' => 'ReportController@yearIeChart']);
-Route::get('/home/reports/year/{year}/{type}',['uses' => 'ReportController@yearComponentPie']);
 
 /**
  * SETTINGSCONTROLLER (and allowances)

@@ -61,21 +61,6 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-4 col-md-12 col-sm-12">
-        <h4>Piechart beneficiaries</h4>
-        <div class="piechart-year" id="beneficiaries"></div>
-    </div>
-    <div class="col-lg-4 col-md-12 col-sm-12">
-        <h4>Piechart categories</h4>
-        <div class="piechart-year" id="categories"></div>
-    </div>
-    <div class="col-lg-4 col-md-12 col-sm-12">
-        <h4>Piechart budgets</h4>
-        <div class="piechart-year" id="budgets"></div>
-    </div>
-</div>
-
-<div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <h4>Records of {{$year}}</h4>
     </div>
@@ -123,7 +108,6 @@
 @section('scripts')
 <script type="text/javascript">
     var year = {{$year}};
-    var predictables = false;
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script src="js/reports.js"></script>

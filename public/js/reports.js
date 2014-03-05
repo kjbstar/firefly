@@ -5,7 +5,6 @@ google.setOnLoadCallback(drawCharts)
 function drawCharts() {
     drawIEchart();
     drawMonthAllAccountsChart();
-    pieChartsYear();
 }
 
 var ieChartSettings = {
@@ -16,11 +15,6 @@ var ieChartSettings = {
     legend: {position: 'none'}
 };
 
-var monthAccounts = {
-    legend: {position: 'none'},
-    height: 250,
-    width: 250
-};
 
 
 function drawIEchart() {
@@ -53,29 +47,6 @@ function drawMonthAllAccountsChart() {
             chart.draw(gdata, {});
         }).fail(function () {
             $('#all-accounts-chart-month').addClass('load-error');
-        });
-    }
-}
-
-function pieChartsYear() {
-    //piechart-year
-    if ($('.piechart-year').length > 0) {
-        $.each($('.piechart-year'), function (i, v) {
-            var holder = $(v);
-            var ID = holder.attr('id');
-            var URL = '/home/reports/year/' + year + '/' + ID;
-            $.getJSON(URL, {predictables: predictables}).success(function (data) {
-                var gdata = new google.visualization.DataTable(data);
-                var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
-                for (i = 1; i < gdata.getNumberOfColumns(); i++) {
-                    money.format(gdata, i);
-                }
-                var chart = new google.visualization.PieChart(document.getElementById(ID));
-                chart.draw(gdata, monthAccounts);
-            }).fail(function () {
-                holder.addClass('load-error');
-            });
-
         });
     }
 }
