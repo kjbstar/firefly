@@ -281,10 +281,11 @@ class AccountController extends BaseController
             $past->addDay();
         }
         $chart->generate();
-        if(Input::get('debug') == 'true') {
+        if (Input::get('debug') == 'true') {
             echo '<pre>';
             var_dump($chart->getData());
             echo '</pre>';
+
             return;
         }
 
@@ -296,6 +297,7 @@ class AccountController extends BaseController
         $start = Toolkit::parseDate($year, $month);
         $end = clone $start;
         $end->endOfMonth();
+        $realDay = new Carbon;
 
         // make chart
         $chart = App::make('gchart');
@@ -320,17 +322,24 @@ class AccountController extends BaseController
         while ($current <= $end) {
             $row = [];
             $row[] = clone $current;
+            if ($current <= $realDay) {
 
-            foreach ($accounts as $account) {
-                $balances[$account->id] = $account->balanceOnDate($current);
-                $annotation = isset($marked[$account->id][$current->format(
-                    'Y-m-d'
-                )]) ? $marked[$account->id][$current->format('Y-m-d')] : null;
-                // add to row:
-                $row[] = $balances[$account->id];
-                $row[] = $annotation[0];
-                $row[] = $annotation[1];
+                foreach ($accounts as $account) {
+                    $balances[$account->id] = $account->balanceOnDate($current);
+                    $annotation = isset($marked[$account->id][$current->format(
+                        'Y-m-d'
+                    )]) ? $marked[$account->id][$current->format('Y-m-d')]
+                        : null;
+                    // add to row:
+                    $row[] = $balances[$account->id];
+                    $row[] = $annotation[0];
+                    $row[] = $annotation[1];
 
+                }
+            } else {
+                $row[] = null;
+                $row[] = null;
+                $row[] = null;
             }
             $chart->addRowArray($row);
 
