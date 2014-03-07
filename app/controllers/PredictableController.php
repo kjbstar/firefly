@@ -47,6 +47,8 @@ class PredictableController extends BaseController
             $prefilled = ['description' => $transaction->description,
                           'amount'      => floatval($transaction->amount),
                           'dom'  => intval($transaction->date->format('d')),
+                          'leeway' => 10,
+                          'inactive' => false,
                           'beneficiary' => is_null($transaction->beneficiary) ? 0 : $transaction->beneficiary->id,
                           'category' => is_null($transaction->category) ? 0 : $transaction->category->id,
                           'budget' => is_null($transaction->budget) ? 0 : $transaction->budget->id];
