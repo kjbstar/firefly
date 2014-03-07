@@ -32,6 +32,7 @@ Route::pattern('month', '[0-9]+');
 Route::pattern('day', '[0-9]+');
 Route::pattern('year', '20[0-9]{2}');
 Route::pattern('otheryear', '20[0-9]{2}');
+Route::pattern('othermonth', '[0-9]+');
 
 /**
  * HOMECONTROLLER
@@ -127,6 +128,12 @@ Route::post('/home/predictable/add/{transaction?}',['uses' => 'PredictableContro
 Route::get('/home/reports',['uses' => 'ReportController@index', 'as' => 'reports']);
 Route::get('/home/reports/period/{year}',['uses' => 'ReportController@year', 'as' => 'yearreport']);
 Route::get('/home/reports/period/{year}/{month}',['uses' => 'ReportController@month', 'as' => 'monthreport']);
+
+// compare:
+Route::get('/home/reports/compare/{year}/{otheryear}',['uses' => 'ReportController@yearCompare', 'as' => 'yearcompare']);
+Route::get('/home/reports/compare/{year}-{month}/{otheryear}-{othermonth}',['uses' => 'ReportController@monthCompare', 'as' => 'monthcompare']);
+Route::get('/home/reports/compare/{year}-{month}/{otheryear}-{othermonth}/account',['uses' => 'ReportController@monthCompareAccountChart']);
+
 
 Route::get('/home/reports/year/{year}/ie',['uses' => 'ReportController@yearIeChart']);
 
