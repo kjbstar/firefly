@@ -1,10 +1,18 @@
-// load google
-google.load('visualization', '1.0', {'packages': ['corechart']});
-google.setOnLoadCallback(drawCharts)
+var google = google ? google : false;
+
+if (google) {
+    google.load('visualization', '1.0', {'packages': ['corechart']});
+    google.setOnLoadCallback(drawCharts)
+}
+$(function () {
+    compareButtons();
+});
 
 function drawCharts() {
     drawIEchart();
     drawMonthAllAccountsChart();
+    drawMonthAccountCompareChart();
+
 }
 
 var ieChartSettings = {
@@ -14,7 +22,6 @@ var ieChartSettings = {
     colors: ['#0a0', '#500', '#a00'],
     legend: {position: 'none'}
 };
-
 
 
 function drawIEchart() {
@@ -49,4 +56,46 @@ function drawMonthAllAccountsChart() {
             $('#all-accounts-chart-month').addClass('load-error');
         });
     }
+}
+
+function drawMonthAccountCompareChart() {
+    if ($('#all-accounts-compare-chart-month').length == 1) {
+        var URL = window.location + '/account';
+        $.getJSON(URL).success(function (data) {
+            var gdata = new google.visualization.DataTable(data);
+            var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
+            for (i = 1; i < gdata.getNumberOfColumns(); i++) {
+                money.format(gdata, i);
+            }
+            var chart = new google.visualization.LineChart(document.getElementById('all-accounts-compare-chart-month'));
+            chart.draw(gdata, {});
+        }).fail(function () {
+            $('#all-accounts-compare-chart-month').addClass('load-error');
+        });
+    }
+}
+
+function compareButtons() {
+    $('#year-compare').on('click', compareYear);
+    $('#month-compare').on('click', compareMonth);
+}
+
+function compareYear(ev) {
+    var left = $('#year_left').val();
+    var right = $('#year_right').val();
+    if(left != right) {
+        var URL = '/home/reports/compare/' + left + '/' + right;
+        window.location = URL;
+    }
+
+    return false;
+}
+function compareMonth(ev) {
+    var left = $('#month_left').val();
+    var right = $('#month_right').val();
+    if(left != right) {
+        var URL = '/home/reports/compare/' + left + '/' + right;
+        window.location = URL;
+    }
+    return false;
 }
