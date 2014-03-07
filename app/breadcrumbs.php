@@ -85,6 +85,12 @@ Breadcrumbs::register(
         $breadcrumbs->push('Report for '.$date->format('F, Y'), route('monthreport',[$date->format('Y'),$date->format('m')]));
     }
 );
+Breadcrumbs::register(
+    'report_compare_month', function ($breadcrumbs,Carbon $one,Carbon $two) {
+        $breadcrumbs->parent('reports');
+        $breadcrumbs->push('Comparing ' . $one->format('F Y') . ' with ' . $two->format('F Y'));
+    }
+);
 
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),
