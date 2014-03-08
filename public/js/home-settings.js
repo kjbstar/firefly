@@ -10,5 +10,8 @@ var accountChartOptions = {
         width: 1060,
         height: 200
     },
+    tooltip: {isHtml: true,
+        trigger: 'selection'
+    },
     intervals: { 'style': 'area' }
 };

@@ -7,6 +7,15 @@ function drawCharts() {
     drawAccountChart();
 }
 
+$('#PopupModal').on('hidden.bs.modal', function () {
+    $(this).removeData();
+})
+
+
+$('#LimitModal').on('hidden.bs.modal', function () {
+    $(this).removeData();
+})
+
 
 function drawAccountChart() {
 
@@ -17,7 +26,36 @@ function drawAccountChart() {
             money.format(gdata, i);
         }
         chart = new google.visualization.LineChart(document.getElementById('home-accounts-chart'));
+
+        // tooltip for prediction info:
+        chart.setAction({
+            id: 'prediction',                  // An id is mandatory for all actions.
+            text: 'More information',       // The text displayed in the tooltip.
+            action: function() {           // When clicked, the following runs.
+                selection = chart.getSelection()[0];
+                // build some sort of modal dialog?
+                var date = gdata.getValue(selection.row,0);
+                date.setDate(date.getDate()+1);
+                var dateString = date.getUTCFullYear()+'/'+ (date.getUTCMonth()+1) + '/' +date.getUTCDate();
+                var URL = '/home/predict/' + dateString;
+                $('#PopupModal').modal(
+                    {
+                        remote: URL
+
+                    }
+                )
+
+
+
+            }
+        });
+
+
+
         chart.draw(gdata, accountChartOptions);
+
+
+
     }).fail(function () {
         $('#home-accounts-chart').addClass('load-error');
     });

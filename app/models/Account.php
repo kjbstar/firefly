@@ -115,12 +115,16 @@ class Account extends Eloquent
      *
      * @return float
      */
-    public function predictOnDate(Carbon $date)
+    public function predictOnDateExpanded(Carbon $date)
     {
-        $data = [];
-        $data['most'] = 0;
-        $data['least'] = 0;
-        $data['prediction'] = 0;
+        $data = [
+            'prediction' => [],
+            'transactions' => [],
+            'predictables' => []
+        ];
+        $data['prediction']['most'] = 0;
+        $data['prediction']['least'] = 0;
+        $data['prediction']['prediction'] = 0;
 
         $predictionStart = Setting::getSetting('predictionStart');
         $predictionDate = new Carbon($predictionStart->value);
@@ -164,6 +168,7 @@ class Account extends Eloquent
         }
         // we need a prediction now, based on these dates:
         $sum = 0;
+        $singleDay = 0;
         foreach ($days as $index => $currentDay) {
             // this is the predicted amount, except predictables.
             $amount = floatval(
@@ -175,10 +180,24 @@ class Account extends Eloquent
 
                         ->onDay($currentDay)->sum('amount')
                 ) * -1;
+            // get these transactions in a list:
+            $list = $this->transactions()->expenses()->afterDate(
+                $predictionDate
+            )->where(
+                    'ignoreprediction', 0
+                )->whereNull('predictable_id')
+
+                ->onDay($currentDay)->get();
+            $data['transactions'][$currentDay->format('d-m-Y')] = $list;
+            unset($list);
+
+
             // now substract possible predictables from this prediction:
             $singleDay = intval($currentDay->format('d'));
             $predicted = Auth::user()->predictables()->active()->where('dom', $singleDay)
                 ->sum('amount');
+
+
             // this is the amount, plus the predictables:
             $amount += ($predicted * -1);
 
@@ -186,35 +205,45 @@ class Account extends Eloquent
             $sum += $amount;
 
             // more than the current 'most expensive day ever'?
-            if ($amount > $data['most']) {
-                $data['most'] = $amount;
+            if ($amount > $data['prediction']['most']) {
+                $data['prediction']['most'] = $amount;
             }
             // first entry is 'least' by default (otherwise it would stick at
             // zero)
             if ($index == 0) {
-                $data['least'] = $amount;
+                $data['prediction']['least'] = $amount;
             }
-            if ($amount < $data['least']) {
-                $data['least'] = $amount;
+            if ($amount < $data['prediction']['least']) {
+                $data['prediction']['least'] = $amount;
             }
             Log::debug(
                 $currentDay->format('d-M-Y') . ': Most/least/sum: '
-                . $data['most'] . '/' . $data['least'] . '/' . $sum
+                . $data['prediction']['most'] . '/' . $data['prediction']['least'] . '/' . $sum
                 . ' [amount: ' . $amount . ']'
             );
         }
+
+        // get the predictables in a list:
+        $list = Auth::user()->predictables()->active()->where('dom', $singleDay)->get();
+        $data['predictables'] = $list;
+        unset($list);
+
         Log::debug('Done looping these days.');
         Log::debug(
-            'Most/least/sum: ' . $data['most'] . '/' . $data['least'] . '/'
+            'Most/least/sum: ' . $data['prediction']['most'] . '/' . $data['prediction']['least'] . '/'
             . $sum
         );
         // the actual prediction:
         $count = count($days);
-        $data['prediction'] = $count > 1 ? $sum / $count : $sum;
+        $data['prediction']['prediction'] = $count > 1 ? $sum / $count : $sum;
 
         return $data;
 
+    }
 
+    public function predictOnDate(Carbon $date) {
+        $data = $this->predictOnDateExpanded($date);
+        return $data['prediction'];
     }
 
     /**

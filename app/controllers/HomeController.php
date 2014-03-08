@@ -85,4 +85,20 @@ class HomeController extends BaseController
                 'predictables', $predictables
             )->with('transfers',$transfers);
     }
+    public function predict($year,$month,$day) {
+        $date = new Carbon($year.'-'.$month.'-'.$day);
+        $account = Toolkit::getFrontpageAccount();
+        $prediction = $account->predictOnDateExpanded($date);
+        // do a prediction, but "visible":
+
+
+        $transactions = Auth::user()->transactions()->expenses()->where(
+            'ignoreprediction', 0
+        )->whereNull('predictable_id');
+
+        return View::make('home.predict')->with('prediction',$prediction)->with('date',$date);
+
+        return $date;
+        //return
+    }
 }
