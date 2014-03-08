@@ -71,6 +71,11 @@
                 <th>{{$one->format('F Y')}}</th>
                 <th>{{$two->format('F Y')}}</th>
             </tr>
+            <tr>
+                <td><em>Sum</em></td>
+                <td><strong>{{mf($predictables['sum_one'],true)}}</strong></td>
+                <td><strong>{{mf($predictables['sum_two'],true)}}</strong></td>
+            </tr>
             @foreach($predictables['predictables'] as $p)
             <tr>
                 <td><a href="{{URL::Route('predictableoverview',$p['id'])}}">{{$p['description']}}</a></td>
@@ -90,11 +95,7 @@
                 </td>
             </tr>
             @endforeach
-            <tr>
-                <td>Sum</td>
-                <td><strong>{{mf($predictables['sum_one'],true)}}</strong></td>
-                <td><strong>{{mf($predictables['sum_two'],true)}}</strong></td>
-            </tr>
+
         </table>
     </div>
     <div class="col-lg-6 col-md-12 col-sm-12">
@@ -104,6 +105,11 @@
                 <th>&nbsp;</th>
                 <th>{{$one->format('F Y')}}</th>
                 <th>{{$two->format('F Y')}}</th>
+            </tr>
+            <tr>
+                <td><em>Sum</em></td>
+                <td><strong>{{mf($incomes['one_sum'],true)}}</strong></td>
+                <td><strong>{{mf($incomes['two_sum'],true)}}</strong></td>
             </tr>
             @foreach($incomes['incomes'] as $description => $data)
             <tr>
@@ -124,11 +130,6 @@
                 </td>
             </tr>
             @endforeach
-            <tr>
-                <td>Sum</td>
-                <td><strong>{{mf($incomes['one_sum'],true)}}</strong></td>
-                <td><strong>{{mf($incomes['two_sum'],true)}}</strong></td>
-            </tr>
         </table>
     </div>
 </div>
