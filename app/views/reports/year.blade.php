@@ -104,6 +104,15 @@
     @endif
 </div>
 
+@if($components > 0)
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h4>Selected components in {{$year}}</h4>
+        <div id="components-year"></div>
+    </div>
+</div>
+@endif
+
 @stop
 @section('scripts')
 <script type="text/javascript">
