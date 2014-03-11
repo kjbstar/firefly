@@ -130,13 +130,17 @@ Route::get('/home/reports',['uses' => 'ReportController@index', 'as' => 'reports
 Route::get('/home/reports/period/{year}',['uses' => 'ReportController@year', 'as' => 'yearreport']);
 Route::get('/home/reports/period/{year}/{month}',['uses' => 'ReportController@month', 'as' => 'monthreport']);
 
-// compare:
+// compares:
 Route::get('/home/reports/compare/{year}/{otheryear}',['uses' => 'ReportController@yearCompare', 'as' => 'yearcompare']);
 Route::get('/home/reports/compare/{year}-{month}/{otheryear}-{othermonth}',['uses' => 'ReportController@monthCompare', 'as' => 'monthcompare']);
+
+// charts:
+Route::get('/home/reports/year/{year}/ie',['uses' => 'ReportController@yearIeChart']);
+Route::get('/home/reports/year/{year}/components',['uses' => 'ReportController@yearComponentsChart']);
 Route::get('/home/reports/compare/{year}-{month}/{otheryear}-{othermonth}/account',['uses' => 'ReportController@monthCompareAccountChart']);
 
 
-Route::get('/home/reports/year/{year}/ie',['uses' => 'ReportController@yearIeChart']);
+
 
 /**
  * SETTINGSCONTROLLER (and allowances)
