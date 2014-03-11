@@ -12,11 +12,6 @@ $('#PopupModal').on('hidden.bs.modal', function () {
 })
 
 
-$('#LimitModal').on('hidden.bs.modal', function () {
-    $(this).removeData();
-})
-
-
 function drawAccountChart() {
 
     $.getJSON('/home/account/'+fpAccount+'/overview/chart/' + year + '/' + month).success(function (data) {
@@ -35,8 +30,10 @@ function drawAccountChart() {
                 selection = chart.getSelection()[0];
                 // build some sort of modal dialog?
                 var date = gdata.getValue(selection.row,0);
-                date.setDate(date.getDate()+1);
-                var dateString = date.getUTCFullYear()+'/'+ (date.getUTCMonth()+1) + '/' +date.getUTCDate();
+                console.log('Before add day: ' + date);
+                //date.setDate(date.getDate()+1);
+                console.log('after add day: ' + date);
+                var dateString = date.getFullYear()+'/'+ (date.getMonth()+1) + '/' +date.getDate();
                 var URL = '/home/predict/' + dateString;
                 $('#PopupModal').modal(
                     {
