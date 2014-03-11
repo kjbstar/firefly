@@ -86,7 +86,7 @@
 
         </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="/logout">Logout</a></li>
+            <li><a href="/logout">Logout {{{Auth::user()->username}}}</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </nav>
