@@ -69,6 +69,11 @@ class AccountHelper
         return $list;
     }
 
+    public static function getPredictionStart() {
+        $predictionStart = Setting::getSetting('predictionStart');
+        return new Carbon($predictionStart->value);
+    }
+
     /**
      * Returns the transactions marked in this period. One per date max.
      *
