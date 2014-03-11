@@ -134,7 +134,7 @@ class HomeHelper
         foreach($predictables as $p) {
             $count = $p->transactions()->inMonth($date)->count();
             if($count == 0) {
-                $p->date = new Carbon($date->format('Y-m-').$p->dom);
+                $p->date = new Carbon('2012-01-'.$p->dom);
                 $list[] = $p;
             }
         }
