@@ -134,6 +134,39 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-lg-6 col-md-12 col-sm-1">
+    <h4>Components</h4>
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>{{$one->format('F Y')}}</th>
+            <th>{{$two->format('F Y')}}</th>
+        </tr>
+        @foreach($components as $c)
+        <tr>
+            <td><a href="{{URL::Route($c['component']->type.'overview')}}" title="Overview of all {{Str::plural($c['component']->type)}}">{{ucfirst($c['component']->type)}}</a>: <a href="{{URL::Route($c['component']->type.'overview',$c['component']->id)}}" title="Overview for {{$c['component']->type}} '{{$c['component']->name}}'">{{$c['component']->name}}</td>
+            <td>{{mf($c['one'],true)}}</td>
+            <td>{{mf($c['two'],true)}}</td>
+        </tr>
+
+
+    @endforeach
+    </table>
+
+    <p>
+        <small><em>Add
+                @if(isset($components) && count($components) > 0)
+                more
+                @endif
+                components to this report
+                by marking them for reports
+                on their respective overviews.
+            </em></small>
+    </p>
+    </div>
+</div>
+
 {{--
 
 <div class="row">
