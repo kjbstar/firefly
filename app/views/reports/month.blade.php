@@ -34,14 +34,6 @@
     </div>
 
 <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12">
-        <h4>Chart</h4>
-        <div id="all-accounts-chart-month"></div>
-    </div>
-</div>
-
-
-<div class="row">
     <div class="col-lg-6 col-md-12 col-sm-12">
         <h4>Transactions (predicted)</h4>
         <table class="table">
@@ -49,34 +41,16 @@
                 <td colspan="2">Sum</td>
                 <td><strong>{{mf($transactions['predictedSum'],true)}}</strong></td>
             </tr>
-        @foreach($transactions['predicted'] as $t)
-        <tr>
-            <td>{{$t->date->format('j F Y')}}</td>
-            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
-            <td>{{mf($t->amount,true)}}</td>
-        </tr>
-        @endforeach
-        </table>
-
-    </div>
-    <div class="col-lg-6 col-md-12 col-sm-12">
-        <h4>Transactions (not predicted)</h4>
-        <table class="table">
+            @foreach($transactions['predicted'] as $t)
             <tr>
-                <td colspan="2">Sum</td>
-                <td><strong>{{mf($transactions['notPredictedSum'],true)}}</strong></td>
+                <td>{{$t->date->format('j F Y')}}</td>
+                <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+                <td>{{mf($t->amount,true)}}</td>
             </tr>
-        @foreach($transactions['notPredicted'] as $t)
-        <tr>
-            <td>{{$t->date->format('j F Y')}}</td>
-            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
-            <td>{{mf($t->amount,true)}}</td>
-        </tr>
-        @endforeach
+            @endforeach
         </table>
     </div>
-</div>
-<div class="row">
+
     <div class="col-lg-6 col-md-12 col-sm-12">
         <h4>Incomes</h4>
         <table class="table">
@@ -98,8 +72,62 @@
         <p>
             &nbsp;
         </p>
+    </div>
 </div>
 
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h4>Chart</h4>
+        <div id="all-accounts-chart-month"></div>
+    </div>
+</div>
+
+
+<div class="row">
+
+    <div class="col-lg-6 col-md-12 col-sm-12">
+        <h4>Transactions (not predicted)</h4>
+        <table class="table">
+            <tr>
+                <td colspan="2">Sum</td>
+                <td><strong>{{mf($transactions['notPredictedSum'],true)}}</strong></td>
+            </tr>
+        @foreach($transactions['notPredicted'] as $t)
+        <tr>
+            <td>{{$t->date->format('j F Y')}}</td>
+            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+            <td>{{mf($t->amount,true)}}</td>
+        </tr>
+        @endforeach
+        </table>
+    </div>
+
+    <div class="col-lg-6 col-md-12 col-sm-12">
+    <h4>Components</h4>
+
+    <table class="table">
+        @foreach($components as $c)
+        <tr>
+            <td>{{ucfirst($c->type)}}: {{$c->name}}</td>
+            <td>{{mf($c->sum,true)}}</td>
+        </tr>
+
+        @endforeach
+    </table>
+
+    <p>
+        <small><em>Add
+                @if(isset($components) && count($components) > 0)
+                more
+                @endif
+                components to this report
+                by marking them for reports
+                on their respective overviews.
+            </em></small>
+    </p>
+
+    </div>
+</div>
 @stop
 @section('scripts')
 <script type="text/javascript">
