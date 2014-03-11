@@ -1,7 +1,7 @@
 var accountChartOptions = {
     height: 250,
     legend: {position: 'none'},
-    lineWidth: 2,
+    lineWidth: 1,
     curveType: 'function',
     axisTitlesPosition: 'none',
     chartArea: {
@@ -10,8 +10,13 @@ var accountChartOptions = {
         width: 1060,
         height: 200
     },
+            series: [{'color': '#D3362D'}],
+
     tooltip: {isHtml: true,
         trigger: 'selection'
     },
-    intervals: { 'style': 'area' }
+        intervals: { style: 'area' },
+
+
+
 };
