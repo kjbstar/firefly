@@ -12,9 +12,9 @@
         <th>Optimistic</th>
     </tr>
     <tr>
-        <td>{{mf($prediction['prediction']['least']*-1,true)}}</td>
-        <td>{{mf($prediction['prediction']['prediction']*-1,true)}}</td>
         <td>{{mf($prediction['prediction']['most']*-1,true)}}</td>
+        <td>{{mf($prediction['prediction']['prediction']*-1,true)}}</td>
+        <td>{{mf($prediction['prediction']['least']*-1,true)}}</td>
     </tr>
 </table>
 
@@ -41,7 +41,7 @@
     @foreach($prediction['predictables'] as  $p)
     <tr>
         <td><span class="glyphicon glyphicon-refresh"</td>
-        <td>{{$p->dom}}</td>
+        <td>{{$p->date->format('jS')}}</td>
         <td>{{$p->description}}</td>
         <td>{{mf($p->amount,true)}}</td>
     </tr>
