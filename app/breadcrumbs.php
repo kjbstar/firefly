@@ -91,6 +91,12 @@ Breadcrumbs::register(
         $breadcrumbs->push('Comparing ' . $one->format('F Y') . ' with ' . $two->format('F Y'));
     }
 );
+Breadcrumbs::register(
+    'report_compare_year', function ($breadcrumbs,Carbon $one,Carbon $two) {
+        $breadcrumbs->parent('reports');
+        $breadcrumbs->push('Comparing ' . $one->format('Y') . ' with ' . $two->format('Y'));
+    }
+);
 
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),
