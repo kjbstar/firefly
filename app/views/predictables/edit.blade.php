@@ -44,7 +44,7 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{Input::old('amount') ? Input::old('amount') : $predictable->amount}}" name="amount" step="any" class="form-control" id="inputAmount">
+                    <input type="number" value="{{{Input::old('amount') ? Input::old('amount') : $predictable->amount}}}" name="amount" step="any" class="form-control" id="inputAmount">
                 </div>
                 @if($errors->has('amount'))
                 <span class="text-danger">{{$errors->first('amount')
@@ -72,7 +72,7 @@
             <div class="col-sm-3">
                 <div id="highAmount"></div>
             </div>
-            <input type="hidden" name="pct" value="{{Input::old('pct') ? Input::old('pct') : $predictable->pct}}" id="inputLeeway" />
+            <input type="hidden" name="pct" value="{{{Input::old('pct') ? Input::old('pct') : $predictable->pct}}}" id="inputLeeway" />
         </div>
 
         <!-- the day of month -->
@@ -83,7 +83,7 @@
              ">
             <label for="inputDom" class="col-sm-3 control-label">Day of month</label>
             <div class="col-sm-9">
-                <input type="number" min="1" max="31" value="{{Input::old('dom') ? Input::old('dom') : $predictable->dom}}" name="dom" step="any" class="form-control" id="inputDom">
+                <input type="number" min="1" max="31" value="{{{Input::old('dom') ? Input::old('dom') : $predictable->dom}}}" name="dom" step="any" class="form-control" id="inputDom">
                 @if($errors->has('dom'))
                 <span class="text-danger">{{$errors->first('dom')
                     }}</span><br />

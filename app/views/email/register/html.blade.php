@@ -8,7 +8,7 @@
       To finish your registration, follow this link.
     </p>
     <p>
-      <a href="{{$url}}">{{$url}}</a>
+      <a href="{{$url}}">{{{$url}}}</a>
     </p>
     <p>
       Regards,<br />

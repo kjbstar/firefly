@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <h2>Yearly overview</h2>
-        <h3>{{$year}}</h3>
+        <h3>{{{$year}}}</h3>
     </div>
 </div>
 
@@ -78,7 +78,7 @@
             @foreach($expenses as $e)
             <tr>
                 <td>{{$e->date->format('d-M')}}</td>
-                <td>{{$e->description}}</td>
+                <td>{{{$e->description}}}</td>
                 <td>{{mf($e->amount,true)}}</td>
             </tr>
             @endforeach
@@ -95,7 +95,7 @@
             </tr>
             @foreach($fans as $index => $f)
             <tr>
-                <td>{{$f->name}}</td>
+                <td>{{{$f->name}}}</td>
                 <td>{{mf($f->total,true)}}</td>
             </tr>
             @endforeach

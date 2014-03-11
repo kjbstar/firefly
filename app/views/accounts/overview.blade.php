@@ -5,7 +5,7 @@
     <div class="col-lg-6">
         <h2>Overview for {{{$account->name}}}
             @if(!is_null($date))
-            in {{$date->format('F Y')}}
+            in {{{$date->format('F Y')}}}
             @endif
         </h2>
         <div class="btn-group">
@@ -34,7 +34,7 @@
             </tr>
             @foreach($transactions as $m)
             <tr>
-                <td><a href="{{$m['url']}}">{{$m['title']}}</a></td>
+                <td><a href="{{$m['url']}}">{{{$m['title']}}}</a></td>
                 <td>{{mf($m['balance_start'],true,true)}}</td>
             </tr>
             @endforeach

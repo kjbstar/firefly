@@ -69,7 +69,7 @@
         <table class="table">
         @foreach($budgets as $id => $budget)
         <tr>
-            <th><a href="{{URL::Route('budgetoverview',$id)}}" title="Overview for {{$budget['name']}}">{{$budget['name']}}</a></th>
+            <th><a href="{{URL::Route('budgetoverview',$id)}}" title="Overview for {{{$budget['name']}}}">{{{$budget['name']}}}</a></th>
         </tr>
         <tr>
             <td>
@@ -104,7 +104,7 @@
             @foreach($transactions as $t)
             <tr>
                 <td>{{$t->date->format('j-M')}}</td>
-                <td><a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit {{$t->description}}">{{$t->description}}</a></td>
+                <td><a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit {{{$t->description}}}">{{{$t->description}}}</a></td>
                 <td>{{mf($t->amount,true)}}</td>
             </tr>
             @endforeach
@@ -119,10 +119,10 @@
             @foreach($transfers as $t)
             <tr>
                 <td>{{$t->date->format('j-M')}}</td>
-                <td><a href="{{URL::Route('edittransfer',$t->id)}}" title="Edit {{$t->description}}">{{$t->description}}</a></td>
+                <td><a href="{{URL::Route('edittransfer',$t->id)}}" title="Edit {{{$t->description}}}">{{{$t->description}}}</a></td>
                 <td>
-                    <a href="{{URL::Route('accountoverview',$t->accountfrom->id)}}" title="Overview for {{$t->accountfrom->name}}">{{$t->accountfrom->name}}</a> &rarr;
-                    <a href="{{URL::Route('accountoverview',$t->accountto->id)}}" title="Overview for {{$t->accountto->name}}">{{$t->accountto->name}}</a>
+                    <a href="{{URL::Route('accountoverview',$t->accountfrom->id)}}" title="Overview for {{{$t->accountfrom->name}}}">{{{$t->accountfrom->name}}}</a> &rarr;
+                    <a href="{{URL::Route('accountoverview',$t->accountto->id)}}" title="Overview for {{{$t->accountto->name}}}">{{{$t->accountto->name}}}</a>
                 </td>
                 <td>{{mf($t->amount,true)}}</td>
             </tr>
@@ -138,7 +138,7 @@
             @foreach($predictables as $p)
             <?php $sum += $p->amount; ?>
             <tr>
-                <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{$p->description}}</a></td>
+                <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{{$p->description}}}</a></td>
                 <td>{{mf($p->amount,true)}}</td>
                 <td>{{$p->date->format('jS')}}</td>
                 <td><a href="{{URL::Route('addtransaction',$p->id)}}" class="btn btn-default btn-xs" title="Add transaction from predictable"><span class="glyphicon glyphicon-plus-sign"></span></a></td>
@@ -157,7 +157,7 @@
 <div class="row">
     <div class="col-lg-12 col-md-12"><h4>Other months</h4>
         @foreach($history as $h)
-        <a class="btn btn-info btn-xs" style="margin:2px;" href="{{$h['url']}}">{{$h['title']}}</a>
+        <a class="btn btn-info btn-xs" style="margin:2px;" href="{{$h['url']}}">{{{$h['title']}}}</a>
         @if(isset($h['newline']))
         <br />
         @endif

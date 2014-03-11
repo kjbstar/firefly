@@ -44,7 +44,7 @@
             @foreach($transactions['predicted'] as $t)
             <tr>
                 <td>{{$t->date->format('j F Y')}}</td>
-                <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+                <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{{$t->description}}}</a></td>
                 <td>{{mf($t->amount,true)}}</td>
             </tr>
             @endforeach
@@ -61,7 +61,7 @@
             @foreach($incomes['transactions'] as $t)
             <tr>
                 <td>{{$t->date->format('j F Y')}}</td>
-                <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+                <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{{$t->description}}}</a></td>
                 <td>{{mf($t->amount,true)}}</td>
             </tr>
             @endforeach
@@ -95,7 +95,7 @@
         @foreach($transactions['notPredicted'] as $t)
         <tr>
             <td>{{$t->date->format('j F Y')}}</td>
-            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{{$t->description}}}</a></td>
             <td>{{mf($t->amount,true)}}</td>
         </tr>
         @endforeach
@@ -108,7 +108,7 @@
     <table class="table">
         @foreach($components as $c)
         <tr>
-            <td>{{ucfirst($c->type)}}: {{$c->name}}</td>
+            <td>{{ucfirst($c->type)}}: {{{$c->name}}}</td>
             <td>{{mf($c->sum,true)}}</td>
         </tr>
 

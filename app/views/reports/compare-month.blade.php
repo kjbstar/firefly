@@ -78,7 +78,7 @@
             </tr>
             @foreach($predictables['predictables'] as $p)
             <tr>
-                <td><a href="{{URL::Route('predictableoverview',$p['id'])}}">{{$p['description']}}</a></td>
+                <td><a href="{{URL::Route('predictableoverview',$p['id'])}}">{{{$p['description']}}}</a></td>
                 <td>
                     @if(!is_null($p['one']))
                         {{mf($p['one']->amount,true)}}
@@ -113,7 +113,7 @@
             </tr>
             @foreach($incomes['incomes'] as $description => $data)
             <tr>
-                <td>{{$description}}</td>
+                <td>{{{$description}}}</td>
                 <td>
                     @if(isset($data['one']))
                         {{mf($data['one']['amount'],true)}}
@@ -145,7 +145,7 @@
         </tr>
         @foreach($components as $c)
         <tr>
-            <td><a href="{{URL::Route($c['component']->type.'overview')}}" title="Overview of all {{Str::plural($c['component']->type)}}">{{ucfirst($c['component']->type)}}</a>: <a href="{{URL::Route($c['component']->type.'overview',$c['component']->id)}}" title="Overview for {{$c['component']->type}} '{{$c['component']->name}}'">{{$c['component']->name}}</td>
+            <td><a href="{{URL::Route($c['component']->type.'overview')}}" title="Overview of all {{Str::plural($c['component']->type)}}">{{{ucfirst($c['component']->type)}}}</a>: <a href="{{URL::Route($c['component']->type.'overview',$c['component']->id)}}" title="Overview for {{$c['component']->type}} '{{{$c['component']->name}}}'">{{{$c['component']->name}}}</td>
             <td>{{mf($c['one'],true)}}</td>
             <td>{{mf($c['two'],true)}}</td>
         </tr>
@@ -180,7 +180,7 @@
         @foreach($transactions['predicted'] as $t)
         <tr>
             <td>{{$t->date->format('j F Y')}}</td>
-            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{{$t->description}}}</a></td>
             <td>{{mf($t->amount,true)}}</td>
         </tr>
         @endforeach
@@ -197,7 +197,7 @@
         @foreach($transactions['notPredicted'] as $t)
         <tr>
             <td>{{$t->date->format('j F Y')}}</td>
-            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{{$t->description}}}</a></td>
             <td>{{mf($t->amount,true)}}</td>
         </tr>
         @endforeach
@@ -215,7 +215,7 @@
             @foreach($incomes['transactions'] as $t)
             <tr>
                 <td>{{$t->date->format('j F Y')}}</td>
-                <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+                <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{{$t->description}}}</a></td>
                 <td>{{mf($t->amount,true)}}</td>
             </tr>
             @endforeach

@@ -4,7 +4,7 @@
       
     <title>Firefly
     @if(isset($title))
-    // {{$title}}
+    // {{{$title}}}
     @endif
     </title>
       <meta charset="UTF-8" />

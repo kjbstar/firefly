@@ -34,7 +34,7 @@
             <div class="col-sm-8">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{$account->openingbalance}}" name="openingbalance" step="any" class="form-control" id="inputOpeningbalance">
+                    <input type="number" value="{{{$account->openingbalance}}}" name="openingbalance" step="any" class="form-control" id="inputOpeningbalance">
                 </div>
                 @if($errors->has('openingbalance'))
                 <span class="text-danger">{{$errors->first('openingbalance')}}</span>
@@ -52,7 +52,7 @@
             <div class="col-sm-8"t>
                 <input 
                     
-                    type="date" value="{{$account->openingbalancedate->format('Y-m-d')}}" name="openingbalancedate" class="form-control" id="inputOpeningbalancedate">
+                    type="date" value="{{{$account->openingbalancedate->format('Y-m-d')}}}" name="openingbalancedate" class="form-control" id="inputOpeningbalancedate">
                 @if($errors->has('openingbalancedate'))
                 <span class="text-danger">{{$errors->first('openingbalancedate')}}</span>
                 @endif

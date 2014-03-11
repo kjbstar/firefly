@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
   <div class="col-lg-6 col-md-12">
-    <h2>Edit {{OBJ}} "{{$object->name}}"</h2>
+    <h2>Edit {{OBJ}} "{{{$object->name}}}"</h2>
 
       {{Form::open(['class' => 'form-horizontal'])}}
     <div class="form-group">
@@ -25,6 +25,26 @@
             </div>
 
     </div>
+
+
+      <!-- REPORTING -->
+      <div class="form-group">
+          <label for="inputReporting" class="col-sm-4 control-label">Reporting</label>
+          <div class="col-sm-8">
+              <div class="checkbox">
+                  <label>
+                      @if($object->reporting == 1)
+                      <input type="checkbox" name="reporting" value="1" checked="checked">
+                      @else
+                      <input type="checkbox" name="reporting" value="1">
+                      @endif
+                      Show this {{OBJ}} in reports.
+                  </label>
+              </div>
+          </div>
+      </div>
+
+
       <button type="submit" class="btn btn-default">Save edits to {{OBJ}}</button>
 
     {{Form::close()}}

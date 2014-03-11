@@ -36,21 +36,21 @@
             @foreach($transactions as $m)
             <tr>
                 <td><a href="{{$m['url']}}"
-                       title="{{$m['month']}}">{{$m['title']}}</a></td>
+                       title="{{$m['month']}}">{{{$m['title']}}}</a></td>
                 <td>{{$m['count']}}</td>
                 @if(isset($m['limit']))
                 <td>{{mf($m['limit'],false,true)}}</td>
                 <td>
 
                     <div class="btn-group">
-                        <a data-toggle="modal" data-target="#LimitModal" href="{{URL::Route('edit'.OBJ.'limit',[$m['limit-id']])}}" class="btn btn-info btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
-                        <a data-toggle="modal" data-target="#LimitModal" href="{{URL::Route('delete'.OBJ.'limit',[$m['limit-id']])}}" class="btn btn-default btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                        <a data-toggle="modal" data-target="#PopupModal" href="{{URL::Route('edit'.OBJ.'limit',[$m['limit-id']])}}" class="btn btn-info btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a data-toggle="modal" data-target="#PopupModal" href="{{URL::Route('delete'.OBJ.'limit',[$m['limit-id']])}}" class="btn btn-default btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
                     </div>
 
                 </td>
 
                 @else
-                <td colspan="2"><a data-toggle="modal" href="{{URL::Route('add'.OBJ.'limit',[$component->id,$m['year'],$m['month']])}}" data-target="#LimitModal" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></a></td>
+                <td colspan="2"><a data-toggle="modal" href="{{URL::Route('add'.OBJ.'limit',[$component->id,$m['year'],$m['month']])}}" data-target="#PopupModal" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></a></td>
                 @endif
 
                 @if(isset($m['limit']) && ($m['sum']*-1) > $m['limit'])

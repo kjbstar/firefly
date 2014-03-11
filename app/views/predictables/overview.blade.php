@@ -34,11 +34,11 @@
         @foreach($predictable->transactions()->get() as $t)
         <tr>
             <td>{{$t->date->format('d M Y')}}</td>
-            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{$t->description}}</a></td>
+            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{{$t->description}}}</a></td>
             <td>{{mf($t->amount,true)}}</td>
             <td>
                 @foreach($t->components as $c)
-                {{ucfirst($c->type)}}: <a href="{{URL::Route($c->type.'overview',$c->id)}}">{{$c->name}}</a><br />
+                {{ucfirst($c->type)}}: <a href="{{URL::Route($c->type.'overview',$c->id)}}">{{{$c->name}}}</a><br />
                 @endforeach
             </td>
         </tr>

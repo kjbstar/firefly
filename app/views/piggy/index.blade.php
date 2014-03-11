@@ -21,7 +21,7 @@
 <div class="row">
     @foreach($piggies as $pig)
     <div class="col-lg-3 col-md-6 col-sm-12">
-        <h3>{{$pig->name}}<small><br />{{mf($pig->amount)}}
+        <h3>{{{$pig->name}}}<small><br />{{mf($pig->amount)}}
                 @if(!is_null($pig->target))
                 / {{mf($pig->target)}}
                 @endif

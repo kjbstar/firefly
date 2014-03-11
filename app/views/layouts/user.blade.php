@@ -3,7 +3,7 @@
 <head>
     <title>Firefly
         @if(isset($title))
-        // {{$title}}
+        // {{{$title}}}
         @endif
     </title>
     <base href="{{URL::to('/')}}/" />
@@ -21,7 +21,7 @@
         <div class="col-lg-12">
             <h1>Firefly</h1>
             @if(isset($title))
-            <h2>{{ucfirst($title)}}</h2>
+            <h2>{{{ucfirst($title)}}}</h2>
             @endif
         </div>
     </div>
@@ -29,7 +29,7 @@
         <div class="col-lg-12">
             @if(isset($warning))
             <div class="alert alert-danger">
-                <strong>Nope!</strong> {{$warning}}
+                <strong>Nope!</strong> {{{$warning}}}
             </div>
             @endif
             @yield('content')

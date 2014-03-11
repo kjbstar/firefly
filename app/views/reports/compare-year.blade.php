@@ -79,7 +79,7 @@
             @foreach($expenses as $e)
             <tr>
                 <td>{{$e->date->format('d-M')}}</td>
-                <td>{{$e->description}}</td>
+                <td>{{{$e->description}}}</td>
                 <td>{{mf($e->amount,true)}}</td>
             </tr>
             @endforeach
@@ -96,7 +96,7 @@
             </tr>
             @foreach($fans as $index => $f)
             <tr>
-                <td>{{$f->name}}</td>
+                <td>{{{$f->name}}}</td>
                 <td>{{mf($f->total,true)}}</td>
             </tr>
             @endforeach

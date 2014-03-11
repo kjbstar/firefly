@@ -24,7 +24,7 @@
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
                 <input type="text" name="description" class="form-control"
-                       value="{{$prefilled['description']}}"
+                       value="{{{$prefilled['description']}}}"
                        id="inputDescription" placeholder="Description">
                 @if($errors->has('description'))
                 <span class="text-danger">{{$errors->first('description')
@@ -44,7 +44,7 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{$prefilled['amount']}}" name="amount" step="any" class="form-control" id="inputAmount">
+                    <input type="number" value="{{{$prefilled['amount']}}}" name="amount" step="any" class="form-control" id="inputAmount">
                 </div>
                 @if($errors->has('amount'))
                 <span class="text-danger">{{$errors->first('amount')

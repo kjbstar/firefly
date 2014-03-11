@@ -8,7 +8,7 @@
       Here's your new password!
     </p>
     <p style="font-family:monospace;">
-      {{$password}}
+      {{{$password}}}
     </p>
     <p>
       Regards,<br />

@@ -41,7 +41,7 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{Input::old('amount')}}" name="amount" step="any" class="form-control" id="inputAmount">
+                    <input type="number" value="{{{Input::old('amount')}}}" name="amount" step="any" class="form-control" id="inputAmount">
                 </div>
                 @if($errors->has('amount'))
                 <span class="text-danger">{{$errors->first('amount')}}</span>
@@ -57,7 +57,7 @@
              ">
             <label for="inputDate" class="col-sm-3 control-label">Date</label>
             <div class="col-sm-9">
-                <input type="date" name="date" value="{{Input::old('date') ? Input::old('date') : date('Y-m-d')}}"  class="form-control" id="inputDate">
+                <input type="date" name="date" value="{{{Input::old('date') ? Input::old('date') : date('Y-m-d')}}}"  class="form-control" id="inputDate">
                 @if($errors->has('date'))
                 <span class="text-danger">{{$errors->first('date')}}</span>
                 @endif

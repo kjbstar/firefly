@@ -32,7 +32,7 @@
     <tr>
         <td><span class="glyphicon glyphicon-euro"</td>
         <td>{{$t->date->format('d-m-Y')}}</td>
-        <td>{{$t->description}}</td>
+        <td>{{{$t->description}}}</td>
         <td>{{mf($t->amount,true)}}</td>
     </tr>
     @endforeach
@@ -42,7 +42,7 @@
     <tr>
         <td><span class="glyphicon glyphicon-refresh"</td>
         <td>{{$p->date->format('jS')}}</td>
-        <td>{{$p->description}}</td>
+        <td>{{{$p->description}}}</td>
         <td>{{mf($p->amount,true)}}</td>
     </tr>
     @endforeach

@@ -21,10 +21,10 @@
             @else
             <tr>
             @endif
-                <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{$p->description}}</a> <span class="label label-info">{{$p->transactions()->count()}}</span></td>
+                <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{{$p->description}}}</a> <span class="label label-info">{{$p->transactions()->count()}}</span></td>
                 <td>
                     @foreach($p->components as $c)
-                        {{ucfirst($c->type)}}<a href="{{URL::Route($c->type.'overview',$c->id)}}">: {{$c->name}}</a><br />
+                        {{{ucfirst($c->type)}}}<a href="{{URL::Route($c->type.'overview',$c->id)}}">: {{{$c->name}}}</a><br />
                     @endforeach
                 </td>
                 <td>{{mf($p->amount*(1-($p->pct/100)))}}</td>

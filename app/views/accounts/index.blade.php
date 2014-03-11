@@ -22,9 +22,9 @@
             <tr>
             @endif
                 @if($a->hidden == 1)
-                <td>{{$a->name}}</td>
+                <td>{{{$a->name}}}</td>
                 @else
-                <td><a href="{{URL::Route('accountoverview',$a->id)}}" title="{{$a->name}}">{{$a->name}}</a></td>
+                <td><a href="{{URL::Route('accountoverview',$a->id)}}" title="{{{$a->name}}}">{{{$a->name}}}</a></td>
                 @endif
                 <td>{{mf($a->today,true)}}</td>
                 <td>

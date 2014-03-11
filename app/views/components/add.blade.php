@@ -7,6 +7,7 @@
 
       {{Form::open(['class' => 'form-horizontal'])}}
 
+      <!-- NAME -->
     <div class="form-group">
       <label for="inputName" class="col-sm-4 control-label">{{ucfirst(OBJ)}} name</label>
         <div class="col-sm-8">
@@ -17,6 +18,7 @@
             </div>
     </div>
 
+      <!-- PARENT -->
     <div class="form-group">
       <label for="inputParent" class="col-sm-4 control-label help-popover"
              title="Set a parent {{OBJ}}">Parent
@@ -28,6 +30,19 @@
       <span class="text-danger">{{$errors->first('parent_component_id')}}</span>
             </div>
     </div>
+
+      <!-- mark in charts -->
+      <div class="form-group">
+          <label for="inputReporting" class="col-sm-4 control-label">Reporting</label>
+          <div class="col-sm-8">
+              <div class="checkbox">
+                  <label>
+                      <input type="checkbox" name="reporting" value="1">
+                      Show this {{OBJ}} in reports.
+                  </label>
+              </div>
+          </div>
+      </div>
 
       <button type="submit" class="btn btn-default">Save new {{OBJ}}</button>
 
