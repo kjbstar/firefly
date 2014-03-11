@@ -23,9 +23,11 @@ class Component extends Eloquent
     public static $rules
         = ['name'                => 'required|between:1,500',
            'user_id'             => 'required|exists:users,id',
+           'reporting'           => 'required|numeric|between:0,1',
            'parent_component_id' => 'exists:components,id',];
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
-    protected $fillable = ['name', 'user_id', 'parent_component_id', 'type'];
+    protected $fillable
+        = ['reporting', 'name', 'user_id', 'parent_component_id', 'type'];
 
     /**
      * This method either finds a component by the name $name or creates it
@@ -138,9 +140,10 @@ class Component extends Eloquent
      */
     public function getNameAttribute($value)
     {
-        if(is_null($value)) {
+        if (is_null($value)) {
             return null;
         }
+
         return Crypt::decrypt($value);
     }
 
@@ -166,6 +169,11 @@ class Component extends Eloquent
     public function getDates()
     {
         return ['created_at', 'updated_at', 'deleted_at'];
+    }
+
+    public function scopeReporting($query)
+    {
+        return $query->where('reporting', 1);
     }
 
 

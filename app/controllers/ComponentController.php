@@ -103,6 +103,7 @@ class ComponentController extends BaseController
         $data['name'] = Input::get('name');
         $data['parent_component_id'] = $parentID;
         $data['user_id'] = Auth::user()->id;
+        $data['reporting'] = Input::get('reporting') == '1' ? 1 : 0;
         $data['type'] = OBJ;
 
 
@@ -171,6 +172,7 @@ class ComponentController extends BaseController
             Input::get('parent_component_id')
         ) : null;
         $component->name = Input::get('name');
+        $component->reporting = Input::get('reporting') == '1' ? 1 : 0;
         $validator = Validator::make($component->toArray(), Component::$rules);
         if ($validator->fails()) {
             return Redirect::route('edit' . OBJ, $component->id)->withErrors(
