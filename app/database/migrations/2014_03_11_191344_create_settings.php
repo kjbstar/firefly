@@ -19,7 +19,7 @@ class CreateSettings extends Migration {
             $table->integer('user_id')->unsigned();
             $table->enum('type', ['date','float','string','int']);
             $table->string('name', 500);
-            $table->date('date');
+            $table->date('date')->nullable();
             $table->text('value');
 
             $table->foreign('user_id')
