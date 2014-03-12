@@ -188,10 +188,14 @@ class AccountTrigger
 
     public function validateAccountName(Account $account)
     {
+        $user = Auth::user();
+        if(is_null(Auth::user())) {
+            $user = User::find($account->user_id);
+        }
         if (is_null($account->id)) {
-            $accounts = Auth::user()->accounts()->get();
+            $accounts = $user->accounts()->get();
         } else {
-            $accounts = Auth::user()->accounts()->where(
+            $accounts = $user->accounts()->where(
                 'id', '!=', $account->id
             )->get();
         }

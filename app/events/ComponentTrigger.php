@@ -5,13 +5,17 @@ class ComponentTrigger
 
     public function validateComponent(Component $component)
     {
+        $user = Auth::user();
+        if(is_null(Auth::user())) {
+            $user = User::find($component->user_id);
+        }
         // find a similar component
         if (is_null($component->id)) {
-            $components = Auth::user()->components()->where(
+            $components = $user->components()->where(
                 'type', $component->type
             )->get();
         } else {
-            $components = Auth::user()->components()->where(
+            $components = $user->components()->where(
                 'type', $component->type
             )->where(
                 'id', '!=', $component->id
@@ -35,7 +39,7 @@ class ComponentTrigger
         // component cannot be attached to a component which already
         // is a child:
         if (!is_null($component->parent_component_id)) {
-            $parent = Auth::user()->components()->find(
+            $parent = $user->components()->find(
                 $component->parent_component_id
             );
             // parent must be valid parent:
