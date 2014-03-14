@@ -17,6 +17,8 @@
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
  * @property-read \User                                                   $user
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
+ * @property boolean $reporting
+ * @method static Component reporting()
  */
 class Component extends Eloquent
 {
@@ -25,7 +27,7 @@ class Component extends Eloquent
            'user_id'             => 'required|exists:users,id',
            'reporting'           => 'required|numeric|between:0,1',
            'parent_component_id' => 'exists:components,id',];
-    protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
         = ['reporting', 'name', 'user_id', 'parent_component_id', 'type'];
 
@@ -168,7 +170,7 @@ class Component extends Eloquent
      */
     public function getDates()
     {
-        return ['created_at', 'updated_at', 'deleted_at'];
+        return ['created_at', 'updated_at'];
     }
 
     public function scopeReporting($query)

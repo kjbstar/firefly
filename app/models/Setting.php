@@ -20,7 +20,7 @@ class Setting extends Eloquent
         = ['name' => 'required|between:1,500',
            'user_id' => 'required|exists:users,id',
            'type' => 'in:date,float,string,int', 'value' => 'required'];
-    protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable = ['user_id', 'name', 'type', 'value'];
 
     public static function findSetting($name)

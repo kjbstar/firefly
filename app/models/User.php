@@ -2,7 +2,7 @@
 
 use Illuminate\Auth\Reminders\RemindableInterface;
 use Illuminate\Auth\UserInterface;
-
+use Illuminate\Database\Eloquent\Model as Eloquent;
 /**
  * Class User
  *
@@ -28,7 +28,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 {
 
     public static $rules
-        = ['username' => 'required|unique:users,username'];
+        = ['username' => 'required|unique:users,username',
+        'email' => 'required|email|unique:users,email'];
     protected $fillable
         = ['username', 'email', 'activation', 'password', 'reset', 'origin'];
     protected $softDelete = true;
@@ -212,7 +213,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
      */
     public function getDates()
     {
-        return ['created_at', 'updated_at', 'deleted_at'];
+        return ['created_at', 'updated_at'];
     }
 
 }

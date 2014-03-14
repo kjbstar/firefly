@@ -33,7 +33,7 @@ class Account extends Eloquent
            'openingbalancedate' => 'required|date|after:1950-01-01',
            'hidden'             => 'required|between:0,1',
            'user_id'            => 'required|exists:users,id',];
-    protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
         = ['name', 'openingbalance', 'openingbalancedate', 'currentbalance',
            'hidden', 'user_id'];

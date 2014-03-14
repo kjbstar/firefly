@@ -17,6 +17,8 @@
  * @property-read mixed                                                   $beneficiary
  * @property-read mixed                                                   $category
  * @property-read mixed                                                   $budget
+ * @property boolean $inactive
+ * @method static Predictable active()
  */
 class Predictable extends Eloquent
 {
@@ -26,7 +28,7 @@ class Predictable extends Eloquent
            'dom'         => 'required|numeric|between:1,31',
            'amount'      => 'required|numeric|not_in:0',
            'inactive'    => 'required|numeric|between:0,1'];
-    protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
         = ['description', 'inactive', 'user_id', 'dom', 'amount'];
 
