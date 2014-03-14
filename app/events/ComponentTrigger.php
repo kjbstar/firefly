@@ -24,6 +24,7 @@ class ComponentTrigger
          foreach ($components as $dbc) {
 
             if ($component->name == $dbc->name) {
+                Log::debug('Found a duplicate component: ' . $component->name.' matches existing ' . $dbc->name);
                 return false;
             }
         }
@@ -33,7 +34,7 @@ class ComponentTrigger
             && !is_null($component->parent_component_id)
             && !is_null($component->id)
         ) {
-
+            Log::debug('Found a parent_component problem.');
             return false;
         }
         // component cannot be attached to a component which already
@@ -44,9 +45,11 @@ class ComponentTrigger
             );
             // parent must be valid parent:
             if (is_null($parent)) {
+                Log::debug('Invalid parent.');
                 return false;
             }
             if (!is_null($parent->parent_component_id)) {
+                Log::debug('Parent already a parent.');
                 return false;
             }
         }

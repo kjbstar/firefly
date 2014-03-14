@@ -5,11 +5,15 @@ class PredictableTrigger
 
     public function validatePredictable(Predictable $predictable)
     {
+        $user = Auth::user();
+        if(is_null(Auth::user())) {
+            $user = User::find($predictable->user_id);
+        }
         // find a similar component
         if (is_null($predictable->id)) {
-            $predictables = Auth::user()->predictables()->get();
+            $predictables = $user->predictables()->get();
         } else {
-            $predictables = Auth::user()->predictables()->where(
+            $predictables = $user->predictables()->where(
                 'id', '!=', $predictable->id
             )->get();
         }
