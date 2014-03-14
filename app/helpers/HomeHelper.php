@@ -36,7 +36,7 @@ class HomeHelper
             $accounts[] = $entry;
         }
 
-        unset($query, $entry);
+        unset($query);
 
         return $accounts;
     }
