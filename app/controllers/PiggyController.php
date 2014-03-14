@@ -116,9 +116,13 @@ class PiggyController extends BaseController
         if ($account) {
             $piggyAccount->value = $account->id;
             $piggyAccount->save();
+            return Redirect::route('piggy');
+        } else {
+            Session::flash('error','Invalid account');
+            return Redirect::route('piggyselect');
         }
 
-        return Redirect::route('piggy');
+
     }
 
     public function edit(Piggybank $pig)

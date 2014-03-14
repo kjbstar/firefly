@@ -125,7 +125,6 @@ class AccountController extends BaseController
 
         if ($result) {
             Session::flash('success', 'The account has been updated.');
-
             return Redirect::to(Session::get('previous'));
         } else {
             Session::flash(
@@ -188,13 +187,17 @@ class AccountController extends BaseController
             $entries = AccountHelper::generateTransactionListByMonth(
                 $account, $date
             );
+            $title = 'Overview for ' . $account->name . ' in ' . $date->format(
+                    'F Y'
+                );
         } else {
             $entries = AccountHelper::generateOverviewOfMonths($account);
-
+            $title = 'Overview for ' . $account->name;
         }
 
+
         return View::make('accounts.overview')->with('account', $account)->with(
-            'title', 'Overview for ' . $account->name
+            'title', $title
         )->with(
                 'transactions', $entries
             )->with('date', $date);
@@ -282,11 +285,7 @@ class AccountController extends BaseController
         }
         $chart->generate();
         if (Input::get('debug') == 'true') {
-            echo '<pre>';
-            var_dump($chart->getData());
-            echo '</pre>';
-
-            return;
+            return '<pre>' . print_r($chart->getData(), true) . '</pre>';
         }
 
         return Response::json($chart->getData());

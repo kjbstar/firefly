@@ -231,7 +231,7 @@ class PredictableController extends BaseController
 
         return View::make('predictables.delete')->with(
             'predictable', $predictable
-        )->with('title', 'Delete transaction ' . $predictable->description);
+        )->with('title', 'Delete predictable ' . $predictable->description);
     }
 
     /**

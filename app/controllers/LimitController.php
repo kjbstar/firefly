@@ -24,15 +24,10 @@ class LimitController extends BaseController
             Session::put('previous', URL::previous());
         }
         $date = Toolkit::parseDate($year, $month);
-        if ($date) {
-            return View::make('meta-limit.add')->with(
-                'object', $component
-            )->with('date', $date);
-        }
 
-        App::abort(404);
-
-        return View::make('error.404');
+        return View::make('meta-limit.add')->with(
+            'object', $component
+        )->with('date', $date);
     }
 
     /**
@@ -47,27 +42,22 @@ class LimitController extends BaseController
     public function postAddLimit(Component $component, $year, $month)
     {
         $date = Toolkit::parseDate($year, $month);
-        if ($date) {
-            $limit = new Limit(['component_id' => $component->id,
-                                'date'         => $date, 'amount' => floatval(
-                    Input::get('amount')
-                )]);
+        $limit = new Limit(['component_id' => $component->id, 'date' => $date,
+                            'amount'       => floatval(
+                                Input::get('amount')
+                            )]);
 
-            $validator = Validator::make($limit->toArray(), Limit::$rules);
-            if ($validator->fails()) {
-                Session::flash('error', 'Could not add ' . OBJ . ' limit.');
+        $validator = Validator::make($limit->toArray(), Limit::$rules);
+        if ($validator->fails()) {
+            Session::flash('error', 'Could not add ' . OBJ . ' limit.');
 
-                return Redirect::route(OBJ . 'overview', [$component->id]);
-            } else {
-                $limit->save();
+            return Redirect::route(OBJ . 'overview', [$component->id]);
+        } else {
+            $limit->save();
 
-                return Redirect::to(Session::get('previous'));
-            }
+            return Redirect::to(Session::get('previous'));
         }
 
-        App::abort(404);
-
-        return View::make('error.404');
     }
 
     /**
@@ -83,15 +73,10 @@ class LimitController extends BaseController
             Session::put('previous', URL::previous());
         }
         $object = Auth::user()->components()->find($limit->component_id);
-        if ($object) {
-            return View::make('meta-limit.edit')->with('object', $object)->with(
-                'limit', $limit
-            );
-        }
 
-        App::abort(404);
-
-        return View::make('error.404');
+        return View::make('meta-limit.edit')->with('object', $object)->with(
+            'limit', $limit
+        );
     }
 
     /**
@@ -104,24 +89,18 @@ class LimitController extends BaseController
     public function postEditLimit(Limit $limit)
     {
         $object = Auth::user()->components()->find($limit->component_id);
-        if ($object) {
-            $limit->amount = floatval(Input::get('amount'));
+        $limit->amount = floatval(Input::get('amount'));
 
-            $validator = Validator::make($limit->toArray(), Limit::$rules);
-            if ($validator->fails()) {
-                Session::flash('error', 'Could not edit ' . OBJ . 'limit.');
+        $validator = Validator::make($limit->toArray(), Limit::$rules);
+        if ($validator->fails()) {
+            Session::flash('error', 'Could not edit ' . OBJ . 'limit.');
 
-                return Redirect::route(OBJ . 'overview', [$object->id]);
-            } else {
-                $limit->save();
+            return Redirect::route(OBJ . 'overview', [$object->id]);
+        } else {
+            $limit->save();
 
-                return Redirect::to(Session::get('previous'));
-            }
+            return Redirect::to(Session::get('previous'));
         }
-
-        App::abort(404);
-
-        return View::make('error.404');
     }
 
     /**
@@ -137,14 +116,10 @@ class LimitController extends BaseController
             Session::put('previous', URL::previous());
         }
         $object = Auth::user()->components()->find($limit->component_id);
-        if ($object) {
-            return View::make('meta-limit.delete')->with('object', $object)
-                ->with('date', $limit->date);
-        }
 
-        App::abort(404);
-
-        return View::make('error.404');
+        return View::make('meta-limit.delete')->with('object', $object)->with(
+                'date', $limit->date
+            );
     }
 
     /**
@@ -157,15 +132,9 @@ class LimitController extends BaseController
     public function postDeleteLimit(Limit $limit)
     {
         $object = Auth::user()->components()->find($limit->component_id);
-        if ($object) {
-            $limit->delete();
-            Session::flash('success', 'Limit removed.');
+        $limit->delete();
+        Session::flash('success', 'Limit removed.');
 
-            return Redirect::to(Session::get('previous'));
-        }
-
-        App::abort(404);
-
-        return View::make('error.404');
+        return Redirect::to(Session::get('previous'));
     }
 } 

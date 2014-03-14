@@ -110,6 +110,7 @@ class ComponentController extends BaseController
         $object = new Component($data);
         $validator = Validator::make($object->toArray(), Component::$rules);
         if ($validator->fails()) {
+            Log::error('Could not save component: ' . print_r($validator->messages()->all(),true));
             return Redirect::route('add' . OBJ)->withErrors($validator)
                 ->withInput();
         } else {
@@ -121,6 +122,7 @@ class ComponentController extends BaseController
 
                 return Redirect::to(Session::get('previous'));
             } else {
+                Log::error('Could not save component, trigger failure!');
                 Session::flash(
                     'error',
                     'Could not save the new ' . OBJ . '. Is the name unique?'
@@ -227,6 +229,7 @@ class ComponentController extends BaseController
     public function postDelete(Component $component)
     {
         $component->delete();
+        Session::flash('success', OBJ.' deleted.');
 
         return Redirect::to(Session::get('previous'));
     }

@@ -28,7 +28,7 @@ class HomeController extends BaseController
     /**
      * Show the homepage. Can be for another month.
      *
-     * @param int $year The year
+     * @param int $year  The year
      * @param int $month The month
      *
      * @return View
@@ -83,22 +83,25 @@ class HomeController extends BaseController
                 'transactions', $transactions
             )->with('fpAccount', $fpAccount)->with('budgets', $budgets)->with(
                 'predictables', $predictables
-            )->with('transfers',$transfers);
+            )->with('transfers', $transfers);
     }
-    public function predict($year,$month,$day) {
-        $date = new Carbon($year.'-'.$month.'-'.$day);
+
+    public function predict($year, $month, $day)
+    {
+        $date = new Carbon($year . '-' . $month . '-' . $day);
         $account = Toolkit::getFrontpageAccount();
-        $prediction = $account->predictOnDateExpanded($date);
-        // do a prediction, but "visible":
+        if (!is_null($account)) {
+            $prediction = $account->predictOnDateExpanded($date);
+            // do a prediction, but "visible":
 
 
-        $transactions = Auth::user()->transactions()->expenses()->where(
-            'ignoreprediction', 0
-        )->whereNull('predictable_id');
+            $transactions = Auth::user()->transactions()->expenses()->where(
+                'ignoreprediction', 0
+            )->whereNull('predictable_id');
 
-        return View::make('home.predict')->with('prediction',$prediction)->with('date',$date);
-
-        return $date;
-        //return
+            return View::make('home.predict')->with('prediction', $prediction)
+                ->with('date', $date);
+        }
+        App::abort(500);
     }
 }

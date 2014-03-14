@@ -274,7 +274,7 @@ class ReportController extends BaseController
         }
         // incomes:
         // first get 'one'
-        $incomes = ['one_sum' => 0, 'two_sum' => 0];
+        $incomes = ['one_sum' => 0, 'two_sum' => 0,'incomes' => []];
         $incomesOne = Auth::user()->transactions()->incomes()->inMonth($one)
             ->get();
         foreach ($incomesOne as $i) {
