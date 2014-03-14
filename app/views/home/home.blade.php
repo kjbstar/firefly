@@ -172,7 +172,7 @@
     var day = {{$today->format('d')}};
     var month = {{$today->format('n')}};
     var year = {{$today->format('Y')}};
-    var fpAccount = {{$fpAccount->id}};
+    var fpAccount = {{$fpAccount ? $fpAccount->id : 0}};
 
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
