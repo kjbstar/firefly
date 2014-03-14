@@ -32,8 +32,12 @@ App::before(
 Route::filter(
     'meta', function ($response, $request) {
         $segment = $request->segment(2);
-        define('OBJ', Str::singular($segment));
-        define('OBJS', Str::plural($segment));
+        if (!defined('OBJ')) {
+            define('OBJ', Str::singular($segment));
+        }
+        if (!defined('OBJS')) {
+            define('OBJS', Str::plural($segment));
+        }
 
 
     }
