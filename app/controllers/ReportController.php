@@ -51,11 +51,13 @@ class ReportController extends BaseController
             ->sum('amount');
 
         // sums:
-        $sumOut = $notPredictedSum + $predictedSum;
+        $sumOut = floatval($notPredictedSum + $predictedSum);
         $sumIn
-            = Auth::user()->transactions()->inMonth($start)->orderBy(
-            'date', 'ASC'
-        )->incomes()->sum('amount');
+            = floatval(
+            Auth::user()->transactions()->inMonth($start)->orderBy(
+                'date', 'ASC'
+            )->incomes()->sum('amount')
+        );
 
         $sums = ['sumIn' => $sumIn, 'sumOut' => $sumOut];
 
@@ -86,8 +88,8 @@ class ReportController extends BaseController
 
         // components:
         $components = Auth::user()->components()->reporting()->orderBy(
-                'type', 'DESC'
-            )->get();
+            'type', 'DESC'
+        )->get();
         foreach ($components as $c) {
             $c->sum = $c->transactions()->inMonth($start)->sum('amount');
         }
@@ -207,8 +209,8 @@ class ReportController extends BaseController
 
     public function yearCompare($yearOne, $yearTwo)
     {
-        $one = new Carbon($yearOne.'-01-01');
-        $two = new Carbon($yearTwo.'-01-01');
+        $one = new Carbon($yearOne . '-01-01');
+        $two = new Carbon($yearTwo . '-01-01');
         if ($one->eq($two)) {
             return App::abort(500);
         }
@@ -216,7 +218,7 @@ class ReportController extends BaseController
         return View::make('reports.compare-year')->with(
             'title',
             'Comparing ' . $one->format('Y') . ' with ' . $two->format('Y')
-        )->with('one',$one)->with('two',$two);
+        )->with('one', $one)->with('two', $two);
     }
 
     public function monthCompare($yearOne, $monthOne, $yearTwo, $monthTwo)
@@ -274,7 +276,7 @@ class ReportController extends BaseController
         }
         // incomes:
         // first get 'one'
-        $incomes = ['one_sum' => 0, 'two_sum' => 0,'incomes' => []];
+        $incomes = ['one_sum' => 0, 'two_sum' => 0, 'incomes' => []];
         $incomesOne = Auth::user()->transactions()->incomes()->inMonth($one)
             ->get();
         foreach ($incomesOne as $i) {
@@ -294,10 +296,12 @@ class ReportController extends BaseController
         // get the components and list them.
         $comp = Auth::user()->components()->reporting()->get();
         $components = [];
-        foreach($comp as $c) {
-            $entry = ['component' => $c,
-                      'one' => floatval($c->transactions()->inMonth($one)->sum('amount')),
-                      'two' => floatval($c->transactions()->inMonth($two)->sum('amount'))];
+        foreach ($comp as $c) {
+            $entry = ['component' => $c, 'one' => floatval(
+                $c->transactions()->inMonth($one)->sum('amount')
+            ), 'two'              => floatval(
+                $c->transactions()->inMonth($two)->sum('amount')
+            )];
             $components[] = $entry;
         }
         unset($comp);
@@ -307,7 +311,8 @@ class ReportController extends BaseController
             'title',
             'Comparing ' . $one->format('F Y') . ' with ' . $two->format('F Y')
         )->with('one', $one)->with('two', $two)->with('numbers', $numbers)
-            ->with('predictables', $predictables)->with('incomes', $incomes)->with('components',$components);
+            ->with('predictables', $predictables)->with('incomes', $incomes)
+            ->with('components', $components);
     }
 
     public function monthCompareAccountChart(
@@ -315,6 +320,9 @@ class ReportController extends BaseController
     ) {
         $one = Toolkit::parseDate($yearOne, $monthOne);
         $two = Toolkit::parseDate($yearTwo, $monthTwo);
+        if ($one->eq($two)) {
+            return App::abort(500);
+        }
         $realDay = new Carbon;
 
 
@@ -359,8 +367,10 @@ class ReportController extends BaseController
 
             $row = [];
             $row[] = clone $start;
-            foreach($components as $c) {
-                $row[] = floatval($c->transactions()->inMonth($start)->sum('amount'));
+            foreach ($components as $c) {
+                $row[] = floatval(
+                    $c->transactions()->inMonth($start)->sum('amount')
+                );
             }
             $chart->addRowArray($row);
 
@@ -370,6 +380,7 @@ class ReportController extends BaseController
         }
 
         $chart->generate();
+
         return Response::json($chart->getData());
     }
 
