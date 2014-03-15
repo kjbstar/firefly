@@ -873,12 +873,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "28346ede4207a9bcb9f745b5f32c55f7092577f2"
+                "reference": "bd44f322f09c8a3537c012e17914369f9326bd6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/28346ede4207a9bcb9f745b5f32c55f7092577f2",
-                "reference": "28346ede4207a9bcb9f745b5f32c55f7092577f2",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/bd44f322f09c8a3537c012e17914369f9326bd6b",
+                "reference": "bd44f322f09c8a3537c012e17914369f9326bd6b",
                 "shasum": ""
             },
             "require": {
@@ -982,7 +982,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2014-03-13 01:02:42"
+            "time": "2014-03-14 21:46:05"
         },
         {
             "name": "loic-sharma/profiler",
@@ -1031,12 +1031,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "dc75a998d83ebb285b94b1a6fd96644b457ed33c"
+                "reference": "db7e2aa311869aaf3c2cc76237b2beff05322629"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/dc75a998d83ebb285b94b1a6fd96644b457ed33c",
-                "reference": "dc75a998d83ebb285b94b1a6fd96644b457ed33c",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/db7e2aa311869aaf3c2cc76237b2beff05322629",
+                "reference": "db7e2aa311869aaf3c2cc76237b2beff05322629",
                 "shasum": ""
             },
             "require": {
@@ -1091,7 +1091,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-03-09 20:51:48"
+            "time": "2014-03-14 09:32:58"
         },
         {
             "name": "nesbot/carbon",
@@ -1824,12 +1824,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "02a7073c06c97f4cfe02dd92c28508e63f9c9a49"
+                "reference": "7da7f15f24b6fc59e57f06515150daada46f03e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/02a7073c06c97f4cfe02dd92c28508e63f9c9a49",
-                "reference": "02a7073c06c97f4cfe02dd92c28508e63f9c9a49",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/7da7f15f24b6fc59e57f06515150daada46f03e3",
+                "reference": "7da7f15f24b6fc59e57f06515150daada46f03e3",
                 "shasum": ""
             },
             "require": {
@@ -1873,7 +1873,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2014-03-11 10:09:20"
+            "time": "2014-03-14 14:59:12"
         },
         {
             "name": "predis/predis",
@@ -3000,16 +3000,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpFoundation.git",
-                "reference": "97052d99f8eea42975ef21e3dba01cb550913157"
+                "reference": "d23d6f965e707ac1bd5c7a8d3f214e95bb7e9315"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/97052d99f8eea42975ef21e3dba01cb550913157",
-                "reference": "97052d99f8eea42975ef21e3dba01cb550913157",
+                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/d23d6f965e707ac1bd5c7a8d3f214e95bb7e9315",
+                "reference": "d23d6f965e707ac1bd5c7a8d3f214e95bb7e9315",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/expression-language": "~2.4"
             },
             "type": "library",
             "extra": {
@@ -3043,7 +3046,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "http://symfony.com",
-            "time": "2014-03-04 07:36:26"
+            "time": "2014-03-13 16:54:12"
         },
         {
             "name": "symfony/http-kernel",
@@ -3125,12 +3128,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Process.git",
-                "reference": "1848a3977972fa40c1e8e1912be88535692e2b0c"
+                "reference": "fa18e426ad43ba9409fbb4b3668cce4dfdb64c83"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Process/zipball/1848a3977972fa40c1e8e1912be88535692e2b0c",
-                "reference": "1848a3977972fa40c1e8e1912be88535692e2b0c",
+                "url": "https://api.github.com/repos/symfony/Process/zipball/fa18e426ad43ba9409fbb4b3668cce4dfdb64c83",
+                "reference": "fa18e426ad43ba9409fbb4b3668cce4dfdb64c83",
                 "shasum": ""
             },
             "require": {
@@ -3165,7 +3168,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "http://symfony.com",
-            "time": "2014-03-12 18:29:58"
+            "time": "2014-03-13 05:40:32"
         },
         {
             "name": "symfony/routing",
