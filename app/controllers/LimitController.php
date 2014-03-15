@@ -53,6 +53,7 @@ class LimitController extends BaseController
 
             return Redirect::route(OBJ . 'overview', [$component->id]);
         } else {
+            Session::flash('success', 'Limit saved!');
             $limit->save();
 
             return Redirect::to(Session::get('previous'));
@@ -97,6 +98,7 @@ class LimitController extends BaseController
 
             return Redirect::route(OBJ . 'overview', [$object->id]);
         } else {
+            Session::flash('success', 'Limit edited!');
             $limit->save();
 
             return Redirect::to(Session::get('previous'));

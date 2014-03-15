@@ -107,6 +107,7 @@ Event::subscribe(new AccountTrigger);
 Event::subscribe(new ComponentTrigger);
 Event::subscribe(new PredictableTrigger);
 Event::subscribe(new TransactionTrigger);
+Event::subscribe(new PiggyTrigger);
 Event::subscribe(new TransferTrigger);
 Cache::extend(
     'authcache', function ($app) {

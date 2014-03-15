@@ -69,6 +69,7 @@ class PiggyController extends BaseController
         $piggy->target = $target;
         $validator = Validator::make($piggy->toArray(), Piggybank::$rules);
         if ($validator->fails()) {
+            Session::flash('error', 'Could not add piggy');
             return Redirect::route('addpiggybank')->withErrors(
                 $validator
             )->withInput();
@@ -116,6 +117,7 @@ class PiggyController extends BaseController
         if ($account) {
             $piggyAccount->value = $account->id;
             $piggyAccount->save();
+            Session::flash('success','Account selected.');
             return Redirect::route('piggy');
         } else {
             Session::flash('error','Invalid account');

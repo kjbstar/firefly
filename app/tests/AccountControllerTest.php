@@ -37,7 +37,10 @@ class AccountControllerTest extends TestCase
 
     public function testEmptyPostAdd()
     {
+        $count = Auth::user()->accounts()->count();
         $this->call('POST', 'home/account/add');
+        $newCount = Auth::user()->accounts()->count();
+        $this->assertEquals($count,$newCount);
         $this->assertResponseStatus(302);
         $this->assertSessionHas('error');
         $this->assertHasOldInput();

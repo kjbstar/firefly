@@ -92,8 +92,11 @@ class ComponentControllerTest extends TestCase
 
     public function testEmptyPostAdd()
     {
+        $count = Auth::user()->components()->count();
         $this->call('POST', 'home/budget/add');
+        $newCount = Auth::user()->components()->count();
         $this->assertResponseStatus(302);
+        $this->assertEquals($count,$newCount);
         $this->assertSessionHas('error');
         $this->assertRedirectedToRoute('addbudget');
         $this->assertHasOldInput();
@@ -101,10 +104,13 @@ class ComponentControllerTest extends TestCase
 
     public function testPostAdd()
     {
+        $count = Auth::user()->components()->count();
         $data = ['name'      => 'InTestComponent', 'type' => 'budget',
                  'reporting' => 1, 'parent_component_id' => 0];
 
         $this->call('POST', 'home/budget/add', $data);
+        $newCount = Auth::user()->components()->count();
+        $this->assertEquals($count+1,$newCount);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
@@ -112,11 +118,14 @@ class ComponentControllerTest extends TestCase
 
     public function testPostWithParentAdd()
     {
+        $count = Auth::user()->components()->count();
         $c = Auth::user()->components()->whereNull('parent_component_id')->first();
         $data = ['name'                => 'Bla.', 'type' => 'budget',
                  'reporting'           => 1, 'parent_component_id' => $c->id];
 
         $this->call('POST', 'home/budget/add', $data);
+        $newCount = Auth::user()->components()->count();
+        $this->assertEquals($count+1,$newCount);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
@@ -124,11 +133,14 @@ class ComponentControllerTest extends TestCase
 
     public function testPostTriggerError()
     {
+        $count = Auth::user()->components()->count();
         $c = Auth::user()->components()->whereNotNull('parent_component_id')->first();
         $data = ['name'                => 'Bla.', 'type' => 'budget',
                  'reporting'           => 1, 'parent_component_id' => $c->id];
 
         $this->call('POST', 'home/budget/add', $data);
+        $newCount = Auth::user()->components()->count();
+        $this->assertEquals($count,$newCount);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('addbudget');
         $this->assertSessionHas('error');
@@ -227,9 +239,12 @@ class ComponentControllerTest extends TestCase
 
     public function testPostDelete()
     {
+        $count = Auth::user()->components()->count();
         $component = Auth::user()->components()->whereNull('parent_component_id')->first();
         $this->call('POST', 'home/budget/' . $component->id . '/delete');
         $this->assertResponseStatus(302);
+        $newCount = Auth::user()->components()->count();
+        $this->assertEquals($count-1,$newCount);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
     }
