@@ -52,7 +52,7 @@ class ComponentController extends BaseController
     /**
      * Shows all transactions without component of type X.
      *
-     * @param int $year  The year
+     * @param int $year The year
      * @param int $month the month
      *
      * @return View
@@ -110,7 +110,15 @@ class ComponentController extends BaseController
         $object = new Component($data);
         $validator = Validator::make($object->toArray(), Component::$rules);
         if ($validator->fails()) {
-            Log::error('Could not save component: ' . print_r($validator->messages()->all(),true));
+            Log::error(
+                'Could not save component: ' . print_r(
+                    $validator->messages()->all(), true
+                )
+            );
+            Session::flash(
+                'error', 'Could not save the new ' . OBJ
+            );
+
             return Redirect::route('add' . OBJ)->withErrors($validator)
                 ->withInput();
         } else {
@@ -177,6 +185,10 @@ class ComponentController extends BaseController
         $component->reporting = Input::get('reporting') == '1' ? 1 : 0;
         $validator = Validator::make($component->toArray(), Component::$rules);
         if ($validator->fails()) {
+            Session::flash(
+                'error',
+                'Could not save the ' . OBJ . '.'
+            );
             return Redirect::route('edit' . OBJ, $component->id)->withErrors(
                 $validator
             )->withInput();
@@ -229,7 +241,7 @@ class ComponentController extends BaseController
     public function postDelete(Component $component)
     {
         $component->delete();
-        Session::flash('success', OBJ.' deleted.');
+        Session::flash('success', OBJ . ' deleted.');
 
         return Redirect::to(Session::get('previous'));
     }

@@ -63,6 +63,10 @@ class AccountController extends BaseController
         $account->user()->associate(Auth::user());
         $validator = Validator::make($account->toArray(), Account::$rules);
         if ($validator->fails()) {
+            Session::flash(
+                'error',
+                'Validation failed. Please try harder.'
+            );
             return Redirect::route('addaccount')->withErrors($validator)
                 ->withInput();
         }
@@ -118,6 +122,10 @@ class AccountController extends BaseController
         // validate and save:
         $validator = Validator::make($account->toArray(), Account::$rules);
         if ($validator->fails()) {
+            Session::flash(
+                'error',
+                'Could not save the account.'
+            );
             return Redirect::route('editaccount', $account->id)->withInput()
                 ->withErrors($validator);
         }
