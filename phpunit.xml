@@ -13,6 +13,7 @@
     <filter>
         <whitelist>
             <directory suffix=".php">./app/controllers</directory>
+            <directory suffix=".php">./app/models</directory>
             <exclude>
                 <file>./app/controllers/BaseController.php</file>
             </exclude>
