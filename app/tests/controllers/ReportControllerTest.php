@@ -43,7 +43,7 @@ class ReportControllerTest extends TestCase
         $this->assertLessThanOrEqual(
             $view['netWorth']['end'], $view['netWorth']['start']
         );
-        $this->assertCount(0, $view['transactions']['predicted']);
+        $this->assertCount(1, $view['transactions']['predicted']);
 
     }
 
@@ -87,6 +87,7 @@ class ReportControllerTest extends TestCase
     {
         $two = new \Carbon\Carbon();
         $two->startOfYear();
+        $two->subYear();
         $one = clone $two;
         $one->subYear();
 
@@ -112,6 +113,7 @@ class ReportControllerTest extends TestCase
     {
         $two = new \Carbon\Carbon();
         $two->startOfMonth();
+        $two->subMonths(2);
         $one = clone $two;
         $one->subYear();
 
@@ -147,6 +149,7 @@ class ReportControllerTest extends TestCase
     {
         $two = new \Carbon\Carbon();
         $two->startOfMonth();
+        $two->subMonths(2);
         $one = clone $two;
         $one->subYear();
 

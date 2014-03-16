@@ -25,6 +25,14 @@ class TestSeedIncomes extends Seeder
                  'ignoreprediction' => 0, 'ignoreallowance' => 0, 'mark' => 0]
             );
 
+            Transaction::create(
+                ['user_id'          => $user->id, 'account_id' => $account->id,
+                 'description'      => 'Test Transaction (similar income)',
+                 'amount'           => 1,
+                 'date'             => $current->format('Y-m-') . $day,
+                 'ignoreprediction' => 0, 'ignoreallowance' => 0, 'mark' => 0]
+            );
+
 
             $current->addMonth();
         }

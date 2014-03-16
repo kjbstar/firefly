@@ -31,11 +31,10 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
     public static function setUpBeforeClass()
     {
-        parent::setUpBeforeClass();
-        $test = new self;
-        $test->setUp();
-        $test->seed();
-        echo 1;
+//        parent::setUpBeforeClass();
+//        $test = new self;
+//        $test->setUp();
+//        $test->seed();
     }
 
     protected function tearDown()

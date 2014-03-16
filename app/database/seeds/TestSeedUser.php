@@ -6,7 +6,7 @@ class TestSeedUser extends Seeder
     {
         DB::table('users')->delete();
         $user = User::create(
-            ['email'      => 'foo@bar.com', 'username' => 'test',
+            ['email'      => 'test@nder.be', 'username' => 'test',
              'password'   => Hash::make('test'), 'origin' => 'Test',
              'activation' => null, 'reset' => null]
         );

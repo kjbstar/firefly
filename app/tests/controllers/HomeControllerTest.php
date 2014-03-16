@@ -23,6 +23,7 @@ class HomeControllerTest extends TestCase
         $this->assertTrue(true);
     }
 
+
     public function testShowHome()
     {
         $date = new Carbon\Carbon;
@@ -97,5 +98,14 @@ class HomeControllerTest extends TestCase
         $this->assertCount(3, $view['prediction']);
         $carbon = new Carbon\Carbon(date('Y-m-d'));
         $this->assertEquals($carbon, $view['date']);
+    }
+
+    public function testShowNotLoggedInIndex()
+    {
+        $this->client->request('GET', '/logout');
+        $this->client->request('GET', '/');
+        $this->assertResponseStatus(302);
+        $this->assertRedirectedToRoute('login');
+        $this->assertTrue(true);
     }
 } 

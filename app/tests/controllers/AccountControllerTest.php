@@ -14,14 +14,11 @@ class AccountControllerTest extends TestCase
 
     public function testShowIndex()
     {
-        // valid numbers for test:
         $accounts = Auth::user()->accounts()->count();
-
         $response = $this->call('GET', 'home/account');
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('All accounts', $view['title']);
-
         $this->assertCount($accounts, $view['accounts']);
     }
 

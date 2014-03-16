@@ -13,15 +13,17 @@
     <filter>
         <whitelist>
             <directory suffix=".php">./app/controllers</directory>
+            <exclude>
+                <file>./app/controllers/BaseController.php</file>
+            </exclude>
             <!--<directory suffix=".php">./app/models</directory>-->
         </whitelist>
+
     </filter>
-    <!--
     <logging>
         <log type="coverage-html" target="./app/storage/logs/report"
              highlight="true"  />
     </logging>
--->
     <testsuites>
         <testsuite name="Application Test Suite">
             <directory>./app/tests/</directory>

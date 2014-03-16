@@ -106,7 +106,7 @@ class ComponentControllerTest extends TestCase
     {
         $count = Auth::user()->components()->count();
         $data = ['name'      => 'InTestComponent', 'type' => 'budget',
-                 'reporting' => 1, 'parent_component_id' => 0];
+                 'reporting' => 1, 'parent_component_id' => null];
 
         $this->call('POST', 'home/budget/add', $data);
         $newCount = Auth::user()->components()->count();
@@ -181,7 +181,7 @@ class ComponentControllerTest extends TestCase
 
     public function testPostEdit()
     {
-        $component = Auth::user()->components()->first();
+        $component = Auth::user()->components()->whereNull('parent_component_id')->orderBy('ID','DESC')->first();
         $data = ['name' => 'EditedComponent'];
         $this->call('POST', 'home/budget/' . $component->id . '/edit', $data);
         $this->assertResponseStatus(302);
@@ -192,7 +192,7 @@ class ComponentControllerTest extends TestCase
 
     public function testPostEditWithParent()
     {
-        $component = Auth::user()->components()->whereNotNull('parent_component_id')->first();
+        $component = Auth::user()->components()->whereNotNull('parent_component_id')->orderBy('ID','DESC')->first();
         $data = ['name'                => 'EditedParentComponent',
                  'parent_component_id' => $component->parent_component_id];
         $this->call('POST', 'home/budget/' . $component->id . '/edit', $data);
@@ -240,7 +240,18 @@ class ComponentControllerTest extends TestCase
     public function testPostDelete()
     {
         $count = Auth::user()->components()->count();
-        $component = Auth::user()->components()->whereNull('parent_component_id')->first();
+        $component = Auth::user()->components()->orderBy('ID','DESC')->whereNull('parent_component_id')->first();
+        $this->call('POST', 'home/budget/' . $component->id . '/delete');
+        $this->assertResponseStatus(302);
+        $newCount = Auth::user()->components()->count();
+        $this->assertEquals($count-1,$newCount);
+        $this->assertRedirectedToRoute('index');
+        $this->assertSessionHas('success');
+    }
+    public function testPostParentDelete()
+    {
+        $count = Auth::user()->components()->count();
+        $component = Auth::user()->components()->orderBy('ID','DESC')->whereNotNull('parent_component_id')->first();
         $this->call('POST', 'home/budget/' . $component->id . '/delete');
         $this->assertResponseStatus(302);
         $newCount = Auth::user()->components()->count();

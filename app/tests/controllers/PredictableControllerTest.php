@@ -8,6 +8,7 @@ class PredictableControllerTest extends TestCase
         $user = User::where('username', 'test')->first();
         $this->be($user);
     }
+    private $amount = 123.45;
 
     public function testIndex()
     {
@@ -90,7 +91,7 @@ class PredictableControllerTest extends TestCase
         $budget = Component::where('type', 'budget')->first();
 
         $data = ['description' => 'TestPredictableFilled', 'dom' => 1, 'pct' => 12,
-                 'inactive'    => 0, 'amount' => -111,
+                 'inactive'    => 0, 'amount' => $this->amount,
                  'beneficiary_id' => $beneficiary->id,'budget_id' => $budget->id,'category_id' => $category->id
         ];
         $this->call('POST', 'home/predictable/add', $data);
@@ -145,7 +146,7 @@ class PredictableControllerTest extends TestCase
      */
     public function testEdit()
     {
-        $pred = Predictable::orderBy('id','DESC')->first();
+        $pred = Predictable::orderBy('id','DESC')->where('amount',$this->amount)->first();
         $response = $this->call('GET', 'home/predictable/'.$pred->id.'/edit');
         $view = $response->original;
         $this->assertResponseStatus(200);
@@ -161,9 +162,9 @@ class PredictableControllerTest extends TestCase
         $category = Component::where('type', 'category')->first();
         $budget = Component::where('type', 'budget')->first();
 
-        $pred = Predictable::orderBy('id','DESC')->first();
+        $pred = Predictable::orderBy('id','DESC')->where('amount',$this->amount)->first();
         $data = ['description' => 'TestPredictableFilledEdited', 'dom' => 1, 'pct' => 12,
-                 'inactive'    => 0, 'amount' => -111,
+                 'inactive'    => 0, 'amount' => $this->amount,
                  'beneficiary_id' => $beneficiary->id,'budget_id' => $budget->id,'category_id' => $category->id
         ];
         $this->call('POST', 'home/predictable/'.$pred->id.'/edit', $data);
@@ -205,7 +206,7 @@ class PredictableControllerTest extends TestCase
 
     public function testDelete()
     {
-        $pred = Predictable::orderBy('id','DESC')->first();
+        $pred = Predictable::orderBy('id','DESC')->where('amount',$this->amount)->first();
         $response = $this->call('GET', 'home/predictable/'.$pred->id.'/delete');
         $view = $response->original;
         $this->assertResponseStatus(200);
@@ -213,22 +214,9 @@ class PredictableControllerTest extends TestCase
 
     }
 
-    public function testPostDelete()
-    {
-        $count = Auth::user()->predictables()->count();
-        $pred = Predictable::orderBy('id','DESC')->first();
-
-        $this->call('POST', 'home/predictable/'.$pred->id.'/delete');
-        $newCount = Auth::user()->predictables()->count();
-        $this->assertResponseStatus(302);
-        $this->assertEquals($count-1,$newCount);
-        $this->assertSessionHas('success');
-        $this->assertRedirectedToRoute('index');
-    }
-
     public function testRescan()
     {
-        $pred = Predictable::orderBy('id','DESC')->first();
+        $pred = Predictable::orderBy('id','DESC')->where('amount',$this->amount)->first();
 
         $this->call('GET', 'home/predictable/'.$pred->id.'/rescan');
         $this->assertResponseStatus(302);
@@ -238,12 +226,27 @@ class PredictableControllerTest extends TestCase
 
     public function testRescanAll()
     {
-        $pred = Predictable::orderBy('id','DESC')->first();
+        $pred = Predictable::orderBy('id','DESC')->where('amount',$this->amount)->first();
 
         $this->call('GET', 'home/predictable/'.$pred->id.'/rescan-all');
         $this->assertResponseStatus(302);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('predictableoverview',$pred->id);
     }
+
+    public function testPostDelete()
+    {
+        $count = Auth::user()->predictables()->count();
+        $pred = Predictable::orderBy('id','DESC')->where('amount',$this->amount)->first();
+
+        $this->call('POST', 'home/predictable/'.$pred->id.'/delete');
+        $newCount = Auth::user()->predictables()->count();
+        $this->assertResponseStatus(302);
+        $this->assertEquals($count-1,$newCount);
+        $this->assertSessionHas('success');
+        $this->assertRedirectedToRoute('index');
+    }
+
+
 
 } 

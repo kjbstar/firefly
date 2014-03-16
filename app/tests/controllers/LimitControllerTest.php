@@ -9,6 +9,7 @@ class LimitControllerTest extends TestCase
         $this->be($user);
 
     }
+    private $amount = 123.45;
 
     public function testAddLimit()
     {
@@ -31,7 +32,7 @@ class LimitControllerTest extends TestCase
     {
         $count = Limit::count();
         $budget = Auth::user()->components()->where('type', 'budget')->first();
-        $data = ['amount' => 150];
+        $data = ['amount' => $this->amount];
         $this->call(
             'POST', 'home/budget/limit/add/' . $budget->id . '/' . date('Y/m'),
             $data
@@ -62,7 +63,7 @@ class LimitControllerTest extends TestCase
 
     public function testEditLimit()
     {
-        $limit = Limit::first();
+        $limit = Limit::where('amount',$this->amount)->first();
         $response = $this->call('GET', 'home/budget/limit/edit/' . $limit->id);
         $view = $response->original;
         $this->assertResponseStatus(200);
@@ -72,8 +73,8 @@ class LimitControllerTest extends TestCase
 
     public function testPostEditLimit()
     {
-        $limit = Limit::first();
-        $data = ['amount' => 300];
+        $limit = Limit::where('amount',$this->amount)->first();
+        $data = ['amount' => $this->amount];
         $this->call('POST', 'home/budget/limit/edit/' . $limit->id, $data);
         $this->assertResponseStatus(302);
         $this->assertSessionHas('success');
@@ -93,7 +94,7 @@ class LimitControllerTest extends TestCase
 
     public function testDeleteLimit()
     {
-        $limit = Limit::first();
+        $limit = Limit::where('amount',$this->amount)->first();
         $response = $this->call(
             'GET', 'home/budget/limit/delete/' . $limit->id
         );
@@ -105,9 +106,8 @@ class LimitControllerTest extends TestCase
 
     public function testPostDeleteLimit()
     {
-        // TODO count objects before/after
         $count = Limit::count();
-        $limit = Limit::first();
+        $limit = Limit::where('amount',$this->amount)->first();
         $this->call('POST', 'home/budget/limit/delete/' . $limit->id);
         $this->assertResponseStatus(302);
         $newCount = Limit::count();
