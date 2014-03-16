@@ -38,7 +38,7 @@ class SettingsController extends BaseController
             'predictionStart', $predictionStart
         )->with(
                 'accountList', $accountList
-            )->with('frontpageAccount',$frontpageAccount);
+            )->with('frontpageAccount', $frontpageAccount);
 
     }
 
@@ -89,7 +89,7 @@ class SettingsController extends BaseController
 
         return View::make('settings.allowances')->with(
             'defaultAllowance', $defaultAllowance
-        )->with('allowances', $allowances);
+        )->with('allowances', $allowances)->with('title', 'Allowances');
     }
 
     /**
@@ -115,7 +115,9 @@ class SettingsController extends BaseController
             Session::put('previous', URL::previous());
         }
 
-        return View::make('settings.add-allowance');
+        return View::make('settings.add-allowance')->with(
+            'title', 'Add a new allowance'
+        );
     }
 
     public function postAddAllowance()
@@ -132,14 +134,17 @@ class SettingsController extends BaseController
         $setting->name = 'specificAllowance';
         // validate
         $validator = Validator::make($setting->toArray(), Setting::$rules);
-        if ($validator->fails()) {
+        if ($validator->fails() || $amount == 0) {
             Session::flash(
-                'warning', 'Because of an error,
+                'error', 'Because of an error,
             the allowance could not be added.'
             );
 
             return Redirect::to(Session::get('previous'));
         } else {
+            Session::flash(
+                'success', 'Allowance saved!'
+            );
             $setting->save();
         }
 
@@ -162,11 +167,19 @@ class SettingsController extends BaseController
     public function postEditAllowance(Setting $setting)
     {
         $setting->value = floatval(Input::get('value'));
-        $setting->save();
-        Session::flash(
-            'success', 'Allowance for ' . $setting->date->format('F Y') . ' has been
+        $validator = Validator::make($setting->toArray(), Setting::$rules);
+        if ($validator->fails() || floatval(Input::get('value')) == 0) {
+            Session::flash(
+                'error', 'Because of an error,
+            the allowance could not be added.'
+            );
+        } else {
+            $setting->save();
+            Session::flash(
+                'success', 'Allowance for ' . $setting->date->format('F Y') . ' has been
             saved.'
-        );
+            );
+        }
 
         return Redirect::to(Session::get('previous'));
     }

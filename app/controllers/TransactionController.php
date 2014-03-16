@@ -53,7 +53,7 @@ class TransactionController extends BaseController
             intval(Input::get('account_id'))
         );
         if (is_null($account)) {
-            Session::flash('warning', 'Invalid account selected.');
+            Session::flash('error', 'Invalid account selected.');
 
             return Redirect::route('addtransaction')->withInput();
         }
@@ -79,7 +79,7 @@ class TransactionController extends BaseController
             $parts = explode('/', $input);
             if (count($parts) > 2) {
                 Session::flash(
-                    'warning',
+                    'error',
                     'Use forward slashes to indicate parent ' . Str::plural(
                         $comp
                     ) . '. Please don\'t use more than one.'
@@ -106,6 +106,7 @@ class TransactionController extends BaseController
             $transaction->toArray(), Transaction::$rules
         );
         if ($validator->fails()) {
+            Session::flash('error', 'Could not save transaction.');
             return Redirect::route('addtransaction')->withInput()->withErrors(
                 $validator
             );
@@ -119,7 +120,6 @@ class TransactionController extends BaseController
         $transaction->attachComponent($budget);
         /** @var $category Component */
         $transaction->attachComponent($category);
-        Log::debug('save');
         Queue::push('PredictableQueue@processTransaction', $transaction);
         Session::flash('success', 'The transaction has been created.');
 
@@ -166,28 +166,56 @@ class TransactionController extends BaseController
         $transaction->ignoreallowance = Input::get('ignoreallowance');
         $transaction->mark = Input::get('mark');
 
-        // beneficiary and budget:
+        // explore the components:
+        // explode every object at the / and see if there is one.
+        // more than one? return to Transaction:
+        foreach (['beneficiary', 'category', 'budget'] as $comp) {
+            $input = Input::get($comp);
+            $parts = explode('/', $input);
+            if (count($parts) > 2) {
+                Session::flash(
+                    'error',
+                    'Use forward slashes to indicate parent ' . Str::plural(
+                        $comp
+                    ) . '. Please don\'t use more than one.'
+                );
 
-        $ben = Component::findOrCreate(
-            'beneficiary', Input::get('beneficiary')
-        );
-        $bud = Component::findOrCreate('budget', Input::get('budget'));
-        $cat = Component::findOrCreate('category', Input::get('category'));
-        $transaction->components()->detach();
-        // attach the beneficiary, if it is set:
-        $transaction->attachComponent($ben);
-        $transaction->attachComponent($bud);
-        $transaction->attachComponent($cat);
+                return Redirect::route('edittransaction',$transaction->id)->withInput();
+            }
+            // count is one? that's the object!
+            if (count($parts) == 1) {
+                $$comp = Component::findOrCreate($comp, Input::get($comp));
+            }
+            // count is two? parent + child.
+            if (count($parts) == 2) {
+                $parent = Component::findOrCreate($comp, $parts[0]);
+                $$comp = Component::findOrCreate($comp, $parts[1]);
+                $$comp->parent_component_id = $parent->id;
+                $$comp->save();
+
+            }
+        }
 
         // validate and save:
         $validator = Validator::make(
             $transaction->toArray(), Transaction::$rules
         );
         if ($validator->fails()) {
+            Session::flash('error', 'The transaction could not be saved.');
             return Redirect::route('edittransaction', $transaction->id)
                 ->withInput()->withErrors($validator);
         } else {
+
+            // attach the beneficiary, if it is set:
+            /** @var $beneficiary Component */
+            $transaction->attachComponent($beneficiary);
+            /** @var $budget Component */
+            $transaction->attachComponent($budget);
+            /** @var $category Component */
+            $transaction->attachComponent($category);
+
             $transaction->save();
+            Queue::push('PredictableQueue@processTransaction', $transaction);
             Session::flash('success', 'The transaction has been saved.');
 
             return Redirect::to(Session::get('previous'));

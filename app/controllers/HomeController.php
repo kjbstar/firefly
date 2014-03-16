@@ -86,22 +86,22 @@ class HomeController extends BaseController
             )->with('transfers', $transfers);
     }
 
+    /**
+     * TODO: catch no accounts present.
+     * @param $year
+     * @param $month
+     * @param $day
+     *
+     * @return \Illuminate\View\View
+     */
     public function predict($year, $month, $day)
     {
         $date = new Carbon($year . '-' . $month . '-' . $day);
         $account = Toolkit::getFrontpageAccount();
-        if (!is_null($account)) {
-            $prediction = $account->predictOnDateExpanded($date);
-            // do a prediction, but "visible":
+        $prediction = $account->predictOnDateExpanded($date);
 
-
-            $transactions = Auth::user()->transactions()->expenses()->where(
-                'ignoreprediction', 0
-            )->whereNull('predictable_id');
-
-            return View::make('home.predict')->with('prediction', $prediction)
-                ->with('date', $date);
-        }
-        App::abort(500);
+        // do a prediction, but "visible":
+        return View::make('home.predict')->with('prediction', $prediction)
+            ->with('date', $date);
     }
 }

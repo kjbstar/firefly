@@ -67,9 +67,9 @@ class UserController extends BaseController
      */
     function activate($code)
     {
-        if (Auth::check()) {
+        if (Auth::check())
             App::abort(500);
-        }
+
         $user = User::where('activation', $code)->first();
         if ($user) {
             $user->sendPasswordMail();

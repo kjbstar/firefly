@@ -36,7 +36,7 @@ class TransferController extends BaseController
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transfers.add')->with(
-            'title', 'Add a transfers'
+            'title', 'Add a transfer'
         )->with('accounts', $accounts);
     }
 
@@ -57,6 +57,7 @@ class TransferController extends BaseController
 
         $validator = Validator::make($transfer->toArray(), Transfer::$rules);
         if ($validator->fails()) {
+            Session::flash('error', 'Could not add transfer.');
             return Redirect::route('addtransfer')->withInput()->withErrors(
                 $validator
             );
@@ -117,6 +118,7 @@ class TransferController extends BaseController
             $transfer->toArray(), Transfer::$rules
         );
         if ($validator->fails()) {
+            Session::flash('error', 'Could not edit transfer.');
             return Redirect::route('edittransfer', $transfer->id)->withInput()
                 ->withErrors($validator);
         } else {
@@ -154,6 +156,7 @@ class TransferController extends BaseController
     public function postDelete(Transfer $transfer)
     {
         $transfer->delete();
+        Session::flash('success', 'The transfer has been deleted.');
 
         return Redirect::to(Session::get('previous'));
     }
