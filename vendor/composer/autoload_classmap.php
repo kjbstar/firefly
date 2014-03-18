@@ -50,6 +50,7 @@ return array(
     'CreatePivots' => $baseDir . '/app/database/migrations/2014_03_11_192143_create_pivots.php',
     'CreatePredictables' => $baseDir . '/app/database/migrations/2014_03_11_191150_create_predictables.php',
     'CreateSettings' => $baseDir . '/app/database/migrations/2014_03_11_191344_create_settings.php',
+    'CreateTokens' => $baseDir . '/app/database/migrations/2014_03_16_171306_create_tokens.php',
     'CreateTransactions' => $baseDir . '/app/database/migrations/2014_03_11_191550_create_transactions.php',
     'CreateTransfers' => $baseDir . '/app/database/migrations/2014_03_11_191924_create_transfers.php',
     'CreateUsersTable' => $baseDir . '/app/database/migrations/2014_03_11_184307_create_users_table.php',

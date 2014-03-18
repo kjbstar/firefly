@@ -5,7 +5,6 @@ Route::when('/home*', 'auth');
 
 // models:
 Route::model('user', 'User');
-
 Route::bind('account', function ($value, $route) {return Auth::user()->accounts()->find($value);});
 Route::bind('component', function ($value, $route) {return Auth::user()->components()->find($value);});
 Route::bind('piggybank', function ($value, $route) {return Auth::user()->piggybanks()->find($value);});
@@ -85,11 +84,6 @@ foreach ($objects as $o) {
         }
     );
 }
-
-/**
- * ComponentController ROUTES (extra)
- */
-Route::get('/home/meta/piechart', ['uses' => 'ComponentController@showPieChart']);
 
 /**
  * PIGGY BANK CONTROLLER
@@ -208,3 +202,20 @@ Route::get('/home/account/overview/chart/{year?}/{month?}',['uses' => 'AccountCo
 Route::post('/home/account/add',['uses' => 'AccountController@postAdd', 'before' => 'csrf']);
 Route::post('/home/account/{account}/edit',['uses' => 'AccountController@postEdit', 'before' => 'csrf']);
 Route::post('/home/account/{account}/delete',['uses' => 'AccountController@postDelete', 'before' => 'csrf']);
+
+/**
+ * API (v1)
+ */
+
+Route::group(
+    ['prefix' => 'api/v1', 'before' => 'auth'], function () {
+        Route::resource('account', 'api\v1\AccountController');
+        //Route::resource('component', 'ComponentController');
+        //Route::resource('limit', 'LimitController');
+        //Route::resource('piggybank', 'PiggybankController');
+        //Route::resource('setting', 'SettingController');
+        //Route::resource('transaction', 'TransactionController');
+        //Route::resource('transfer', 'TransferController');
+
+    }
+);

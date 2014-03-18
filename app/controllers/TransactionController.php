@@ -205,7 +205,8 @@ class TransactionController extends BaseController
             return Redirect::route('edittransaction', $transaction->id)
                 ->withInput()->withErrors($validator);
         } else {
-
+            // detach all components first:
+            $transaction->components()->sync([]);
             // attach the beneficiary, if it is set:
             /** @var $beneficiary Component */
             $transaction->attachComponent($beneficiary);

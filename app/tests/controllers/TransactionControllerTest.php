@@ -3,7 +3,7 @@
 class TransactionControllerTest extends TestCase
 {
 
-    private $amount = 123.45;
+    private $amount = 123.40;
 
     public function setUp()
     {
@@ -78,6 +78,9 @@ class TransactionControllerTest extends TestCase
         $this->assertEquals($count + 1, $newCount);
     }
 
+    /**
+     * The amount  = * 2 because we need it later.
+     */
     public function testPostAddParentComponents()
     {
         $count = Auth::user()->transactions()->count();
@@ -86,7 +89,7 @@ class TransactionControllerTest extends TestCase
                  'category'    => 'TestCategory #1', // existing
                  'beneficiary' => 'TestBeneficiary #1', // existing
                  'budget'      => 'SomethingElse/Else', // new
-                 'amount'      => $this->amount, 'date' => date('Y-m-d')
+                 'amount'      => $this->amount*2, 'date' => date('Y-m-d')
 
         ];
         $this->call('POST', 'home/transaction/add', $data);
@@ -168,6 +171,29 @@ class TransactionControllerTest extends TestCase
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
     }
+
+    /**
+     * Leave everything as is except the account.
+     */
+    public function testPostEditChangeAccounts()
+    {
+        $transaction = Auth::user()->transactions()->where('amount',$this->amount*2)->first();
+        // get another account:
+        $newAccount = Auth::user()->accounts()->where('id','!=',$transaction->account_id)->first();
+        $data = ['description' => 'TestEdit', 'amount' => $this->amount,
+                 'date'        => date('Y-m-d'), 'account_id' => $newAccount->id,
+                'budget' => $transaction->budget->name,
+                'beneficiary' => $transaction->beneficiary->name,
+        ];
+
+        $this->call(
+            'POST', 'home/transaction/' . $transaction->id . '/edit', $data
+        );
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('success');
+        $this->assertRedirectedToRoute('index');
+    }
+
 
     public function testPostEditFail()
     {
@@ -273,7 +299,9 @@ class TransactionControllerTest extends TestCase
 
     public static function tearDownAfterClass()
     {
-        DB::table('transactions')->where('amount',123.45)->delete();
+        DB::table('transactions')->where('amount',123.40)->delete();
+        DB::table('transactions')->where('amount',123.40*2)->delete();
+
         DB::table('components')->where('reporting',0)->delete();
     }
 

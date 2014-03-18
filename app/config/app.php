@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'key'       => 'p8gHwoaLe2bA5D4xovWizovPNdGTZWf2',
+    'key'       => md5('Fill in a key here.'),
 
     /*
     |--------------------------------------------------------------------------

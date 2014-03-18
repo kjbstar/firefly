@@ -25,22 +25,12 @@ $app = new Illuminate\Foundation\Application;
 */
 
 $env = $app->detectEnvironment(
-	function()
-{
-	if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == 'sander.xs4all.nl') {
-		return 'xs4all';
-	} else {
-		return 'production';
-	}
-}
+    [
 
-// 	array(
+        'local' => array('sander*.lan', '*.box', '*.local'),
 
-// 	'local' => array('localhost','geld.nder.dev'),
-
-// )
-
-	);
+    ]
+);
 
 
 /*
@@ -54,7 +44,7 @@ $env = $app->detectEnvironment(
 |
 */
 
-$app->bindInstallPaths(require __DIR__.'/paths.php');
+$app->bindInstallPaths(require __DIR__ . '/paths.php');
 
 /*
 |--------------------------------------------------------------------------
@@ -67,9 +57,9 @@ $app->bindInstallPaths(require __DIR__.'/paths.php');
 |
 */
 
-$framework = $app['path.base'].'/vendor/laravel/framework/src';
+$framework = $app['path.base'] . '/vendor/laravel/framework/src';
 
-require $framework.'/Illuminate/Foundation/start.php';
+require $framework . '/Illuminate/Foundation/start.php';
 
 /*
 |--------------------------------------------------------------------------
