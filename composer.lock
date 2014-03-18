@@ -873,12 +873,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "bd44f322f09c8a3537c012e17914369f9326bd6b"
+                "reference": "4f69e545e0ca19b54010ca4c68a66ba6de6e853c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/bd44f322f09c8a3537c012e17914369f9326bd6b",
-                "reference": "bd44f322f09c8a3537c012e17914369f9326bd6b",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/4f69e545e0ca19b54010ca4c68a66ba6de6e853c",
+                "reference": "4f69e545e0ca19b54010ca4c68a66ba6de6e853c",
                 "shasum": ""
             },
             "require": {
@@ -982,7 +982,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2014-03-14 21:46:05"
+            "time": "2014-03-17 15:49:21"
         },
         {
             "name": "loic-sharma/profiler",
@@ -1241,12 +1241,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pdepend/pdepend.git",
-                "reference": "6997a6e7e6e4bc73c33e6050cdcd591689a50b87"
+                "reference": "87aabf54d9df84175760e163cbaf6ee359864878"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/6997a6e7e6e4bc73c33e6050cdcd591689a50b87",
-                "reference": "6997a6e7e6e4bc73c33e6050cdcd591689a50b87",
+                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/87aabf54d9df84175760e163cbaf6ee359864878",
+                "reference": "87aabf54d9df84175760e163cbaf6ee359864878",
                 "shasum": ""
             },
             "require": {
@@ -1276,7 +1276,7 @@
                 "BSD-3-Clause"
             ],
             "description": "Official version of pdepend to be handled with Composer",
-            "time": "2014-03-12 12:53:48"
+            "time": "2014-03-17 15:52:29"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -1455,12 +1455,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "c773f6af29261e81c42ce4ae164b412a6d90cee2"
+                "reference": "258c60148166b463af7b546224b6dc95dee0495b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/c773f6af29261e81c42ce4ae164b412a6d90cee2",
-                "reference": "c773f6af29261e81c42ce4ae164b412a6d90cee2",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/258c60148166b463af7b546224b6dc95dee0495b",
+                "reference": "258c60148166b463af7b546224b6dc95dee0495b",
                 "shasum": ""
             },
             "require": {
@@ -1511,7 +1511,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-03-05 01:41:05"
+            "time": "2014-03-17 10:22:07"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -1748,12 +1748,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "04f6eabe5c1068827c93dff2f9913cf3d696affe"
+                "reference": "37f14f231156c6cbc654edefeafa4fdcc8f72168"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/04f6eabe5c1068827c93dff2f9913cf3d696affe",
-                "reference": "04f6eabe5c1068827c93dff2f9913cf3d696affe",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/37f14f231156c6cbc654edefeafa4fdcc8f72168",
+                "reference": "37f14f231156c6cbc654edefeafa4fdcc8f72168",
                 "shasum": ""
             },
             "require": {
@@ -1816,7 +1816,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-03-09 07:02:30"
+            "time": "2014-03-17 14:56:01"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

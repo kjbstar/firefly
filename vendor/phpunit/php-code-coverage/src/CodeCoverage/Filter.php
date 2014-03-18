@@ -218,7 +218,8 @@ class PHP_CodeCoverage_Filter
     /**
      * Checks whether a filename is a real filename.
      *
-     * @param string $filename
+     * @param  string $filename
+     * @return boolean
      */
     public function isFile($filename)
     {
@@ -240,8 +241,7 @@ class PHP_CodeCoverage_Filter
      * When the whitelist is empty (default), blacklisting is used.
      * When the whitelist is not empty, whitelisting is used.
      *
-     * @param  string                     $filename
-     * @param  boolean                    $ignoreWhitelist
+     * @param  string $filename
      * @return boolean
      * @throws PHP_CodeCoverage_Exception
      */
@@ -312,8 +312,9 @@ class PHP_CodeCoverage_Filter
         $this->addDirectoryContainingClassToBlacklist('PHPUnit_Extensions_Story_TestCase', 2);
         $this->addDirectoryContainingClassToBlacklist('Text_Template');
         $this->addDirectoryContainingClassToBlacklist('Symfony\Component\Yaml\Yaml');
-        $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Diff');
+        $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Diff\Diff');
         $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Environment\Runtime');
+        $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Comparator\Comparator');
         $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Exporter\Exporter');
         $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Version');
         $this->addDirectoryContainingClassToBlacklist('Composer\Autoload\ClassLoader');
