@@ -14,21 +14,13 @@ class TestSeedIncomes extends Seeder
         while ($current < $today) {
             $count++;
             $account = Account::orderBy(DB::Raw('RAND()'))->first();
-            $amount = rand(1500, 2500);
-            $day = rand(10, 28);
+            $amount = rand(2500, 3000);
+            $day = rand(24, 26);
 
             Transaction::create(
                 ['user_id'          => $user->id, 'account_id' => $account->id,
-                 'description'      => 'Test Transaction (income) #' . $count,
+                 'description'      => 'Salary',
                  'amount'           => $amount,
-                 'date'             => $current->format('Y-m-') . $day,
-                 'ignoreprediction' => 0, 'ignoreallowance' => 0, 'mark' => 0]
-            );
-
-            Transaction::create(
-                ['user_id'          => $user->id, 'account_id' => $account->id,
-                 'description'      => 'Test Transaction (similar income)',
-                 'amount'           => 1,
                  'date'             => $current->format('Y-m-') . $day,
                  'ignoreprediction' => 0, 'ignoreallowance' => 0, 'mark' => 0]
             );
