@@ -46,6 +46,7 @@ class ReportControllerTest extends TestCase
         // since we go for the current month, no predicted transactions:
         $this->assertCount(0, $view['transactions']['predicted']);
     }
+
     public function testOldMonth()
     {
 
@@ -196,7 +197,6 @@ class ReportControllerTest extends TestCase
 
     }
 
-//
     public function testYearComponentsChart()
     {
         $comp = Auth::user()->components()->reporting()->count();
@@ -211,53 +211,46 @@ class ReportControllerTest extends TestCase
         $this->assertCount(12, $responseData['rows']);
     }
 
-    /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
-     *
-     */
     public function testSameMonthCompare()
     {
         $one = new \Carbon\Carbon();
         $one->startOfMonth();
-        $response = $this->call(
+        $crawler = $this->client->request(
             'GET',
             'home/reports/compare/' . $one->format('Y-m') . '/' . $one->format(
                 'Y-m'
             )
         );
-        $this->assertResponseStatus(500);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertCount(1, $crawler->filter('h1:contains("HTTP Error: 500")'));
     }
 
-    /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
-     */
     public function testSameYearCompare()
     {
         $one = new \Carbon\Carbon();
         $one->startOfMonth();
-        $response = $this->call(
+        $crawler = $this->client->request(
             'GET',
             'home/reports/compare/' . $one->format('Y') . '/' . $one->format(
                 'Y'
             )
         );
-        $this->assertResponseStatus(500);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertCount(1, $crawler->filter('h1:contains("HTTP Error: 500")'));
     }
 
-    /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
-     */
     public function testSameMonthCompareAccountChart()
     {
         $one = new \Carbon\Carbon();
 
-        $this->call(
+        $crawler = $this->client->request(
             'GET',
             'home/reports/compare/' . $one->format('Y-m') . '/' . $one->format(
                 'Y-m'
             ) . '/account'
         );
-        $this->assertResponseStatus(500);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertCount(1, $crawler->filter('h1:contains("HTTP Error: 500")'));
 
     }
 

@@ -99,7 +99,7 @@ class AccountTrigger
         $end->addDay();
         $balanceModifier = $account->balancemodifiers()->onDay($end)->first();
         if (is_null($balanceModifier)) {
-            App::abort(500);
+            return View::make('error.500');
         } else {
             $balanceModifier->balance -= floatval($balance);
             $balanceModifier->save();
@@ -157,7 +157,7 @@ class AccountTrigger
 
         // THERE SHOULD BE A BALANCE MODIFIER
         if (is_null($balanceModifier)) {
-            App::abort(500);
+            return View::make('error.500');
         } else {
             $balanceModifier->balance += $difference;
             $balanceModifier->save();

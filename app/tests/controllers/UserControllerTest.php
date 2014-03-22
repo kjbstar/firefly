@@ -16,7 +16,7 @@ class UserControllerTest extends TestCase
             'username' => 'test',
             'password' => 'test'
         ];
-        $this->call('POST', 'login',$data);
+        $this->call('POST', 'login', $data);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('home');
     }
@@ -27,7 +27,7 @@ class UserControllerTest extends TestCase
             'username' => 'test',
             'password' => 'test!'
         ];
-        $response = $this->call('POST', 'login',$data);
+        $response = $this->call('POST', 'login', $data);
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Incorrect login details', $view['warning']);
@@ -47,18 +47,20 @@ class UserControllerTest extends TestCase
         $this->assertResponseStatus(200);
         $this->assertEquals('Register', $view['title']);
     }
+
     public function testPostRegister()
     {
         $data = ['email' => 'random@nder.be'];
-        $response = $this->call('POST', 'register',$data);
+        $response = $this->call('POST', 'register', $data);
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Registered!', $view['title']);
     }
+
     public function testPostRegisterInvalid()
     {
         $data = ['email' => 'yo moma'];
-        $response = $this->call('POST', 'register',$data);
+        $response = $this->call('POST', 'register', $data);
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Register', $view['title']);
@@ -67,31 +69,30 @@ class UserControllerTest extends TestCase
 
     public function testActivate()
     {
-        $user = User::where('email','random@nder.be')->first();
+        $user = User::where('email', 'random@nder.be')->first();
         $code = $user->activation;
 
-        $response = $this->call('GET', 'activate/'.$code);
+        $response = $this->call('GET', 'activate/' . $code);
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Activated', $view['title']);
 
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
-     */
     public function testActivateLoggedIn()
     {
         $data = [
             'username' => 'test',
             'password' => 'test'
         ];
-        $this->call('POST', 'login',$data);
-        $this->call('GET', 'activate/12434');
-        $this->assertResponseStatus(500);
+        $this->call('POST', 'login', $data);
+        $crawler = $this->client->request('GET', 'activate/12434');
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertCount(1, $crawler->filter('h1:contains("HTTP Error: 500")'));
 
 
     }
+
     public function testActivateInvalid()
     {
         $response = $this->call('GET', 'activate/12434');
@@ -99,7 +100,6 @@ class UserControllerTest extends TestCase
         $this->assertResponseStatus(200);
         $this->assertEquals('Activated', $view['title']);
     }
-
 
 
     public function testReset()
@@ -115,7 +115,7 @@ class UserControllerTest extends TestCase
         $data = [
             'username' => 'random@nder.be',
         ];
-        $response = $this->call('POST', 'reset',$data);
+        $response = $this->call('POST', 'reset', $data);
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Sent!', $view['title']);
@@ -126,7 +126,7 @@ class UserControllerTest extends TestCase
         $data = [
             'username' => 'testblabla',
         ];
-        $response = $this->call('POST', 'reset',$data);
+        $response = $this->call('POST', 'reset', $data);
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Sent!', $view['title']);
@@ -134,14 +134,15 @@ class UserControllerTest extends TestCase
 
     public function testResetme()
     {
-        $user = User::where('username','random@nder.be')->first();
+        $user = User::where('username', 'random@nder.be')->first();
         $code = $user->reset;
-        $response = $this->call('GET', 'resetme/'.$code);
+        $response = $this->call('GET', 'resetme/' . $code);
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Reset!', $view['title']);
 
     }
+
     public function testResetmeInvalid()
     {
         $response = $this->call('GET', 'resetme/blabla');
@@ -153,8 +154,8 @@ class UserControllerTest extends TestCase
     }
 
     public static function tearDownAfterClass()
-{
-DB::table('users')->where('username','random@nder.be')->delete();
-}
+    {
+        DB::table('users')->where('username', 'random@nder.be')->delete();
+    }
 
 } 

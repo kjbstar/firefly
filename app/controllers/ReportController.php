@@ -215,7 +215,7 @@ class ReportController extends BaseController
         $one = new Carbon($yearOne . '-01-01');
         $two = new Carbon($yearTwo . '-01-01');
         if ($one->eq($two)) {
-            App::abort(500);
+            Return View::make('error.500');
         }
 
         return View::make('reports.compare-year')->with(
@@ -229,7 +229,7 @@ class ReportController extends BaseController
         $one = Toolkit::parseDate($yearOne, $monthOne);
         $two = Toolkit::parseDate($yearTwo, $monthTwo);
         if ($one->eq($two)) {
-            App::abort(500);
+            Return View::make('error.500');
         }
         $numbers = [];
         // incomes + expenses
@@ -324,7 +324,7 @@ class ReportController extends BaseController
         $one = Toolkit::parseDate($yearOne, $monthOne);
         $two = Toolkit::parseDate($yearTwo, $monthTwo);
         if ($one->eq($two)) {
-            App::abort(500);
+            return View::make('error.500');
         }
         $realDay = new Carbon;
 
