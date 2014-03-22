@@ -19,7 +19,7 @@ class CreatePiggies extends Migration {
             $table->integer('user_id')->unsigned();
             $table->string('name', 500);
             $table->decimal('amount', 10, 2);
-            $table->decimal('target', 10, 2);
+            $table->decimal('target', 10, 2)->nullable();
 
 
 

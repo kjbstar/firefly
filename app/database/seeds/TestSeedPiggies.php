@@ -13,9 +13,14 @@ class TestSeedPiggies extends Seeder
              'target'  => 200]
         );
         Piggybank::create(
-            ['user_id' => $user->id, 'name' => 'Test Piggy #1',
+            ['user_id' => $user->id, 'name' => 'Test Piggy #2',
              'amount' => 0,
              'target'  => 400]
+        );
+        Piggybank::create(
+            ['user_id' => $user->id, 'name' => 'Test Piggy #3',
+             'amount' => 0,
+             'target'  => null]
         );
     }
 } 

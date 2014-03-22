@@ -17,7 +17,7 @@
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
  * @property-read \User                                                   $user
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
- * @property boolean $reporting
+ * @property boolean                                                      $reporting
  * @method static Component reporting()
  */
 class Component extends Eloquent
@@ -51,26 +51,23 @@ class Component extends Eloquent
             $name = substr($name, ($strpos + 1));
         }
         $componentID = null;
-        if (Auth::check()) {
-            foreach (
-                Auth::user()->components()->where('type', $type)->get() as $c
-            ) {
-                if ($c->name == $name) {
-                    return $c;
-                }
-            }
-            if (is_null($componentID)) {
-                $component = new Component(['name'    => $name,
-                                            'user_id' => Auth::user()->id,
-                                            'type'    => $type]);
-                $component->save();
-                if (isset($component->id)) {
-                    return $component;
-                }
-            }
+        $user = Auth::user();
+        if (is_null($user)) {
+            return null;
         }
 
-        return null;
+        foreach (
+            $user->components()->where('type', $type)->get() as $c
+        ) {
+            if ($c->name == $name) {
+                return $c;
+            }
+        }
+        $component = new Component(['name'    => $name,
+                                    'user_id' => Auth::user()->id,
+                                    'type'    => $type]);
+        $component->save();
+        return $component;
     }
 
     /**
