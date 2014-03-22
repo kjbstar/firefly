@@ -4,8 +4,16 @@ use Carbon\Carbon as Carbon;
 /** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/PredictableHelper.php');
 
+/**
+ * Class PredictableController
+ */
 class PredictableController extends BaseController
 {
+    /**
+     * Show index.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         $predictables = Auth::user()->predictables()->get()->each(

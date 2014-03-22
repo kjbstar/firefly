@@ -1,6 +1,9 @@
 <?php
 use Carbon\Carbon as Carbon;
 
+/**
+ * Class PiggyController
+ */
 class PiggyController extends BaseController
 {
 

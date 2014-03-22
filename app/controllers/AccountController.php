@@ -5,6 +5,9 @@ require_once(app_path() . '/helpers/AccountHelper.php');
 require_once(app_path() . '/helpers/Toolkit.php');
 use Carbon\Carbon as Carbon;
 
+/**
+ * Class AccountController
+ */
 class AccountController extends BaseController
 {
 
@@ -256,8 +259,6 @@ class AccountController extends BaseController
 
         // loop depending on the stuffs
         // interval values
-        $intervalAbove = 0;
-        $intervalBelow = 0;
         while ($past <= $date) {
             $current = clone $past;
             // do a prediction

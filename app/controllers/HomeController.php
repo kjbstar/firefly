@@ -6,6 +6,9 @@ include_once(app_path() . '/helpers/Toolkit.php');
 
 use Carbon\Carbon as Carbon;
 
+/**
+ * Class HomeController
+ */
 class HomeController extends BaseController
 {
 

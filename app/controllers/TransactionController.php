@@ -25,21 +25,71 @@ class TransactionController extends BaseController
     }
 
     /**
-     * Add a new transaction
+     * Add a new transaction.
      *
-     * @return View
+     * @param Predictable $predictable
+     *
+     * @return \Illuminate\View\View
      */
     public function add(Predictable $predictable = null)
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
+        // empty by default:
+        $prefilled = [
+            'description'      => '',
+            'amount'           => '',
+            'date'             => date('Y-m-d'),
+            'account_id'       => null,
+            'beneficiary'      => '',
+            'category'         => '',
+            'budget'           => '',
+            'ignoreprediction' => 0,
+            'ignoreallowance'  => 0,
+            'mark'             => 0
+        ];
+
+        // prefill from predictable:
+        if(!is_nulL($predictable)) {
+            $d = sprintf('%02d', $predictable->dom);
+            $prefilled = [
+                'description'      => $predictable->description,
+                'amount'           => $predictable->amount,
+                'date'             => date('Y-m-').$d,
+                'account_id'       => null,
+                'beneficiary'      => is_null($predictable->beneficiary) ? '' : $predictable->beneficiary->name,
+                'category'         => is_null($predictable->category) ? '' : $predictable->category->name,
+                'budget'           => is_null($predictable->budget) ? '' : $predictable->budget->name,
+                'ignoreprediction' => 0,
+                'ignoreallowance'  => 0,
+                'mark'             => 0
+            ];
+        }
+
+        // prefill from old input:
+        if (Input::old()) {
+            $prefilled = ['description'      => Input::old('description'),
+                          'amount'           => floatval(Input::old('amount')),
+                          'date'             => Input::old('date'),
+                          'account_id'       => intval(Input::old('account_id')),
+                          'beneficiary'      => intval(Input::old('beneficiary_id')),
+                          'category'         => intval(Input::old('category_id')),
+                          'budget'           => intval(Input::old('budget_id')),
+                          'ignoreprediction' => intval(Input::old('ignoreprediction')),
+                          'ignoreallowance'  => intval(Input::old('ignoreallowance')),
+                          'mark'             => intval(Input::old('mark'))
+
+            ];
+        }
+
+
 
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transactions.add')->with(
             'title', 'Add a transaction'
-        )->with('accounts', $accounts)->with('predictable', $predictable);
+        )->with('accounts', $accounts)->with('prefilled',$prefilled);
     }
 
     /**
@@ -47,16 +97,19 @@ class TransactionController extends BaseController
      *
      * @return View
      */
-    public function postAdd()
+    public function postAdd(Predictable $p = null)
     {
-        $account = Auth::user()->accounts()->find(
-            intval(Input::get('account_id'))
-        );
+        Log::debug('AccountID: ' . Input::get('account_id'));
+        $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
+        Log::debug('Account is null? '.(is_null($account) ? 1  : 0));
+        Log::debug('Test');
         if (is_null($account)) {
             Session::flash('error', 'Invalid account selected.');
-
+            Log::debug('Invalid account (#' . Input::get('account_id') . ')');
             return Redirect::route('addtransaction')->withInput();
+            Log::debug('Test2');
         }
+        Log::debug('Test3');
 
 
         // fields:
@@ -68,9 +121,9 @@ class TransactionController extends BaseController
         $transaction->account()->associate($account);
         /** @noinspection PhpParamsInspection */
         $transaction->user()->associate(Auth::user());
-        $transaction->ignoreprediction = Input::get('ignoreprediction');
-        $transaction->ignoreallowance = Input::get('ignoreallowance');
-        $transaction->mark = Input::get('mark');
+        $transaction->ignoreprediction = is_null(Input::get('ignoreprediction')) ? 0 : 1;
+        $transaction->ignoreallowance = is_null(Input::get('ignoreallowance')) ? 0 : 1;
+        $transaction->mark = is_null(Input::get('mark')) ? 0 : 1;
 
         // explode every object at the / and see if there is one.
         // more than one? return to Transaction:
@@ -107,6 +160,7 @@ class TransactionController extends BaseController
         );
         if ($validator->fails()) {
             Session::flash('error', 'Could not save transaction.');
+            Log::debug('Rule failed: ' . print_r($validator->messages()->all(),true));
             return Redirect::route('addtransaction')->withInput()->withErrors(
                 $validator
             );
@@ -120,7 +174,6 @@ class TransactionController extends BaseController
         $transaction->attachComponent($budget);
         /** @var $category Component */
         $transaction->attachComponent($category);
-        Queue::push('PredictableQueue@processTransaction', $transaction);
         Session::flash('success', 'The transaction has been created.');
 
         return Redirect::to(Session::get('previous'));
@@ -162,9 +215,9 @@ class TransactionController extends BaseController
         $transaction->amount = floatval(Input::get('amount'));
         $transaction->date = Input::get('date');
         $transaction->account_id = intval(Input::get('account_id'));
-        $transaction->ignoreprediction = Input::get('ignoreprediction');
-        $transaction->ignoreallowance = Input::get('ignoreallowance');
-        $transaction->mark = Input::get('mark');
+        $transaction->ignoreprediction = is_null(Input::get('ignoreprediction')) ? 0 : 1;
+        $transaction->ignoreallowance = is_null(Input::get('ignoreallowance')) ? 0 : 1;
+        $transaction->mark = is_null(Input::get('mark')) ? 0 : 1;
 
         // explore the components:
         // explode every object at the / and see if there is one.
@@ -180,7 +233,7 @@ class TransactionController extends BaseController
                     ) . '. Please don\'t use more than one.'
                 );
 
-                return Redirect::route('edittransaction',$transaction->id)->withInput();
+                return Redirect::route('edittransaction', $transaction->id)->withInput();
             }
             // count is one? that's the object!
             if (count($parts) == 1) {
@@ -202,6 +255,7 @@ class TransactionController extends BaseController
         );
         if ($validator->fails()) {
             Session::flash('error', 'The transaction could not be saved.');
+            Log::debug('These rules failed: ' . print_r($validator->messages()->all(),true));
             return Redirect::route('edittransaction', $transaction->id)
                 ->withInput()->withErrors($validator);
         } else {

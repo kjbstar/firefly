@@ -133,7 +133,6 @@ class LimitController extends BaseController
      */
     public function postDeleteLimit(Limit $limit)
     {
-        $object = Auth::user()->components()->find($limit->component_id);
         $limit->delete();
         Session::flash('success', 'Limit removed.');
 
