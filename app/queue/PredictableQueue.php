@@ -6,13 +6,25 @@ class PredictableQueue
 
     public function scan($job, Predictable $predictable)
     {
-        $query = Auth::user()->transactions()->whereNull('predictable_id');
+        Log::debug('Trigger PredictableQueue[scan]!');
+        $user = Auth::user();
+        if(is_null($user)) {
+            $user = User::find($predictable->user_id);
+        }
+
+        $query = $user->transactions()->whereNull('predictable_id');
         $this->processPredictable($job, $predictable, $query);
     }
 
     public function scanAll($job, Predictable $predictable)
     {
-        $query = Auth::user()->transactions();
+        Log::debug('Trigger PredictableQueue[scanAll]!');
+        $user = Auth::user();
+        if(is_null($user)) {
+            $user = User::find($predictable->user_id);
+        }
+
+        $query = $user->transactions();
         $this->processPredictable($job, $predictable, $query);
     }
 
@@ -20,6 +32,7 @@ class PredictableQueue
         $job, Predictable $predictable,
         Illuminate\Database\Eloquent\Relations\HasMany $set
     ) {
+        Log::debug('Trigger PredictableQueue[processPredictable]!');
         Log::debug('Looking for ' . $predictable->description);
         // find transactions in the range of this predictable:
 
@@ -43,6 +56,8 @@ class PredictableQueue
         );
 
         foreach ($transactions as $t) {
+            Log::debug('Now checking '.$t->description.' with amount ' . $t->amount.' on date'. $t->date->format
+                    ('d-m-Y'));
             $components = [];
             foreach ($t->components as $c) {
                 $components[] = $c->id;
@@ -56,9 +71,13 @@ class PredictableQueue
             if ($components == $requiredComponents
                 && $t->description === $predictable->description
             ) {
+                Log::debug('Match on description! Updating transaction #' . $t->id);
                 // update transaction
                 $t->predictable()->associate($predictable);
-                $t->save();
+                $result = $t->save();
+                Log::debug('Saved transaction: ' . $result.' (#'.$predictable->id.')');
+            } else {
+                Log::debug('No match on description! NOT updating transaction #' . $t->id);
             }
         }
         $job->delete();
@@ -71,8 +90,12 @@ class PredictableQueue
             return;
         }
 
+        $user = Auth::user();
+        if(is_null($user)) {
+            $user = User::find($transaction->user_id);
+        }
         // will this one fit in any of the predictables?
-        foreach (Auth::user()->predictables()->get() as $predictable) {
+        foreach ($user->predictables()->get() as $predictable) {
             Log::debug('Checking ' . $predictable->description);
             $lowLimit = $predictable->amount * (1 - ($predictable->pct / 100));
             $highLimit = $predictable->amount * (1 + ($predictable->pct / 100));

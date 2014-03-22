@@ -25,7 +25,7 @@
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
                 <input type="text" name="description" class="form-control"
-                       value="{{{Input::old('description') ? Input::old('description') : $predictable ? $predictable->description : ''}}}"
+                       value="{{{$prefilled['description']}}}"
                        id="inputDescription" placeholder="Description">
                 @if($errors->has('description'))
                 <span class="text-danger">{{$errors->first('description')
@@ -44,7 +44,8 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{{Input::old('amount') ? Input::old('amount') : $predictable ? $predictable->amount : ''}}}" name="amount" step="any" class="form-control" id="inputAmount">
+                    <input type="number" value="{{{$prefilled['amount']}}}" name="amount" step="any"
+                           class="form-control" id="inputAmount">
                 </div>
                 @if($errors->has('amount'))
                 <span class="text-danger">{{$errors->first('amount')
@@ -61,7 +62,7 @@
              ">
             <label for="inputDate" class="col-sm-3 control-label">Date</label>
             <div class="col-sm-9">
-                <input type="date" name="date" value="{{{Input::old('date') ? Input::old('date') : date('Y-m-d')}}}"  class="form-control" id="inputDate">
+                <input type="date" name="date" value="{{{$prefilled['date']}}}"  class="form-control" id="inputDate">
                 @if($errors->has('date'))
                 <span class="text-danger">{{$errors->first('date')
                     }}</span><br />
@@ -77,7 +78,7 @@
              ">
             <label for="inputAccount" class="col-sm-3 control-label">Account</label>
             <div class="col-sm-9">
-                {{Form::select('account_id',$accounts,null,
+                {{Form::select('account_id',$accounts,$prefilled['account_id'],
                 ['class' => 'form-control'])}}
                 @if($errors->has('account_id'))
                 <span class="text-danger">{{$errors->first('account_id')
@@ -95,18 +96,8 @@
         <div class="form-group">
             <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
             <div class="col-sm-9">
-                @if(is_null($predictable))
-                <input type="text" value="{{{Input::old('beneficiary')}}}"
+                <input type="text" value="{{{$prefilled['beneficiary']}}}"
                        name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
-                @else
-                @if(!is_null($predictable->beneficiary))
-                <input type="text" value="{{{Input::old('beneficiary') ? Input::old('beneficiary') : $predictable->beneficiary->name}}}"
-                       name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
-                @else
-                <input type="text" value="{{{Input::old('beneficiary')}}}"
-                       name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
-                @endif
-                @endif
             </div>
         </div>
         
@@ -114,18 +105,8 @@
         <div class="form-group">
             <label for="inputCategory" class="col-sm-3 control-label">Category</label>
             <div class="col-sm-9">
-                @if(is_null($predictable))
-                <input type="text" value="{{{Input::old('category')}}}"
+                <input type="text" value="{{{$prefilled['category']}}}"
                        name="category" class="form-control" id="inputCategory" autocomplete="off" />
-                @else
-                @if(!is_null($predictable->beneficiary))
-                <input type="text" value="{{{Input::old('category') ? Input::old('category') : $predictable->category->name}}}"
-                       name="category" class="form-control" id="inputCategory" autocomplete="off" />
-                @else
-                <input type="text" value="{{{Input::old('beneficiary')}}}"
-                       name="category" class="form-control" id="inputCategory" autocomplete="off" />
-                @endif
-                @endif
             </div>
         </div>
 
@@ -133,18 +114,8 @@
         <div class="form-group">
             <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
             <div class="col-sm-9">
-                @if(is_null($predictable))
-                <input type="text" value="{{{Input::old('budget')}}}"
+                <input type="text" value="{{{$prefilled['budget']}}}"
                        name="budget" class="form-control" id="inputBudget" autocomplete="off" />
-                @else
-                @if(!is_null($predictable->beneficiary))
-                <input type="text" value="{{{Input::old('budget') ? Input::old('budget') : $predictable->budget->name}}}"
-                       name="budget" class="form-control" id="inputBudget" autocomplete="off" />
-                @else
-                <input type="text" value="{{{Input::old('budget')}}}"
-                       name="budget" class="form-control" id="inputBudget" autocomplete="off" />
-                @endif
-                @endif
             </div>
         </div>
 
@@ -154,7 +125,11 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                <input type="checkbox" name="ignoreprediction" value="1">
+                <input type="checkbox" name="ignoreprediction" value="1"
+                    @if($prefilled['ignoreprediction'])
+                        checked="checked"
+                    @endif
+                    >
                         Ignores this transaction in predictions.
                     </label>
                 </div>
@@ -168,7 +143,11 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="ignoreallowance" value="1">
+                        <input type="checkbox" name="ignoreallowance" value="1"
+                        @if($prefilled['ignoreallowance'])
+                        checked="checked"
+                        @endif
+                            >
                         Do not substract this transaction
                         from the allowance (if set).</label></div>
             </div>
@@ -180,7 +159,12 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                <input type="checkbox" name="mark" value="1">Marks
+                <input type="checkbox" name="mark" value="1"
+
+                        @if($prefilled['mark'])
+                        checked="checked"
+                        @endif
+                    >Marks
                     this transaction in certain charts.
                     </label>
                     </div>

@@ -160,6 +160,7 @@ Route::get('/home/transaction',['uses' => 'TransactionController@showIndex', 'as
 Route::get('/home/transaction/{transaction}/edit',['uses' => 'TransactionController@edit', 'as' => 'edittransaction']);
 Route::get('/home/transaction/{transaction}/delete',['uses' => 'TransactionController@delete', 'as' => 'deletetransaction']);
 Route::get('/home/transaction/add/{predictable?}',['uses' => 'TransactionController@add', 'as' => 'addtransaction']);
+
 Route::post('/home/transaction/{transaction}/edit',['uses' => 'TransactionController@postEdit', 'before' => 'csrf']);
 Route::post('/home/transaction/{transaction}/delete',['uses' => 'TransactionController@postDelete', 'before' => 'csrf']);
 Route::post('/home/transaction/add/{predictable?}',['uses' => 'TransactionController@postAdd', 'before' => 'csrf']);

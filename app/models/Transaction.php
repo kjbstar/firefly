@@ -5,23 +5,23 @@ use Carbon\Carbon as Carbon;
 /**
  * Class Transaction
  *
- * @property integer $id
- * @property integer $user_id
- * @property integer $account_id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property string $description
- * @property float $amount
- * @property string $date
- * @property boolean $ignoreprediction
- * @property boolean $ignoreallowance
- * @property boolean $mark
- * @property-read mixed $beneficiary
- * @property-read mixed $category
- * @property-read mixed $budget
- * @property-read \Account $account
+ * @property integer                                                    $id
+ * @property integer                                                    $user_id
+ * @property integer                                                    $account_id
+ * @property \Carbon\Carbon                                             $created_at
+ * @property \Carbon\Carbon                                             $updated_at
+ * @property string                                                     $description
+ * @property float                                                      $amount
+ * @property string                                                     $date
+ * @property boolean                                                    $ignoreprediction
+ * @property boolean                                                    $ignoreallowance
+ * @property boolean                                                    $mark
+ * @property-read mixed                                                 $beneficiary
+ * @property-read mixed                                                 $category
+ * @property-read mixed                                                 $budget
+ * @property-read \Account                                              $account
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
- * @property-read \User $user
+ * @property-read \User                                                 $user
  * @method static Transaction inMonth($date)
  * @method static Transaction onDay($date)
  * @method static Transaction onDayOfMonth($date)
@@ -33,8 +33,8 @@ use Carbon\Carbon as Carbon;
  * @method static Transaction inYear($date)
  * @method static Transaction afterDate($date)
  * @method static Transaction incomes()
- * @property integer $predictable_id
- * @property-read \Predictable $predictable
+ * @property integer                                                    $predictable_id
+ * @property-read \Predictable                                          $predictable
  * @method static Transaction beforeDate($date)
  * @method static Transaction fromAccount($account)
  */
@@ -48,8 +48,12 @@ class Transaction extends Eloquent
            'description'      => 'required|between:1,500',
            'amount'           => 'required|numeric|between:-65536,65536|not_in:0',
            'ignoreprediction' => 'required|numeric|between:0,1',
-           'ignoreallowance'  => 'required|numeric|between:0,1'];
+           'ignoreallowance'  => 'required|numeric|between:0,1',
+           'mark'             => 'required|numeric|between:0,1'
+
+        ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $fillable = ['user_id', 'date', 'description', 'amount', 'ignoreprediction', 'ignoreallowance', 'mark'];
     protected $appends = ['beneficiary', 'category', 'budget'];
 
     /**
@@ -209,6 +213,7 @@ class Transaction extends Eloquent
     {
         return $query->where('amount', '<', 0.0);
     }
+
     public function scopeAfterDate($query, Carbon $date)
     {
         return $query->where(
@@ -257,7 +262,7 @@ class Transaction extends Eloquent
      */
     public function getDescriptionAttribute($value)
     {
-        if(is_null($value)) {
+        if (is_null($value)) {
             return null;
         }
         return Crypt::decrypt($value);
@@ -282,51 +287,51 @@ class Transaction extends Eloquent
      *
      * @param $value
      */
-    public function setIgnorepredictionAttribute($value)
-    {
-        if ($value == 1 || $value == '1' || $value == true
-            || $value == 'true'
-        ) {
-            $this->attributes['ignoreprediction'] = 1;
-        } else {
-            $this->attributes['ignoreprediction'] = 0;
-        }
-
-    }
-
-    /**
-     * Set the ignoreallowance value no matter its input:
-     *
-     * @param $value
-     */
-    public function setIgnoreallowanceAttribute($value)
-    {
-        if ($value == 1 || $value == '1' || $value == true
-            || $value == 'true'
-        ) {
-            $this->attributes['ignoreallowance'] = 1;
-        } else {
-            $this->attributes['ignoreallowance'] = 0;
-        }
-
-    }
+//    public function setIgnorepredictionAttribute($value)
+//    {
+//        if ($value === 1 || $value == '1' || $value == true
+//            || $value == 'true'
+//        ) {
+//            $this->attributes['ignoreprediction'] = 1;
+//        } else {
+//            $this->attributes['ignoreprediction'] = 0;
+//        }
+//
+//    }
 
     /**
      * Set the ignoreallowance value no matter its input:
      *
      * @param $value
      */
-    public function setMarkAttribute($value)
-    {
-        if ($value == 1 || $value == '1' || $value == true
-            || $value == 'true'
-        ) {
-            $this->attributes['mark'] = 1;
-        } else {
-            $this->attributes['mark'] = 0;
-        }
+//    public function setIgnoreallowanceAttribute($value)
+//    {
+//        if ($value == 1 || $value == '1' || $value == true
+//            || $value == 'true'
+//        ) {
+//            $this->attributes['ignoreallowance'] = 1;
+//        } else {
+//            $this->attributes['ignoreallowance'] = 0;
+//        }
+//
+//    }
 
-    }
+    /**
+     * Set the ignoreallowance value no matter its input:
+     *
+     * @param $value
+     */
+//    public function setMarkAttribute($value)
+//    {
+//        if ($value == 1 || $value == '1' || $value == true
+//            || $value == 'true'
+//        ) {
+//            $this->attributes['mark'] = 1;
+//        } else {
+//            $this->attributes['mark'] = 0;
+//        }
+//
+//    }
 
     /**
      * These date/time fields must be Carbon objects.

@@ -40,9 +40,10 @@ class PredictableControllerTest extends TestCase
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Add a predictable', $view['title']);
-        $bud = Auth::user()->components()->where('type','budget')->count();
-        $cat = Auth::user()->components()->where('type','category')->count();
-        $ben = Auth::user()->components()->where('type','beneficiary')->count();
+        // +1 is no parent
+        $bud = Auth::user()->components()->where('type','budget')->whereNull('parent_component_id')->count() + 1;
+        $cat = Auth::user()->components()->where('type','category')->whereNull('parent_component_id')->count() + 1;
+        $ben = Auth::user()->components()->where('type','beneficiary')->whereNull('parent_component_id')->count() + 1;
 
         $this->assertCount(3, $view['components']);
         $this->assertCount($bud, $view['components']['budget']);
@@ -61,9 +62,9 @@ class PredictableControllerTest extends TestCase
         $this->assertEquals('Add a predictable based on "'.$t->description.'"', $view['title']);
         $this->assertEquals($t->description,$view['prefilled']['description']);
 
-        $bud = Auth::user()->components()->where('type','budget')->count();
-        $cat = Auth::user()->components()->where('type','category')->count();
-        $ben = Auth::user()->components()->where('type','beneficiary')->count();
+        $bud = Auth::user()->components()->where('type','budget')->whereNull('parent_component_id')->count() + 1;
+        $cat = Auth::user()->components()->where('type','category')->whereNull('parent_component_id')->count() + 1;
+        $ben = Auth::user()->components()->where('type','beneficiary')->whereNull('parent_component_id')->count() + 1;
 
         $this->assertCount(3, $view['components']);
         $this->assertCount($bud, $view['components']['budget']);
@@ -130,7 +131,7 @@ class PredictableControllerTest extends TestCase
     {
         $count = Auth::user()->predictables()->count();
         $data = ['description' => 'TestPredictableFilled', 'dom' => 1, 'pct' => 12,
-                 'inactive'    => 0, 'amount' => -111,
+                 'inactive'    => 0, 'amount' => $this->amount,
         ];
         $this->call('POST', 'home/predictable/add', $data);
         $newCount = Auth::user()->predictables()->count();
@@ -142,7 +143,7 @@ class PredictableControllerTest extends TestCase
     }
 
     /**
-     * @dependsOn testPostAdd
+     * @depends testPostAdd
      */
     public function testEdit()
     {
@@ -194,7 +195,7 @@ class PredictableControllerTest extends TestCase
         $budget = Component::where('type', 'budget')->first();
 
         $data = ['description' => 'TestPredictable #2', 'dom' => 1, 'pct' => 12,
-                 'inactive'    => 0, 'amount' => -111,
+                 'inactive'    => 0, 'amount' => $this->amount,
                  'beneficiary_id' => $beneficiary->id,'budget_id' => $budget->id,'category_id' => $category->id
         ];;
         $this->call('POST', 'home/predictable/'.$pred->id.'/edit', $data);
@@ -245,6 +246,12 @@ class PredictableControllerTest extends TestCase
         $this->assertEquals($count-1,$newCount);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        DB::table('predictables')->where('amount',$this->amount)->delete();
     }
 
 

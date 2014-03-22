@@ -8,6 +8,7 @@ class PiggyControllerTest extends TestCase
         $user = User::where('username', 'test')->first();
         $this->be($user);
     }
+
     private $target = 123.45;
 
     public function testIndexBeforeSetting()
@@ -39,7 +40,7 @@ class PiggyControllerTest extends TestCase
     {
         $setting = Auth::user()->settings()->where('name', 'piggyAccount')
             ->first();
-        $this->assertEquals(0,$setting->value);
+        $this->assertEquals(0, $setting->value);
         $account = Account::first()->id;
         $data = ['account' => $account];
         $this->call('POST', 'home/piggy/select', $data);
@@ -47,7 +48,7 @@ class PiggyControllerTest extends TestCase
         $this->assertSessionHas('success');
         $setting = Auth::user()->settings()->where('name', 'piggyAccount')
             ->first();
-        $this->assertEquals($account,$setting->value);
+        $this->assertEquals($account, $setting->value);
 
         $this->assertRedirectedToRoute('piggy');
     }
@@ -60,14 +61,14 @@ class PiggyControllerTest extends TestCase
         $this->call('POST', 'home/piggy/select', $data);
         $this->assertResponseStatus(302);
         $this->assertSessionHas('error');
-        $this->assertNotEquals($setting->value,0);
+        $this->assertNotEquals($setting->value, 0);
         $this->assertRedirectedToRoute('piggyselect');
     }
 
 
     /**
-     * @dependsOn testSelectAccount
-     * @dependsOn testPostSelectAccount
+     * @depends testSelectAccount
+     * @depends testPostSelectAccount
      */
     public function testIndex()
     {
@@ -93,7 +94,7 @@ class PiggyControllerTest extends TestCase
         $count = Auth::user()->piggybanks()->count();
         $this->call('POST', 'home/piggy/add');
         $newCount = Auth::user()->piggybanks()->count();
-        $this->assertEquals($count,$newCount);
+        $this->assertEquals($count, $newCount);
         $this->assertResponseStatus(302);
         $this->assertHasOldInput();
         $this->assertSessionHas('error');
@@ -107,7 +108,7 @@ class PiggyControllerTest extends TestCase
         $this->call('POST', 'home/piggy/add', $data);
         $newCount = Auth::user()->piggybanks()->count();
         $this->assertResponseStatus(302);
-        $this->assertEquals($count+1,$newCount);
+        $this->assertEquals($count + 1, $newCount);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
 
@@ -121,19 +122,15 @@ class PiggyControllerTest extends TestCase
         $newCount = Auth::user()->piggybanks()->count();
         $this->assertResponseStatus(302);
         $this->assertHasOldInput();
-        $this->assertEquals($count,$newCount);
+        $this->assertEquals($count, $newCount);
         $this->assertRedirectedToRoute('addpiggybank');
 
 
     }
 
-
-
-
-
     public function testEdit()
     {
-        $pig = Auth::user()->piggybanks()->where('target',$this->target)->first();
+        $pig = Auth::user()->piggybanks()->where('target', $this->target)->first();
         $response = $this->call('GET', 'home/piggy/edit/' . $pig->id);
         $view = $response->original;
         $this->assertResponseStatus(200);
@@ -144,9 +141,9 @@ class PiggyControllerTest extends TestCase
 
     public function testPostEdit()
     {
-        $pig = Auth::user()->piggybanks()->where('target',$this->target)->first();
+        $pig = Auth::user()->piggybanks()->where('target', $this->target)->first();
         $data = ['amount' => 100, 'target' => $this->target, 'name' => 'Edited name'];
-        $response = $this->call('POST', 'home/piggy/edit/' . $pig->id, $data);
+        $this->call('POST', 'home/piggy/edit/' . $pig->id, $data);
         $this->assertResponseStatus(302);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
@@ -154,7 +151,7 @@ class PiggyControllerTest extends TestCase
 
     public function testPostInvalidEdit()
     {
-        $pig = Auth::user()->piggybanks()->where('target',$this->target)->first();
+        $pig = Auth::user()->piggybanks()->where('target', $this->target)->first();
         $data = ['amount' => 100, 'target' => $this->target,];
         $response = $this->call('POST', 'home/piggy/edit/' . $pig->id, $data);
         $this->assertResponseStatus(302);
@@ -163,7 +160,7 @@ class PiggyControllerTest extends TestCase
 
     public function testUpdateAmount()
     {
-        $pig = Auth::user()->piggybanks()->where('target',$this->target)->first();
+        $pig = Auth::user()->piggybanks()->where('target', $this->target)->first();
         $response = $this->call('GET', 'home/piggy/amount/' . $pig->id);
         $view = $response->original;
         $this->assertResponseStatus(200);
@@ -173,7 +170,7 @@ class PiggyControllerTest extends TestCase
 
     public function testPostUpdateAmount()
     {
-        $pig = Auth::user()->piggybanks()->where('target',$this->target)->first();
+        $pig = Auth::user()->piggybanks()->where('target', $this->target)->first();
         $data = ['amount' => -20,];
         $response = $this->call('POST', 'home/piggy/amount/' . $pig->id, $data);
         $this->assertResponseStatus(302);
@@ -182,25 +179,29 @@ class PiggyControllerTest extends TestCase
 
     public function testDelete()
     {
-        $pig = Auth::user()->piggybanks()->where('target',$this->target)->first();
+        $pig = Auth::user()->piggybanks()->where('target', $this->target)->first();
         $response = $this->call('GET', 'home/piggy/delete/' . $pig->id);
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Delete piggy bank ' . $pig->name, $view['title']);
     }
 
+    /**
+     * @depends testFilledPostAdd
+     */
     public function testPostDelete()
     {
         $count = Auth::user()->piggybanks()->count();
-        $pig = Auth::user()->piggybanks()->where('target',$this->target)->first();
+        $pig = Auth::user()->piggybanks()->where('target', $this->target)->first();
         $this->call('POST', 'home/piggy/delete/' . $pig->id);
         $newCount = Auth::user()->piggybanks()->count();
         $this->assertResponseStatus(302);
-        $this->assertEquals($count-1,$newCount);
+        $this->assertEquals($count - 1, $newCount);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
 
     }
+
     public static function tearDownAfterClass()
     {
         DB::table('settings')->delete();

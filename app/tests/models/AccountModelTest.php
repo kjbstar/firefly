@@ -83,7 +83,12 @@ class AccountModelTest extends TestCase
     public function testPredictOnDateExpanded()
     {
         $account = Auth::user()->accounts()->first();
-        $date = new Carbon\Carbon;
+        $date = Carbon\Carbon::create(2014,03,10);
+
+        // in order to touch some of the loops in this
+        // method, we create some special cases.
+
+
         $result = $account->predictOnDateExpanded($date);
     }
 

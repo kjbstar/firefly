@@ -18,8 +18,8 @@ class ComponentControllerTest extends TestCase
         $this->assertResponseStatus(200);
         $this->assertEquals('All budgets', $view['title']);
 
-        $count = Auth::user()->components()->where('type','budget')->whereNotNull('parent_component_id')->count();
-        $this->assertCount($count, $view['objects']);
+        $count = Auth::user()->components()->where('type', 'budget')->whereNull('parent_component_id')->count();
+        $this->assertEquals($count, count($view['objects']));
 
         Route::disableFilters();
 
@@ -35,7 +35,7 @@ class ComponentControllerTest extends TestCase
 
         $jsonResponse = $this->client->getResponse()->getContent();
         $responseData = json_decode($jsonResponse, true);
-        $count = Auth::user()->components()->where('type','budget')->count();
+        $count = Auth::user()->components()->where('type', 'budget')->count();
         $this->assertCount($count, $responseData);
     }
 
@@ -48,8 +48,8 @@ class ComponentControllerTest extends TestCase
         $this->assertEquals('Transactions without a budget', $view['title']);
         $transactions = Auth::user()->transactions()->get();
         $count = 0;
-        foreach($transactions as $t) {
-            if(is_null($t->budget)) {
+        foreach ($transactions as $t) {
+            if (is_null($t->budget)) {
                 $count++;
             }
         }
@@ -66,8 +66,8 @@ class ComponentControllerTest extends TestCase
         $this->assertEquals('Transactions without a budget', $view['title']);
         $transactions = Auth::user()->transactions()->inMonth(new \Carbon\Carbon)->get();
         $count = 0;
-        foreach($transactions as $t) {
-            if(is_null($t->budget)) {
+        foreach ($transactions as $t) {
+            if (is_null($t->budget)) {
                 $count++;
             }
         }
@@ -83,8 +83,8 @@ class ComponentControllerTest extends TestCase
         $this->assertResponseStatus(200);
         $this->assertEquals('Add new budget', $view['title']);
         $this->assertSessionHas('previous');
-        $count = Auth::user()->components()->where('type','budget')->count();
-
+        // +1 = no parent
+        $count = Auth::user()->components()->where('type', 'budget')->whereNull('parent_component_id')->count() + 1;
         $this->assertCount($count, $view['parents']);
         Route::disableFilters();
 
@@ -96,7 +96,7 @@ class ComponentControllerTest extends TestCase
         $this->call('POST', 'home/budget/add');
         $newCount = Auth::user()->components()->count();
         $this->assertResponseStatus(302);
-        $this->assertEquals($count,$newCount);
+        $this->assertEquals($count, $newCount);
         $this->assertSessionHas('error');
         $this->assertRedirectedToRoute('addbudget');
         $this->assertHasOldInput();
@@ -110,7 +110,7 @@ class ComponentControllerTest extends TestCase
 
         $this->call('POST', 'home/budget/add', $data);
         $newCount = Auth::user()->components()->count();
-        $this->assertEquals($count+1,$newCount);
+        $this->assertEquals($count + 1, $newCount);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
@@ -120,12 +120,12 @@ class ComponentControllerTest extends TestCase
     {
         $count = Auth::user()->components()->count();
         $c = Auth::user()->components()->whereNull('parent_component_id')->first();
-        $data = ['name'                => 'Bla.', 'type' => 'budget',
-                 'reporting'           => 1, 'parent_component_id' => $c->id];
+        $data = ['name'      => 'Bla.', 'type' => 'budget',
+                 'reporting' => 1, 'parent_component_id' => $c->id];
 
         $this->call('POST', 'home/budget/add', $data);
         $newCount = Auth::user()->components()->count();
-        $this->assertEquals($count+1,$newCount);
+        $this->assertEquals($count + 1, $newCount);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
@@ -135,12 +135,12 @@ class ComponentControllerTest extends TestCase
     {
         $count = Auth::user()->components()->count();
         $c = Auth::user()->components()->whereNotNull('parent_component_id')->first();
-        $data = ['name'                => 'Bla.', 'type' => 'budget',
-                 'reporting'           => 1, 'parent_component_id' => $c->id];
+        $data = ['name'      => 'Bla.', 'type' => 'budget',
+                 'reporting' => 1, 'parent_component_id' => $c->id];
 
         $this->call('POST', 'home/budget/add', $data);
         $newCount = Auth::user()->components()->count();
-        $this->assertEquals($count,$newCount);
+        $this->assertEquals($count, $newCount);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('addbudget');
         $this->assertSessionHas('error');
@@ -173,15 +173,17 @@ class ComponentControllerTest extends TestCase
         $this->assertResponseStatus(200);
         $this->assertEquals('Edit budget ' . $component->name, $view['title']);
         $this->assertSessionHas('previous');
-        $count = Auth::user()->components()->whereNull('parent_component_id')->where('id','!=',$component->id)->where('type','budget')->count() + 1;
+        $count = Auth::user()->components()->whereNull('parent_component_id')->where('id', '!=', $component->id)->where(
+                'type', 'budget'
+            )->count() + 1;
 
-            $this->assertCount($count, $view['parents']);
+        $this->assertCount($count, $view['parents']);
         Route::disableFilters();
     }
 
     public function testPostEdit()
     {
-        $component = Auth::user()->components()->whereNull('parent_component_id')->orderBy('ID','DESC')->first();
+        $component = Auth::user()->components()->whereNull('parent_component_id')->orderBy('ID', 'DESC')->first();
         $data = ['name' => 'EditedComponent'];
         $this->call('POST', 'home/budget/' . $component->id . '/edit', $data);
         $this->assertResponseStatus(302);
@@ -192,7 +194,7 @@ class ComponentControllerTest extends TestCase
 
     public function testPostEditWithParent()
     {
-        $component = Auth::user()->components()->whereNotNull('parent_component_id')->orderBy('ID','DESC')->first();
+        $component = Auth::user()->components()->whereNotNull('parent_component_id')->orderBy('ID', 'DESC')->first();
         $data = ['name'                => 'EditedParentComponent',
                  'parent_component_id' => $component->parent_component_id];
         $this->call('POST', 'home/budget/' . $component->id . '/edit', $data);
@@ -240,22 +242,23 @@ class ComponentControllerTest extends TestCase
     public function testPostDelete()
     {
         $count = Auth::user()->components()->count();
-        $component = Auth::user()->components()->orderBy('ID','DESC')->whereNull('parent_component_id')->first();
+        $component = Auth::user()->components()->orderBy('ID', 'DESC')->whereNull('parent_component_id')->first();
         $this->call('POST', 'home/budget/' . $component->id . '/delete');
         $this->assertResponseStatus(302);
         $newCount = Auth::user()->components()->count();
-        $this->assertEquals($count-1,$newCount);
+        $this->assertEquals($count - 1, $newCount);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
     }
+
     public function testPostParentDelete()
     {
         $count = Auth::user()->components()->count();
-        $component = Auth::user()->components()->orderBy('ID','DESC')->whereNotNull('parent_component_id')->first();
+        $component = Auth::user()->components()->orderBy('ID', 'DESC')->whereNotNull('parent_component_id')->first();
         $this->call('POST', 'home/budget/' . $component->id . '/delete');
         $this->assertResponseStatus(302);
         $newCount = Auth::user()->components()->count();
-        $this->assertEquals($count-1,$newCount);
+        $this->assertEquals($count - 1, $newCount);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
     }

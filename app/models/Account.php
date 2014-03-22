@@ -128,9 +128,7 @@ class Account extends Eloquent
         $current = clone $date;
         $dateDay = intval($date->format('d'));
         $predictionDate = AccountHelper::getPredictionStart();
-        Log::debug(
-            'Predicting for ' . $this->name . ' on ' . $date->format('d-M-Y')
-        );
+        Log::debug('Predicting for ' . $this->name . ' on ' . $date->format('d-M-Y'));
 
         // between $predictionDate and $date
         // there are X occurences of the day $date
@@ -138,9 +136,9 @@ class Account extends Eloquent
         // is: 16-jan, 16-feb,16-march.
         // we need those dates.
         $days = [];
-        Log::debug('Days loop debug.');
+        Log::debug('Start looping over days for ' . $date->format('d-M-Y') . '.');
         while ($current >= $predictionDate) {
-            Log::debug($current->format('d-M-Y'));
+
             // if $current is in the same month as the
             // $date var, we skip it, because it's pretty pointless
             // to compare the current month with itself.
@@ -149,20 +147,25 @@ class Account extends Eloquent
 
 
             if ($current != $date && $dateDay == $currentDay) {
+                Log::debug('Added ' . $current->format('d-M-Y'));
                 $days[] = clone $current;
             }
             // submonth jumps the wrong way
             $current->subMonth();
         }
+        Log::debug('End of loop');
         // loop over these days
         // (12-jan, 12-feb, 12-mar, etc.)
         $sum = 0;
+        Log::debug('Now looping these days.');
+        Log::debug('Prediction date: ' . $predictionDate->format('d-m-Y'));
         foreach ($days as $index => $currentDay) {
             // the query for this day:
             $query = $this->transactions()->expenses()->afterDate(
                 $predictionDate
             )->where('ignoreprediction', 0)->whereNull('predictable_id')->onDay($currentDay);
             $amount = floatval($query->sum('amount')) * -1;
+            Log::debug('Sum for ' . $currentDay->format('d-m-Y') . ': ' . $amount);
             // save the list
             $data['transactions'][$currentDay->format('d-m-Y')] = $query->get();
 
@@ -196,15 +199,16 @@ class Account extends Eloquent
         $predictables = Auth::user()->predictables()->active()->where(
             'dom', $dateDay
         )->get();
-        Log::debug('Found ' .count($predictables).' predictable on '. $dateDay.'.');
+        Log::debug('Found ' . count($predictables) . ' predictables on ' . $dateDay . '.');
         $predictableSum = 0;
         foreach ($predictables as $p) {
             // predictables that were paid in this month
             // already are ignored.
-            Log::debug('Now at "'.$p->description.'"');
+            Log::debug('Now at "' . $p->description . '"');
             $count = $p->transactions()->inMonth($date)->count();
+            Log::debug('Found ' . $count . ' transactions for this predictable.');
             if ($count == 0) {
-                Log::debug($p->description. ' has not been paid yet this month');
+                Log::debug($p->description . ' has not been paid yet this month');
                 // if they ARE in this month, we use the number to
                 // finetune the $data['prediction'] array
                 $amount = ($p->amount * -1);
@@ -212,24 +216,29 @@ class Account extends Eloquent
                 $predictableSum += $amount;
                 // update the least / most if need be:
 
-                $p->date = new Carbon('2012-01-'.$p->dom);
+                $p->date = new Carbon('2012-01-' . $p->dom);
                 // and we save it:
                 $data['predictables'][] = $p;
             }
         }
         // update most/least sums:
         if ($predictableSum > $data['prediction']['most']) {
-            Log::debug($predictableSum . ' > ' . $data['prediction']['most'].', so "most" is updated.');
+            Log::debug($predictableSum . ' > ' . $data['prediction']['most'] . ', so "most" is updated.');
             $data['prediction']['most'] = $predictableSum;
+        } else {
+            if ($predictableSum > 0 && $predictableSum < $data['prediction']['least']) {
+                Log::debug($predictableSum . ' < ' . $data['prediction']['least'] . ', so "least" is updated.');
+                $data['prediction']['least'] = $predictableSum;
+            } else {
+                Log::debug(
+                    $predictableSum . ' is in between ' . $data['prediction']['most'] . ' and  '
+                    . $data['prediction']['least'] . ', so nothing is updated.'
+                );
+            }
         }
-        if ($predictableSum > 0 && $predictableSum < $data['prediction']['least']) {
-            Log::debug($predictableSum . ' < ' . $data['prediction']['least'].', so "least" is updated.');
-            $data['prediction']['least'] = $predictableSum;
-        }
 
 
-
-        Log::debug('Done looping these days.');
+        Log::debug('Done looping all days.');
         Log::debug(
             'Most/least/sum: ' . $data['prediction']['most'] . '/'
             . $data['prediction']['least'] . '/' . $sum

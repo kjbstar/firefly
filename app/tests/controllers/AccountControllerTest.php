@@ -10,7 +10,7 @@ class AccountControllerTest extends TestCase
         $this->be($user);
     }
 
-    private $balance = 543.21;
+    private $balance = 543.21; // used to find the right account.
 
     public function testShowIndex()
     {
@@ -67,7 +67,7 @@ class AccountControllerTest extends TestCase
     }
 
     /**
-     * @dependsOn testFilledPostAdd
+     * @depends testFilledPostAdd
      */
     public function testDoubleFilledPostAdd()
     {
@@ -87,7 +87,7 @@ class AccountControllerTest extends TestCase
 
 
     /**
-     * @dependsOn testFilledPostAdd
+     * @depends testFilledPostAdd
      */
     public function testEdit()
     {
@@ -155,7 +155,7 @@ class AccountControllerTest extends TestCase
     }
 
     /**
-     * @dependsOn testFilledPostAdd
+     * @depends testFilledPostAdd
      */
     public function testDelete()
     {

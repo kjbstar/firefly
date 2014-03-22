@@ -43,8 +43,34 @@ class ReportControllerTest extends TestCase
         $this->assertLessThanOrEqual(
             $view['netWorth']['end'], $view['netWorth']['start']
         );
-        $this->assertCount(1, $view['transactions']['predicted']);
+        // since we go for the current month, no predicted transactions:
+        $this->assertCount(0, $view['transactions']['predicted']);
+    }
+    public function testOldMonth()
+    {
 
+        $date = new \Carbon\Carbon();
+        $date->subYear();
+        $date->startOfMonth();
+        // in our test data, we always make more than we spend.
+        $response = $this->call(
+            'GET', 'home/reports/period/' . $date->format('Y/m')
+        );
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertEquals(
+            'Report for ' . $date->format('F Y'), $view['title']
+        );
+        $this->assertEquals($date, $view['start']);
+        $this->assertLessThanOrEqual(
+            $view['sums']['sumIn'], $view['sums']['sumOut']
+        );
+        $this->assertLessThanOrEqual(
+            $view['netWorth']['end'], $view['netWorth']['start']
+        );
+        // since we go for an old month, both predictables fired.
+        $count = Auth::user()->predictables()->count();
+        $this->assertCount($count, $view['transactions']['predicted']);
     }
 
 //

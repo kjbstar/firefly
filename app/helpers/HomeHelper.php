@@ -70,6 +70,7 @@ class HomeHelper
         }
         // loop budgets for percentages:
         foreach ($budgets as $id => $budget) {
+            Log::debug('Spent for budget ' . $budget['name'].': ' .mf($budget['spent']));
             if (isset($budget['limit'])
                 && $budget['limit'] < $budget['spent']
             ) {
