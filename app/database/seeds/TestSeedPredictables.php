@@ -50,6 +50,16 @@ class TestSeedPredictables extends Seeder
              'amount'  => -120, 'pct' => 5, 'dom' => 2, 'inactive' => 0]
         );
 
+        // small predictable for test purposes.
+        Predictable::create(
+            ['user_id' => $user->id, 'description' => 'Something small',
+             'amount'  => -10, 'pct' => 5, 'dom' => 3, 'inactive' => 0]
+        );
 
+        // average predictable for test purposes.
+        Predictable::create(
+            ['user_id' => $user->id, 'description' => 'Something average',
+             'amount'  => -20, 'pct' => 5, 'dom' => 4, 'inactive' => 0]
+        );
     }
 }

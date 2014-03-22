@@ -43,6 +43,21 @@ class TransactionControllerTest extends TestCase
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
         $this->assertEquals($view['title'], 'Add a transaction');
+        $this->assertEquals($view['prefilled']['description'],$predictable->description);
+        $this->assertCount($accounts, $view['accounts']);
+    }
+
+    public function testAddWithOldInput()
+    {
+        $this->session(['_old_input' => ['description' => 'Test', 'amount' => 100]]);
+        $accounts = Auth::user()->accounts()->count();
+        $response = $this->call(
+            'GET', 'home/transaction/add/'
+        );
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertEquals($view['prefilled']['description'],'Test');
+        $this->assertEquals($view['title'], 'Add a transaction');
         $this->assertCount($accounts, $view['accounts']);
     }
 

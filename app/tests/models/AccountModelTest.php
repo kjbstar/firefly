@@ -50,8 +50,8 @@ class AccountModelTest extends TestCase
         $balance = floatval(
             DB::table('balancemodifiers')->where('account_id', $account->id)
                 ->where(
-                'date', '<=', $date->format('Y-m-d')
-            )->sum('balance')
+                    'date', '<=', $date->format('Y-m-d')
+                )->sum('balance')
         );
         $this->assertEquals($balance, $account->balanceOnDate($date));
     }
@@ -76,43 +76,84 @@ class AccountModelTest extends TestCase
     {
         $account = Auth::user()->accounts()->first();
         $db = $account->balancemodifiers()->count();
-        $raw = DB::table('balancemodifiers')->where('account_id',$account->id)->count();
-        $this->assertEquals($raw,$db);
+        $raw = DB::table('balancemodifiers')->where('account_id', $account->id)->count();
+        $this->assertEquals($raw, $db);
     }
 
     public function testPredictOnDateExpanded()
     {
+        // TODO write tests.
         $account = Auth::user()->accounts()->first();
-        $date = Carbon\Carbon::create(2014,03,10);
-
-        // in order to touch some of the loops in this
-        // method, we create some special cases.
-
-
+        $date = Carbon\Carbon::create(2014, 03, 1);
         $result = $account->predictOnDateExpanded($date);
     }
 
+    public function testPredictOnDateExpandedSmallPredictable()
+    {
+        // TODO write tests.
+        $account = Auth::user()->accounts()->first();
+        $date = Carbon\Carbon::create(2014, 03, 3);
+        $result = $account->predictOnDateExpanded($date);
+    }
+
+    public function testPredictOnDateExpandedAveragePredictable()
+    {
+        // TODO write tests.
+        $account = Auth::user()->accounts()->first();
+        $date = Carbon\Carbon::create(2014, 03, 4);
+        $result = $account->predictOnDateExpanded($date);
+    }
+
+
+
     public function testPredictOnDate()
     {
+        // simply to hit the code
+        // TODO write tests.
+
+
+        $account = Auth::user()->accounts()->first();
+        $date = Carbon\Carbon::create(2014, 03, 2);
+        $result = $account->predictOnDate($date);
     }
 
     public function testTransactions()
     {
+        $account = Auth::user()->accounts()->first();
+        $raw = DB::table('transactions')->where('account_id', $account->id)->count();
+        $count = $account->transactions()->count();
+        $this->assertEquals($raw, $count);
+    }
+
+    public function testGetNullNameAttribute()
+    {
+        $account = Auth::user()->accounts()->first();
+        $account->name = null;
+        $this->assertNull($account->name);
     }
 
     public function testGetNameAttribute()
     {
-    }
-
-    public function testSetNameAttribute()
-    {
+        $account = Auth::user()->accounts()->first();
+        $account->name = 'Bla bla bla';
+        $this->assertNotNull($account->name);
+        $this->assertEquals('Bla bla bla', $account->name);
     }
 
     public function testGetDates()
     {
+        $account = Auth::user()->accounts()->first();
+        $this->assertInstanceOf('\Carbon\Carbon', $account->created_at);
+        $this->assertInstanceOf('\Carbon\Carbon', $account->updated_at);
+        $this->assertInstanceOf('\Carbon\Carbon', $account->openingbalancedate);
+
+
     }
 
     public function testScopeNotHidden()
     {
+        $raw = Auth::user()->accounts()->where('hidden',0)->count();
+        $count = Auth::user()->accounts()->notHidden()->count();
+        $this->assertEquals($raw,$count);
     }
 } 
