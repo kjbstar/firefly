@@ -35,6 +35,8 @@ class TransactionTrigger
         $balanceModifier->balance += floatval($transaction->amount);
         $balanceModifier->save();
 
+        Queue::push('PredictableQueue@processTransaction', $transaction);
+
         return true;
     }
 
@@ -96,28 +98,39 @@ class TransactionTrigger
      */
     public function editTransaction(Transaction $transaction)
     {
+        Log::debug('Trigger edit on transaction #' . $transaction->id);
         $account = $transaction->account()->first();
         if ($transaction->date < $account->openingbalancedate) {
+            Log::debug('Date before date');
             return false;
         }
+        $triggerPrediction = false;
 
         if ($account->id != intval($transaction->getOriginal('account_id'))) {
+            $triggerPrediction = true;
             $this->triggerAccountChanged($transaction);
         }
         if ($transaction->date->format('Y-m-d') != $transaction->getOriginal(
                 'date'
             )
         ) {
+            $triggerPrediction = true;
             $this->triggerDateChanged($transaction);
         }
         if ($transaction->amount != floatval(
                 $transaction->getOriginal('amount')
             )
         ) {
+            $triggerPrediction = true;
             $this->triggerAmountChanged($transaction);
         }
         // loop all predictables:
-        Queue::push('PredictableQueue@processTransaction', $transaction);
+        if ($triggerPrediction) {
+            Log::debug('Triggering predictions!');
+            Queue::push('PredictableQueue@processTransaction', $transaction);
+        } else {
+            Log::debug('No relevant changes, not triggering prediction.');
+        }
 
         return true;
     }
@@ -197,8 +210,7 @@ class TransactionTrigger
         $oldBm->save();
 
         // update for new date:
-        $newBm = $account->balancemodifiers()->onDay($transaction->date)->first(
-        );
+        $newBm = $account->balancemodifiers()->onDay($transaction->date)->first();
         if (is_null($newBm)) {
             $newBm = new Balancemodifier();
             $newBm->account()->associate($account);
@@ -221,8 +233,7 @@ class TransactionTrigger
         $diff = $transaction->amount - floatval(
                 $transaction->getOriginal('amount')
             );
-        $balanceModifier = $account->balancemodifiers()->onDay($oldDate)->first(
-        );
+        $balanceModifier = $account->balancemodifiers()->onDay($oldDate)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier();
             $balanceModifier->account()->associate($account);

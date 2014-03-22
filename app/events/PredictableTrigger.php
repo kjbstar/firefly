@@ -23,8 +23,12 @@ class PredictableTrigger
                 return false;
             }
         }
-
         return true;
+    }
+
+    public function jobPredictable(Predictable $predictable) {
+        Log::debug('Trigger new predictable scan.');
+        Queue::push('PredictableQueue@scan', $predictable);
     }
 
     public function subscribe(Illuminate\Events\Dispatcher $events)
@@ -33,6 +37,7 @@ class PredictableTrigger
             'eloquent.creating: Predictable',
             'PredictableTrigger@validatePredictable'
         );
+        $events->listen('eloquent.saved: Predictable','PredictableTrigger@jobPredictable');
 
         $events->listen(
             'eloquent.updating: Predictable',
