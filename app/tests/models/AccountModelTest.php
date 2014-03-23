@@ -191,4 +191,11 @@ class AccountModelTest extends TestCase
         $count = Auth::user()->accounts()->notHidden()->count();
         $this->assertEquals($raw,$count);
     }
+
+    public function testScopeShared()
+    {
+        $raw = Auth::user()->accounts()->where('shared',1)->count();
+        $count = Auth::user()->accounts()->shared()->count();
+        $this->assertEquals($raw,$count);
+    }
 } 

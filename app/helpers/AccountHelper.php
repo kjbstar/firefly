@@ -71,7 +71,7 @@ class AccountHelper
 
     public static function getPredictionStart() {
         $predictionStart = Setting::getSetting('predictionStart');
-        return new Carbon($predictionStart->value);
+        return $predictionStart->value;
     }
 
     /**

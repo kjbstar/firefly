@@ -40,10 +40,26 @@ class AccountController extends BaseController
             Session::put('previous', URL::previous());
         }
 
+        $prefilled = [
+            'name'               => '',
+            'openingbalance'     => '',
+            'openingbalancedate' => date('Y-m-d'),
+            'shared'             => false
+        ];
+
+        if (Input::old()) {
+            $prefilled = [
+                'name'               => Input::old('name'),
+                'openingbalance'     => Input::old('openingbalance'),
+                'openingbalancedate' => Input::old('openingbalancedate'),
+                'shared'             => intval(Input::old('shared')) == 1 ? true : false
+            ];
+        }
+
 
         return View::make('accounts.add')->with(
             'title', 'Add account'
-        );
+        )->with('prefilled', $prefilled);
     }
 
     /**
@@ -60,6 +76,7 @@ class AccountController extends BaseController
         $data['currentbalance'] = floatval(Input::get('openingbalance'));
         $data['openingbalancedate'] = Input::get('openingbalancedate');
         $data['hidden'] = Input::get('hidden') == '1' ? 1 : 0;
+        $data['shared'] = Input::get('shared') == '1' ? 1 : 0;
 
         $account = new Account($data);
         /** @noinspection PhpParamsInspection */
@@ -101,10 +118,28 @@ class AccountController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
+        $prefilled = [
+            'name'               => $account->name,
+            'openingbalance'     => $account->openingbalance,
+            'openingbalancedate' => $account->openingbalancedate->format('Y-m-d'),
+            'hidden'             => $account->hidden == 1 ? true : false,
+            'shared'             => $account->shared == 1 ? true : false,
+
+        ];
+        if (Input::old()) {
+            $prefilled = [
+                'name'               => Input::old('name'),
+                'openingbalance'     => Input::old('openingbalance'),
+                'openingbalancedate' => Input::old('openingbalancedate'),
+                'hidden'             => intval(Input::old('hidden')) == 1 ? true : false,
+                'shared'             => intval(Input::old('shared')) == 1 ? true : false
+            ];
+        }
+
 
         return View::make('accounts.edit')->with(
             'title', 'Edit account ' . $account->name
-        )->with('account', $account);
+        )->with('account', $account)->with('prefilled', $prefilled);
     }
 
     /**

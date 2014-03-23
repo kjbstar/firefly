@@ -12,22 +12,31 @@ class HomeHelperTest extends TestCase
 
     public function testHomeAccountList()
     {
-        // TODO implement
+        $list = HomeHelper::homeAccountList(new \Carbon\Carbon());
+        $db = Auth::user()->accounts()->notHidden()->get();
+        $this->assertEquals(count($list), count($db));
+        foreach ($db as $item) {
+            $this->assertEquals($item->name, $item['name']);
+        }
     }
 
     public function testBudgetOverview()
     {
-        // TODO implement
+        // TODO implement.
+        HomeHelper::budgetOverview(new \Carbon\Carbon());
     }
 
     public function testGetAllowance()
     {
         // TODO implement
+        HomeHelper::getAllowance(new \Carbon\Carbon());
+
     }
 
     public function testGetPredictables()
     {
         // TODO implement
+        HomeHelper::getPredictables(new \Carbon\Carbon());
     }
 
 }

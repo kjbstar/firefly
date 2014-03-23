@@ -24,11 +24,15 @@ class AccountControllerTest extends TestCase
 
     public function testAdd()
     {
-        $response = $this->call('GET', 'home/account/add');
-        $view = $response->original;
+        $crawler = $this->client->request('GET', 'home/account/add');
+        $this->assertCount(1, $crawler->filter('h2:contains("Add a new account")'));
+        $this->assertCount(1, $crawler->filter('title:contains("Add account")'));
+        $this->assertCount(1,$crawler->filter('input[name="shared"]'));
+        $this->assertCount(1,$crawler->filter('label[for="inputShared"]'));
+
+
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
-        $this->assertEquals($view['title'], 'Add account');
 
     }
 
@@ -49,7 +53,8 @@ class AccountControllerTest extends TestCase
         // account data:
         $data = ['name'               => 'New-test-account',
                  'openingbalance'     => $this->balance,
-                 'openingbalancedate' => date('Y-m-d')];
+                 'openingbalancedate' => date('Y-m-d'),
+        'shared' => 1];
 
         $this->call('POST', 'home/account/add', $data);
 
@@ -64,6 +69,7 @@ class AccountControllerTest extends TestCase
         $this->assertSessionHas('success');
         $this->assertEquals($account->openingbalance, $data['openingbalance']);
         $this->assertEquals($account->name, $data['name']);
+        $this->assertEquals($account->shared, $data['shared']);
     }
 
     /**
@@ -94,15 +100,14 @@ class AccountControllerTest extends TestCase
         $account = Auth::user()->accounts()->where(
             'openingbalance', $this->balance
         )->first();
+        $crawler = $this->client->request('GET', 'home/account/' . $account->id . '/edit');
+        $this->assertCount(1, $crawler->filter('h2:contains("Edit '.$account->name.'")'));
+        $this->assertCount(1, $crawler->filter('title:contains("Edit account '.$account->name.'")'));
+        $this->assertCount(1,$crawler->filter('input[name="shared"]'));
+        $this->assertCount(1,$crawler->filter('label[for="inputShared"]'));
 
-        $response = $this->call(
-            'GET', 'home/account/' . $account->id . '/edit'
-        );
-        $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
-        $this->assertEquals($view['title'], 'Edit account ' . $account->name);
-        $this->assertEquals($view['account']->name, $account->name);
     }
 
     public function testPostEdit()

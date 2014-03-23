@@ -32,11 +32,12 @@ class Account extends Eloquent
            'openingbalance'     => 'required|numeric',
            'openingbalancedate' => 'required|date|after:1950-01-01',
            'hidden'             => 'required|between:0,1',
+           'shared'             => 'required|between:0,1',
            'user_id'            => 'required|exists:users,id',];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
         = ['name', 'openingbalance', 'openingbalancedate', 'currentbalance',
-           'hidden', 'user_id'];
+           'hidden', 'user_id','shared'];
 
     /**
      * Account belongs to a User.
@@ -318,6 +319,11 @@ class Account extends Eloquent
     public function scopeNotHidden($query)
     {
         return $query->where('hidden', 0);
+    }
+
+    public function scopeShared($query)
+    {
+        return $query->where('shared', 1);
     }
 
 }

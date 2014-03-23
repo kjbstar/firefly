@@ -12,8 +12,14 @@
 
     <filter>
         <whitelist>
+            <!--
             <directory suffix=".php">./app/controllers</directory>
             <directory suffix=".php">./app/models</directory>
+            <directory suffix=".php">./app/events</directory>
+            <directory suffix=".php">./app/extensions</directory>
+            <directory suffix=".php">./app/queue</directory>
+            -->
+            <directory suffix=".php">./app/helpers</directory>
             <exclude>
                 <file>./app/controllers/BaseController.php</file>
             </exclude>
@@ -21,10 +27,12 @@
         </whitelist>
 
     </filter>
+    <!--
     <logging>
         <log type="coverage-html" target="./app/storage/logs/report"
              highlight="true"  />
     </logging>
+    -->
     <testsuites>
         <testsuite name="Application Test Suite">
             <directory>./app/tests/</directory>

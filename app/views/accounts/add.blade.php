@@ -20,7 +20,7 @@
             <label for="inputName" class="col-sm-4 control-label">Name</label>
             <div class="col-sm-8">
                 <input type="text" name="name" class="form-control"
-                       value="{{{Input::old('name')}}}" id="inputName"
+                       value="{{{$prefilled['name']}}}" id="inputName"
                        placeholder="Name">
                 @if($errors->has('name'))
                 <span class="text-danger">{{$errors->first('name')
@@ -42,7 +42,8 @@
             <div class="col-sm-8">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{{Input::old('openingbalance')}}}" name="openingbalance" step="any" class="form-control" id="inputOpeningbalance">
+                    <input type="number" value="{{{$prefilled['openingbalance']}}}" name="openingbalance" step="any"
+                           class="form-control" id="inputOpeningbalance">
                 </div>
                 @if($errors->has('openingbalance'))
                 <span class="text-danger">{{$errors->first('openingbalance')}}</span>
@@ -63,11 +64,31 @@
                    Firefly.">Opening balance
                 date</label>
             <div class="col-sm-8"t>
-                <input type="date" value="{{{Input::old('openingbalancedate')}}}" name="openingbalancedate" class="form-control" id="inputOpeningbalancedate">
+                <input type="date" value="{{{$prefilled['openingbalancedate']}}}" name="openingbalancedate"
+                       class="form-control" id="inputOpeningbalancedate">
                 @if($errors->has('openingbalancedate'))
                 <span class="text-danger">{{$errors->first
                     ('openingbalancedate')}}</span><br />
                 @endif
+            </div>
+        </div>
+
+        <!-- Make this account a shared account. -->
+        <div class="form-group">
+            <label for="inputShared" class="col-sm-4 control-label">Shared <small>(optional)</small></label>
+            <div class="col-sm-8">
+                <div class="checkbox">
+                    <label>
+                        @if($prefilled['shared'] == true)
+                        <input type="checkbox" name="shared" checked="checked" value="1">
+                        @else
+                        <input type="checkbox" name="shared" value="1">
+                        @endif
+                        This is a shared account. Expenses paid from this account won't count
+                        towards <em>your</em> expenses. Transfers made to this account <em>will</em> count as
+                        expenses.
+                    </label>
+                </div>
             </div>
         </div>
     

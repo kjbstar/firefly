@@ -22,7 +22,7 @@ class TestSeedIncomes extends Seeder
                  'description'      => 'Salary',
                  'amount'           => $amount,
                  'date'             => $current->format('Y-m-') . $day,
-                 'ignoreprediction' => 0, 'ignoreallowance' => 0, 'mark' => 0]
+                 'ignoreprediction' => 0, 'ignoreallowance' => 0, 'mark' => 1]
             );
 
 

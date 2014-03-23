@@ -18,7 +18,7 @@ class ComponentHelper
     {
         $end = new Carbon;
         $end->addMonth();
-        $start = new Carbon('first day of january 2013');
+        $start = Toolkit::getEarliestEvent();
         $list = [];
         while ($end > $start) {
             $query = $component->transactions()->inMonth($end);
@@ -75,15 +75,13 @@ class ComponentHelper
     public static function transactionsWithoutComponent(
         $type, Carbon $date = null
     ) {
-        $query = Auth::user()->transactions()->orderBy('date', 'DESC')->with(
-            'components'
-        );
+        $query = Auth::user()->transactions()->orderBy('date', 'DESC');
         if (!is_null($date)) {
             $query->inMonth($date);
         }
         $list = [];
         foreach ($query->get() as $tr) {
-            if (!self::hasComponent($tr, $type)) {
+            if (is_null($tr->$type)) {
                 $list[] = $tr;
             }
         }
@@ -91,27 +89,6 @@ class ComponentHelper
         return $list;
 
     }
-
-    /**
-     * Does the transaction have a component of type X?
-     *
-     * @param Transaction $transaction
-     * @param             $type
-     *
-     * @return bool
-     */
-
-    public static function hasComponent(Transaction $transaction, $type)
-    {
-        foreach ($transaction->components()->get() as $component) {
-            if ($component->type === $type) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 
     /**
      * Get a parent list for components of type.

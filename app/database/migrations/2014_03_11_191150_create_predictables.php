@@ -19,8 +19,8 @@ class CreatePredictables extends Migration {
             $table->integer('user_id')->unsigned();
             $table->string('description', 500);
             $table->decimal('amount', 10, 2);
-            $table->smallInteger('dom');
-            $table->smallInteger('pct')->default(10);
+            $table->smallInteger('dom')->unsigned()->default(1);
+            $table->smallInteger('pct')->unsigned()->default(10);
             $table->boolean('inactive')->default(false);
 
             $table->foreign('user_id')
