@@ -47,7 +47,7 @@ class HomeController extends BaseController
         $allowance = HomeHelper::getAllowance($today);
         $predictables = HomeHelper::getPredictables($today);
         // budget overview.
-        $budgets = HomeHelper::bugetOverview($today);
+        $budgets = HomeHelper::budgetOverview($today);
 
         // TODO move to homehelper
         $transactions = Auth::user()->transactions()->take(5)->orderBy(

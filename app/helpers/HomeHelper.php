@@ -41,7 +41,7 @@ class HomeHelper
         return $accounts;
     }
 
-    public static function bugetOverview(Carbon $date)
+    public static function budgetOverview(Carbon $date)
     {
         $budgets = [];
         $transactions = Auth::user()->transactions()->expenses()->inMonth($date)
