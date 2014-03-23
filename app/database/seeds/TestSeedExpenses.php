@@ -17,6 +17,27 @@ class TestSeedExpenses extends Seeder
 
         $mainAccount = $user->accounts()->first();
 
+        // create a transaction with components
+        // for test purposes:
+        $filled = Transaction::create(
+            ['user_id'          => $user->id,
+             'account_id'       => $mainAccount->id,
+             'description'      => 'Something with components',
+             'amount'           => 0.01,
+             'date'             => $current->format('Y-m-') . '12',
+             'ignoreprediction' => 0,
+             'ignoreallowance'  => 0,
+             'mark'             => 0]
+        );
+
+        $beneficiary = $user->components()->where('type', 'beneficiary')->first();
+        $category = $user->components()->where('type', 'category')->first();
+        $budget = $user->components()->where('type', 'budget')->first();
+
+        $filled->components()->save($beneficiary);
+        $filled->components()->save($category);
+        $filled->components()->save($budget);
+
 
         // loop every month:
         while ($current < $today) {

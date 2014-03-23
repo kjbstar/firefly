@@ -7,7 +7,6 @@ class LimitControllerTest extends TestCase
         parent::setUp();
         $user = User::where('username', 'test')->first();
         $this->be($user);
-
     }
     private $amount = 123.45;
 

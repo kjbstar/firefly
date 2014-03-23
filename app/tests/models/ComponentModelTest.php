@@ -38,17 +38,19 @@ class ComponentModelTest extends TestCase
 
     public function testFindOrCreate()
     {
-        // TODO more tests!
+        $count = DB::table('components')->count();
         $result = Component::findOrCreate('beneficiary', 'This one is new');
+        $newCount= DB::table('components')->count();
         $this->assertInstanceOf('\Component', $result);
         $this->assertEquals('This one is new', $result->name);
+        $this->assertEquals('beneficiary',$result->type);
+        $this->assertEquals($count+1,$newCount);
     }
 
 
     public function testFindOrCreateLoggedOut()
     {
         Auth::logout();
-        // TODO more tests?
         $result = Component::findOrCreate('budget', 'SomeSome');
         $this->assertNull($result);
     }
@@ -103,7 +105,7 @@ class ComponentModelTest extends TestCase
     public function testUser()
     {
         $component = Auth::user()->components()->first();
-        $this->assertEquals(Auth::user()->username,$component->user()->first()->username);
+        $this->assertEquals(Auth::user()->username, $component->user()->first()->username);
     }
 
     public function testGetNameAttribute()
@@ -111,6 +113,14 @@ class ComponentModelTest extends TestCase
         $component = Auth::user()->components()->first();
         $component->name = null;
         $this->assertNull($component->name);
+    }
+    public function testSetNameAttribute() {
+        $component = Auth::user()->components()->first();
+        $component->name = 'Bla bla';
+        $array = $component->toArray();
+        $this->assertEquals($array['name'],$component->name);
+
+        // TODO implement
     }
 
     public function testGetDates()
@@ -122,9 +132,9 @@ class ComponentModelTest extends TestCase
 
     public function testScopeReporting()
     {
-        $raw = DB::table('components')->where('user_id',Auth::user()->id)->where('reporting',1)->count();
+        $raw = DB::table('components')->where('user_id', Auth::user()->id)->where('reporting', 1)->count();
         $count = Auth::user()->components()->reporting()->count();
-        $this->assertEquals($raw,$count);
+        $this->assertEquals($raw, $count);
     }
 
     public static function tearDownAfterClass()

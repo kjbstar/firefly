@@ -61,5 +61,18 @@ class TestSeedPredictables extends Seeder
             ['user_id' => $user->id, 'description' => 'Something average',
              'amount'  => -20, 'pct' => 5, 'dom' => 4, 'inactive' => 0]
         );
+
+        // predictable with components for test purposes:
+        $beneficiary = $user->components()->where('type', 'beneficiary')->first();
+        $category = $user->components()->where('type', 'category')->first();
+        $budget = $user->components()->where('type', 'budget')->first();
+
+        $filled = Predictable::create(
+            ['user_id' => $user->id, 'description' => 'Something filled',
+             'amount'  => -20, 'pct' => 5, 'dom' => 5, 'inactive' => 0]
+        );
+        $filled->components()->save($beneficiary);
+        $filled->components()->save($category);
+        $filled->components()->save($budget);
     }
 }

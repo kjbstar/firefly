@@ -82,10 +82,17 @@ class AccountModelTest extends TestCase
 
     public function testPredictOnDateExpanded()
     {
-        // TODO write tests.
         $account = Auth::user()->accounts()->first();
         $date = Carbon\Carbon::create(2014, 03, 1);
         $result = $account->predictOnDateExpanded($date);
+
+        // I have no way of seeing if the predicted result
+        // is accurate (randomness in the test seeds)
+        // but at least we can check the content of the result array.
+
+        $this->assertCount(3,$result);
+        $this->assertLessThanOrEqual($result['prediction']['most'],$result['prediction']['prediction']);
+        $this->assertLessThanOrEqual($result['prediction']['prediction'],$result['prediction']['least']);
     }
 
     public function testPredictOnDateExpandedSmallPredictable()
@@ -94,6 +101,14 @@ class AccountModelTest extends TestCase
         $account = Auth::user()->accounts()->first();
         $date = Carbon\Carbon::create(2014, 03, 3);
         $result = $account->predictOnDateExpanded($date);
+
+        // I have no way of seeing if the predicted result
+        // is accurate (randomness in the test seeds)
+        // but at least we can check the content of the result array.
+
+        $this->assertCount(3,$result);
+        $this->assertLessThanOrEqual($result['prediction']['most'],$result['prediction']['prediction']);
+        $this->assertLessThanOrEqual($result['prediction']['prediction'],$result['prediction']['least']);
     }
 
     public function testPredictOnDateExpandedAveragePredictable()
@@ -102,6 +117,14 @@ class AccountModelTest extends TestCase
         $account = Auth::user()->accounts()->first();
         $date = Carbon\Carbon::create(2014, 03, 4);
         $result = $account->predictOnDateExpanded($date);
+
+        // I have no way of seeing if the predicted result
+        // is accurate (randomness in the test seeds)
+        // but at least we can check the content of the result array.
+
+        $this->assertCount(3,$result);
+        $this->assertLessThanOrEqual($result['prediction']['most'],$result['prediction']['prediction']);
+        $this->assertLessThanOrEqual($result['prediction']['prediction'],$result['prediction']['least']);
     }
 
 
@@ -115,6 +138,14 @@ class AccountModelTest extends TestCase
         $account = Auth::user()->accounts()->first();
         $date = Carbon\Carbon::create(2014, 03, 2);
         $result = $account->predictOnDate($date);
+
+        // I have no way of seeing if the predicted result
+        // is accurate (randomness in the test seeds)
+        // but at least we can check the content of the result array.
+
+        $this->assertCount(3,$result);
+        $this->assertLessThanOrEqual($result['most'],$result['prediction']);
+        $this->assertLessThanOrEqual($result['prediction'],$result['least']);
     }
 
     public function testTransactions()
@@ -138,6 +169,10 @@ class AccountModelTest extends TestCase
         $account->name = 'Bla bla bla';
         $this->assertNotNull($account->name);
         $this->assertEquals('Bla bla bla', $account->name);
+    }
+
+    public function setNameAttribute() {
+        // TODO also save it?
     }
 
     public function testGetDates()

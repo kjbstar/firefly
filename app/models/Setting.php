@@ -17,11 +17,11 @@ use Carbon\Carbon as Carbon;
 class Setting extends Eloquent
 {
     public static $rules
-        = ['name' => 'required|between:1,500',
+        = ['name'    => 'required|between:1,500',
            'user_id' => 'required|exists:users,id',
-           'type' => 'in:date,float,string,int', 'value' => 'required'];
+           'type'    => 'in:date,float,string,int', 'value' => 'required'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
-    protected $fillable = ['user_id', 'name', 'type', 'value'];
+    protected $fillable = ['user_id', 'name', 'date','type', 'value'];
 
     public static function findSetting($name)
     {
@@ -64,20 +64,31 @@ class Setting extends Eloquent
     /**
      * Gets the description as a decrypted string.
      *
+     * TODO expand into other types.
+     *
      * @param $value
      *
      * @return null|string
      */
     public function getValueAttribute($value)
     {
-        if (isset($this->attributes['type'])
-            && $this->attributes['type'] == 'date'
-        ) {
-            return new Carbon($value);
-        } else {
-            return $value;
+        $type = isset($this->attributes['type']) ? $this->attributes['type'] : 'default';
+        $return = null;
+        switch ($type) {
+            case 'date':
+                $return = new Carbon($value);
+                break;
+            case 'float':
+                $return = floatval($value);
+                break;
+            case 'int':
+                $return = intval($value);
+                break;
+            case 'string':
+                $return = trim($value);
+                break;
         }
-
+        return $return;
     }
 
     /**
