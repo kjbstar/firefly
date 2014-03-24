@@ -19,6 +19,14 @@
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
  * @property boolean                                                      $reporting
  * @method static Component reporting()
+ * @method static \Illuminate\Database\Query\Builder|\Component whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Component whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Component whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Component whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Component whereParentComponentId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Component whereType($value)
+ * @method static \Illuminate\Database\Query\Builder|\Component whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\Component whereReporting($value)
  */
 class Component extends Eloquent
 {

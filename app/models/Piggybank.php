@@ -11,6 +11,13 @@
  * @property float $amount
  * @property float $target
  * @property-read \User $user
+ * @method static \Illuminate\Database\Query\Builder|\Piggybank whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Piggybank whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Piggybank whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Piggybank whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Piggybank whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\Piggybank whereAmount($value)
+ * @method static \Illuminate\Database\Query\Builder|\Piggybank whereTarget($value)
  */
 class Piggybank extends Eloquent
 {

@@ -13,6 +13,14 @@ use Carbon\Carbon as Carbon;
  * @property string         $date
  * @property string         $value
  * @property-read \User     $user
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereType($value)
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereDate($value)
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereValue($value)
  */
 class Setting extends Eloquent
 {

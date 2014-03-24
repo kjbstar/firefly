@@ -5,19 +5,32 @@ use Carbon\Carbon as Carbon;
 /**
  * Class Transfer
  *
- * @property integer $id
+ * @property integer        $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property integer $user_id
- * @property integer $accountfrom_id
- * @property integer $accountto_id
- * @property string $description
- * @property float $amount
- * @property string $date
- * @property-read \Account $accountfrom
- * @property-read \Account $accountto
- * @property-read \User $user
+ * @property integer        $user_id
+ * @property integer        $accountfrom_id
+ * @property integer        $accountto_id
+ * @property string         $description
+ * @property float          $amount
+ * @property string         $date
+ * @property-read \Account  $accountfrom
+ * @property-read \Account  $accountto
+ * @property-read \User     $user
  * @method static Transfer inMonth($date)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
+ * @property-read mixed $beneficiary
+ * @property-read mixed $category
+ * @property-read mixed $budget
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereAccountfromId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereAccounttoId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereDescription($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereAmount($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereDate($value)
  */
 class Transfer extends Eloquent
 {
@@ -33,6 +46,7 @@ class Transfer extends Eloquent
         = ['date', 'amount', 'description', 'accountfrom_id', 'accountto_id',
            'user_id'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $appends = ['beneficiary', 'category', 'budget'];
 
     /**
      * Which account did the transfer come from?
@@ -52,6 +66,66 @@ class Transfer extends Eloquent
     public function accountto()
     {
         return $this->belongsTo('Account', 'accountto_id');
+    }
+
+    /**
+     * Get all components belonging to this user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function components()
+    {
+        return $this->belongsToMany('Component');
+    }
+
+    /**
+     * Get the beneficiary.
+     *
+     * @return Component|null
+     */
+    public function getBeneficiaryAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'beneficiary') {
+                return $component;
+            }
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Get the category
+     *
+     * @return Component|null
+     */
+    public function getCategoryAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'category') {
+                return $component;
+            }
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Get the budget
+     *
+     * @return Component|null
+     */
+    public function getBudgetAttribute()
+    {
+        foreach ($this->components as $component) {
+            if ($component->type == 'budget') {
+                return $component;
+            }
+        }
+
+        return null;
     }
 
     /**

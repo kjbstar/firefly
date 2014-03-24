@@ -37,6 +37,18 @@ use Carbon\Carbon as Carbon;
  * @property-read \Predictable                                          $predictable
  * @method static Transaction beforeDate($date)
  * @method static Transaction fromAccount($account)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereAccountId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction wherePredictableId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereDescription($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereAmount($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereDate($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereIgnoreprediction($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereIgnoreallowance($value)
+ * @method static \Illuminate\Database\Query\Builder|\Transaction whereMark($value)
  */
 class Transaction extends Eloquent
 {
@@ -218,6 +230,13 @@ class Transaction extends Eloquent
     {
         return $query->where(
             'date', '>=', $date->format('Y-m-d')
+        );
+    }
+
+    public function scopeBeforeDate($query, Carbon $date)
+    {
+        return $query->where(
+            'date', '<=', $date->format('Y-m-d')
         );
     }
 

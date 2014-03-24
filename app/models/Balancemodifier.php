@@ -13,6 +13,12 @@ use Carbon\Carbon as Carbon;
  * @property-read \Account $account
  * @method static Balancemodifier onDay($date)
  * @method static Balancemodifier beforeDay($date)
+ * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereAccountId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereDate($value)
+ * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereBalance($value)
  */
 class Balancemodifier extends Eloquent
 {

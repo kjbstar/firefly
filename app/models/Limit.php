@@ -13,6 +13,12 @@ use Carbon\Carbon as Carbon;
  * @property string $date
  * @property-read \Component $component
  * @method static Limit inMonth($date)
+ * @method static \Illuminate\Database\Query\Builder|\Limit whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Limit whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Limit whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Limit whereComponentId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Limit whereAmount($value)
+ * @method static \Illuminate\Database\Query\Builder|\Limit whereDate($value)
  */
 class Limit extends Eloquent
 {

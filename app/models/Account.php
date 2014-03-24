@@ -23,6 +23,18 @@ require_once(app_path() . '/helpers/AccountHelper.php');
  * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[]     $transactions
  * @method static Account notHidden()
+ * @property boolean $shared
+ * @method static \Illuminate\Database\Query\Builder|\Account whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereOpeningbalance($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereOpeningbalancedate($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereCurrentbalance($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereHidden($value)
+ * @method static \Illuminate\Database\Query\Builder|\Account whereShared($value)
+ * @method static \Account shared()
  */
 class Account extends Eloquent
 {

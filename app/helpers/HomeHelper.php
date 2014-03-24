@@ -33,6 +33,7 @@ class HomeHelper
             $entry['name'] = $account->name;
             $entry['url'] = $url;
             $entry['current'] = $account->balanceOnDate($date);
+            $entry['shared'] = $account->shared == 1 ? true : false;
             $accounts[] = $entry;
         }
 
@@ -45,27 +46,29 @@ class HomeHelper
     {
         $budgets = [];
         $transactions = Auth::user()->transactions()->expenses()->inMonth($date)
-            ->get();
+            ->beforeDate($date)->get();
         foreach ($transactions as $t) {
             // get the budget
-            if ($t->budget) {
-                // basic budget info:
-                $id = $t->budget->id;
-                if (isset($budgets[$id])) {
-                    // only add information
-                    $budgets[$id]['spent'] += ($t->amount * -1);
-                } else {
-                    // create new one:
-                    $budgets[$id] = ['name' => $t->budget->name,
-                                     'spent' => ($t->amount * -1)];
-                    // limit:
-                    $limit = $t->budget->limits()->inMonth($date)->first();
-                    if ($limit) {
-                        $budgets[$id]['limit'] = $limit->amount;
+            if ($t->account()->first()->shared == 0) {
+                if ($t->budget) {
+                    // basic budget info:
+                    $id = $t->budget->id;
+                    if (isset($budgets[$id])) {
+                        // only add information
+                        $budgets[$id]['spent'] += ($t->amount * -1);
+                    } else {
+                        // create new one:
+                        $budgets[$id] = ['name'  => $t->budget->name,
+                                         'spent' => ($t->amount * -1)];
+                        // limit:
+                        $limit = $t->budget->limits()->inMonth($date)->first();
+                        if ($limit) {
+                            $budgets[$id]['limit'] = $limit->amount;
+                        }
+
                     }
 
                 }
-
             }
         }
         // loop budgets for percentages:

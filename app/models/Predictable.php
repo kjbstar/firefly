@@ -19,6 +19,15 @@
  * @property-read mixed                                                   $budget
  * @property boolean $inactive
  * @method static Predictable active()
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereDescription($value)
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereAmount($value)
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereDom($value)
+ * @method static \Illuminate\Database\Query\Builder|\Predictable wherePct($value)
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereInactive($value)
  */
 class Predictable extends Eloquent
 {

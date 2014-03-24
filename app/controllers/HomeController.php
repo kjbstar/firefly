@@ -40,6 +40,14 @@ class HomeController extends BaseController
     {
         $earliest = Toolkit::getEarliestEvent();
         $today = Toolkit::parseDate($year, $month, new Carbon);
+        $actual = new Carbon;
+        // fix $today if it's in this month:
+        if($actual->diffInMonths($today) == 0) {
+            $today = new Carbon;
+        }
+        unset($actual);
+
+
         $fpAccount = Toolkit::getFrontpageAccount();
 
         // get all kinds of lists:
