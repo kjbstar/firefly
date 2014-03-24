@@ -112,8 +112,9 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     }
 
     /**
-     * @param  mixed                       $test
-     * @param  array                       $arguments
+     * @param  PHPUnit_Framework_Test|ReflectionClass $test
+     * @param  array                               $arguments
+     * @return PHPUnit_Framework_TestResult
      * @throws PHPUnit_Framework_Exception
      */
     public static function run($test, array $arguments = array())
@@ -852,24 +853,37 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 $arguments['addUncoveredFilesFromWhitelist'] = $filterConfiguration['whitelist']['addUncoveredFilesFromWhitelist'];
                 $arguments['processUncoveredFilesFromWhitelist'] = $filterConfiguration['whitelist']['processUncoveredFilesFromWhitelist'];
 
-                foreach ($filterConfiguration['blacklist']['include']['directory'] as $dir) {
-                    $this->codeCoverageFilter->addDirectoryToBlacklist(
-                      $dir['path'], $dir['suffix'], $dir['prefix'], $dir['group']
-                    );
-                }
+                if (empty($filterConfiguration['whitelist']['include']['directory']) &&
+                    empty($filterConfiguration['whitelist']['include']['file'])) {
+                    if (defined('__PHPUNIT_PHAR__')) {
+                        $this->codeCoverageFilter->addFileToBlacklist(__PHPUNIT_PHAR__);
+                    }
 
-                foreach ($filterConfiguration['blacklist']['include']['file'] as $file) {
-                    $this->codeCoverageFilter->addFileToBlacklist($file);
-                }
+                    $blacklist = new PHPUnit_Util_Blacklist;
 
-                foreach ($filterConfiguration['blacklist']['exclude']['directory'] as $dir) {
-                    $this->codeCoverageFilter->removeDirectoryFromBlacklist(
-                      $dir['path'], $dir['suffix'], $dir['prefix'], $dir['group']
-                    );
-                }
+                    foreach ($blacklist->getBlacklistedDirectories() as $directory) {
+                        $this->codeCoverageFilter->addDirectoryToBlacklist($directory);
+                    }
 
-                foreach ($filterConfiguration['blacklist']['exclude']['file'] as $file) {
-                    $this->codeCoverageFilter->removeFileFromBlacklist($file);
+                    foreach ($filterConfiguration['blacklist']['include']['directory'] as $dir) {
+                        $this->codeCoverageFilter->addDirectoryToBlacklist(
+                            $dir['path'], $dir['suffix'], $dir['prefix'], $dir['group']
+                        );
+                    }
+
+                    foreach ($filterConfiguration['blacklist']['include']['file'] as $file) {
+                        $this->codeCoverageFilter->addFileToBlacklist($file);
+                    }
+
+                    foreach ($filterConfiguration['blacklist']['exclude']['directory'] as $dir) {
+                        $this->codeCoverageFilter->removeDirectoryFromBlacklist(
+                            $dir['path'], $dir['suffix'], $dir['prefix'], $dir['group']
+                        );
+                    }
+
+                    foreach ($filterConfiguration['blacklist']['exclude']['file'] as $file) {
+                        $this->codeCoverageFilter->removeFileFromBlacklist($file);
+                    }
                 }
 
                 foreach ($filterConfiguration['whitelist']['include']['directory'] as $dir) {

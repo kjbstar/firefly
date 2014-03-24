@@ -71,11 +71,6 @@ class PHP_CodeCoverage_Filter
     private $whitelistedFiles = array();
 
     /**
-     * @var boolean
-     */
-    private $blacklistPrefilled = false;
-
-    /**
      * Adds a directory to the blacklist (recursively).
      *
      * @param string $directory
@@ -253,10 +248,6 @@ class PHP_CodeCoverage_Filter
             return !isset($this->whitelistedFiles[$filename]);
         }
 
-        if (!$this->blacklistPrefilled) {
-            $this->prefillBlacklist();
-        }
-
         return isset($this->blacklistedFiles[$filename]);
     }
 
@@ -289,58 +280,6 @@ class PHP_CodeCoverage_Filter
     public function hasWhitelist()
     {
         return !empty($this->whitelistedFiles);
-    }
-
-    /**
-     * @since Method available since Release 1.2.3
-     */
-    private function prefillBlacklist()
-    {
-        if (defined('__PHPUNIT_PHAR__')) {
-            $this->addFileToBlacklist(__PHPUNIT_PHAR__);
-        }
-
-        $this->addDirectoryContainingClassToBlacklist('File_Iterator');
-        $this->addDirectoryContainingClassToBlacklist('PHP_CodeCoverage');
-        $this->addDirectoryContainingClassToBlacklist('PHP_Invoker');
-        $this->addDirectoryContainingClassToBlacklist('PHP_Timer');
-        $this->addDirectoryContainingClassToBlacklist('PHP_Token');
-        $this->addDirectoryContainingClassToBlacklist('PHPUnit_Framework_TestCase', 2);
-        $this->addDirectoryContainingClassToBlacklist('PHPUnit_Extensions_Database_TestCase', 2);
-        $this->addDirectoryContainingClassToBlacklist('PHPUnit_Framework_MockObject_Generator', 2);
-        $this->addDirectoryContainingClassToBlacklist('PHPUnit_Extensions_SeleniumTestCase', 2);
-        $this->addDirectoryContainingClassToBlacklist('PHPUnit_Extensions_Story_TestCase', 2);
-        $this->addDirectoryContainingClassToBlacklist('Text_Template');
-        $this->addDirectoryContainingClassToBlacklist('Symfony\Component\Yaml\Yaml');
-        $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Diff\Diff');
-        $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Environment\Runtime');
-        $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Comparator\Comparator');
-        $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Exporter\Exporter');
-        $this->addDirectoryContainingClassToBlacklist('SebastianBergmann\Version');
-        $this->addDirectoryContainingClassToBlacklist('Composer\Autoload\ClassLoader');
-
-        $this->blacklistPrefilled = true;
-    }
-
-    /**
-     * @param string  $className
-     * @param integer $parent
-     * @since Method available since Release 1.2.3
-     */
-    private function addDirectoryContainingClassToBlacklist($className, $parent = 1)
-    {
-        if (!class_exists($className)) {
-            return;
-        }
-
-        $reflector = new ReflectionClass($className);
-        $directory = $reflector->getFileName();
-
-        for ($i = 0; $i < $parent; $i++) {
-            $directory = dirname($directory);
-        }
-
-        $this->addDirectoryToBlacklist($directory);
     }
 
     /**
