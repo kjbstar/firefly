@@ -70,17 +70,17 @@ class HomeHelper
         }
         // loop budgets for percentages:
         foreach ($budgets as $id => $budget) {
-            Log::debug('Spent for budget ' . $budget['name'].': ' .mf($budget['spent']));
+            Log::debug('Spent for budget ' . $budget['name'] . ': ' . mf($budget['spent']));
             if (isset($budget['limit'])
                 && $budget['limit'] < $budget['spent']
             ) {
                 // overspent:
-                $budgets[$id]['pct'] = ceil(($budget['limit'] / $budget['spent'])*100);
+                $budgets[$id]['pct'] = ceil(($budget['limit'] / $budget['spent']) * 100);
 
             } elseif (isset($budget['limit'])
                 && $budget['limit'] >= $budget['spent']
             ) {
-                $budgets[$id]['pct'] = ceil(($budget['spent'] / $budget['limit'])*100);
+                $budgets[$id]['pct'] = ceil(($budget['spent'] / $budget['limit']) * 100);
 
             }
         }
@@ -94,6 +94,7 @@ class HomeHelper
     {
         // default values and array
         $defaultAllowance = Setting::getSetting('defaultAllowance');
+
         $specificAllowance = Auth::user()->settings()->where(
             'name', 'specificAllowance'
         )->where('date', $date->format('Y-m') . '-01')->first();
@@ -111,8 +112,9 @@ class HomeHelper
         // start!
         if ($amount > 0) {
             $spent = floatval(
-                    Auth::user()->transactions()->inMonth($date)->expenses()
-                        ->where('ignoreallowance', 0)->sum('amount')
+                    Auth::user()->transactions()->inMonth($date)->expenses()->where('ignoreallowance', 0)->leftJoin(
+                        'accounts', 'accounts.id', '=', 'transactions.account_id'
+                    )->where('accounts.shared', 0)->sum('amount')
                 ) * -1;
             $allowance['spent'] = $spent;
             // overspent this allowance:
@@ -129,13 +131,14 @@ class HomeHelper
         return $allowance;
     }
 
-    public static function getPredictables(Carbon $date) {
-        $predictables = Auth::user()->predictables()->active()->orderBy('dom','ASC')->get();
+    public static function getPredictables(Carbon $date)
+    {
+        $predictables = Auth::user()->predictables()->active()->orderBy('dom', 'ASC')->get();
         $list = [];
-        foreach($predictables as $p) {
+        foreach ($predictables as $p) {
             $count = $p->transactions()->inMonth($date)->count();
-            if($count == 0) {
-                $p->date = new Carbon('2012-01-'.$p->dom);
+            if ($count == 0) {
+                $p->date = new Carbon('2012-01-' . $p->dom);
                 $list[] = $p;
             }
         }

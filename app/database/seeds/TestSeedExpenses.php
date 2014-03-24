@@ -23,7 +23,7 @@ class TestSeedExpenses extends Seeder
             ['user_id'          => $user->id,
              'account_id'       => $mainAccount->id,
              'description'      => 'Something with components',
-             'amount'           => 0.01,
+             'amount'             => 0.01,
              'date'             => $current->format('Y-m-') . '12',
              'ignoreprediction' => 0,
              'ignoreallowance'  => 0,

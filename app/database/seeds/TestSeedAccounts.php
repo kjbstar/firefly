@@ -16,6 +16,17 @@ class TestSeedAccounts extends Seeder
             );
 
         }
+        Account::create(
+            [
+                'user_id' => $user->id,
+                'name' => 'Shared account',
+                'openingbalance' => 1000,
+                'currentbalance' => 1000,
+                'openingbalancedate' => date('Y').'-01-01',
+                'hidden' => 0,
+                'shared' => 1
+            ]
+        );
     }
 
 } 
