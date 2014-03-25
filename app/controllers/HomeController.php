@@ -42,8 +42,9 @@ class HomeController extends BaseController
         $today = Toolkit::parseDate($year, $month, new Carbon);
         $actual = new Carbon;
         // fix $today if it's in this month:
-        if($actual->diffInMonths($today) == 0) {
+        if($actual->format('Y-m') == $today->format('Y-m')) {
             $today = new Carbon;
+
         }
         unset($actual);
 

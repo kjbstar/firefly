@@ -35,8 +35,6 @@ class TransactionTrigger
         $balanceModifier->balance += floatval($transaction->amount);
         $balanceModifier->save();
 
-        Queue::push('PredictableQueue@processTransaction', $transaction);
-
         return true;
     }
 
@@ -247,6 +245,11 @@ class TransactionTrigger
         $account->save();
     }
 
+    public function pushTransaction(Transaction $transaction)
+    {
+        Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
+    }
+
     /**
      * Create the triggers.
      *
@@ -259,14 +262,11 @@ class TransactionTrigger
             'eloquent.creating: Transaction',
             'TransactionTrigger@createTransaction'
         );
-        $events->listen(
-            'eloquent.deleted: Transaction',
-            'TransactionTrigger@deleteTransaction'
-        );
-        $events->listen(
-            'eloquent.updating: Transaction',
-            'TransactionTrigger@editTransaction'
-        );
+        $events->listen('eloquent.created: Transaction', 'TransactionTrigger@pushTransaction');
+        $events->listen('eloquent.deleted: Transaction','TransactionTrigger@deleteTransaction');
+        $events->listen('eloquent.updating: Transaction','TransactionTrigger@editTransaction');
+        $events->listen('eloquent.updated: Transaction','TransactionTrigger@pushTransaction');
+
     }
 
 }

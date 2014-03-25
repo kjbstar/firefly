@@ -270,7 +270,6 @@ class TransactionController extends BaseController
             $transaction->attachComponent($category);
 
             $transaction->save();
-            Queue::push('PredictableQueue@processTransaction', $transaction);
             Session::flash('success', 'The transaction has been saved.');
 
             return Redirect::to(Session::get('previous'));

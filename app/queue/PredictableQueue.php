@@ -83,8 +83,11 @@ class PredictableQueue
         $job->delete();
     }
 
-    public function processTransaction($job, Transaction $transaction)
+    public function processTransaction($job, $payload)
     {
+        $transaction = Transaction::find($payload['transaction_id']);
+
+
 
         if (!is_null($transaction->predictable()->first())) {
             return;

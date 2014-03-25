@@ -49,6 +49,31 @@ class ReportController extends BaseController
         $notPredicted = Auth::user()->transactions()->expenses()->orderBy(
             'date', 'ASC'
         )->inMonth($start)->whereNull('predictable_id')->get();
+
+        // group the not predicted transactions on their category:
+        $notPredictedGrouped = [];
+        foreach ($notPredicted as $transaction) {
+            if (is_null($transaction->category)) {
+                $id = 0;
+                $name = 'No category';
+            } else {
+                $id = $transaction->category->id;
+                $name = $transaction->category->name;
+            }
+            if(!isset($notPredictedGrouped[$id])) {
+                $notPredictedGrouped[$id] = [
+                    'category' => [
+                        'id' => $id,
+                        'name' => $name
+                    ],
+                    'transactions' => []
+                ];
+            }
+            $notPredictedGrouped[$id]['transactions'][] = $transaction;
+        }
+        unset($notPredicted);
+
+
         $notPredictedSum = Auth::user()->transactions()->inMonth($start)
             ->whereNull('predictable_id')->expenses()->orderBy('date', 'ASC')
             ->sum('amount');
@@ -86,7 +111,7 @@ class ReportController extends BaseController
 
         $transactions = ['predicted'       => $predicted,
                          'predictedSum'    => $predictedSum,
-                         'notPredicted'    => $notPredicted,
+                         'notPredicted'    => $notPredictedGrouped,
                          'notPredictedSum' => $notPredictedSum];
 
         // components:

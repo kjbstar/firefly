@@ -89,15 +89,22 @@
         <h4>Transactions (not predicted)</h4>
         <table class="table">
             <tr>
-                <td colspan="2">Sum</td>
+                <td style="width:85%" colspan="2">Sum</td>
                 <td><strong>{{mf($transactions['notPredictedSum'],true)}}</strong></td>
             </tr>
-        @foreach($transactions['notPredicted'] as $t)
-        <tr>
-            <td>{{$t->date->format('j F Y')}}</td>
-            <td><a href="{{URL::Route('edittransaction',$t->id)}}">{{{$t->description}}}</a></td>
-            <td>{{mf($t->amount,true)}}</td>
-        </tr>
+            </table>
+        @foreach($transactions['notPredicted'] as $group)
+            <h5>{{{$group['category']['name']}}}</h5>
+            <table class="table">
+            @foreach($group['transactions'] as $t)
+                <tr>
+                    <td style="width:25%;">{{$t->date->format('j F Y')}}</td>
+                    <td style="width:60%;"><a href="{{URL::Route('edittransaction',
+                    $t->id)}}">{{{$t->description}}}</a></td>
+                    <td>{{mf($t->amount,true)}}</td>
+                </tr>
+                @endforeach
+            </table>
         @endforeach
         </table>
     </div>
