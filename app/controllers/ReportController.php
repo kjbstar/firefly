@@ -80,6 +80,7 @@ class ReportController extends BaseController
 
         // sums:
         $sumOut = floatval($notPredictedSum + $predictedSum);
+
         $sumIn
             = floatval(
             Auth::user()->transactions()->inMonth($start)->orderBy(
@@ -87,12 +88,28 @@ class ReportController extends BaseController
             )->incomes()->sum('amount')
         );
 
+        // what did the shared accounts get us?
+        $spentOnShared = floatval(Auth::user()->transfers()->inMonth($start)->leftJoin('accounts','accounts.id','=',
+                'transfers.accountto_id')->where('accounts.shared',1)->sum('transfers.amount'));
+        $earnedOnShared = floatval(Auth::user()->transfers()->inMonth($start)->leftJoin('accounts','accounts.id','=',
+                'transfers.accountfrom_id')->where('accounts.shared',1)->sum('transfers.amount'));
+        $sumShared = $spentOnShared - $earnedOnShared;
+        if($sumShared > 0) {
+            // spent more than we got back:
+            $sumOut -= $sumShared;
+        } else {
+            // earned from shared account:
+            $sumIn += ($sumShared*-1);
+        }
+
+
+
         $sums = ['sumIn' => $sumIn, 'sumOut' => $sumOut];
 
         // net worth:
         $startNetWorth = 0;
         $endNetWorth = 0;
-        foreach (Auth::user()->accounts()->get() as $a) {
+        foreach (Auth::user()->accounts()->notShared()->get() as $a) {
             $startNetWorth += $a->balanceOnDate($start);
             $endNetWorth += $a->balanceOnDate($end);
         }
@@ -139,7 +156,7 @@ class ReportController extends BaseController
         $end = new Carbon($year . '-12-31');
         $startNetWorth = 0;
         $endNetWorth = 0;
-        foreach (Auth::user()->accounts()->get() as $account) {
+        foreach (Auth::user()->accounts()->notShared()->get() as $account) {
             $startNetWorth += $account->balanceOnDate($start);
             $endNetWorth += $account->balanceOnDate($end);
         }
@@ -168,9 +185,26 @@ class ReportController extends BaseController
         // total income, total expenses
         $totalIncome = Auth::user()->transactions()->incomes()->inYear($start)
             ->sum('amount');
+
         $totalExpenses = Auth::user()->transactions()->expenses()->inYear(
             $start
         )->sum('amount');
+
+        // what did the shared accounts get us?
+        $spentOnShared = floatval(Auth::user()->transfers()->inYear($start)->leftJoin('accounts','accounts.id','=',
+                'transfers.accountto_id')->where('accounts.shared',1)->sum('transfers.amount'));
+        $earnedOnShared = floatval(Auth::user()->transfers()->inYear($start)->leftJoin('accounts','accounts.id','=',
+                'transfers.accountfrom_id')->where('accounts.shared',1)->sum('transfers.amount'));
+        $sumShared = $spentOnShared - $earnedOnShared;
+        if($sumShared > 0) {
+            // spent more than we got back:
+            $totalExpenses -= $sumShared;
+        } else {
+            // earned from shared account:
+            $totalIncome += ($sumShared*-1);
+        }
+
+
 
         // count the components for a chart:
         $components = Auth::user()->components()->reporting()->count();
@@ -268,10 +302,24 @@ class ReportController extends BaseController
                     'date', 'ASC'
                 )->inMonth($date)->sum('amount');
 
+            // get the transfers to and from a shared account:
+            $spentOnShared = floatval(Auth::user()->transfers()->inMonth($date)->leftJoin('accounts','accounts.id','=',
+                    'transfers.accountto_id')->where('accounts.shared',1)->sum('transfers.amount'));
+            $earnedOnShared = floatval(Auth::user()->transfers()->inMonth($date)->leftJoin('accounts','accounts.id','=',
+                    'transfers.accountfrom_id')->where('accounts.shared',1)->sum('transfers.amount'));
+            $sumShared = $spentOnShared - $earnedOnShared;
+            if($sumShared > 0) {
+                // spent more than we got back:
+                $numbers[$key]['out'] -= $sumShared;
+            } else {
+                // earned from shared account:
+                $numbers[$key]['in'] += ($sumShared*-1);
+            }
+
         }
         // start and end net worths:
         foreach (['one' => $one, 'two' => $two] as $key => $start) {
-            $accounts = Auth::user()->accounts()->get();
+            $accounts = Auth::user()->accounts()->notShared()->get();
             $end = clone $start;
             $end->endOfMonth();
             $numbers[$key]['net_start'] = 0;

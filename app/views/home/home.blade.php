@@ -112,7 +112,7 @@
     </div>
 </div>
 <div class="row">
-    <!-- TRANSFERS IN COLLAPSEABLE -->
+    <!-- TRANSFERS -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         <h4>Transfers</h4>
         <table class="table table-condensed table-striped">
@@ -123,6 +123,14 @@
                 <td>
                     <a href="{{URL::Route('accountoverview',$t->accountfrom->id)}}" title="Overview for {{{$t->accountfrom->name}}}">{{{$t->accountfrom->name}}}</a> &rarr;
                     <a href="{{URL::Route('accountoverview',$t->accountto->id)}}" title="Overview for {{{$t->accountto->name}}}">{{{$t->accountto->name}}}</a>
+                </td>
+                <td>
+                    @if($t->accountfrom->shared == 1)
+                    <img src="i/money_add.png" />
+                    @endif
+                    @if($t->accountto->shared == 1)
+                    <img src="i/money_delete.png" />
+                    @endif
                 </td>
                 <td>{{mf($t->amount,true)}}</td>
             </tr>

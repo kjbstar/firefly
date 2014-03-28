@@ -338,4 +338,9 @@ class Account extends Eloquent
         return $query->where('shared', 1);
     }
 
+    public function scopeNotShared($query)
+    {
+        return $query->where('shared', 0);
+    }
+
 }

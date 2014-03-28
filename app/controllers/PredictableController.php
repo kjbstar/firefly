@@ -142,7 +142,6 @@ class PredictableController extends BaseController
             }
 
             Session::flash('success', 'The predictable has been saved.');
-            Queue::push('PredictableQueue@scan', $predictable);
 
             return Redirect::to(Session::get('previous'));
         } else {
@@ -227,7 +226,6 @@ class PredictableController extends BaseController
             Session::flash(
                 'success', 'The changed predictable has been saved.'
             );
-            Queue::push('PredictableQueue@scan', $predictable);
 
             return Redirect::to(Session::get('previous'));
         } else {
@@ -278,7 +276,7 @@ class PredictableController extends BaseController
 
     public function rescan(Predictable $predictable)
     {
-        Queue::push('PredictableQueue@scan', $predictable);
+        Queue::push('PredictableQueue@scan', ['predictable_id' => $predictable->id]);
         Session::flash(
             'success', 'Rescan was queued.'
         );
@@ -288,7 +286,7 @@ class PredictableController extends BaseController
 
     public function rescanAll(Predictable $predictable)
     {
-        Queue::push('PredictableQueue@scanAll', $predictable);
+        Queue::push('PredictableQueue@scanAll', ['predictable_id' => $predictable->id]);
         Session::flash(
             'success', 'Rescan was queued.'
         );

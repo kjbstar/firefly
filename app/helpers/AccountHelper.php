@@ -38,6 +38,17 @@ class AccountHelper
             ->get();
     }
 
+    public static function generateTransferListByMonth(
+        Account $account, Carbon $date
+    ) {
+        return Auth::user()->transfers()->where('accountto_id', $account->id)->orWhere(
+            'accountfrom_id',
+            $account->id
+        )
+            ->orderBy('date', 'DESC')->inMonth($date)
+            ->get();
+    }
+
     /**
      * Generates a list of months and the balances during that month.
      *
@@ -69,7 +80,8 @@ class AccountHelper
         return $list;
     }
 
-    public static function getPredictionStart() {
+    public static function getPredictionStart()
+    {
         $predictionStart = Setting::getSetting('predictionStart');
         return $predictionStart->value;
     }

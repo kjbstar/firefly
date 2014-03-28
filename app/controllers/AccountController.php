@@ -229,10 +229,17 @@ class AccountController extends BaseController
     {
 
         $date = Toolkit::parseDate($year, $month);
+        $transfers = [];
         if ($date) {
             $entries = AccountHelper::generateTransactionListByMonth(
                 $account, $date
             );
+
+            // also grab a list of transfers by month:
+            $transfers = AccountHelper::generateTransferListByMonth(
+                $account, $date
+            );
+
             $title = 'Overview for ' . $account->name . ' in ' . $date->format(
                     'F Y'
                 );
@@ -246,7 +253,7 @@ class AccountController extends BaseController
             'title', $title
         )->with(
                 'transactions', $entries
-            )->with('date', $date);
+            )->with('date', $date)->with('transfers',$transfers);
     }
 
     /**

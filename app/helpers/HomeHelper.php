@@ -119,7 +119,12 @@ class HomeHelper
                         'accounts', 'accounts.id', '=', 'transactions.account_id'
                     )->where('accounts.shared', 0)->sum('amount')
                 ) * -1;
-            $allowance['spent'] = $spent;
+
+            // also count transfers that went to a shared account:
+            $moved = floatval(Auth::user()->transfers()->inMonth($date)->leftJoin('accounts','accounts.id','=',
+                'transfers.accountto_id')->where('accounts.shared',1)->sum('transfers.amount'));
+
+            $allowance['spent'] = $spent + $moved;
             // overspent this allowance:
             if ($spent > $amount) {
                 $allowance['over'] = true;

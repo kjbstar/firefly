@@ -41,9 +41,14 @@
         </table>
         @else
         <h4>Transactions</h4>
-
         @include('list.transactions')
+
+        <h4>Transfers</h4>
+        @include('list.transfers')
+
         @endif
+
+
     </div>
 </div>
 

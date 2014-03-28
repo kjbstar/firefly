@@ -125,7 +125,7 @@ class TransactionTrigger
         // loop all predictables:
         if ($triggerPrediction) {
             Log::debug('Triggering predictions!');
-            Queue::push('PredictableQueue@processTransaction', $transaction);
+            Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
         } else {
             Log::debug('No relevant changes, not triggering prediction.');
         }
@@ -263,9 +263,11 @@ class TransactionTrigger
             'TransactionTrigger@createTransaction'
         );
         $events->listen('eloquent.created: Transaction', 'TransactionTrigger@pushTransaction');
+        $events->listen('eloquent.updated: Transaction','TransactionTrigger@pushTransaction');
+
         $events->listen('eloquent.deleted: Transaction','TransactionTrigger@deleteTransaction');
         $events->listen('eloquent.updating: Transaction','TransactionTrigger@editTransaction');
-        $events->listen('eloquent.updated: Transaction','TransactionTrigger@pushTransaction');
+
 
     }
 

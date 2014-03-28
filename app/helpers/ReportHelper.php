@@ -27,6 +27,10 @@ class ReportHelper
             [DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),
              DB::Raw('SUM(`amount`) as `total`')]
         );
+
+        // TODO also include either incomes or expenses for transfers from/to shared accounts:
+
+
         $list = [];
         foreach($result as $row) {
             switch($type) {
@@ -35,6 +39,8 @@ class ReportHelper
                     break;
                 case 'expenses':
                     $list[$row->month] = $row->total*-1;
+
+
                     break;
             }
         }

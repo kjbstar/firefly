@@ -4,8 +4,9 @@
 class PredictableQueue
 {
 
-    public function scan($job, Predictable $predictable)
+    public function scan($job, $payload)
     {
+        $predictable = Predictable::find($payload['predictable_id']);
         Log::debug('Trigger PredictableQueue[scan]!');
         $user = Auth::user();
         if(is_null($user)) {
@@ -16,8 +17,9 @@ class PredictableQueue
         $this->processPredictable($job, $predictable, $query);
     }
 
-    public function scanAll($job, Predictable $predictable)
+    public function scanAll($job, $payload)
     {
+        $predictable = Predictable::find($payload['predictable_id']);
         Log::debug('Trigger PredictableQueue[scanAll]!');
         $user = Auth::user();
         if(is_null($user)) {

@@ -1,85 +1,77 @@
+<table class="table table-bordered table-condensed">
+    <tr>
+        <th>Date</th>
+        <th colspan="2">Description</th>
+        <th>Amount</th>
+        <th>Beneficiary</th>
+        <th>Budget</th>
+        <th>Category</th>
+
+        <th>&nbsp;</th>
+    </tr>
 
 @foreach($transactions as $t)
-{{--
 
-<table class="table table-bordered">
     <tr>
-        <td>{{$t->date->format(Config::get('firefly.date_format'))}}</td>
-        <td><a href="{{URL::Route('edittransaction',[$t->id])}}">{{{$t->description}}}</a></td>
+        <td>{{$t->date->format('d-m-y')}}</td>
+        @if($t->ignoreprediction == 0 && $t->ignoreallowance == 0 && $t->mark == 0 && is_null($t->predictable_id))
+            <td colspan="2">
+        @else
+            <td>
+        @endif
+            <a href="{{URL::Route('edittransaction',[$t->id])}}">{{{$t->description}}}</a></td>
+        @if($t->ignoreprediction == 1 || $t->ignoreallowance == 1 || $t->mark == 1 || !is_null($t->predictable_id))
+            <td>
+                @if($t->ignoreprediction == 1)
+                    <span class="glyphicon glyphicon-eye-close" title="Ignored in predictions"></span>
+                @endif
+                @if($t->ignoreallowance == 1)
+                    <span class="glyphicon glyphicon-gift" title="Ignored in allowance"></span>
+                @endif
+                @if($t->mark == 1)
+                    <span class="glyphicon glyphicon-ok" title="Marked in charts"></span>
+                @endif
+                @if(!is_null($t->predictable_id))
+                <a href="{{URL::Route('predictableoverview',$t->predictable_id)}}" title="{{{$t->predictable->description}}}"><span
+                        class="glyphicon glyphicon-repeat" title="{{{$t->predictable->description}}}"></span></a>
+                @endif
+            </td>
+        @endif
+
         <td>{{mf($t->amount,true)}}</td>
         <td>
-            @if(!is_null($t->beneficiary))
-
-            <?php $b = $t->beneficiary;?>
-            <!-- ICON -->
-            <span class="glyphicon glyphicon-user"></span>
-            <!-- PARENT -->
-            <?php
-            $p = $b->parentComponent()->first();
-            ?>
-
-            @if(!is_null($p))
-                <a href="{{URL::Route('beneficiaryoverview',$p->id)}}" title="Overview for {{{$p->name}}}">{{{$p->name}}}</a>
-            /
+            @if($t->beneficiary)
+            @if(!is_null($t->beneficiary->parentComponent()->first()))
+            <small>{{{$t->beneficiary->parentComponent()->first()->name}}}</small><br />
             @endif
-            <!-- BENEFICIARY -->
-            <a href="{{URL::Route('beneficiaryoverview',$b->id)}}" title="Overview for {{{$b->name}}}">{{$b->name}}</a>
-
+            {{{$t->beneficiary->name}}}
             @endif
         </td>
-
-    </tr>
-    <tr>
         <td>
-            <div class="btn-group">
-                <a href="{{URL::Route('deletetransaction',[$t->id])}}" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
-                <a href="{{URL::Route('edittransaction',[$t->id])}}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
-            </div>
+            @if($t->budget)
+            @if(!is_null($t->budget->parentComponent()->first()))
+            <small>{{{$t->budget->parentComponent()->first()->name}}}</small><br />
+            @endif
+            {{{$t->budget->name}}}
+            @endif
         </td>
-        <td colspan="2">
-            @if($t->ignoreprediction == 1)
-            <span class="glyphicon glyphicon-eye-close" title="Ignored in predictions"></span>
+        <td>
+            @if($t->category)
+            @if(!is_null($t->category->parentComponent()->first()))
+            <small>{{{$t->category->parentComponent()->first()->name}}}</small><br />
             @endif
-            @if($t->ignoreallowance == 1)
-            <span class="glyphicon glyphicon-gift" title="Ignored in allowance"></span>
+            {{{$t->category->name}}}
             @endif
-            @if($t->mark == 1)
-            <span class="glyphicon glyphicon-ok" title="Marked in charts"></span>
-            @endif
-
         </td>
-        <td>Category (if)</td>
-    </tr>
-    <tr>
-        <td>I</td>
-        <td>J</td>
-        <td>K</td>
-        <td>Budget (if)</td>
-    </tr>
-    <tr>
-        <td>M</td>
-        <td>N</td>
-        <td>O</td>
-        <td>Predictable (if)</td>
-    </tr>
-</table>
 
---}}
-<?php
-$t->rowspan = 1;
-if(count($t->components) > 1) {
-    $t->rowspan += count($t->components);
-}
-if(!is_null($t->predictable_id)) {
-    $t->rowspan++;
-}
-?>
-<table class="table table-bordered table-condensed">
+        <td><a href="{{URL::Route('deletetransaction',[$t->id])}}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a></td>
+    </tr>
+    {{--
     <tr>
         <!-- CELL MET DATE -->
         <td style="width:150px;" rowspan="{{$t->rowspan}}">
         {{$t->date->format(Config::get('firefly.date_format'))}}<br />
-            <a href="{{URL::Route('deletetransaction',[$t->id])}}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+
         </td>
         <!-- CELL MET DESCRIPTION -->
         <td rowspan="{{$t->rowspan}}">
@@ -88,8 +80,7 @@ if(!is_null($t->predictable_id)) {
             <span class="glyphicon glyphicon-eye-close" title="Ignored in predictions"></span>
             @endif
             @if($t->ignoreallowance == 1)
-                    <span class="glyphicon glyphicon-gift" title="Ignored in
-                    allowance"></span>
+                    <span class="glyphicon glyphicon-gift" title="Ignored in allowance"></span>
             @endif
             @if($t->mark == 1)
             <span class="glyphicon glyphicon-ok" title="Marked in charts"></span>
@@ -136,7 +127,10 @@ if(!is_null($t->predictable_id)) {
         </td>
     </tr>
     @endif
+
+    --}}
     <!-- edit and delete -->
 
-</table>
+
 @endforeach
+</table>

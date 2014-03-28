@@ -153,6 +153,13 @@ class Transfer extends Eloquent
         );
     }
 
+    public function scopeInYear($query, Carbon $date)
+    {
+        return $query->where(
+            DB::Raw('DATE_FORMAT(`date`,"%Y")'), '=', $date->format('Y')
+        );
+    }
+
 
     /**
      * Get the unencrypted description.

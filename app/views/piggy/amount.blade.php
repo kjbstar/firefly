@@ -34,11 +34,19 @@
                 <div class="col-sm-9">
                     <div class="input-group">
                         <span class="input-group-addon">&euro;</span>
+                        @if($balance < $pig->amount*-1)
+                        <input type="number" max="-{{$pig->amount}}"
+                               min="{{$balance}}" value="0"
+                               step="any"
+                               name="amount"
+                               class="form-control" id="inputAmount">
+                        @else
                         <input type="number" max="{{$balance}}"
                                min="-{{$pig->amount}}" value="0"
                                step="any"
                                name="amount"
                                class="form-control" id="inputAmount">
+                        @endif
                     </div>
                 </div>
             </div>

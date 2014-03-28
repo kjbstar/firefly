@@ -28,7 +28,7 @@ class PredictableTrigger
 
     public function jobPredictable(Predictable $predictable) {
         Log::debug('Trigger new predictable scan.');
-        Queue::push('PredictableQueue@scan', $predictable);
+        Queue::push('PredictableQueue@scan', ['predictable_id' => $predictable->id]);
     }
 
     public function subscribe(Illuminate\Events\Dispatcher $events)
