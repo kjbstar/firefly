@@ -37,9 +37,8 @@ class SettingsControllerTest extends TestCase
     public function testPostIndex()
     {
         $account = Auth::user()->accounts()->first();
-        $data = ['predictionStart' => '2013-01-01',
-                 'frontpageAccount' => $account->id];
-        $response = $this->call('POST', 'home/settings', $data);
+        $data = ['predictionStart' => '2013-01-01', 'frontpageAccount' => $account->id];
+        $this->call('POST', 'home/settings', $data);
 
         // validate result:
         $this->assertResponseStatus(302);
@@ -122,9 +121,9 @@ class SettingsControllerTest extends TestCase
 
         $setting = Auth::user()->settings()->where('name', 'specificAllowance')
             ->where('date', $date->format('Y-m') . '-01')->with(
-            'value', $data['amount']
-        )->count();
-        $this->assertEquals(1,$setting);
+                'value', $data['amount']
+            )->count();
+        $this->assertEquals(1, $setting);
 
 
     }
@@ -139,63 +138,63 @@ class SettingsControllerTest extends TestCase
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('error');
-        $this->assertEquals($count,$newCount);
+        $this->assertEquals($count, $newCount);
     }
 
     public function testEditAllowance()
     {
-        $setting = Auth::user()->settings()->where('name','specificAllowance')->first();
-        $response = $this->call('GET', 'home/allowance/'.$setting->id.'/edit');
+        $setting = Auth::user()->settings()->where('name', 'specificAllowance')->first();
+        $response = $this->call('GET', 'home/allowance/' . $setting->id . '/edit');
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
-        $this->assertEquals($setting->amount,$view['setting']->amount);
+        $this->assertEquals($setting->amount, $view['setting']->amount);
 
     }
 
     public function testPostEditAllowance()
     {
         $data = ['value' => 1300];
-        $setting = Auth::user()->settings()->where('name','specificAllowance')->first();
-        $this->call('POST', 'home/allowance/'.$setting->id.'/edit',$data);
-        $count = Auth::user()->settings()->where('name','specificAllowance')->where('value',$data['value'])->count();
+        $setting = Auth::user()->settings()->where('name', 'specificAllowance')->first();
+        $this->call('POST', 'home/allowance/' . $setting->id . '/edit', $data);
+        $count = Auth::user()->settings()->where('name', 'specificAllowance')->where('value', $data['value'])->count();
 
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
-        $this->assertEquals(1,$count);
+        $this->assertEquals(1, $count);
 
     }
 
     public function testPostEditInvalidAllowance()
     {
         $data = ['value' => 0];
-        $setting = Auth::user()->settings()->where('name','specificAllowance')->first();
-        $this->call('POST', 'home/allowance/'.$setting->id.'/edit',$data);
-        $count = Auth::user()->settings()->where('name','specificAllowance')->where('value',$data['value'])->count();
+        $setting = Auth::user()->settings()->where('name', 'specificAllowance')->first();
+        $this->call('POST', 'home/allowance/' . $setting->id . '/edit', $data);
+        $count = Auth::user()->settings()->where('name', 'specificAllowance')->where('value', $data['value'])->count();
 
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('error');
-        $this->assertEquals(0,$count);
+        $this->assertEquals(0, $count);
     }
 
     public function testDeleteAllowance()
     {
-        $setting = Auth::user()->settings()->where('name','specificAllowance')->first();
-        $response = $this->call('GET', 'home/allowance/'.$setting->id.'/delete');
+        $setting = Auth::user()->settings()->where('name', 'specificAllowance')->first();
+        $response = $this->call('GET', 'home/allowance/' . $setting->id . '/delete');
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
-        $this->assertEquals($setting->amount,$view['setting']->amount);
+        $this->assertEquals($setting->amount, $view['setting']->amount);
     }
 
     public function testDostDeleteInvalidAllowance()
     {
-        $setting = Auth::user()->settings()->where('name','specificAllowance')->first();
-        $id = $setting->id;
-        $this->call('POST', 'home/allowance/'.$setting->id.'/delete');
-        $deleted = Auth::user()->settings()->find($id);
+        $setting = Auth::user()->settings()->where('name', 'specificAllowance')->first();
+        $settingID = $setting->id;
+        $this->call('POST', 'home/allowance/' . $setting->id . '/delete');
+        $deleted = Auth::user()->settings()->find($settingID);
 
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
@@ -210,5 +209,4 @@ class SettingsControllerTest extends TestCase
     }
 
 
-
-} 
+}

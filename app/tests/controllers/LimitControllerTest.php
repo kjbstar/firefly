@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class LimitControllerTest
+ */
 class LimitControllerTest extends TestCase
 {
     public function setUp()
@@ -8,7 +11,8 @@ class LimitControllerTest extends TestCase
         $user = User::where('username', 'test')->first();
         $this->be($user);
     }
-    private $amount = 123.45;
+
+    private $_amount = 123.45;
 
     public function testAddLimit()
     {
@@ -31,13 +35,13 @@ class LimitControllerTest extends TestCase
     {
         $count = Limit::count();
         $budget = Auth::user()->components()->where('type', 'budget')->first();
-        $data = ['amount' => $this->amount];
+        $data = ['amount' => $this->_amount];
         $this->call(
             'POST', 'home/budget/limit/add/' . $budget->id . '/' . date('Y/m'),
             $data
         );
         $newCount = Limit::count();
-        $this->assertEquals($count+1,$newCount);
+        $this->assertEquals($count + 1, $newCount);
         $this->assertResponseStatus(302);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
@@ -55,14 +59,14 @@ class LimitControllerTest extends TestCase
         );
         $newCount = Limit::count();
         $this->assertResponseStatus(302);
-        $this->assertEquals($count,$newCount);
+        $this->assertEquals($count, $newCount);
         $this->assertSessionHas('error');
         $this->assertRedirectedToRoute('budgetoverview', $budget->id);
     }
 
     public function testEditLimit()
     {
-        $limit = Limit::where('amount',$this->amount)->first();
+        $limit = Limit::where('amount', $this->_amount)->first();
         $response = $this->call('GET', 'home/budget/limit/edit/' . $limit->id);
         $view = $response->original;
         $this->assertResponseStatus(200);
@@ -72,8 +76,8 @@ class LimitControllerTest extends TestCase
 
     public function testPostEditLimit()
     {
-        $limit = Limit::where('amount',$this->amount)->first();
-        $data = ['amount' => $this->amount];
+        $limit = Limit::where('amount', $this->_amount)->first();
+        $data = ['amount' => $this->_amount];
         $this->call('POST', 'home/budget/limit/edit/' . $limit->id, $data);
         $this->assertResponseStatus(302);
         $this->assertSessionHas('success');
@@ -93,7 +97,7 @@ class LimitControllerTest extends TestCase
 
     public function testDeleteLimit()
     {
-        $limit = Limit::where('amount',$this->amount)->first();
+        $limit = Limit::where('amount', $this->_amount)->first();
         $response = $this->call(
             'GET', 'home/budget/limit/delete/' . $limit->id
         );
@@ -106,11 +110,11 @@ class LimitControllerTest extends TestCase
     public function testPostDeleteLimit()
     {
         $count = Limit::count();
-        $limit = Limit::where('amount',$this->amount)->first();
+        $limit = Limit::where('amount', $this->_amount)->first();
         $this->call('POST', 'home/budget/limit/delete/' . $limit->id);
         $this->assertResponseStatus(302);
         $newCount = Limit::count();
-        $this->assertEquals($count-1,$newCount);
+        $this->assertEquals($count - 1, $newCount);
         $this->assertRedirectedToRoute('index');
         $this->assertSessionHas('success');
     }

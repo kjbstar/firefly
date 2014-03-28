@@ -1,6 +1,7 @@
 <?php
 /** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/AccountHelper.php');
+include_once(app_path() . '/helpers/TransactionHelper.php');
 
 /**
  * Class TransactionController
@@ -15,13 +16,8 @@ class TransactionController extends BaseController
      */
     public function showIndex()
     {
-        $transactions = Auth::user()->transactions()->orderBy('date', 'DESC')
-            ->orderBy('id', 'DESC')->paginate(25);
-
-
-        return View::make('transactions.index')->with(
-            'title', 'All transactions'
-        )->with('transactions', $transactions);
+        $transactions = Auth::user()->transactions()->orderBy('date', 'DESC')->orderBy('id', 'DESC')->paginate(25);
+        return View::make('transactions.index')->with('title', 'All transactions')->with('transactions', $transactions);
     }
 
     /**
@@ -37,59 +33,22 @@ class TransactionController extends BaseController
             Session::put('previous', URL::previous());
         }
         // empty by default:
-        $prefilled = [
-            'description'      => '',
-            'amount'           => '',
-            'date'             => date('Y-m-d'),
-            'account_id'       => null,
-            'beneficiary'      => '',
-            'category'         => '',
-            'budget'           => '',
-            'ignoreprediction' => 0,
-            'ignoreallowance'  => 0,
-            'mark'             => 0
-        ];
-
+        $prefilled = TransactionHelper::emptyPrefilledAray();
         // prefill from predictable:
-        if(!is_nulL($predictable)) {
-            $d = sprintf('%02d', $predictable->dom);
-            $prefilled = [
-                'description'      => $predictable->description,
-                'amount'           => $predictable->amount,
-                'date'             => date('Y-m-').$d,
-                'account_id'       => null,
-                'beneficiary'      => is_null($predictable->beneficiary) ? '' : $predictable->beneficiary->name,
-                'category'         => is_null($predictable->category) ? '' : $predictable->category->name,
-                'budget'           => is_null($predictable->budget) ? '' : $predictable->budget->name,
-                'ignoreprediction' => 0,
-                'ignoreallowance'  => 0,
-                'mark'             => 0
-            ];
+        if (!is_null($predictable)) {
+            $prefilled = TransactionHelper::prefilledFromPredictable($predictable);
         }
-
         // prefill from old input:
         if (Input::old()) {
-            $prefilled = ['description'      => Input::old('description'),
-                          'amount'           => floatval(Input::old('amount')),
-                          'date'             => Input::old('date'),
-                          'account_id'       => intval(Input::old('account_id')),
-                          'beneficiary'      => intval(Input::old('beneficiary_id')),
-                          'category'         => intval(Input::old('category_id')),
-                          'budget'           => intval(Input::old('budget_id')),
-                          'ignoreprediction' => intval(Input::old('ignoreprediction')),
-                          'ignoreallowance'  => intval(Input::old('ignoreallowance')),
-                          'mark'             => intval(Input::old('mark'))
-
-            ];
+            $prefilled = TransactionHelper::prefilledFromOldInput();
         }
-
 
 
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transactions.add')->with(
             'title', 'Add a transaction'
-        )->with('accounts', $accounts)->with('prefilled',$prefilled);
+        )->with('accounts', $accounts)->with('prefilled', $prefilled);
     }
 
     /**
@@ -97,82 +56,44 @@ class TransactionController extends BaseController
      *
      * @return View
      */
-    public function postAdd(Predictable $p = null)
+    public function postAdd()
     {
-        Log::debug('AccountID: ' . Input::get('account_id'));
         $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
-        Log::debug('Account is null? '.(is_null($account) ? 1  : 0));
-        Log::debug('Test');
         if (is_null($account)) {
             Session::flash('error', 'Invalid account selected.');
-            Log::debug('Invalid account (#' . Input::get('account_id') . ')');
             return Redirect::route('addtransaction')->withInput();
-            Log::debug('Test2');
         }
-        Log::debug('Test3');
 
-
-        // fields:
         $transaction = new Transaction();
-
         $transaction->description = Input::get('description');
         $transaction->amount = floatval(Input::get('amount'));
         $transaction->date = Input::get('date');
         $transaction->account()->associate($account);
+
         /** @noinspection PhpParamsInspection */
         $transaction->user()->associate(Auth::user());
-        $transaction->ignoreprediction = is_null(Input::get('ignoreprediction')) ? 0 : 1;
-        $transaction->ignoreallowance = is_null(Input::get('ignoreallowance')) ? 0 : 1;
-        $transaction->mark = is_null(Input::get('mark')) ? 0 : 1;
+        $transaction->ignoreprediction = intval(Input::get('ignoreprediction'));
+        $transaction->ignoreallowance = intval(Input::get('ignoreallowance'));
+        $transaction->mark = intval(Input::get('mark'));
 
         // explode every object at the / and see if there is one.
         // more than one? return to Transaction:
-        foreach (['beneficiary', 'category', 'budget'] as $comp) {
-            $input = Input::get($comp);
-            $parts = explode('/', $input);
-            if (count($parts) > 2) {
-                Session::flash(
-                    'error',
-                    'Use forward slashes to indicate parent ' . Str::plural(
-                        $comp
-                    ) . '. Please don\'t use more than one.'
-                );
+        $beneficiary = TransactionHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
+        $category = TransactionHelper::saveComponentFromText('category', Input::get('category'));
+        $budget = TransactionHelper::saveComponentFromText('budget', Input::get('budget'));
 
-                return Redirect::route('addtransaction')->withInput();
-            }
-            // count is one? that's the object!
-            if (count($parts) == 1) {
-                $$comp = Component::findOrCreate($comp, Input::get($comp));
-            }
-            // count is two? parent + child.
-            if (count($parts) == 2) {
-                $parent = Component::findOrCreate($comp, $parts[0]);
-                $$comp = Component::findOrCreate($comp, $parts[1]);
-                $$comp->parent_component_id = $parent->id;
-                $$comp->save();
-
-            }
-        }
 
         // save and / or create the beneficiary:
-        $validator = Validator::make(
-            $transaction->toArray(), Transaction::$rules
-        );
+        $validator = Validator::make($transaction->toArray(), Transaction::$rules);
         if ($validator->fails()) {
             Session::flash('error', 'Could not save transaction.');
-            Log::debug('Rule failed: ' . print_r($validator->messages()->all(),true));
-            return Redirect::route('addtransaction')->withInput()->withErrors(
-                $validator
-            );
+            return Redirect::route('addtransaction')->withInput()->withErrors($validator);
         }
         $transaction->save();
 
         // attach the beneficiary, if it is set:
-        /** @var $beneficiary Component */
         $transaction->attachComponent($beneficiary);
-        /** @var $budget Component */
         $transaction->attachComponent($budget);
-        /** @var $category Component */
         $transaction->attachComponent($category);
         Session::flash('success', 'The transaction has been created.');
 
@@ -255,7 +176,7 @@ class TransactionController extends BaseController
         );
         if ($validator->fails()) {
             Session::flash('error', 'The transaction could not be saved.');
-            Log::debug('These rules failed: ' . print_r($validator->messages()->all(),true));
+            Log::debug('These rules failed: ' . print_r($validator->messages()->all(), true));
             return Redirect::route('edittransaction', $transaction->id)
                 ->withInput()->withErrors($validator);
         } else {

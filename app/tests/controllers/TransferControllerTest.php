@@ -1,8 +1,11 @@
 <?php
 
+/**
+ * Class TransferControllerTest
+ */
 class TransferControllerTest extends TestCase
 {
-    private $amount = 123.45;
+    private $_amount = 123.45;
 
     public function setUp()
     {
@@ -23,13 +26,32 @@ class TransferControllerTest extends TestCase
 
     public function testAdd()
     {
-        $accounts = Auth::user()->accounts()->count();
-        $response = $this->call('GET', 'home/transfer/add');
-        $view = $response->original;
+        $crawler = $this->client->request('GET', 'home/transfer/add');
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
-        $this->assertEquals($view['title'], 'Add a transfer');
-        $this->assertCount($accounts, $view['accounts']);
+        // test the view for certain elements:
+        //echo $crawler->filter('title:contains("transfer")')->text();
+        $this->assertCount(1, $crawler->filter('title:contains("Add a transfer")'));
+        $this->assertCount(1, $crawler->filter("p.text-info"));
+        $this->assertCount(1, $crawler->filter('h4:contains("Optional")'));
+        $this->assertCount(1, $crawler->filter('h4:contains("Mandatory")'));
+        $this->assertCount(1, $crawler->filter("input[name=amount]"));
+        $this->assertCount(1, $crawler->filter("input[name=budget]"));
+    }
+
+    public function testAddWithOldInput()
+    {
+        $this->session(['_old_input' => ['description' => 'Test', 'amount' => 100]]);
+        $crawler = $this->client->request('GET', 'home/transfer/add');
+        $this->assertResponseStatus(200);
+        // test the view for certain elements:
+        //echo $crawler->filter('title:contains("transfer")')->text();
+        $this->assertCount(1, $crawler->filter('title:contains("Add a transfer")'));
+        $this->assertCount(1, $crawler->filter("p.text-info"));
+        $this->assertCount(1, $crawler->filter('h4:contains("Optional")'));
+        $this->assertCount(1, $crawler->filter('h4:contains("Mandatory")'));
+        $this->assertCount(1, $crawler->filter("input[name=amount]"));
+        $this->assertCount(1, $crawler->filter("input[name=budget]"));
     }
 
     public function testPostAdd()
@@ -41,7 +63,7 @@ class TransferControllerTest extends TestCase
         )->first();
         $data = ['accountfrom_id' => $accountfrom->id,
                  'accountto_id'   => $accountto->id,
-                 'description'    => 'TestTransfer', 'amount' => $this->amount,
+                 'description'    => 'TestTransfer', 'amount' => $this->_amount,
                  'date'           => date('Y-m-d')
 
         ];
@@ -73,7 +95,7 @@ class TransferControllerTest extends TestCase
     public function testEdit()
     {
         $accounts = Auth::user()->accounts()->count();
-        $transfer = Auth::user()->transfers()->where('amount',$this->amount)->first();
+        $transfer = Auth::user()->transfers()->where('amount', $this->_amount)->first();
         $response = $this->call(
             'GET', 'home/transfer/' . $transfer->id . '/edit'
         );
@@ -88,11 +110,11 @@ class TransferControllerTest extends TestCase
 
     public function testPostEdit()
     {
-        $transfer = Auth::user()->transfers()->where('amount',$this->amount)->first();
-        $data = ['description' => 'TestEdit', 'amount' => $this->amount,
-                 'date' => date('Y-m-d'),
+        $transfer = Auth::user()->transfers()->where('amount', $this->_amount)->first();
+        $data = ['description'    => 'TestEdit', 'amount' => $this->_amount,
+                 'date'           => date('Y-m-d'),
                  'accountfrom_id' => $transfer->accountto_id,
-                 'accountto_id' => $transfer->accountfrom_id];
+                 'accountto_id'   => $transfer->accountfrom_id];
 
         $this->call('POST', 'home/transfer/' . $transfer->id . '/edit', $data);
         $this->assertResponseStatus(302);
@@ -114,7 +136,7 @@ class TransferControllerTest extends TestCase
 
     public function testDelete()
     {
-        $transfer = Auth::user()->transfers()->where('amount',$this->amount)->first();
+        $transfer = Auth::user()->transfers()->where('amount', $this->_amount)->first();
         $response = $this->call(
             'GET', 'home/transfer/' . $transfer->id . '/delete'
         );
@@ -129,7 +151,7 @@ class TransferControllerTest extends TestCase
     public function testPostDelete()
     {
         $count = Auth::user()->transfers()->count();
-        $transfer = Auth::user()->transfers()->where('amount',$this->amount)->first();
+        $transfer = Auth::user()->transfers()->where('amount', $this->_amount)->first();
         $this->call('POST', 'home/transfer/' . $transfer->id . '/delete');
         $newCount = Auth::user()->transfers()->count();
         $this->assertEquals($count - 1, $newCount);

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class PredictableControllerTest
+ */
 class PredictableControllerTest extends TestCase
 {
     public function setUp()
@@ -9,7 +12,7 @@ class PredictableControllerTest extends TestCase
         $this->be($user);
     }
 
-    private $amount = 123.45;
+    private $_amount = 123.45;
 
     public function testIndex()
     {
@@ -17,20 +20,20 @@ class PredictableControllerTest extends TestCase
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Predictables', $view['title']);
-        $p = Predictable::count();
-        $this->assertCount($p, $view['predictables']);
+        $predictable = Predictable::count();
+        $this->assertCount($predictable, $view['predictables']);
     }
 
     public function testOverview()
     {
-        $p = Predictable::first();
+        $predictable = Predictable::first();
         $response = $this->call(
-            'GET', 'home/predictable/' . $p->id . '/overview'
+            'GET', 'home/predictable/' . $predictable->id . '/overview'
         );
         $view = $response->original;
         $this->assertResponseStatus(200);
-        $this->assertEquals('Overview for ' . $p->description, $view['title']);
-        $this->assertEquals($p->id, $view['predictable']->id);
+        $this->assertEquals('Overview for ' . $predictable->description, $view['title']);
+        $this->assertEquals($predictable->id, $view['predictable']->id);
 
 
     }
@@ -55,13 +58,13 @@ class PredictableControllerTest extends TestCase
 
     public function testAddWithTransaction()
     {
-        $t = Transaction::first();
-        $response = $this->call('GET', 'home/predictable/add/' . $t->id);
+        $transaction = Transaction::first();
+        $response = $this->call('GET', 'home/predictable/add/' . $transaction->id);
         $view = $response->original;
         $this->assertResponseStatus(200);
         // TODO match prefilled content
-        $this->assertEquals('Add a predictable based on "' . $t->description . '"', $view['title']);
-        $this->assertEquals($t->description, $view['prefilled']['description']);
+        $this->assertEquals('Add a predictable based on "' . $transaction->description . '"', $view['title']);
+        $this->assertEquals($transaction->description, $view['prefilled']['description']);
 
         $bud = Auth::user()->components()->where('type', 'budget')->whereNull('parent_component_id')->count() + 1;
         $cat = Auth::user()->components()->where('type', 'category')->whereNull('parent_component_id')->count() + 1;
@@ -99,7 +102,7 @@ class PredictableControllerTest extends TestCase
         $budget = Component::where('type', 'budget')->first();
 
         $data = ['description'    => 'TestPredictableFilled', 'dom' => 1, 'pct' => 12,
-                 'inactive'       => 0, 'amount' => $this->amount,
+                 'inactive'       => 0, 'amount' => $this->_amount,
                  'beneficiary_id' => $beneficiary->id, 'budget_id' => $budget->id, 'category_id' => $category->id
         ];
         $this->call('POST', 'home/predictable/add', $data);
@@ -141,7 +144,7 @@ class PredictableControllerTest extends TestCase
     {
         $count = Auth::user()->predictables()->count();
         $data = ['description' => 'TestPredictableFilled', 'dom' => 1, 'pct' => 12,
-                 'inactive'    => 0, 'amount' => $this->amount,
+                 'inactive'    => 0, 'amount' => $this->_amount,
         ];
         $this->call('POST', 'home/predictable/add', $data);
         $newCount = Auth::user()->predictables()->count();
@@ -157,7 +160,7 @@ class PredictableControllerTest extends TestCase
      */
     public function testEdit()
     {
-        $predictable = Predictable::orderBy('id', 'DESC')->where('amount', $this->amount)->first();
+        $predictable = Predictable::orderBy('id', 'DESC')->where('amount', $this->_amount)->first();
         $response = $this->call('GET', 'home/predictable/' . $predictable->id . '/edit');
         $view = $response->original;
         $this->assertResponseStatus(200);
@@ -173,9 +176,9 @@ class PredictableControllerTest extends TestCase
         $category = Component::where('type', 'category')->first();
         $budget = Component::where('type', 'budget')->first();
 
-        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->amount)->first();
+        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->_amount)->first();
         $data = ['description'    => 'TestPredictableFilledEdited', 'dom' => 1, 'pct' => 12,
-                 'inactive'       => 0, 'amount' => $this->amount,
+                 'inactive'       => 0, 'amount' => $this->_amount,
                  'beneficiary_id' => $beneficiary->id, 'budget_id' => $budget->id, 'category_id' => $category->id
         ];
         $this->call('POST', 'home/predictable/' . $pred->id . '/edit', $data);
@@ -206,7 +209,7 @@ class PredictableControllerTest extends TestCase
         $budget = Component::where('type', 'budget')->first();
 
         $data = ['description'    => 'Rent', 'dom' => 1, 'pct' => 12,
-                 'inactive'       => 0, 'amount' => $this->amount,
+                 'inactive'       => 0, 'amount' => $this->_amount,
                  'beneficiary_id' => $beneficiary->id, 'budget_id' => $budget->id, 'category_id' => $category->id
         ];;
         $this->call('POST', 'home/predictable/' . $pred->id . '/edit', $data);
@@ -218,7 +221,7 @@ class PredictableControllerTest extends TestCase
 
     public function testDelete()
     {
-        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->amount)->first();
+        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->_amount)->first();
         $response = $this->call('GET', 'home/predictable/' . $pred->id . '/delete');
         $view = $response->original;
         $this->assertResponseStatus(200);
@@ -228,7 +231,7 @@ class PredictableControllerTest extends TestCase
 
     public function testRescan()
     {
-        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->amount)->first();
+        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->_amount)->first();
 
         $this->call('GET', 'home/predictable/' . $pred->id . '/rescan');
         $this->assertResponseStatus(302);
@@ -238,7 +241,7 @@ class PredictableControllerTest extends TestCase
 
     public function testRescanAll()
     {
-        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->amount)->first();
+        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->_amount)->first();
 
         $this->call('GET', 'home/predictable/' . $pred->id . '/rescan-all');
         $this->assertResponseStatus(302);
@@ -249,7 +252,7 @@ class PredictableControllerTest extends TestCase
     public function testPostDelete()
     {
         $count = Auth::user()->predictables()->count();
-        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->amount)->first();
+        $pred = Predictable::orderBy('id', 'DESC')->where('amount', $this->_amount)->first();
 
         $this->call('POST', 'home/predictable/' . $pred->id . '/delete');
         $newCount = Auth::user()->predictables()->count();

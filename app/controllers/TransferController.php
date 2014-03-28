@@ -33,11 +33,39 @@ class TransferController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
+
+        // prefilled when old input:
+        if (!Input::old()) {
+            $prefilled = [
+                'description'    => '',
+                'amount'         => '',
+                'date'           => date('Y-m-d'),
+                'accountfrom_id' => 0,
+                'accountto_id'   => 0,
+                'beneficiary'    => '',
+                'budget'         => '',
+                'category'       => ''
+            ];
+        }
+        if (Input::old()) {
+            $prefilled = [
+                'description'    => Input::old('description'),
+                'amount'         => floatval(Input::old('amount')),
+                'date'           => Input::old('date'),
+                'accountfrom_id' => intval(Input::old('accountfrom_id')),
+                'accountto_id'   => intval(Input::old('accountto_id')),
+                'beneficiary'    => Input::old('beneficiary'),
+                'budget'         => Input::old('budget'),
+                'category'       => Input::old('category')
+            ];
+        }
+
+
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transfers.add')->with(
             'title', 'Add a transfer'
-        )->with('accounts', $accounts);
+        )->with('accounts', $accounts)->with('prefilled', $prefilled);
     }
 
     /**

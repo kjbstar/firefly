@@ -48,7 +48,7 @@ class HomeControllerTest extends TestCase
         $start = new Carbon\Carbon('2012-01-01');
         $now = new Carbon\Carbon;
         $diff = $now->diffInMonths($start);
-        $diff = $diff+2;
+        $diff = $diff + 2;
 
         // TODO better count
         $this->assertCount($diff, $view['history']);
@@ -82,7 +82,7 @@ class HomeControllerTest extends TestCase
         $start = new Carbon\Carbon('2012-01-01');
         $now = new Carbon\Carbon;
         $diff = $now->diffInMonths($start);
-        $diff = $diff+2;
+        $diff = $diff + 2;
 
         // TODO better count
         $this->assertCount($diff, $view['history']);

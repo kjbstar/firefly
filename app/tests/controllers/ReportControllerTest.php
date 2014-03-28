@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class ReportControllerTest
+ */
 class ReportControllerTest extends TestCase
 {
     public function setUp()
@@ -75,7 +78,6 @@ class ReportControllerTest extends TestCase
 //        $this->assertCount($count, $view['transactions']['predicted']);
     }
 
-//
     public function testYear()
     {
         $date = new \Carbon\Carbon();

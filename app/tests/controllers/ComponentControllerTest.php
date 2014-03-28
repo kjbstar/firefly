@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class ComponentControllerTest
+ */
 class ComponentControllerTest extends TestCase
 {
     public function setUp()
@@ -119,9 +122,9 @@ class ComponentControllerTest extends TestCase
     public function testPostWithParentAdd()
     {
         $count = Auth::user()->components()->count();
-        $c = Auth::user()->components()->whereNull('parent_component_id')->first();
+        $component = Auth::user()->components()->whereNull('parent_component_id')->first();
         $data = ['name'      => 'Bla.', 'type' => 'budget',
-                 'reporting' => 1, 'parent_component_id' => $c->id];
+                 'reporting' => 1, 'parent_component_id' => $component->id];
 
         $this->call('POST', 'home/budget/add', $data);
         $newCount = Auth::user()->components()->count();
@@ -134,9 +137,9 @@ class ComponentControllerTest extends TestCase
     public function testPostTriggerError()
     {
         $count = Auth::user()->components()->count();
-        $c = Auth::user()->components()->whereNotNull('parent_component_id')->first();
+        $component = Auth::user()->components()->whereNotNull('parent_component_id')->first();
         $data = ['name'      => 'Bla.', 'type' => 'budget',
-                 'reporting' => 1, 'parent_component_id' => $c->id];
+                 'reporting' => 1, 'parent_component_id' => $component->id];
 
         $this->call('POST', 'home/budget/add', $data);
         $newCount = Auth::user()->components()->count();

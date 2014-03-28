@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class AccountControllerTest
+ */
 class AccountControllerTest extends TestCase
 {
 
@@ -10,16 +13,22 @@ class AccountControllerTest extends TestCase
         $this->be($user);
     }
 
-    private $balance = 543.21; // used to find the right account.
+    private $_balance = 543.21; // used to find the right account.
 
     public function testShowIndex()
     {
         $accounts = Auth::user()->accounts()->count();
-        $response = $this->call('GET', 'home/account');
-        $view = $response->original;
+        $crawler = $this->client->request('GET', 'home/account');
         $this->assertResponseStatus(200);
-        $this->assertEquals('All accounts', $view['title']);
-        $this->assertCount($accounts, $view['accounts']);
+        $this->assertCount(1, $crawler->filter('title:contains("All accounts")'));
+        // number of row matches the number of accounts:
+        $this->assertCount($accounts, $crawler->filter('table.table > tr > td:first-child'));
+
+        // if there is a shared account, icon should exist.
+        $shared = Auth::user()->accounts()->shared()->count();
+        if ($shared > 0) {
+            $this->assertCount($shared, $crawler->filter('table.table > tr > td:first-child img'));
+        }
     }
 
     public function testAdd()
@@ -27,8 +36,8 @@ class AccountControllerTest extends TestCase
         $crawler = $this->client->request('GET', 'home/account/add');
         $this->assertCount(1, $crawler->filter('h2:contains("Add a new account")'));
         $this->assertCount(1, $crawler->filter('title:contains("Add account")'));
-        $this->assertCount(1,$crawler->filter('input[name="shared"]'));
-        $this->assertCount(1,$crawler->filter('label[for="inputShared"]'));
+        $this->assertCount(1, $crawler->filter('input[name="shared"]'));
+        $this->assertCount(1, $crawler->filter('label[for="inputShared"]'));
 
 
         $this->assertResponseStatus(200);
@@ -41,7 +50,7 @@ class AccountControllerTest extends TestCase
         $count = Auth::user()->accounts()->count();
         $this->call('POST', 'home/account/add');
         $newCount = Auth::user()->accounts()->count();
-        $this->assertEquals($count,$newCount);
+        $this->assertEquals($count, $newCount);
         $this->assertResponseStatus(302);
         $this->assertSessionHas('error');
         $this->assertHasOldInput();
@@ -52,14 +61,14 @@ class AccountControllerTest extends TestCase
         $count = Auth::user()->accounts()->count();
         // account data:
         $data = ['name'               => 'New-test-account',
-                 'openingbalance'     => $this->balance,
+                 'openingbalance'     => $this->_balance,
                  'openingbalancedate' => date('Y-m-d'),
-        'shared' => 1];
+                 'shared'             => 1];
 
         $this->call('POST', 'home/account/add', $data);
 
         // find account:
-        $account = Account::where('openingbalance', $this->balance)->first();
+        $account = Account::where('openingbalance', $this->_balance)->first();
         $newCount = Auth::user()->accounts()->count();
 
         $this->assertNotNull($account);
@@ -80,7 +89,7 @@ class AccountControllerTest extends TestCase
         $count = Auth::user()->accounts()->count();
 
         // account data:
-        $data = ['name' => 'New-test-account', 'openingbalance' => 300,
+        $data = ['name'               => 'New-test-account', 'openingbalance' => 300,
                  'openingbalancedate' => date('Y-m-d')];
         $this->call('POST', 'home/account/add', $data);
         $newCount = Auth::user()->accounts()->count();
@@ -98,13 +107,13 @@ class AccountControllerTest extends TestCase
     public function testEdit()
     {
         $account = Auth::user()->accounts()->where(
-            'openingbalance', $this->balance
+            'openingbalance', $this->_balance
         )->first();
         $crawler = $this->client->request('GET', 'home/account/' . $account->id . '/edit');
-        $this->assertCount(1, $crawler->filter('h2:contains("Edit '.$account->name.'")'));
-        $this->assertCount(1, $crawler->filter('title:contains("Edit account '.$account->name.'")'));
-        $this->assertCount(1,$crawler->filter('input[name="shared"]'));
-        $this->assertCount(1,$crawler->filter('label[for="inputShared"]'));
+        $this->assertCount(1, $crawler->filter('h2:contains("Edit ' . $account->name . '")'));
+        $this->assertCount(1, $crawler->filter('title:contains("Edit account ' . $account->name . '")'));
+        $this->assertCount(1, $crawler->filter('input[name="shared"]'));
+        $this->assertCount(1, $crawler->filter('label[for="inputShared"]'));
 
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
@@ -113,11 +122,11 @@ class AccountControllerTest extends TestCase
     public function testPostEdit()
     {
         $account = Auth::user()->accounts()->where(
-            'openingbalance', $this->balance
+            'openingbalance', $this->_balance
         )->first();
         $count = Auth::user()->accounts()->count();
         $data = ['name'               => 'New-test-account-edited',
-                 'openingbalance'     => $this->balance,
+                 'openingbalance'     => $this->_balance,
                  'openingbalancedate' => date('Y-m-d')];
         $this->call('POST', 'home/account/' . $account->id . '/edit', $data);
         $newCount = Auth::user()->accounts()->count();
@@ -131,10 +140,10 @@ class AccountControllerTest extends TestCase
     public function testPostFailedEdit()
     {
         $account = Auth::user()->accounts()->where(
-            'openingbalance', $this->balance
+            'openingbalance', $this->_balance
         )->first();
         $count = Auth::user()->accounts()->count();
-        $data = ['name' => null, 'openingbalance' => $this->balance,
+        $data = ['name'               => null, 'openingbalance' => $this->_balance,
                  'openingbalancedate' => date('Y-m-d')];
         $this->call('POST', 'home/account/' . $account->id . '/edit', $data);
         $newCount = Auth::user()->accounts()->count();
@@ -148,9 +157,9 @@ class AccountControllerTest extends TestCase
     public function testPostDoubleEdit()
     {
         $account = Auth::user()->accounts()->where(
-            'openingbalance', $this->balance
+            'openingbalance', $this->_balance
         )->first();
-        $data = ['name' => 'TestAccount #1', 'openingbalance' => $this->balance,
+        $data = ['name'               => 'TestAccount #1', 'openingbalance' => $this->_balance,
                  'openingbalancedate' => date('Y-m-d')];
         $this->call('POST', 'home/account/' . $account->id . '/edit', $data);
         $this->assertResponseStatus(302);
@@ -165,7 +174,7 @@ class AccountControllerTest extends TestCase
     public function testDelete()
     {
         $account = Auth::user()->accounts()->where(
-            'openingbalance', $this->balance
+            'openingbalance', $this->_balance
         )->first();
         $response = $this->call(
             'GET', 'home/account/' . $account->id . '/delete'
@@ -183,7 +192,7 @@ class AccountControllerTest extends TestCase
     public function testPostDelete()
     {
         $count = Auth::user()->accounts()->count();
-        $account = Account::where('openingbalance', $this->balance)->first();
+        $account = Account::where('openingbalance', $this->_balance)->first();
         $this->call('POST', 'home/account/' . $account->id . '/delete');
         $newCount = Auth::user()->accounts()->count();
         $this->assertResponseStatus(302);

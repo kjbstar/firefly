@@ -22,9 +22,19 @@
             <tr>
             @endif
                 @if($a->hidden == 1)
-                <td>{{{$a->name}}}</td>
+                <td>
+                    {{{$a->name}}}
+                    @if(intval($a->shared) == 1)
+                        <img src="i/group.png" alt="Shared account" />
+                    @endif
+                </td>
                 @else
-                <td><a href="{{URL::Route('accountoverview',$a->id)}}" title="{{{$a->name}}}">{{{$a->name}}}</a></td>
+                <td>
+                    <a href="{{URL::Route('accountoverview',$a->id)}}" title="{{{$a->name}}}">{{{$a->name}}}</a>
+                    @if($a->shared == 1)
+                    <img src="i/group.png" alt="Shared account" />
+                    @endif
+                </td>
                 @endif
                 <td>{{mf($a->today,true)}}</td>
                 <td>

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class UserControllerTest
+ */
 class UserControllerTest extends TestCase
 {
     public function testLogin()

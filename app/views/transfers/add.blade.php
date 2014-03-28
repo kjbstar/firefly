@@ -12,7 +12,8 @@
 {{Form::open(['class' => 'form-horizontal'])}}
 <div class="row">
 
-    <div class="col-lg-6">
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <h4>Mandatory fields</h4>
 
         <!-- description -->
         <div class="form-group
@@ -23,7 +24,7 @@
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
                 <input type="text" name="description" class="form-control"
-                       value="{{{Input::old('description')}}}"
+                       value="{{{$prefilled['description']}}}"
                        id="inputDescription" placeholder="Description">
                 @if($errors->has('description'))
                 <span class="text-danger">{{$errors->first('description')}}</span>
@@ -41,7 +42,8 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{{Input::old('amount')}}}" name="amount" step="any" class="form-control" id="inputAmount">
+                    <input type="number" value="{{{$prefilled['amount']}}}" name="amount" step="any"
+                           class="form-control" id="inputAmount">
                 </div>
                 @if($errors->has('amount'))
                 <span class="text-danger">{{$errors->first('amount')}}</span>
@@ -57,7 +59,7 @@
              ">
             <label for="inputDate" class="col-sm-3 control-label">Date</label>
             <div class="col-sm-9">
-                <input type="date" name="date" value="{{{Input::old('date') ? Input::old('date') : date('Y-m-d')}}}"  class="form-control" id="inputDate">
+                <input type="date" name="date" value="{{{$prefilled['date']}}}"  class="form-control" id="inputDate">
                 @if($errors->has('date'))
                 <span class="text-danger">{{$errors->first('date')}}</span>
                 @endif
@@ -72,7 +74,7 @@
              ">
             <label for="inputAccountfrom" class="col-sm-3 control-label">Account from</label>
             <div class="col-sm-9">
-                {{Form::select('accountfrom_id',$accounts,Input::old('accountfrom_id'),['class' => 'form-control'])}}
+                {{Form::select('accountfrom_id',$accounts,$prefilled['accountfrom_id'],['class' => 'form-control'])}}
                 @if($errors->has('accountfrom_id'))
                 <span class="text-danger">{{$errors->first('accountfrom_id')}}</span>
                 @endif
@@ -86,13 +88,52 @@
              ">
             <label for="inputAccountto" class="col-sm-3 control-label">Account to</label>
             <div class="col-sm-9">
-                {{Form::select('accountto_id',$accounts,Input::old('accountto_id'),['class' => 'form-control'])}}
+                {{Form::select('accountto_id',$accounts,$prefilled['accountto_id'],['class' => 'form-control'])}}
                 @if($errors->has('accountto_id'))
                 <span class="text-danger">{{$errors->first('accountto_id')}}</span>
                 @endif
             </div>
         </div>
 
+
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <h4>Optional fields</h4>
+
+        <p class="text-info">
+            Adding these properties to a transfer is pretty pointless, unless
+            you transfer funds to a shared account. Since money transfered to a shared
+            account is considered an expense, such transfers <em>will</em> show up in various
+            reports as being an expense. As such, they will need this optional information
+            to be properly grouped.
+        </p>
+
+        <!-- beneficiary (can be created) -->
+        <div class="form-group">
+            <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
+            <div class="col-sm-9">
+                <input type="text" value="{{{$prefilled['beneficiary']}}}"
+                       name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
+            </div>
+        </div>
+
+        <!-- category (can be created) -->
+        <div class="form-group">
+            <label for="inputCategory" class="col-sm-3 control-label">Category</label>
+            <div class="col-sm-9">
+                <input type="text" value="{{{$prefilled['category']}}}"
+                       name="category" class="form-control" id="inputCategory" autocomplete="off" />
+            </div>
+        </div>
+
+        <!-- budget (can be created) -->
+        <div class="form-group">
+            <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
+            <div class="col-sm-9">
+                <input type="text" value="{{{$prefilled['budget']}}}"
+                       name="budget" class="form-control" id="inputBudget" autocomplete="off" />
+            </div>
+        </div>
 
     </div>
 

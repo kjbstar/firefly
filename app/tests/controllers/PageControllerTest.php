@@ -1,12 +1,13 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: sander
  * Date: 13/03/14
  * Time: 09:03
  */
-
-class PageControllerTest extends TestCase {
+class PageControllerTest extends TestCase
+{
     public function setUp()
     {
         parent::setUp();
@@ -15,10 +16,9 @@ class PageControllerTest extends TestCase {
 
     }
 
-    public function testRecalculate() {
-        $response = $this->call(
-            'GET', 'home/recalc'
-        );
+    public function testRecalculate()
+    {
+        $this->call('GET', 'home/recalc');
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('index');
     }

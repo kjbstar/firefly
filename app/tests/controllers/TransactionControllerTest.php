@@ -1,9 +1,12 @@
 <?php
 
+/**
+ * Class TransactionControllerTest
+ */
 class TransactionControllerTest extends TestCase
 {
 
-    private $amount = 123.40;
+    private $_amount = 123.40;
 
     public function setUp()
     {
@@ -43,7 +46,7 @@ class TransactionControllerTest extends TestCase
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
         $this->assertEquals($view['title'], 'Add a transaction');
-        $this->assertEquals($view['prefilled']['description'],$predictable->description);
+        $this->assertEquals($view['prefilled']['description'], $predictable->description);
         $this->assertCount($accounts, $view['accounts']);
     }
 
@@ -56,7 +59,7 @@ class TransactionControllerTest extends TestCase
         );
         $view = $response->original;
         $this->assertResponseStatus(200);
-        $this->assertEquals($view['prefilled']['description'],'Test');
+        $this->assertEquals($view['prefilled']['description'], 'Test');
         $this->assertEquals($view['title'], 'Add a transaction');
         $this->assertCount($accounts, $view['accounts']);
     }
@@ -85,7 +88,7 @@ class TransactionControllerTest extends TestCase
                  'category'    => 'TestCategory #1', // existing
                  'beneficiary' => 'TestBeneficiary #1', // existing
                  'budget'      => 'Something', // new
-                 'amount'      => $this->amount, 'date' => date('Y-m-d')
+                 'amount'      => $this->_amount, 'date' => date('Y-m-d')
         ];
 
         $this->call('POST', 'home/transaction/add', $data);
@@ -108,7 +111,7 @@ class TransactionControllerTest extends TestCase
                  'category'    => 'TestCategory #1', // existing
                  'beneficiary' => 'TestBeneficiary #1', // existing
                  'budget'      => 'SomethingElse/Else', // new
-                 'amount'      => $this->amount * 2, 'date' => date('Y-m-d')
+                 'amount'      => $this->_amount * 2, 'date' => date('Y-m-d')
 
         ];
         $this->call('POST', 'home/transaction/add', $data);
@@ -127,7 +130,7 @@ class TransactionControllerTest extends TestCase
                  'category'    => 'TestCategory #1', // existing
                  'beneficiary' => 'TestBeneficiary #1', // existing
                  'budget'      => 'SomethingElse/Else/Wow', // new
-                 'amount'      => $this->amount, 'date' => date('Y-m-d')
+                 'amount'      => $this->_amount, 'date' => date('Y-m-d')
 
         ];
         $this->call('POST', 'home/transaction/add', $data);
@@ -147,7 +150,7 @@ class TransactionControllerTest extends TestCase
                  'category'    => 'TestCategory #1', // existing
                  'beneficiary' => 'TestBeneficiary #1', // existing
                  'budget'      => 'Wow', // new
-                 'amount'      => $this->amount, null
+                 'amount'      => $this->_amount, null
 
         ];
         $this->call('POST', 'home/transaction/add', $data);
@@ -166,7 +169,7 @@ class TransactionControllerTest extends TestCase
     public function testEdit()
     {
         $accounts = Auth::user()->accounts()->count();
-        $transaction = Auth::user()->transactions()->where('amount', $this->amount)->first();
+        $transaction = Auth::user()->transactions()->where('amount', $this->_amount)->first();
         $response = $this->call(
             'GET', 'home/transaction/' . $transaction->id . '/edit'
         );
@@ -184,9 +187,9 @@ class TransactionControllerTest extends TestCase
      */
     public function testPostEdit()
     {
-        $transaction = Auth::user()->transactions()->where('amount', $this->amount)->first();
+        $transaction = Auth::user()->transactions()->where('amount', $this->_amount)->first();
         $account = Auth::user()->accounts()->first();
-        $data = ['description' => 'TestEdit', 'amount' => $this->amount,
+        $data = ['description' => 'TestEdit', 'amount' => $this->_amount,
                  'date'        => date('Y-m-d'), 'account_id' => $account->id];
 
         $this->call(
@@ -204,10 +207,10 @@ class TransactionControllerTest extends TestCase
      */
     public function testPostEditChangeAccounts()
     {
-        $transaction = Auth::user()->transactions()->where('amount', $this->amount * 2)->first();
+        $transaction = Auth::user()->transactions()->where('amount', $this->_amount * 2)->first();
         // get another account:
         $newAccount = Auth::user()->accounts()->where('id', '!=', $transaction->account_id)->first();
-        $data = ['description' => 'TestEdit', 'amount' => $this->amount,
+        $data = ['description' => 'TestEdit', 'amount' => $this->_amount,
                  'date'        => date('Y-m-d'), 'account_id' => $newAccount->id,
                  'budget'      => $transaction->budget->name,
                  'beneficiary' => $transaction->beneficiary->name,
@@ -240,9 +243,9 @@ class TransactionControllerTest extends TestCase
      */
     public function testPostEditComponents()
     {
-        $transaction = Auth::user()->transactions()->where('amount', $this->amount)->first();
+        $transaction = Auth::user()->transactions()->where('amount', $this->_amount)->first();
         $account = Auth::user()->accounts()->first();
-        $data = ['description' => 'TestEdit', 'amount' => $this->amount,
+        $data = ['description' => 'TestEdit', 'amount' => $this->_amount,
                  'date'        => date('Y-m-d'), 'account_id' => $account->id,
                  'category'    => 'TestCategory #1', // existing
                  'beneficiary' => 'TestBeneficiary #1', // existing
@@ -264,9 +267,9 @@ class TransactionControllerTest extends TestCase
      */
     public function testPostEditParentComponents()
     {
-        $transaction = Auth::user()->transactions()->where('amount', $this->amount)->first();
+        $transaction = Auth::user()->transactions()->where('amount', $this->_amount)->first();
         $account = Auth::user()->accounts()->first();
-        $data = ['description' => 'TestEdit', 'amount' => $this->amount,
+        $data = ['description' => 'TestEdit', 'amount' => $this->_amount,
                  'date'        => date('Y-m-d'), 'account_id' => $account->id,
                  'category'    => 'TestCategory #1', // existing
                  'beneficiary' => 'TestBeneficiary #1', // existing
@@ -322,7 +325,7 @@ class TransactionControllerTest extends TestCase
     public function testPostDelete()
     {
         $count = Auth::user()->transactions()->count();
-        $transaction = Auth::user()->transactions()->where('amount', $this->amount)->first();
+        $transaction = Auth::user()->transactions()->where('amount', $this->_amount)->first();
         $this->call('POST', 'home/transaction/' . $transaction->id . '/delete');
         $newCount = Auth::user()->transactions()->count();
         $this->assertEquals($count - 1, $newCount);
