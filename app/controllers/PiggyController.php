@@ -1,6 +1,10 @@
 <?php
 use Carbon\Carbon as Carbon;
 
+/** @noinspection PhpIncludeInspection */
+require_once(app_path() . '/helpers/PiggybankHelper.php');
+
+
 /**
  * Class PiggyController
  */
@@ -47,13 +51,18 @@ class PiggyController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = PiggybankHelper::emptyPrefilledAray();
+        } else {
+            $prefilled = PiggybankHelper::prefilledFromOldInput();
         }
+
+
         $piggyAccount = Setting::getSetting('piggyAccount');
         if (intval($piggyAccount->value) == 0) {
             return Redirect::route('piggyselect');
         }
 
-        return View::make('piggy.add')->with('title', 'Add new piggy bank');
+        return View::make('piggy.add')->with('title', 'Add new piggy bank')->with('prefilled', $prefilled);
     }
 
     public function postAdd()
@@ -63,8 +72,13 @@ class PiggyController extends BaseController
         $piggy->user()->associate(Auth::user());
         $piggy->name = Input::get('name');
         $piggy->amount = 0;
-        $target = is_null(Input::get('target')) || intval(Input::get
-                ('target')) == 0
+        $target = is_null(Input::get('target'))
+        || intval(
+            Input::get
+                (
+                    'target'
+                )
+        ) == 0
             ? null
             : floatval(
                 Input::get('target')
@@ -83,19 +97,18 @@ class PiggyController extends BaseController
         return Redirect::to(Session::get('previous'));
     }
 
-    public function delete(Piggybank $pig) {
+    public function delete(Piggybank $pig)
+    {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
-        return View::make('piggy.delete')->with('piggy', $pig)->with(
-            'title', 'Delete piggy bank ' . $pig->name
-        );
+        return View::make('piggy.delete')->with('piggy', $pig)->with('title', 'Delete piggy bank ' . $pig->name);
     }
 
     public function postDelete(Piggybank $pig)
     {
         $pig->delete();
-        Session::flash('success','Piggy bank deleted.');
+        Session::flash('success', 'Piggy bank deleted.');
         return Redirect::to(Session::get('previous'));
     }
 
@@ -120,10 +133,10 @@ class PiggyController extends BaseController
         if ($account) {
             $piggyAccount->value = $account->id;
             $piggyAccount->save();
-            Session::flash('success','Account selected.');
+            Session::flash('success', 'Account selected.');
             return Redirect::route('piggy');
         } else {
-            Session::flash('error','Invalid account');
+            Session::flash('error', 'Invalid account');
             return Redirect::route('piggyselect');
         }
 
@@ -134,11 +147,15 @@ class PiggyController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = PiggybankHelper::prefilledFromPiggybank($pig);
+        } else {
+            $prefilled = PiggybankHelper::prefilledFromOldInput();
+
         }
 
         return View::make('piggy.edit')->with('pig', $pig)->with(
             'title', 'Edit piggy bank "' . $pig->name . '"'
-        );
+        )->with('prefilled',$prefilled);
     }
 
     public function postEdit(Piggybank $pig)

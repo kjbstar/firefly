@@ -31,7 +31,7 @@ class HomeController extends BaseController
     /**
      * Show the homepage. Can be for another month.
      *
-     * @param int $year The year
+     * @param int $year  The year
      * @param int $month The month
      *
      * @return View
@@ -42,7 +42,7 @@ class HomeController extends BaseController
         $today = Toolkit::parseDate($year, $month, new Carbon);
         $actual = new Carbon;
         // fix $today if it's in this month:
-        if($actual->format('Y-m') == $today->format('Y-m')) {
+        if ($actual->format('Y-m') == $today->format('Y-m')) {
             $today = new Carbon;
 
         }
@@ -70,8 +70,8 @@ class HomeController extends BaseController
         $history = [];
         $now = new Carbon;
         $now->addMonth();
-
         while ($now > $earliest) {
+
 
             $url = URL::Route('home', [$now->format('Y'), $now->format('n')]);
             $entry = [];
@@ -83,6 +83,7 @@ class HomeController extends BaseController
             $history[] = $entry;
             $now->subMonth();
         }
+
 
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(
             'history', $history

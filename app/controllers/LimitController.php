@@ -25,9 +25,7 @@ class LimitController extends BaseController
         }
         $date = Toolkit::parseDate($year, $month);
 
-        return View::make('meta-limit.add')->with(
-            'object', $component
-        )->with('date', $date);
+        return View::make('meta-limit.add')->with('object', $component)->with('date', $date);
     }
 
     /**
@@ -42,10 +40,13 @@ class LimitController extends BaseController
     public function postAddLimit(Component $component, $year, $month)
     {
         $date = Toolkit::parseDate($year, $month);
-        $limit = new Limit(['component_id' => $component->id, 'date' => $date,
-                            'amount'       => floatval(
-                                Input::get('amount')
-                            )]);
+        $limit = new Limit(
+            [
+                'component_id' => $component->id,
+                'date'         => $date,
+                'amount'       => floatval(Input::get('amount'))
+            ]
+        );
 
         $validator = Validator::make($limit->toArray(), Limit::$rules);
         if ($validator->fails()) {
@@ -119,9 +120,7 @@ class LimitController extends BaseController
         }
         $object = Auth::user()->components()->find($limit->component_id);
 
-        return View::make('meta-limit.delete')->with('object', $object)->with(
-                'date', $limit->date
-            );
+        return View::make('meta-limit.delete')->with('object', $object)->with('date', $limit->date);
     }
 
     /**

@@ -39,10 +39,24 @@ class AccountControllerTest extends TestCase
         $this->assertCount(1, $crawler->filter('input[name="shared"]'));
         $this->assertCount(1, $crawler->filter('label[for="inputShared"]'));
 
-
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
+    }
 
+    public function testAddWithOldInput()
+    {
+        $this->session(['_old_input' => ['name' => 'Test', 'openingbalance' => 100, 'shared' => '1']]);
+
+        $crawler = $this->client->request('GET', 'home/account/add');
+        $this->assertCount(1, $crawler->filter('h2:contains("Add a new account")'));
+        $this->assertCount(1, $crawler->filter('title:contains("Add account")'));
+        $this->assertCount(1, $crawler->filter('input[name="shared"]'));
+        $this->assertCount(1, $crawler->filter('input[value="Test"]'));
+        $this->assertCount(1, $crawler->filter('input[value="100"]'));
+        $this->assertCount(1, $crawler->filter('input[checked="checked"]'));
+        $this->assertCount(1, $crawler->filter('label[for="inputShared"]'));
+
+        $this->assertResponseStatus(200);
     }
 
     public function testEmptyPostAdd()

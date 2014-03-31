@@ -13,7 +13,7 @@
 <div class="row">
 
     <div class="col-lg-6">
-
+        <h4>Mandatory fields</h4>
         <!-- description -->
         <div class="form-group
              @if($errors->has('description'))
@@ -92,8 +92,36 @@
                 @endif
             </div>
         </div>
+    </div>
+    <div class="col-lg-6">
+        <h4>Optional fields</h4>
 
+        <!-- beneficiary (can be created) -->
+        <div class="form-group">
+            <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
+            <div class="col-sm-9">
+                <input type="text" value="{{{$prefilled['beneficiary']}}}"
+                       name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
+            </div>
+        </div>
 
+        <!-- category (can be created) -->
+        <div class="form-group">
+            <label for="inputCategory" class="col-sm-3 control-label">Category</label>
+            <div class="col-sm-9">
+                <input type="text" value="{{{$prefilled['category']}}}"
+                       name="category" class="form-control" id="inputCategory" autocomplete="off" />
+            </div>
+        </div>
+
+        <!-- budget (can be created) -->
+        <div class="form-group">
+            <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
+            <div class="col-sm-9">
+                <input type="text" value="{{{$prefilled['budget']}}}"
+                       name="budget" class="form-control" id="inputBudget" autocomplete="off" />
+            </div>
+        </div>
     </div>
 
 </div>
@@ -109,7 +137,7 @@
 @stop
 @section('scripts')
 <script src="js/typeahead.min.js"></script>
-<script src="../../../public/js/predictables.js"></script>
+<script src="js/transfers.js"></script>
 @stop
 @section('styles')
 <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">

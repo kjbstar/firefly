@@ -82,13 +82,16 @@ class ComponentController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = ComponentHelper::emptyPrefilledAray();
+        } else {
+            $prefilled = ComponentHelper::prefilledFromOldInput();
         }
         $parents = ComponentHelper::getParentList(OBJ);
 
         return View::make('components.add')->with('title', 'Add new ' . OBJ)
             ->with(
                 'parents', $parents
-            );
+            )->with('prefilled',$prefilled);
     }
 
     /**
@@ -156,19 +159,14 @@ class ComponentController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = ComponentHelper::prefilledFromComponent($component);
+        } else {
+            $prefilled = ComponentHelper::prefilledFromOldInput();
         }
         $parents = ComponentHelper::getParentList(OBJ, $component);
-        $component->parent_component_id = is_null(
-            $component->parent_component_id
-        )
-            ? 0
-            : intval(
-                $component->parent_component_id
-            );
-
         return View::make('components.edit')->with('object', $component)->with(
             'parents', $parents
-        )->with('title', 'Edit ' . OBJ . ' ' . $component->name);
+        )->with('title', 'Edit ' . OBJ . ' ' . $component->name)->with('prefilled',$prefilled);
     }
 
     /**
@@ -311,7 +309,7 @@ class ComponentController extends BaseController
             $name = $o->name;
             $parent = $o->parentComponent()->first();
             if ($parent) {
-                $name = $parent->name . '/' . $name;
+                $name = $parent->name.'/'.$name;
             }
             $return[] = $name;
         }

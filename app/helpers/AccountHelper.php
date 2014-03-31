@@ -111,4 +111,38 @@ class AccountHelper
         return $marked;
     }
 
+    public static function emptyPrefilledAray()
+    {
+        return [
+            'name'               => '',
+            'openingbalance'     => '',
+            'openingbalancedate' => date('Y-m-d'),
+            'hidden'             => false,
+            'shared'             => false
+        ];
+    }
+
+    public static function prefilledFromOldInput()
+    {
+        return [
+            'name'               => Input::old('name'),
+            'openingbalance'     => Input::old('openingbalance'),
+            'openingbalancedate' => Input::old('openingbalancedate'),
+            'hidden'             => intval(Input::old('hidden')) == 1 ? true : false,
+            'shared'             => intval(Input::old('shared')) == 1 ? true : false
+        ];
+    }
+
+    public static function prefilledFromAccount(Account $account)
+    {
+        return [
+            'name'               => $account->name,
+            'openingbalance'     => $account->openingbalance,
+            'openingbalancedate' => $account->openingbalancedate->format('Y-m-d'),
+            'hidden'             => $account->hidden == 1 ? true : false,
+            'shared'             => $account->shared == 1 ? true : false,
+
+        ];
+    }
+
 } 

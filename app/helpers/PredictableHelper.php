@@ -35,4 +35,60 @@ class PredictableHelper
         return $list;
     }
 
+    public static function emptyPrefilledAray()
+    {
+        return [
+            'description' => '',
+            'amount'      => 0,
+            'pct'      => 10,
+            'dom'         => 1,
+            'beneficiary' => 0,
+            'category'    => 0,
+            'budget'      => 0,
+            'inactive'    => false
+        ];
+    }
+
+    public static function prefilledFromOldInput()
+    {
+        return [
+            'description' => Input::old('description'),
+            'amount'      => floatval(Input::old('amount')),
+            'pct'      => intval(Input::old('pct')),
+            'dom'         => intval(Input::old('dom')),
+            'beneficiary' => intval(Input::old('beneficiary_id')),
+            'category'    => intval(Input::old('category_id')),
+            'budget'      => intval(Input::old('budget_id')),
+            'inactive'    => intval(Input::old('inactive')) == 1 ? true : false
+
+        ];
+    }
+
+    public static function prefilledFromTransaction(Transaction $transaction)
+    {
+        return [
+            'description' => $transaction->description,
+            'amount'      => floatval($transaction->amount),
+            'dom'         => intval($transaction->date->format('d')),
+            'pct'      => 10,
+            'inactive'    => false,
+            'beneficiary' => is_null($transaction->beneficiary) ? 0 : $transaction->beneficiary->id,
+            'category'    => is_null($transaction->category) ? 0 : $transaction->category->id,
+            'budget'      => is_null($transaction->budget) ? 0 : $transaction->budget->id
+        ];
+    }
+
+    public static function prefilledFromPredictable(Predictable $predictable) {
+        return [
+            'description' => $predictable->description,
+            'amount'      => floatval($predictable->amount),
+            'dom'         => intval($predictable->dom),
+            'pct'      => intval($predictable->pct),
+            'inactive'    => intval($predictable->inactive) == 1 ? true : false,
+            'beneficiary' => is_null($predictable->beneficiary) ? 0 : $predictable->beneficiary->id,
+            'category'    => is_null($predictable->category) ? 0 : $predictable->category->id,
+            'budget'      => is_null($predictable->budget) ? 0 : $predictable->budget->id
+        ];
+    }
+
 }

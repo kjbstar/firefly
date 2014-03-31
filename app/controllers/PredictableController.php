@@ -41,51 +41,17 @@ class PredictableController extends BaseController
 
     public function add(Transaction $transaction = null)
     {
-        if (!Input::old()) {
+        if (!Input::old() && is_null($transaction)) {
             Session::put('previous', URL::previous());
+            $prefilled = PredictableHelper::emptyPrefilledAray();
+        } else {
+            if (!Input::old() && !is_null($transaction)) {
+                $prefilled = PredictableHelper::prefilledFromTransaction($transaction);
+            } else {
+                $prefilled = PredictableHelper::prefilledFromOldInput();
+            }
         }
-        // do something easy for the prefilled values so the
-        // view will be easier to manage:
         $title = 'Add a predictable';
-
-        $prefilled = ['description' => '', 'amount' => 0, 'leeway' => 10,
-                      'dom'         => 1, 'beneficiary' => 0, 'category' => 0,
-                      'budget'      => 0, 'inactive' => false];
-
-        if (!is_null($transaction)) {
-            $prefilled = ['description' => $transaction->description,
-                          'amount' => floatval(
-                              $transaction->amount
-                          ), 'dom' => intval(
-                    $transaction->date->format('d')
-                ), 'leeway' => 10, 'inactive' => false,
-                          'beneficiary' => is_null(
-                                  $transaction->beneficiary
-                              ) ? 0 : $transaction->beneficiary->id,
-                          'category' => is_null(
-                                  $transaction->category
-                              ) ? 0 : $transaction->category->id,
-                          'budget' => is_null(
-                                  $transaction->budget
-                              ) ? 0 : $transaction->budget->id];
-            $title .= ' based on "' . $transaction->description . '"';
-        }
-
-        if (Input::old()) {
-            $prefilled = ['description' => Input::old('description'),
-                          'amount'      => floatval(Input::old('amount')),
-                          'leeway'      => intval(Input::old('leeway')),
-                          'dom'         => intval(Input::old('dom')),
-                          'beneficiary' => intval(Input::old('beneficiary_id')),
-                          'category'    => intval(Input::old('category_id')),
-                          'budget'      => intval(Input::old('budget_id')),
-                          'inactive'    =>
-                              intval(Input::old('inactive')) == 1 ? true : false
-
-            ];
-        }
-
-
         $list = PredictableHelper::componentList();
 
         return View::make('predictables.add')->with(
@@ -157,26 +123,18 @@ class PredictableController extends BaseController
 
     public function edit(Predictable $predictable)
     {
-        // TODO do the prefilled thing just like add()
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = PredictableHelper::prefilledFromPredictable($predictable);
+        } else {
+            $prefilled = PredictableHelper::prefilledFromOldInput();
+
         }
         $list = PredictableHelper::componentList();
 
-        // set some id's
-        if (!is_null($predictable->beneficiary)) {
-            $predictable->beneficiary_id = $predictable->beneficiary->id;
-        }
-        if (!is_null($predictable->category)) {
-            $predictable->category_id = $predictable->category->id;
-        }
-        if (!is_null($predictable->budget)) {
-            $predictable->budget_id = $predictable->budget->id;
-        }
-
         return View::make('predictables.edit')->with(
             'title', 'Edit predictable "' . $predictable->description . '"'
-        )->with('predictable', $predictable)->with('components', $list);
+        )->with('predictable', $predictable)->with('components', $list)->with('prefilled', $prefilled);
     }
 
     public function postEdit(Predictable $predictable)

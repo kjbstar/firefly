@@ -30,9 +30,7 @@ class ComponentControllerTest extends TestCase
 
     public function testTypeahead()
     {
-        $response = $this->call(
-            'GET', 'home/budget/typeahead'
-        );
+        $response = $this->call('GET', 'home/budget/typeahead');
         $this->assertResponseStatus(200);
         $this->assertNotNull($response);
 
@@ -92,6 +90,28 @@ class ComponentControllerTest extends TestCase
         Route::disableFilters();
 
     }
+
+    public function testAddWithOldInput()
+    {
+        Route::enableFilters();
+        $this->session(['_old_input' => ['name' => 'Test', 'reporting' => '1']]);
+        $crawler = $this->client->request('GET', 'home/budget/add');
+        $this->assertResponseStatus(200);
+        $this->assertCount(1, $crawler->filter('h2:contains("Add a new budget")'));
+        $this->assertCount(1, $crawler->filter('title:contains("Add new budget")'));
+
+        $this->assertCount(1, $crawler->filter('input[name="reporting"]'));
+        $this->assertCount(1, $crawler->filter('input[value="Test"]'));
+        $this->assertCount(1, $crawler->filter('input[checked="checked"]'));
+        $this->assertCount(1, $crawler->filter('label[for="inputReporting"]'));
+
+        // +1 = no parent
+        $count = Auth::user()->components()->where('type', 'budget')->whereNull('parent_component_id')->count() + 1;
+        $this->assertCount($count, $crawler->filter('select > option'));
+        Route::disableFilters();
+
+    }
+
 
     public function testEmptyPostAdd()
     {
@@ -153,14 +173,35 @@ class ComponentControllerTest extends TestCase
     {
         Route::enableFilters();
         $component = Auth::user()->components()->first();
-        $response = $this->call(
-            'GET', 'home/budget/' . $component->id . '/edit'
-        );
+        $response = $this->call('GET', 'home/budget/' . $component->id . '/edit');
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Edit budget ' . $component->name, $view['title']);
         $this->assertSessionHas('previous');
         $this->assertCount(1, $view['parents']);
+        Route::disableFilters();
+
+    }
+
+    public function testEditWithOldData()
+    {
+        Route::enableFilters();
+        $component = Auth::user()->components()->first();
+        $this->session(['_old_input' => ['name' => 'Test', 'reporting' => '1']]);
+        $crawler = $this->client->request('GET', 'home/budget/' . $component->id . '/edit');
+        $this->assertResponseStatus(200);
+
+        $this->assertCount(1, $crawler->filter('title:contains("Edit budget '.$component->name.'")'));
+        $this->assertCount(1, $crawler->filter('h2:contains("'.$component->name.'")'));
+
+        $this->assertCount(1, $crawler->filter('input[name="reporting"]'));
+        $this->assertCount(1, $crawler->filter('input[value="Test"]'));
+        $this->assertCount(1, $crawler->filter('input[checked="checked"]'));
+        $this->assertCount(1, $crawler->filter('label[for="inputReporting"]'));
+
+//        $count = Auth::user()->components()->where('type', 'budget')->whereNull('parent_component_id')->count() + 1;
+//        $this->assertCount($count, $crawler->filter('option'));
+
         Route::disableFilters();
 
     }

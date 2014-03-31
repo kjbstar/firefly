@@ -1,7 +1,10 @@
 <?php
 /** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/AccountHelper.php');
+/** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/TransactionHelper.php');
+/** @noinspection PhpIncludeInspection */
+include_once(app_path() . '/helpers/ComponentHelper.php');
 
 /**
  * Class TransactionController
@@ -31,9 +34,8 @@ class TransactionController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = TransactionHelper::emptyPrefilledAray();
         }
-        // empty by default:
-        $prefilled = TransactionHelper::emptyPrefilledAray();
         // prefill from predictable:
         if (!is_null($predictable)) {
             $prefilled = TransactionHelper::prefilledFromPredictable($predictable);
@@ -78,9 +80,9 @@ class TransactionController extends BaseController
 
         // explode every object at the / and see if there is one.
         // more than one? return to Transaction:
-        $beneficiary = TransactionHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
-        $category = TransactionHelper::saveComponentFromText('category', Input::get('category'));
-        $budget = TransactionHelper::saveComponentFromText('budget', Input::get('budget'));
+        $beneficiary = ComponentHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
+        $category = ComponentHelper::saveComponentFromText('category', Input::get('category'));
+        $budget = ComponentHelper::saveComponentFromText('budget', Input::get('budget'));
 
 
         // save and / or create the beneficiary:
@@ -89,7 +91,11 @@ class TransactionController extends BaseController
             Session::flash('error', 'Could not save transaction.');
             return Redirect::route('addtransaction')->withInput()->withErrors($validator);
         }
-        $transaction->save();
+        $result = $transaction->save();
+        if(!$result) {
+            Session::flash('error', 'Could not save transaction.');
+            return Redirect::route('addtransaction')->withInput()->withErrors($validator);
+        }
 
         // attach the beneficiary, if it is set:
         $transaction->attachComponent($beneficiary);
@@ -111,6 +117,9 @@ class TransactionController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = TransactionHelper::prefilledFromTransaction($transaction);
+        } else {
+            $prefilled = TransactionHelper::prefilledFromOldInput();
         }
         $accounts = AccountHelper::accountsAsSelectList();
 
@@ -118,7 +127,7 @@ class TransactionController extends BaseController
             'transaction', $transaction
         )->with('accounts', $accounts)->with(
                 'title', 'Edit transaction ' . $transaction->description
-            );
+            )->with('prefilled',$prefilled);
     }
 
     /**
@@ -140,35 +149,11 @@ class TransactionController extends BaseController
         $transaction->ignoreallowance = is_null(Input::get('ignoreallowance')) ? 0 : 1;
         $transaction->mark = is_null(Input::get('mark')) ? 0 : 1;
 
-        // explore the components:
         // explode every object at the / and see if there is one.
         // more than one? return to Transaction:
-        foreach (['beneficiary', 'category', 'budget'] as $comp) {
-            $input = Input::get($comp);
-            $parts = explode('/', $input);
-            if (count($parts) > 2) {
-                Session::flash(
-                    'error',
-                    'Use forward slashes to indicate parent ' . Str::plural(
-                        $comp
-                    ) . '. Please don\'t use more than one.'
-                );
-
-                return Redirect::route('edittransaction', $transaction->id)->withInput();
-            }
-            // count is one? that's the object!
-            if (count($parts) == 1) {
-                $$comp = Component::findOrCreate($comp, Input::get($comp));
-            }
-            // count is two? parent + child.
-            if (count($parts) == 2) {
-                $parent = Component::findOrCreate($comp, $parts[0]);
-                $$comp = Component::findOrCreate($comp, $parts[1]);
-                $$comp->parent_component_id = $parent->id;
-                $$comp->save();
-
-            }
-        }
+        $beneficiary = ComponentHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
+        $category = ComponentHelper::saveComponentFromText('category', Input::get('category'));
+        $budget = ComponentHelper::saveComponentFromText('budget', Input::get('budget'));
 
         // validate and save:
         $validator = Validator::make(
@@ -183,11 +168,8 @@ class TransactionController extends BaseController
             // detach all components first:
             $transaction->components()->sync([]);
             // attach the beneficiary, if it is set:
-            /** @var $beneficiary Component */
             $transaction->attachComponent($beneficiary);
-            /** @var $budget Component */
             $transaction->attachComponent($budget);
-            /** @var $category Component */
             $transaction->attachComponent($category);
 
             $transaction->save();

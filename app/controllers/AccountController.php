@@ -24,9 +24,7 @@ class AccountController extends BaseController
             }
         );
 
-        return View::make('accounts.index')->with('accounts', $accounts)->with(
-            'title', 'All accounts'
-        );
+        return View::make('accounts.index')->with('accounts', $accounts)->with('title', 'All accounts');
     }
 
     /**
@@ -38,24 +36,10 @@ class AccountController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = AccountHelper::emptyPrefilledAray();
+        } else {
+            $prefilled = AccountHelper::prefilledFromOldInput();
         }
-
-        $prefilled = [
-            'name'               => '',
-            'openingbalance'     => '',
-            'openingbalancedate' => date('Y-m-d'),
-            'shared'             => false
-        ];
-
-        if (Input::old()) {
-            $prefilled = [
-                'name'               => Input::old('name'),
-                'openingbalance'     => Input::old('openingbalance'),
-                'openingbalancedate' => Input::old('openingbalancedate'),
-                'shared'             => intval(Input::old('shared')) == 1 ? true : false
-            ];
-        }
-
 
         return View::make('accounts.add')->with(
             'title', 'Add account'
@@ -118,22 +102,9 @@ class AccountController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
-        $prefilled = [
-            'name'               => $account->name,
-            'openingbalance'     => $account->openingbalance,
-            'openingbalancedate' => $account->openingbalancedate->format('Y-m-d'),
-            'hidden'             => $account->hidden == 1 ? true : false,
-            'shared'             => $account->shared == 1 ? true : false,
-
-        ];
+        $prefilled = AccountHelper::prefilledFromAccount($account);
         if (Input::old()) {
-            $prefilled = [
-                'name'               => Input::old('name'),
-                'openingbalance'     => Input::old('openingbalance'),
-                'openingbalancedate' => Input::old('openingbalancedate'),
-                'hidden'             => intval(Input::old('hidden')) == 1 ? true : false,
-                'shared'             => intval(Input::old('shared')) == 1 ? true : false
-            ];
+            $prefilled = AccountHelper::prefilledFromOldInput();
         }
 
 
@@ -253,7 +224,7 @@ class AccountController extends BaseController
             'title', $title
         )->with(
                 'transactions', $entries
-            )->with('date', $date)->with('transfers',$transfers);
+            )->with('date', $date)->with('transfers', $transfers);
     }
 
     /**

@@ -2,6 +2,8 @@
 
 /** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/AccountHelper.php');
+/** @noinspection PhpIncludeInspection */
+include_once(app_path() . '/helpers/TransferHelper.php');
 
 /**
  * Class TransferController
@@ -32,37 +34,12 @@ class TransferController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
-        }
+            $prefilled = TransferHelper::emptyPrefilledAray();
+        } else {
+            $prefilled = TransferHelper::prefilledFromOldInput();
 
-        // prefilled when old input:
-        if (!Input::old()) {
-            $prefilled = [
-                'description'    => '',
-                'amount'         => '',
-                'date'           => date('Y-m-d'),
-                'accountfrom_id' => 0,
-                'accountto_id'   => 0,
-                'beneficiary'    => '',
-                'budget'         => '',
-                'category'       => ''
-            ];
         }
-        if (Input::old()) {
-            $prefilled = [
-                'description'    => Input::old('description'),
-                'amount'         => floatval(Input::old('amount')),
-                'date'           => Input::old('date'),
-                'accountfrom_id' => intval(Input::old('accountfrom_id')),
-                'accountto_id'   => intval(Input::old('accountto_id')),
-                'beneficiary'    => Input::old('beneficiary'),
-                'budget'         => Input::old('budget'),
-                'category'       => Input::old('category')
-            ];
-        }
-
-
         $accounts = AccountHelper::accountsAsSelectList();
-
         return View::make('transfers.add')->with(
             'title', 'Add a transfer'
         )->with('accounts', $accounts)->with('prefilled', $prefilled);
@@ -83,14 +60,28 @@ class TransferController extends BaseController
                  'user_id'        => Auth::user()->id];
         $transfer = new Transfer($data);
 
+        // explode every object at the / and see if there is one.
+        // more than one? return to Transaction:
+        $beneficiary = ComponentHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
+        $category = ComponentHelper::saveComponentFromText('category', Input::get('category'));
+        $budget = ComponentHelper::saveComponentFromText('budget', Input::get('budget'));
+
+
         $validator = Validator::make($transfer->toArray(), Transfer::$rules);
         if ($validator->fails()) {
             Session::flash('error', 'Could not add transfer.');
-            return Redirect::route('addtransfer')->withInput()->withErrors(
-                $validator
-            );
+            return Redirect::route('addtransfer')->withInput()->withErrors($validator);
         } else {
-            $transfer->save();
+            $result = $transfer->save();
+            if (!$result) {
+                Session::flash('error', 'Could not add transfer.');
+                return Redirect::route('addtransfer')->withInput()->withErrors($validator);
+            }
+            // attach the beneficiary, if it is set:
+            $transfer->attachComponent($beneficiary);
+            $transfer->attachComponent($budget);
+            $transfer->attachComponent($category);
+
             Session::flash('success', 'The transfer has been created.');
 
             return Redirect::to(Session::get('previous'));
@@ -108,12 +99,15 @@ class TransferController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
+            $prefilled = TransferHelper::prefilledFromTransfer($transfer);
+        } else {
+            $prefilled = TransferHelper::prefilledFromOldInput();
         }
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('transfers.edit')->with('transfer', $transfer)->with(
             'accounts', $accounts
-        )->with('title', 'Edit transfer ' . $transfer->description);
+        )->with('title', 'Edit transfer ' . $transfer->description)->with('prefilled', $prefilled);
     }
 
     /**
@@ -142,15 +136,34 @@ class TransferController extends BaseController
             $transfer->accountto()->associate($toAccount);
         }
 
+        // explode every object at the / and see if there is one.
+        // more than one? return to Transaction:
+        $beneficiary = ComponentHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
+        $category = ComponentHelper::saveComponentFromText('category', Input::get('category'));
+        $budget = ComponentHelper::saveComponentFromText('budget', Input::get('budget'));
+
         $validator = Validator::make(
             $transfer->toArray(), Transfer::$rules
         );
         if ($validator->fails()) {
             Session::flash('error', 'Could not edit transfer.');
-            return Redirect::route('edittransfer', $transfer->id)->withInput()
-                ->withErrors($validator);
+            return Redirect::route('edittransfer', $transfer->id)->withInput()->withErrors($validator);
         } else {
-            $transfer->save();
+            $result = $transfer->save();
+            if (!$result) {
+                Session::flash('error', 'Could not edit transfer.');
+                return Redirect::route('edittransfer', $transfer->id)->withInput()->withErrors($validator);
+            } else {
+
+
+                // detach all components first:
+                $transfer->components()->sync([]);
+                // attach the beneficiary, if it is set:
+                $transfer->attachComponent($beneficiary);
+                $transfer->attachComponent($budget);
+                $transfer->attachComponent($category);
+            }
+
             Session::flash('success', 'The transfer has been edited.');
 
             return Redirect::to(Session::get('previous'));

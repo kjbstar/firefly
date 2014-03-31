@@ -56,6 +56,26 @@ class PredictableControllerTest extends TestCase
 
     }
 
+    public function testAddWithPredictable()
+    {
+
+        $response = $this->call('GET', 'home/predictable/add');
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertEquals('Add a predictable', $view['title']);
+        // +1 is no parent
+        $bud = Auth::user()->components()->where('type', 'budget')->whereNull('parent_component_id')->count() + 1;
+        $cat = Auth::user()->components()->where('type', 'category')->whereNull('parent_component_id')->count() + 1;
+        $ben = Auth::user()->components()->where('type', 'beneficiary')->whereNull('parent_component_id')->count() + 1;
+
+
+        $this->assertCount(3, $view['components']);
+        $this->assertCount($bud, $view['components']['budget']);
+        $this->assertCount($cat, $view['components']['category']);
+        $this->assertCount($ben, $view['components']['beneficiary']);
+
+    }
+
     public function testAddWithTransaction()
     {
         $transaction = Transaction::first();
@@ -63,7 +83,7 @@ class PredictableControllerTest extends TestCase
         $view = $response->original;
         $this->assertResponseStatus(200);
         // TODO match prefilled content
-        $this->assertEquals('Add a predictable based on "' . $transaction->description . '"', $view['title']);
+        $this->assertEquals('Add a predictable', $view['title']);
         $this->assertEquals($transaction->description, $view['prefilled']['description']);
 
         $bud = Auth::user()->components()->where('type', 'budget')->whereNull('parent_component_id')->count() + 1;
@@ -78,13 +98,14 @@ class PredictableControllerTest extends TestCase
 
     public function testAddWithOldInput()
     {
-        $this->session(['_old_input' => ['description' => 'Test', 'amount' => 100]]);
+        $data = ['description' => 'Test', 'pct' => 12];
+        $this->session(['_old_input' => $data]);
         $response = $this->call('GET', 'home/predictable/add/');
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Add a predictable', $view['title']);
-        $this->assertEquals('Test', $view['prefilled']['description']);
-        $this->assertEquals(100, $view['prefilled']['amount']);
+        $this->assertEquals($data['description'], $view['prefilled']['description']);
+        $this->assertEquals($data['pct'], $view['prefilled']['pct']);
         $bud = Auth::user()->components()->where('type', 'budget')->whereNull('parent_component_id')->count() + 1;
         $cat = Auth::user()->components()->where('type', 'category')->whereNull('parent_component_id')->count() + 1;
         $ben = Auth::user()->components()->where('type', 'beneficiary')->whereNull('parent_component_id')->count() + 1;
@@ -165,6 +186,25 @@ class PredictableControllerTest extends TestCase
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Edit predictable "' . $predictable->description . '"', $view['title']);
+        $this->assertCount(3, $view['components']);
+
+    }
+
+    /**
+     * @depends testPostAdd
+     * @depends testEdit
+     */
+    public function testEditWithOldInput()
+    {
+        $data = ['description' => 'Test', 'pct' => 12];
+        $this->session(['_old_input' => $data]);
+        $predictable = Predictable::orderBy('id', 'DESC')->where('amount', $this->_amount)->first();
+        $response = $this->call('GET', 'home/predictable/' . $predictable->id . '/edit');
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertEquals('Edit predictable "' . $predictable->description . '"', $view['title']);
+        $this->assertEquals($data['description'], $view['prefilled']['description']);
+        $this->assertEquals($data['pct'], $view['prefilled']['pct']);
         $this->assertCount(3, $view['components']);
 
     }

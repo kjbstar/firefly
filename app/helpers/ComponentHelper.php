@@ -120,4 +120,53 @@ class ComponentHelper
         return $parents;
     }
 
+    public static function emptyPrefilledAray()
+    {
+        return [
+            'name'                => '',
+            'parent_component_id' => 0,
+            'reporting'           => false,
+        ];
+    }
+
+    public static function prefilledFromOldInput()
+    {
+        return [
+            'name'                => Input::old('name'),
+            'parent_component_id' => intval(Input::old('parent_component_id')),
+            'reporting'           => intval(Input::old('reporting')) == 1 ? true : false,
+        ];
+    }
+
+    public static function prefilledFromComponent(Component $component)
+    {
+        return [
+            'name'                => $component->name,
+            'parent_component_id' => intval($component->parent_component_id),
+            'reporting'           => $component->reporting == 1 ? true : false
+        ];
+    }
+
+    public static function saveComponentFromText($type, $name)
+    {
+        $parts = explode('/', $name);
+        if (count($parts) > 2) {
+            Session::flash('error', 'Could not save ' . $type . ' "' . htmlentities($name) . '" due to errors.');
+            return null;
+        }
+
+        if (count($parts) == 1) {
+            return Component::findOrCreate($type, $name);
+        }
+        if (count($parts) == 2) {
+            $parent = Component::findOrCreate($type, $parts[0]);
+            $object = Component::findOrCreate($type, $parts[1]);
+            $object->parent_component_id = $parent->id;
+            $object->save();
+            return $object;
+        }
+        return null;
+
+    }
+
 }

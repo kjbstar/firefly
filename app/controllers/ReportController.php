@@ -88,21 +88,7 @@ class ReportController extends BaseController
             )->incomes()->sum('amount')
         );
 
-        // what did the shared accounts get us?
-        $spentOnShared = floatval(Auth::user()->transfers()->inMonth($start)->leftJoin('accounts','accounts.id','=',
-                'transfers.accountto_id')->where('accounts.shared',1)->sum('transfers.amount'));
-        $earnedOnShared = floatval(Auth::user()->transfers()->inMonth($start)->leftJoin('accounts','accounts.id','=',
-                'transfers.accountfrom_id')->where('accounts.shared',1)->sum('transfers.amount'));
-        $sumShared = $spentOnShared - $earnedOnShared;
-        if($sumShared > 0) {
-            // spent more than we got back:
-            $sumOut -= $sumShared;
-        } else {
-            // earned from shared account:
-            $sumIn += ($sumShared*-1);
-        }
-
-
+        // TODO what did the shared accounts get us?
 
         $sums = ['sumIn' => $sumIn, 'sumOut' => $sumOut];
 
@@ -190,20 +176,7 @@ class ReportController extends BaseController
             $start
         )->sum('amount');
 
-        // what did the shared accounts get us?
-        $spentOnShared = floatval(Auth::user()->transfers()->inYear($start)->leftJoin('accounts','accounts.id','=',
-                'transfers.accountto_id')->where('accounts.shared',1)->sum('transfers.amount'));
-        $earnedOnShared = floatval(Auth::user()->transfers()->inYear($start)->leftJoin('accounts','accounts.id','=',
-                'transfers.accountfrom_id')->where('accounts.shared',1)->sum('transfers.amount'));
-        $sumShared = $spentOnShared - $earnedOnShared;
-        if($sumShared > 0) {
-            // spent more than we got back:
-            $totalExpenses -= $sumShared;
-        } else {
-            // earned from shared account:
-            $totalIncome += ($sumShared*-1);
-        }
-
+        // TODO what did the shared accounts get us?
 
 
         // count the components for a chart:
@@ -302,20 +275,7 @@ class ReportController extends BaseController
                     'date', 'ASC'
                 )->inMonth($date)->sum('amount');
 
-            // get the transfers to and from a shared account:
-            $spentOnShared = floatval(Auth::user()->transfers()->inMonth($date)->leftJoin('accounts','accounts.id','=',
-                    'transfers.accountto_id')->where('accounts.shared',1)->sum('transfers.amount'));
-            $earnedOnShared = floatval(Auth::user()->transfers()->inMonth($date)->leftJoin('accounts','accounts.id','=',
-                    'transfers.accountfrom_id')->where('accounts.shared',1)->sum('transfers.amount'));
-            $sumShared = $spentOnShared - $earnedOnShared;
-            if($sumShared > 0) {
-                // spent more than we got back:
-                $numbers[$key]['out'] -= $sumShared;
-            } else {
-                // earned from shared account:
-                $numbers[$key]['in'] += ($sumShared*-1);
-            }
-
+            // TODO get the transfers to and from a shared account:
         }
         // start and end net worths:
         foreach (['one' => $one, 'two' => $two] as $key => $start) {

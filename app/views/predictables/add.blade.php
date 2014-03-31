@@ -72,7 +72,7 @@
             <div class="col-sm-3">
                 <div id="highAmount"></div>
             </div>
-            <input type="hidden" name="pct" value="{{$prefilled['leeway']}}" id="inputLeeway" />
+            <input type="hidden" name="pct" value="{{$prefilled['pct']}}" id="inputLeeway" />
         </div>
 
         <!-- the day of month -->

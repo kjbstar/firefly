@@ -8,7 +8,7 @@
     </div>
 <div class="row">
     <div class="col-lg-6 col-md-12">
-
+    <h4>Mandatory</h4>
 
     {{Form::open(['class' => 'form-horizontal'])}}
     
@@ -21,14 +21,16 @@
             <label for="inputName" class="col-sm-4 control-label">Name</label>
             <div class="col-sm-8">
                 <input type="text" name="name" class="form-control"
-                       value="{{{Input::old('name')}}}" id="inputName"
-                       placeholder="Name">
+                       value="{{{$prefilled['name']}}}" id="inputName"
+                       placeholder="{{{$prefilled['name']}}}">
                 @if($errors->has('name'))
                 <span class="text-danger">{{$errors->first('name')}}</span><br />
                 @endif
             </div>
         </div>
-    
+        </div>
+    <div class="col-lg-6 col-md-12">
+        <h4>Optional</h4>
         <!-- Target -->
         <div class="form-group
              @if($errors->has('target'))
@@ -41,7 +43,7 @@
             <div class="col-sm-8">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{Input::old('target')}}"
+                    <input type="number" value="{{$prefilled['target']}}"
                            name="target" step="any" class="form-control"
                            id="inputTarget">
                 </div>
@@ -50,10 +52,13 @@
                 @endif
             </div>
         </div>
+        </div>
+    </div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
 
       <button type="submit" class="btn btn-default">Save new piggy
           bank</button>
-
     {{Form::close()}}
 
   </div>

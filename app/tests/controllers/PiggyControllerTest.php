@@ -92,6 +92,16 @@ class PiggyControllerTest extends TestCase
 
     }
 
+    public function testAddWithOldInput()
+    {
+        $this->session(['_old_input' => ['name' => 'Test', 'target' => 100]]);
+        $response = $this->call('GET', 'home/piggy/add');
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertEquals('Add new piggy bank', $view['title']);
+
+    }
+
     public function testEmptyPostAdd()
     {
         $count = Auth::user()->piggybanks()->count();
@@ -141,6 +151,18 @@ class PiggyControllerTest extends TestCase
             'Edit piggy bank "' . $pig->name . '"', $view['title']
         );
     }
+    public function testEditWithOldInput()
+    {
+        $this->session(['_old_input' => ['name' => 'Test', 'target' => 100]]);
+        $pig = Auth::user()->piggybanks()->where('target', $this->_target)->first();
+        $response = $this->call('GET', 'home/piggy/edit/' . $pig->id);
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertEquals(
+            'Edit piggy bank "' . $pig->name . '"', $view['title']
+        );
+    }
+
 
     public function testPostEdit()
     {

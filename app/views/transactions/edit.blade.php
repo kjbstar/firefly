@@ -24,8 +24,7 @@
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
                 <input type="text" name="description" class="form-control"
-                       value="{{{Input::old('description') ? Input::old
-                       ('description') : $transaction->description}}}"
+                       value="{{{$prefilled['description']}}}"
                        id="inputDescription"
                        placeholder="{{{$transaction->description}}}">
                 @if($errors->has('description'))
@@ -44,7 +43,8 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{{Input::old('amount') ? Input::old('amount') : $transaction->amount}}}" name="amount" step="any" class="form-control" id="inputAmount">
+                    <input type="number" value="{{{$prefilled['amount']}}}" name="amount" step="any"
+                           class="form-control" id="inputAmount">
                 </div>
                 @if($errors->has('amount'))
                 <span class="text-danger">{{$errors->first('amount')}}</span>
@@ -60,7 +60,7 @@
              ">
             <label for="inputDate" class="col-sm-3 control-label">Date</label>
             <div class="col-sm-9">
-                <input type="date" name="date" value="{{{Input::old('date') ? Input::old('date') : $transaction->date->format('Y-m-d')}}}"  class="form-control" id="inputDate">
+                <input type="date" name="date" value="{{{$prefilled['date']}}}"  class="form-control" id="inputDate">
                 @if($errors->has('date'))
                 <span class="text-danger">{{$errors->first('date')}}</span>
                 @endif
@@ -75,7 +75,7 @@
              ">
             <label for="inputAccount" class="col-sm-3 control-label">Account</label>
             <div class="col-sm-9">
-                {{Form::select('account_id',$accounts,Input::old('account_id') ? Input::old('account_id') :$transaction->account_id,['class' => 'form-control'])}}
+                {{Form::select('account_id',$accounts,$prefilled['account_id'],['class' => 'form-control'])}}
                 @if($errors->has('date'))
                 <span class="text-danger">{{$errors->first('account_id')}}</span>
                 @endif
@@ -91,9 +91,8 @@
         <div class="form-group">
             <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
             <div class="col-sm-9">
-                <input type="text" value="{{{Input::old('beneficiary') ?
-                Input::old('beneficiary') : $transaction->beneficiary ?
-                $transaction->beneficiary->name : ''}}}" name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
+                <input type="text" value="{{{$prefilled['beneficiary']}}}" name="beneficiary" class="form-control"
+                       id="inputBeneficiary" autocomplete="off" />
             </div>
         </div>
         
@@ -101,9 +100,8 @@
         <div class="form-group">
             <label for="inputCategory" class="col-sm-3 control-label">Category</label>
             <div class="col-sm-9">
-                <input type="text" value="{{{Input::old('category') ?
-                Input::old('category') : $transaction->category ?
-                $transaction->category->name : ''}}}" name="category" class="form-control" id="inputCategory" autocomplete="off" />
+                <input type="text" value="{{{$prefilled['category']}}}" name="category" class="form-control"
+                       id="inputCategory" autocomplete="off" />
             </div>
         </div>
 
@@ -111,9 +109,8 @@
         <div class="form-group">
             <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
             <div class="col-sm-9">
-                <input type="text" value="{{{Input::old('budget') ?
-                Input::old('budget') : $transaction->budget ?
-                $transaction->budget->name : ''}}}" name="budget" class="form-control" id="inputBudget" autocomplete="off" />
+                <input type="text" value="{{{$prefilled['budget']}}}" name="budget" class="form-control"
+                       id="inputBudget" autocomplete="off" />
             </div>
         </div>
 
@@ -123,11 +120,13 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                <input type="checkbox" name="ignoreprediction" value="1"
-                       @if($transaction->ignoreprediction == 1)
-                       checked="checked"
+
+                       @if($transaction->ignoreprediction == true)
+                        <input type="checkbox" name="ignoreprediction" value="1" checked="checked" />
+                        @else
+                        <input type="checkbox" name="ignoreprediction" value="1" />
                        @endif
-                       > Ignores this transaction in predictions.
+                       Ignores this transaction in predictions.
                     </label></div>
             </div>
         </div>
@@ -139,12 +138,13 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="ignoreallowance" value="1"
-                        @if($transaction->ignoreallowance == 1)
-                        checked="checked"
+
+                        @if($transaction->ignoreallowance == true)
+                        <input type="checkbox" name="ignoreallowance" value="1" checked="checked" />
+                        @else
+                        <input type="checkbox" name="ignoreallowance" value="1" />
                         @endif
-                        > Do not substract this transaction
-                        from the allowance (if set).</label></div>
+                        Do not substract this transaction from the allowance (if set).</label></div>
             </div>
         </div>
         
@@ -154,11 +154,13 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                <input type="checkbox" name="mark" value="1"
-                       @if($transaction->mark == 1)
-                       checked="checked"
+
+                       @if($transaction->mark == true)
+                        <input type="checkbox" name="mark" value="1" checked="checked" />
+                        @else
+                        <input type="checkbox" name="mark" value="1"  />
                        @endif
-                       > Marks this transaction in certain charts.
+                       Marks this transaction in certain charts.
                         </label></div>
             </div>
         </div>

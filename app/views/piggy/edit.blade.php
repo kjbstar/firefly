@@ -24,11 +24,8 @@
             <label for="inputName" class="col-sm-3
             control-label">Name</label>
             <div class="col-sm-9">
-                <input type="text" name="name" class="form-control"
-                       value="{{{Input::old('name') ? Input::old
-                       ('name') : $pig->name}}}"
-                       id="inputName"
-                       placeholder="{{{$pig->name}}}">
+                <input type="text" name="name" class="form-control" value="{{{$prefilled['name']}}}" id="inputName"
+                       placeholder="{{{$prefilled['name']}}}">
                 @if($errors->has('name'))
                 <span class="text-danger">{{$errors->first('name')}}</span>
                 @endif
@@ -45,8 +42,7 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{Input::old('amount') ?
-                    Input::old('amount') : $pig->amount}}" name="amount"
+                    <input type="number" value="{{$prefilled['amount']}}" name="amount"
                            step="any" class="form-control" id="inputAmount">
                 </div>
                 @if($errors->has('amount'))
@@ -68,8 +64,7 @@
             <div class="col-sm-9">
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{Input::old('target') ?
-                    Input::old('target') : $pig->target}}" name="target"
+                    <input type="number" value="{{$prefilled['target']}}" name="target"
                            step="any" class="form-control" id="inputTarget">
                 </div>
                 @if($errors->has('target'))

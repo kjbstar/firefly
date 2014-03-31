@@ -49,28 +49,28 @@ class HomeHelper
             ->beforeDate($date)->get();
         foreach ($transactions as $t) {
             // get the budget
-            if ($t->account()->first()->shared == 0) {
-                if ($t->budget) {
-                    // basic budget info:
-                    $id = $t->budget->id;
-                    if (isset($budgets[$id])) {
-                        // only add information
-                        $budgets[$id]['spent'] += ($t->amount * -1);
-                    } else {
-                        // create new one:
-                        $budgets[$id] = ['name'  => $t->budget->name,
-                                         'spent' => ($t->amount * -1)];
-                        // limit:
-                        $limit = $t->budget->limits()->inMonth($date)->first();
-                        if ($limit) {
-                            $budgets[$id]['limit'] = $limit->amount;
-                        }
-
+            if ($t->budget) {
+                // basic budget info:
+                $id = $t->budget->id;
+                if (isset($budgets[$id])) {
+                    // only add information
+                    $budgets[$id]['spent'] += ($t->amount * -1);
+                } else {
+                    // create new one:
+                    $budgets[$id] = ['name'  => $t->budget->name,
+                                     'spent' => ($t->amount * -1)];
+                    // limit:
+                    $limit = $t->budget->limits()->inMonth($date)->first();
+                    if ($limit) {
+                        $budgets[$id]['limit'] = $limit->amount;
                     }
 
                 }
+
             }
         }
+        
+
         // loop budgets for percentages:
         foreach ($budgets as $id => $budget) {
             Log::debug('Spent for budget ' . $budget['name'] . ': ' . mf($budget['spent']));
@@ -115,16 +115,16 @@ class HomeHelper
         // start!
         if ($amount > 0) {
             $spent = floatval(
-                    Auth::user()->transactions()->inMonth($date)->expenses()->where('ignoreallowance', 0)->leftJoin(
-                        'accounts', 'accounts.id', '=', 'transactions.account_id'
-                    )->where('accounts.shared', 0)->sum('amount')
+                    Auth::user()->transactions()->inMonth($date)->expenses()->where('ignoreallowance', 0)->sum('amount')
                 ) * -1;
 
-            // also count transfers that went to a shared account:
-            $moved = floatval(Auth::user()->transfers()->inMonth($date)->leftJoin('accounts','accounts.id','=',
-                'transfers.accountto_id')->where('accounts.shared',1)->sum('transfers.amount'));
+            // Also count transfers that went to a shared account:
+            $spentOnShared = floatval(Auth::user()->transfers()->leftJoin('accounts','accounts.id','=','transfers.accountto_id')
+            ->inMonth($date)->sum('amount')
+            );
 
-            $allowance['spent'] = $spent + $moved;
+
+            $allowance['spent'] = $spent + $spentOnShared;
             // overspent this allowance:
             if ($spent > $amount) {
                 $allowance['over'] = true;

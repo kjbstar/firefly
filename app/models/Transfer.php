@@ -5,23 +5,23 @@ use Carbon\Carbon as Carbon;
 /**
  * Class Transfer
  *
- * @property integer        $id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property integer        $user_id
- * @property integer        $accountfrom_id
- * @property integer        $accountto_id
- * @property string         $description
- * @property float          $amount
- * @property string         $date
- * @property-read \Account  $accountfrom
- * @property-read \Account  $accountto
- * @property-read \User     $user
+ * @property integer                                                    $id
+ * @property \Carbon\Carbon                                             $created_at
+ * @property \Carbon\Carbon                                             $updated_at
+ * @property integer                                                    $user_id
+ * @property integer                                                    $accountfrom_id
+ * @property integer                                                    $accountto_id
+ * @property string                                                     $description
+ * @property float                                                      $amount
+ * @property string                                                     $date
+ * @property-read \Account                                              $accountfrom
+ * @property-read \Account                                              $accountto
+ * @property-read \User                                                 $user
  * @method static Transfer inMonth($date)
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
- * @property-read mixed $beneficiary
- * @property-read mixed $category
- * @property-read mixed $budget
+ * @property-read mixed                                                 $beneficiary
+ * @property-read mixed                                                 $category
+ * @property-read mixed                                                 $budget
  * @method static \Illuminate\Database\Query\Builder|\Transfer whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\Transfer whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\Transfer whereUpdatedAt($value)
@@ -119,7 +119,8 @@ class Transfer extends Eloquent
      */
     public function getBudgetAttribute()
     {
-        foreach ($this->components as $component) {
+
+        foreach ($this->components()->get() as $component) {
             if ($component->type == 'budget') {
                 return $component;
             }
@@ -174,6 +175,19 @@ class Transfer extends Eloquent
     }
 
     /**
+     * Add the component to the transaction.
+     *
+     * @param Component $component
+     */
+    public function attachComponent(Component $component = null)
+    {
+        if (is_null($component)) {
+            return;
+        }
+        $this->components()->attach($component->id);
+    }
+
+    /**
      * Encrypt the description.
      *
      * @param $value
@@ -193,5 +207,11 @@ class Transfer extends Eloquent
         return ['created_at', 'updated_at', 'date'];
     }
 
+    public function scopeBeforeDate($query, Carbon $date)
+    {
+        return $query->where(
+            'date', '<=', $date->format('Y-m-d')
+        );
+    }
 
 }

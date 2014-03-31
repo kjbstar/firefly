@@ -36,6 +36,22 @@ class TransactionHelper
         ];
     }
 
+    public static function prefilledFromTransaction(Transaction $transaction)
+    {
+        return [
+            'description'      => $transaction->description,
+            'amount'           => $transaction->amount,
+            'date'             => $transaction->date->format('Y-m-d'),
+            'account_id'       => $transaction->account_id,
+            'beneficiary'      => is_null($transaction->beneficiary) ? '' : $transaction->beneficiary->name,
+            'category'         => is_null($transaction->category) ? '' : $transaction->category->name,
+            'budget'           => is_null($transaction->budget) ? '' : $transaction->budget->name,
+            'ignoreprediction' => intval($transaction->ignoreprediction) == 1 ? true : false,
+            'ignoreallowance'  => intval($transaction->ignoreallowance) == 1 ? true : false,
+            'mark'             => intval($transaction->mark) == 1 ? true : false,
+        ];
+    }
+
     public static function prefilledFromOldInput()
     {
         return ['description'      => Input::old('description'),
@@ -52,25 +68,4 @@ class TransactionHelper
         ];
     }
 
-    public static function saveComponentFromText($type, $name)
-    {
-        $parts = explode('/', $name);
-        if (count($parts) > 2) {
-            Session::flash('error', 'Could not save ' . $type . ' "' . htmlentities($name) . '" due to errors.');
-            return null;
-        }
-
-        if (count($parts) == 1) {
-            return Component::findOrCreate($type, $name);
-        }
-        if (count($parts) == 2) {
-            $parent = Component::findOrCreate($type, $parts[0]);
-            $object = Component::findOrCreate($type, $parts[1]);
-            $object->parent_component_id = $parent->id;
-            $object->save();
-            return $object;
-        }
-        return null;
-
-    }
 }

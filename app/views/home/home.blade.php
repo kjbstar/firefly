@@ -34,7 +34,11 @@
         <table class="table table-condensed table-bordered">
             @foreach($accounts as $account)
             <tr>
+                @if($account['shared'])
+                <td><a href="{{$account['url']}}">{{{$account['name']}}}</a> <img src="i/group.png" alt="Shared account" /></td>
+                @else
                 <td><a href="{{$account['url']}}">{{{$account['name']}}}</a></td>
+                @endif
                 <td style="text-align:right;">{{mf ($account['current'],true,true)}}</td>
             </tr>
             @endforeach

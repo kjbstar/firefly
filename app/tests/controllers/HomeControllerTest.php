@@ -45,13 +45,10 @@ class HomeControllerTest extends TestCase
         $this->assertCount($transfers, $view['transfers']);
 
         // we know we started in 2012-01-01, it's hard coded.
+
         $start = new Carbon\Carbon('2012-01-01');
         $now = new Carbon\Carbon;
-        $diff = $now->diffInMonths($start);
-        $diff = $diff + 2;
-
-        // TODO better count
-        $this->assertCount($diff, $view['history']);
+        $this->assertCount($now->diffInMonths($start)+3, $view['history']);
         $this->assertCount(0, $view['budgets']);
 
 
@@ -81,11 +78,7 @@ class HomeControllerTest extends TestCase
         // we know we started in 2012-01-01, it's hard coded.
         $start = new Carbon\Carbon('2012-01-01');
         $now = new Carbon\Carbon;
-        $diff = $now->diffInMonths($start);
-        $diff = $diff + 2;
-
-        // TODO better count
-        $this->assertCount($diff, $view['history']);
+        $this->assertCount($now->diffInMonths($start)+3, $view['history']);
         $this->assertCount(0, $view['budgets']);
 
     }

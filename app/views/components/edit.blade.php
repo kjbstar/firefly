@@ -10,7 +10,7 @@
       <label for="inputName" class="col-sm-4 control-label">{{ucfirst(OBJ)}} name</label>
         <div class="col-sm-8">
       <input type="text" name="name" class="form-control" id="inputName"
-             placeholder="{{{$object->name}}}" value="{{{$object->name}}}"><br
+             placeholder="{{{$object->name}}}" value="{{{$prefilled['name']}}}"><br
             />
       <span class="text-danger">{{$errors->first('name')}}</span>
             </div>
@@ -20,7 +20,8 @@
       <label for="inputBalance" class="col-sm-4 control-label">Parent {{OBJ}}
           <small>(optional)</small></label>
         <div class="col-sm-8">
-      {{Form::select('parent_component_id',$parents,$object->parent_component_id,array('class' => 'form-control'))}}
+      {{Form::select('parent_component_id',$parents,$prefilled['parent_component_id'],
+            array('class' => 'form-control'))}}
             <span class="text-danger">{{$errors->first('parent_component_id')}}</span>
             </div>
 
@@ -33,7 +34,7 @@
           <div class="col-sm-8">
               <div class="checkbox">
                   <label>
-                      @if($object->reporting == 1)
+                      @if($prefilled['reporting'] == 1)
                       <input type="checkbox" name="reporting" value="1" checked="checked">
                       @else
                       <input type="checkbox" name="reporting" value="1">
