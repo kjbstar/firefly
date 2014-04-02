@@ -23,30 +23,70 @@ class AccountHelper
         return $accounts;
     }
 
-    /**
-     * Generates a list of transactions in the month indicated by $date
-     *
-     * @param Account $account The account
-     * @param Carbon  $date    THe date
-     *
-     * @return array
-     */
-    public static function generateTransactionListByMonth(
-        Account $account, Carbon $date
-    ) {
-        return $account->transactions()->orderBy('date', 'DESC')->inMonth($date)
-            ->get();
+
+//
+//    /**
+//     * Generates a list of transactions in the month indicated by $date
+//     *
+//     * @param Account $account The account
+//     * @param Carbon  $date    THe date
+//     *
+//     * @return array
+//     */
+//    public static function generateTransactionListByMonth(
+//        Account $account, Carbon $date
+//    ) {
+//        return $account->transactions()->orderBy('date', 'DESC')->inMonth($date)
+//            ->get();
+//    }
+
+//    public static function generateTransferListByMonth(
+//        Account $account, Carbon $date
+//    ) {
+//        return Auth::user()->transfers()->where('accountto_id', $account->id)->orWhere(
+//            'accountfrom_id',
+//            $account->id
+//        )
+//            ->orderBy('date', 'DESC')->inMonth($date)
+//            ->get();
+//    }
+
+    public static function months(Account $account)
+    {
+        $end = new Carbon;
+        $end->firstOfMonth();
+        $start = Toolkit::getEarliestEvent();
+        $list = [];
+        while ($end >= $start) {
+            $url = URL::Route(
+                'accountoverviewmonth', [$account->id, $end->format('Y'), $end->format('m')]
+            );
+            $list[] = [
+                'url'     => $url,
+                'title'   => $end->format('F Y'),
+                'date'    => clone $end,
+                'balance' => $account->balanceOnDate($end)
+            ];
+            $end->subMonth();
+        }
+
+
+        return $list;
     }
 
-    public static function generateTransferListByMonth(
-        Account $account, Carbon $date
-    ) {
-        return Auth::user()->transfers()->where('accountto_id', $account->id)->orWhere(
-            'accountfrom_id',
-            $account->id
-        )
-            ->orderBy('date', 'DESC')->inMonth($date)
-            ->get();
+    public static function mutations(Account $account, Carbon $date)
+    {
+        $transactions = $account->transactions()->inMonth($date)->get();
+        $transfersTo = $account->transfersto()->inMonth($date)->get();
+        $transfersFrom = $account->transfersfrom()->inMonth($date)->get();
+        $result = $transactions->merge($transfersFrom);
+        $result = $result->merge($transfersTo);
+        $result = $result->sortBy(
+            function ($a) {
+                return $a->created_at;
+            }
+        )->reverse();
+        return $result;
     }
 
     /**
@@ -56,29 +96,29 @@ class AccountHelper
      *
      * @return array
      */
-    public static function generateOverviewOfMonths(Account $account)
-    {
-        $end = new Carbon;
-        $end->firstOfMonth();
-        $start = Toolkit::getEarliestEvent();
-        $list = [];
-        while ($end >= $start) {
-
-            // money in:
-            $url = URL::Route(
-                'accountoverview',
-                [$account->id, $end->format('Y'), $end->format('m')]
-            );
-            $entry = [];
-            $entry['url'] = $url;
-            $entry['title'] = $end->format('F Y');
-            $entry['balance_start'] = $account->balanceOnDate($end);
-            $end->subMonth();
-            $list[] = $entry;
-        }
-
-        return $list;
-    }
+//    public static function generateOverviewOfMonths(Account $account)
+//    {
+//        $end = new Carbon;
+//        $end->firstOfMonth();
+//        $start = Toolkit::getEarliestEvent();
+//        $list = [];
+//        while ($end >= $start) {
+//
+//            // money in:
+//            $url = URL::Route(
+//                'accountoverview',
+//                [$account->id, $end->format('Y'), $end->format('m')]
+//            );
+//            $entry = [];
+//            $entry['url'] = $url;
+//            $entry['title'] = $end->format('F Y');
+//            $entry['balance_start'] = $account->balanceOnDate($end);
+//            $end->subMonth();
+//            $list[] = $entry;
+//        }
+//
+//        return $list;
+//    }
 
     public static function getPredictionStart()
     {
@@ -98,17 +138,29 @@ class AccountHelper
     public static function getMarkedTransactions(
         Account $account, Carbon $start, Carbon $end
     ) {
-        $transactions = $account->transactions()->where(
-            'mark', 1
-        )->betweenDates($start, $end)->get();
-        $marked = [];
-        foreach ($transactions as $t) {
-            $theDate = $t->date->format('Y-m-d');
-            $marked[$theDate] = [$t->description,
-                                 $t->description . ': EUR ' . $t->amount];
+        $now = new Carbon;
+        if ($now->diffInMonths($start) > 2) {
+            $cacheTime = 20160;
+        } else {
+            $cacheTime = 1440;
         }
+        $key = Auth::user()->id . $account->id . 'marked' . $start->format('Ymd') . $end->format('Ymd') . 'Marked';
+        if (Cache::has($key)) {
+            return Cache::has($key);
+        } else {
 
-        return $marked;
+            $transactions = $account->transactions()->where(
+                'mark', 1
+            )->betweenDates($start, $end)->get();
+            $marked = [];
+            foreach ($transactions as $t) {
+                $theDate = $t->date->format('Y-m-d');
+                $marked[$theDate] = [$t->description,
+                                     $t->description . ': EUR ' . $t->amount];
+            }
+            Cache::put($key, $marked, $cacheTime);
+            return $marked;
+        }
     }
 
     public static function emptyPrefilledAray()

@@ -32,6 +32,7 @@ class AccountController extends BaseController
         )->get(['account_id', DB::Raw('SUM(`balance`) as aggregate')]);
         $balances = [];
         foreach ($raw as $entry) {
+            /** @noinspection PhpUndefinedFieldInspection */
             $balances[$entry->account_id] = floatval($entry->aggregate);
         }
         return View::make('accounts.index')->with('accounts', $accounts)->with('balances', $balances)->with(
@@ -53,9 +54,7 @@ class AccountController extends BaseController
             $prefilled = AccountHelper::prefilledFromOldInput();
         }
 
-        return View::make('accounts.add')->with(
-            'title', 'Add account'
-        )->with('prefilled', $prefilled);
+        return View::make('accounts.add')->with('title', 'Add account')->with('prefilled', $prefilled);
     }
 
     /**
@@ -65,6 +64,7 @@ class AccountController extends BaseController
      */
     public function postAdd()
     {
+        /** @noinspection PhpUndefinedFieldInspection */
         $data = [
             'name'               => Input::get('name'),
             'openingbalance'     => floatval(Input::get('openingbalance')),
@@ -117,11 +117,8 @@ class AccountController extends BaseController
         if (Input::old()) {
             $prefilled = AccountHelper::prefilledFromOldInput();
         }
-
-
-        return View::make('accounts.edit')->with(
-            'title', 'Edit account ' . $account->name
-        )->with('account', $account)->with('prefilled', $prefilled);
+        return View::make('accounts.edit')->with('title', 'Edit account ' . $account->name)->with('account', $account)
+            ->with('prefilled', $prefilled);
     }
 
     /**
@@ -138,31 +135,29 @@ class AccountController extends BaseController
         $account->openingbalance = floatval(Input::get('openingbalance'));
         $account->openingbalancedate = Input::get('openingbalancedate');
         $account->hidden = Input::get('hidden') == '1' ? 1 : 0;
+        $account->shared = Input::get('shared') == '1' ? 1 : 0;
 
-        // validate and save:
+        // validate it:
         $validator = Validator::make($account->toArray(), Account::$rules);
+
+        // failed!
         if ($validator->fails()) {
-            Session::flash(
-                'error',
-                'Could not save the account.'
-            );
-            return Redirect::route('editaccount', $account->id)->withInput()
-                ->withErrors($validator);
+            Session::flash('error', 'Could not save the account.');
+            return Redirect::route('editaccount', $account->id)->withInput()->withErrors($validator);
         }
+
+        // try to save it
         $result = $account->save();
 
-        if ($result) {
-            Session::flash('success', 'The account has been updated.');
-            return Redirect::to(Session::get('previous'));
-        } else {
-            Session::flash(
-                'error',
-                'Could not save the account. Is the account name unique?'
-            );
+        // failed again!
+        if (!$result) {
+            Session::flash('error', 'Could not save the account. Is the account name unique?');
+            return Redirect::route('editaccount', $account->id)->withInput()->withErrors($validator);
 
-            return Redirect::route('editaccount', $account->id)->withInput()
-                ->withErrors($validator);
         }
+        // success!
+        Session::flash('success', 'The account has been updated.');
+        return Redirect::to(Session::get('previous'));
 
 
     }
@@ -201,120 +196,150 @@ class AccountController extends BaseController
     }
 
     /**
-     * @param Account $account The account.
-     * @param int     $year    The year
-     * @param int     $month   The month
+     * Shows an overview of an account.
      *
-     * @return \Illuminate\View\View|void
+     * @param Account $account
+     *
+     * @return \Illuminate\View\View
      */
-    public function showOverview(Account $account, $year = null, $month = null)
+    public function showOverview(Account $account)
     {
-
-        $date = Toolkit::parseDate($year, $month);
-        $transfers = [];
-        if ($date) {
-            $entries = AccountHelper::generateTransactionListByMonth(
-                $account, $date
-            );
-
-            // also grab a list of transfers by month:
-            $transfers = AccountHelper::generateTransferListByMonth(
-                $account, $date
-            );
-
-            $title = 'Overview for ' . $account->name . ' in ' . $date->format(
-                    'F Y'
-                );
-        } else {
-            $entries = AccountHelper::generateOverviewOfMonths($account);
-            $title = 'Overview for ' . $account->name;
-        }
-
-
-        return View::make('accounts.overview')->with('account', $account)->with(
-            'title', $title
-        )->with(
-                'transactions', $entries
-            )->with('date', $date)->with('transfers', $transfers);
+        $months = AccountHelper::months($account);
+        $title = 'Overview for account "' . $account->name . '"';
+        return View::make('accounts.overview')->with('account', $account)->with('title', $title)->with(
+            'months', $months
+        );
     }
 
     /**
-     * Show the chart overview JSON
+     * Shows the chart that goes with prev.
      *
-     * @param Account $account The account.
-     * @param int     $year    The year
-     * @param int     $month   The month
+     * @param Account $account
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return mixed
      */
-    public function showChartOverview(
-        account $account, $year = null, $month = null
-    ) {
-        $default = new Carbon;
-        $date = Toolkit::parseDate($year, $month, $default);
-        $date = $date->endOfMonth();
-        // make chart
+    public function showOverviewChart(Account $account)
+    {
+        $months = AccountHelper::months($account);
         $chart = App::make('gchart');
-        $chart->addColumn('Day', 'date');
-        $chart->addColumn('Balance', 'number');
+        $chart->addColumn('date', 'date');
+        $chart->addColumn('Balance for "' . $account->name . '"', 'number');
+        foreach ($months as $month) {
+            $chart->addRow($month['date'], $month['balance']);
+        }
+        $chart->generate();
+
+        // catch debug request:
+        if (Input::get('debug') == 'true') {
+            echo '<pre>';
+            print_r($chart->getData());
+            echo '</pre>';
+            return;
+        } else {
+            return $chart->getData();
+        }
+    }
+
+    /**
+     * Same for a specific month.
+     *
+     * @param Account $account
+     * @param         $year
+     * @param         $month
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showOverviewByMonth(Account $account, $year, $month)
+    {
+        $date = Toolkit::parseDate($year, $month);
+        $mutations = AccountHelper::mutations($account, $date);
+        $title = 'Overview for account "' . $account->name . '" in ' . $date->format('F Y');
+        return View::make('accounts.overview-by-month')->with('account', $account)->with('title', $title)->with(
+            'mutations', $mutations
+        )->with('date', $date);
+
+    }
+
+    /**
+     * Chart for account and month
+     *
+     * @param Account $account
+     * @param         $year
+     * @param         $month
+     *
+     * @return mixed
+     */
+    public function showOverviewChartByMonth(Account $account, $year, $month)
+    {
+        $date = Toolkit::parseDate($year, $month);
+        $date->startOfMonth();
+        $end = clone $date;
+        $end->endOfMonth();
+
+        // all columns:
+        $chart = App::make('gchart');
+        $chart->addColumn('date', 'date');
+        $chart->addColumn('Balance for "' . $account->name . '"', 'number');
         $chart->addAnnotation(1);
         $chart->addCertainty(1);
         $chart->addInterval(1);
         $chart->addInterval(1);
 
-        $past = clone $date;
-        $past->startOfMonth();
+        // all annotations:
+        $marked = AccountHelper::getMarkedTransactions($account, $date, $end);
 
-        // get transactions with a marker
-        $marked = AccountHelper::getMarkedTransactions(
-            $account, $past, $date
-        );
+        // first balance:
 
-        $balance = $account->balanceOnDate($past);
+        $now = new Carbon;
+        if ($now < $date) {
+            $balance = $account->balanceOnDate($date);
+        }
 
-        // loop depending on the stuffs
-        // interval values
-        while ($past <= $date) {
-            $current = clone $past;
-            // do a prediction
-            if ($current > $default) {
-                $certain = false;
-                $data = $account->predictOnDate($current);
 
-                // interval above: the 'max' above from the prediction
-                $intervalAbove = ($balance - $data['least']);
-                // interval under: the 'min' above from the prediction
-                $intervalBelow = ($balance - $data['most']);
-
-                $balance -= $data['prediction'];
-
-                // do just the balance
-            } else {
+        while ($date <= $end) {
+            $current = clone $date;
+            if ($current < $now) {
+                // get the past:
                 $certain = true;
                 $balance = $account->balanceOnDate($current);
-                $intervalAbove = $balance;
-                $intervalBelow = $balance;
+                $above = $balance;
+                $below = $balance;
+            } else {
+                // predict the future:
+                $certain = false;
+                $prediction = $account->predictOnDate($current);
+                $above = ($balance - $prediction['least']);
+                $below = ($balance - $prediction['most']);
+
+                $balance -= $prediction['prediction'];
             }
-
-            // find a marker
-            $annotation = isset($marked[$current->format('Y-m-d')])
-                ? $marked[$current->format('Y-m-d')] : null;
-
-            // add the row.
-            $chart->addRow(
-                $current, $balance, $annotation[0], $annotation[1], $certain,
-                $intervalAbove, $intervalBelow
-            );
-            $past->addDay();
+            // get the marked transactions:
+            $annotation = isset($marked[$current->format('Y-m-d')]) ? $marked[$current->format('Y-m-d')] : null;
+            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $below);
+            $date->addDay();
         }
+
         $chart->generate();
+
         if (Input::get('debug') == 'true') {
-            return '<pre>' . print_r($chart->getData(), true) . '</pre>';
+            echo '<pre>';
+            print_r($chart->getData());
+            echo '</pre>';
+            return;
+        } else {
+            return $chart->getData();
         }
 
-        return Response::json($chart->getData());
     }
 
+    /**
+     * Chart for all months.
+     *
+     * @param $year
+     * @param $month
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function showChartAllOverview($year, $month)
     {
         $start = Toolkit::parseDate($year, $month);
@@ -328,15 +353,12 @@ class AccountController extends BaseController
 
         $marked = [];
         $balances = [];
-        $accounts = Auth::user()->accounts()->notHidden()->where(
-            'openingbalancedate', '<=', $start->format('Y-m-d')
-        )->get();
+        $accounts = Auth::user()->accounts()->notHidden()->where('openingbalancedate', '<=', $start->format('Y-m-d'))
+            ->get();
         foreach ($accounts as $account) {
             $x = $chart->addColumn($account->name . ' Balance', 'number');
             $chart->addAnnotation($x);
-            $marked[$account->id] = AccountHelper::getMarkedTransactions(
-                $account, $start, $end
-            );
+            $marked[$account->id] = AccountHelper::getMarkedTransactions($account, $start, $end);
             $balances[$account->id] = $account->balanceOnDate($start);
         }
         // loop again for data:
@@ -349,10 +371,8 @@ class AccountController extends BaseController
 
                 foreach ($accounts as $account) {
                     $balances[$account->id] = $account->balanceOnDate($current);
-                    $annotation = isset($marked[$account->id][$current->format(
-                        'Y-m-d'
-                    )]) ? $marked[$account->id][$current->format('Y-m-d')]
-                        : null;
+                    $annotation = isset($marked[$account->id][$current->format('Y-m-d')])
+                        ? $marked[$account->id][$current->format('Y-m-d')] : null;
                     // add to row:
                     $row[] = $balances[$account->id];
                     $row[] = $annotation[0];
@@ -365,13 +385,9 @@ class AccountController extends BaseController
                 $row[] = null;
             }
             $chart->addRowArray($row);
-
-
             $current->addDay();
         }
         $chart->generate();
-
         return Response::json($chart->getData());
-
     }
 }

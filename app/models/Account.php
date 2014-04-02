@@ -23,7 +23,7 @@ require_once(app_path() . '/helpers/AccountHelper.php');
  * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[]     $transactions
  * @method static Account notHidden()
- * @property boolean $shared
+ * @property boolean                                                          $shared
  * @method static \Illuminate\Database\Query\Builder|\Account whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\Account whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\Account whereUpdatedAt($value)
@@ -49,7 +49,7 @@ class Account extends Eloquent
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
         = ['name', 'openingbalance', 'openingbalancedate', 'currentbalance',
-           'hidden', 'user_id','shared'];
+           'hidden', 'user_id', 'shared'];
 
     /**
      * Account belongs to a User.
@@ -93,12 +93,21 @@ class Account extends Eloquent
         if ($date < $this->openingbalancedate) {
             $date = $this->openingbalancedate;
         }
+        $now = new Carbon;
+        if ($now->diffInMonths($date) > 2) {
+            $cacheTime = 20160;
+        } else {
+            $cacheTime = 10;
+        }
+        $key = $date->format('Y-m-d') . Auth::user()->id . $this->id . '-balanceOndate';
 
-        return floatval(
-            $this->balancemodifiers()->where(
-                'date', '<=', $date->format('Y-m-d')
-            )->sum('balance')
-        );
+        if (cache::has($key)) {
+            return Cache::get($key);
+        } else {
+            $r = floatval($this->balancemodifiers()->where('date', '<=', $date->format('Y-m-d'))->sum('balance'));
+            Cache::put($key, $r, $cacheTime);
+            return $r;
+        }
     }
 
     /**
@@ -134,14 +143,24 @@ class Account extends Eloquent
     public function predictOnDateExpanded(Carbon $date)
     {
         // data that will be returned:
-        $data = ['prediction' => ['most'       => 0, 'least' => 0,
-                                  'prediction' => 0,], 'transactions' => [],
-                 'predictables' => []];
+        $data = [
+            'prediction'   => [
+                'most'       => 0,
+                'least'      => 0,
+                'prediction' => 0
+            ],
+            'transactions' => [],
+            'predictables' => []
+        ];
+
         // dates
         $current = clone $date;
         $dateDay = intval($date->format('d'));
         $predictionDate = AccountHelper::getPredictionStart();
         Log::debug('Predicting for ' . $this->name . ' on ' . $date->format('d-M-Y'));
+
+        // we set current to the first day of the month:
+        $current->firstOfMonth();
 
         // between $predictionDate and $date
         // there are X occurences of the day $date
@@ -150,20 +169,36 @@ class Account extends Eloquent
         // we need those dates.
         $days = [];
         Log::debug('Start looping over days for ' . $date->format('d-M-Y') . '.');
+        Log::debug('Prediction date: ' . $predictionDate->format('d-M-Y') . '.');
         while ($current >= $predictionDate) {
+            Log::debug('Now feeling the waters for ' . $current->format('Y-m-d'));
+            $daysInMonth = intval($current->format('t'));
+            $year = intval($current->format('Y'));
+            $month = intval($current->format('m'));
+            Log::debug($current->format('F Y') . ' has ' . $daysInMonth . ' days.');
+            if ($daysInMonth >= $dateDay) {
+                Log::debug('We can safely add day ' . $dateDay . '.');
+                $current->setDate($year, $month, $dateDay);
+            } else {
+                Log::error('We cannot predict for this exact day. Fallback to day #' . $daysInMonth);
+                $current->setDate($year, $month, $daysInMonth);
+            }
+            Log::debug('Will add ' . $current->format('Y-m-d') . ' to the list');
+            $days[] = clone $current;
 
             // if $current is in the same month as the
             // $date var, we skip it, because it's pretty pointless
             // to compare the current month with itself.
             // this happens on 31-mar, which jumps back to 1-mar.
-            $currentDay = $current->format('d');
+//            $currentDay = $current->format('d');
 
 
-            if ($current != $date && $dateDay == $currentDay) {
-                Log::debug('Added ' . $current->format('d-M-Y'));
-                $days[] = clone $current;
-            }
-            // submonth jumps the wrong way
+//            if ($current != $date && $dateDay == $currentDay) {
+//                Log::debug('Added ' . $current->format('d-M-Y'));
+//                $days[] = clone $current;
+//            }
+            // submonth jumps the wrong way!
+            $current->firstOfMonth();
             $current->subMonth();
         }
         Log::debug('End of loop');

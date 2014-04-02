@@ -48,9 +48,12 @@ class Setting extends Eloquent
      */
     public static function getSetting($name)
     {
-        $userSetting = Auth::user()->settings()->where(
-            'name', $name
-        )->first();
+        $key = Auth::user()->id.'setting'.$name;
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        } else {
+        $userSetting = Auth::user()->settings()->where('name', $name)->first();
+
         if (is_null($userSetting)) {
             // create a new setting with the default
             // value from a config file:
@@ -65,8 +68,9 @@ class Setting extends Eloquent
                 $userSetting->save();
             }
         }
-
+        Cache::put($key,$userSetting,2880);
         return $userSetting;
+        }
     }
 
     /**
