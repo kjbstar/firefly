@@ -18,13 +18,25 @@ class AccountController extends BaseController
      */
     public function showIndex()
     {
-        $accounts = Auth::user()->accounts()->get()->each(
-            function ($account) {
-                $account->today = $account->balanceOnDate(new Carbon);
-            }
+        // get the accounts:
+        $accounts = Auth::user()->accounts()->get();
+        // get their id's:
+        $ids = [];
+        foreach ($accounts as $account) {
+            $ids[] = $account->id;
+        }
+        // get balances:
+        $date = new Carbon;
+        $raw = Balancemodifier::where('date', '<=', $date->format('Y-m-d'))->whereIn('account_id', $ids)->groupBy(
+            'account_id'
+        )->get(['account_id', DB::Raw('SUM(`balance`) as aggregate')]);
+        $balances = [];
+        foreach ($raw as $entry) {
+            $balances[$entry->account_id] = floatval($entry->aggregate);
+        }
+        return View::make('accounts.index')->with('accounts', $accounts)->with('balances', $balances)->with(
+            'title', 'All accounts'
         );
-
-        return View::make('accounts.index')->with('accounts', $accounts)->with('title', 'All accounts');
     }
 
     /**
