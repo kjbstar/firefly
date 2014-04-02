@@ -65,41 +65,40 @@ class AccountController extends BaseController
      */
     public function postAdd()
     {
-        $data = [];
-
-        $data['name'] = Input::get('name');
-        $data['openingbalance'] = floatval(Input::get('openingbalance'));
-        $data['currentbalance'] = floatval(Input::get('openingbalance'));
-        $data['openingbalancedate'] = Input::get('openingbalancedate');
-        $data['hidden'] = Input::get('hidden') == '1' ? 1 : 0;
-        $data['shared'] = Input::get('shared') == '1' ? 1 : 0;
-
+        $data = [
+            'name'               => Input::get('name'),
+            'openingbalance'     => floatval(Input::get('openingbalance')),
+            'currentbalance'     => floatval(Input::get('openingbalance')),
+            'openingbalancedate' => Input::get('openingbalancedate'),
+            'hidden'             => Input::get('hidden') == '1' ? 1 : 0,
+            'shared'             => Input::get('shared') == '1' ? 1 : 0,
+            'user_id'            => Auth::user()->id
+        ];
+        // create the new account:
         $account = new Account($data);
-        /** @noinspection PhpParamsInspection */
-        $account->user()->associate(Auth::user());
+
+        // validate it:
         $validator = Validator::make($account->toArray(), Account::$rules);
+
+        // validation failed!
         if ($validator->fails()) {
-            Session::flash(
-                'error',
-                'Validation failed. Please try harder.'
-            );
-            return Redirect::route('addaccount')->withErrors($validator)
-                ->withInput();
+            Session::flash('error', 'Validation failed. Please try harder.');
+            return Redirect::route('addaccount')->withErrors($validator)->withInput();
         }
+
+        // try to save it:
         $result = $account->save();
-        if ($result) {
-            Session::flash('success', 'The changes has been saved.');
 
-            return Redirect::to(Session::get('previous'));
-        } else {
-            Session::flash(
-                'error',
-                'Could not save the new account. Is the account name unique?'
-            );
+        // it failed again!
+        if (!$result) {
+            Session::flash('error', 'Could not save the new account. Is the account name unique?');
+            return Redirect::route('addaccount')->withErrors($validator)->withInput();
 
-            return Redirect::route('addaccount')->withErrors($validator)
-                ->withInput();
         }
+
+        // success!
+        Session::flash('success', 'The changes has been saved.');
+        return Redirect::to(Session::get('previous'));
     }
 
     /**
