@@ -258,11 +258,10 @@ class TransactionTrigger
      */
     public function subscribe(\Illuminate\Events\Dispatcher $events)
     {
-        $events->listen(
-            'eloquent.creating: Transaction',
-            'TransactionTrigger@createTransaction'
-        );
-        $events->listen('eloquent.created: Transaction', 'TransactionTrigger@pushTransaction');
+        $events->listen('eloquent.creating: Transaction','TransactionTrigger@createTransaction');
+        // TODO this is too early; the components have not yet been saved.
+        //$events->listen('eloquent.created: Transaction', 'TransactionTrigger@pushTransaction');
+        // TODO this is too early; the components have not yet been saved.
         $events->listen('eloquent.updated: Transaction','TransactionTrigger@pushTransaction');
 
         $events->listen('eloquent.deleted: Transaction','TransactionTrigger@deleteTransaction');

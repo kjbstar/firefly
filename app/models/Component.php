@@ -119,6 +119,16 @@ class Component extends Eloquent
     }
 
     /**
+     * Get the transfers belonging to this component.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function transfers()
+    {
+        return $this->belongsToMany('Transfer');
+    }
+
+    /**
      * Get the predictables belonging to this component.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany

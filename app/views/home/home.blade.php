@@ -170,7 +170,7 @@
     <div class="col-lg-12 col-md-12"><h4>Other months</h4>
         @foreach($history as $h)
         <a class="btn btn-info btn-xs" style="margin:2px;" href="{{$h['url']}}">{{{$h['title']}}}</a>
-        @if(isset($h['newline']))
+        @if($h['newline'] === true)
         <br />
         @endif
         @endforeach

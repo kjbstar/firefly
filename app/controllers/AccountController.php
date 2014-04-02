@@ -241,15 +241,7 @@ class AccountController extends BaseController
     ) {
         $default = new Carbon;
         $date = Toolkit::parseDate($year, $month, $default);
-
-        if ($date === $default) {
-            $period = 2; // two months
-            $date->addDays(2);
-        } else {
-            $period = 1; // one month
-            $date->lastOfMonth();
-        }
-
+        $date = $date->endOfMonth();
         // make chart
         $chart = App::make('gchart');
         $chart->addColumn('Day', 'date');
@@ -260,7 +252,6 @@ class AccountController extends BaseController
         $chart->addInterval(1);
 
         $past = clone $date;
-        $past->subMonths($period);
         $past->startOfMonth();
 
         // get transactions with a marker

@@ -33,15 +33,23 @@ class Toolkit
 
     public static function getFrontpageAccount()
     {
-        $frontpageAccount = Setting::getSetting('frontpageAccount');
-        if($frontpageAccount->value == '') {
-            return Auth::user()->accounts()->first();
+        $key = Auth::user()->id.'frontPageAccount';
+        if (Cache::has($key)) {
+            return Cache::get($key);
         } else {
-            return Auth::user()->accounts()->find($frontpageAccount->value);
+            $frontpageAccount = Setting::getSetting('frontpageAccount');
+            if ($frontpageAccount->value == '') {
+                $account = Auth::user()->accounts()->first();
+            } else {
+                $account = Auth::user()->accounts()->find($frontpageAccount->value);
+            }
+            Cache::put($key, $account, 10080);
+            return $account;
         }
     }
 
-    public static function getPredictionStart() {
+    public static function getPredictionStart()
+    {
         $setting = Setting::getSetting('predictionStart');
         return $setting->value;
 
@@ -49,14 +57,21 @@ class Toolkit
 
     public static function getEarliestEvent()
     {
-        $account = Auth::user()->accounts()->orderBy(
-            'openingbalancedate', 'ASC'
-        )->first();
-        if ($account) {
-            $date = $account->openingbalancedate;
+        $key = Auth::user()->id.'getEarliestEvent';
+        if (Cache::has($key)) {
+            return Cache::get($key);
         } else {
-            $date = new Carbon;
+            $account = Auth::user()->accounts()->orderBy(
+                'openingbalancedate', 'ASC'
+            )->first();
+            if ($account) {
+                $date = $account->openingbalancedate;
+            } else {
+                $date = new Carbon;
+            }
+            Cache::put($key, $date, 10080);
+            return $date;
         }
-        return $date;
+
     }
 }

@@ -24,21 +24,16 @@ class HomeHelper
         $accounts = [];
 
         foreach ($query as $account) {
-            $url = URL::Route(
-                'accountoverview',
-                [$account->id, $date->format('Y'), $date->format('m')]
-            );
-
-            $entry = [];
-            $entry['name'] = $account->name;
-            $entry['url'] = $url;
-            $entry['current'] = $account->balanceOnDate($date);
-            $entry['shared'] = $account->shared == 1 ? true : false;
-            $accounts[] = $entry;
+            $url = URL::Route('accountoverview', [$account->id, $date->format('Y'), $date->format('m')]);
+            $accounts[] = [
+                'name'    => $account->name,
+                'url'     => $url,
+                'current' => $account->balanceOnDate($date),
+                'shared'  => $account->shared == 1 ? true : false,
+            ];
         }
 
         unset($query);
-
         return $accounts;
     }
 
@@ -69,7 +64,33 @@ class HomeHelper
 
             }
         }
-        
+
+        // Add transfers to shared accounts as expenses:
+        $transfers = Auth::user()->transfers()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+            ->beforeDate($date)->get(['transfers.*']);
+        foreach ($transfers as $t) {
+            // get the budget
+            if ($t->budget) {
+                // basic budget info:
+                $id = $t->budget->id;
+                if (isset($budgets[$id])) {
+                    // only add information
+                    $budgets[$id]['spent'] += $t->amount;
+                } else {
+                    // create new one:
+                    $budgets[$id] = ['name'  => $t->budget->name,
+                                     'spent' => $t->amount];
+                    // limit:
+                    $limit = $t->budget->limits()->inMonth($date)->first();
+                    if ($limit) {
+                        $budgets[$id]['limit'] = $limit->amount;
+                    }
+
+                }
+
+            }
+        }
+
 
         // loop budgets for percentages:
         foreach ($budgets as $id => $budget) {
@@ -95,45 +116,48 @@ class HomeHelper
 
     public static function getAllowance(Carbon $date)
     {
-        // default values and array
+        // get the allowance (setting) for this month, OR specific month.
+        // and grab the value:
         $defaultAllowance = Setting::getSetting('defaultAllowance');
+        $specificAllowance = Auth::user()->settings()->where('name', 'specificAllowance')->where(
+            'date', $date->format('Y-m') . '-01'
+        )->first();
+        $amount = !is_null($specificAllowance) ? $specificAllowance->value : $defaultAllowance->value;
+        unset($specificAllowance, $defaultAllowance);
 
-        $specificAllowance = Auth::user()->settings()->where(
-            'name', 'specificAllowance'
-        )->where('date', $date->format('Y-m') . '-01')->first();
-        $allowance = !is_null($specificAllowance) ? $specificAllowance
-            : $defaultAllowance;
+        // make the default array:
+        // days = number of days left, used as a percentage:
+        $allowance = [
+            'amount' => $amount,
+            'over'   => false,
+            'spent'  => 0,
+            'days'   => round((intval($date->format('d')) / intval($date->format('t'))) * 100)
+        ];
 
-        $amount = floatval($allowance->value);
-        $allowance = ['amount' => $amount, 'over' => false, 'spent' => 0];
-        $days = round(
-            (intval($date->format('d')) / intval(
-                    $date->format('t')
-                )) * 100
-        );
-        $allowance['days'] = $days;
-        // start!
+        // start with the allowance thing,
+        // if relevant:
         if ($amount > 0) {
+            // get all transactions and ignore transactions from shared accounts:
             $spent = floatval(
-                    Auth::user()->transactions()->inMonth($date)->expenses()->where('ignoreallowance', 0)->sum('amount')
+                    Auth::user()->transactions()->inMonth($date)->expenses()->where('ignoreallowance', 0)->leftJoin(
+                        'accounts', 'accounts.id', '=', 'transactions.account_id'
+                    )->where('accounts.shared', 0)->sum('amount')
                 ) * -1;
 
-            // Also count transfers that went to a shared account:
-            $spentOnShared = floatval(Auth::user()->transfers()->leftJoin('accounts','accounts.id','=','transfers.accountto_id')
-            ->inMonth($date)->sum('amount')
+            // also count transfers that went to a shared account:
+            $spentOnShared = floatval(
+                Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')->where(
+                    'accounts.shared', 1
+                )->inMonth($date)->sum('amount')
             );
 
-
+            // save it as the spent amount:
             $allowance['spent'] = $spent + $spentOnShared;
-            // overspent this allowance:
+            // if we have overspent:
             if ($spent > $amount) {
                 $allowance['over'] = true;
-                $allowance['pct'] = round(($amount / $spent) * 100);
             }
-            // did not overspend this allowance.
-            if ($spent <= $amount) {
-                $allowance['pct'] = round(($spent / $amount) * 100);
-            }
+            $allowance['pct'] = round(($spent / $amount) * 100);
         }
 
         return $allowance;
@@ -151,6 +175,36 @@ class HomeHelper
             }
         }
         return $list;
+    }
+
+    public static function transactions(Carbon $date)
+    {
+        return Auth::user()->transactions()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+            ->get();
+    }
+
+    public static function transfers(Carbon $date)
+    {
+        return Auth::user()->transfers()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get(
+        );
+    }
+
+    public static function history()
+    {
+        $earliest = Toolkit::getEarliestEvent();
+        $history = [];
+        $now = new Carbon;
+        $now->addMonth();
+        while ($now > $earliest) {
+            $url = URL::Route('home', [$now->format('Y'), $now->format('n')]);
+            $history[] = [
+                'url'     => $url,
+                'title'   => $now->format('F Y'),
+                'newline' => ($now->format('m') == '1') ? true : false,
+            ];
+            $now->subMonth();
+        }
+        return $history;
     }
 
 }

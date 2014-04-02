@@ -6,6 +6,33 @@ use Carbon\Carbon as Carbon;
  */
 class ComponentHelper
 {
+
+
+    public static function mutations(Component $component, Carbon $date = null)
+    {
+        $transfersQuery = $component->transfers()->orderBy('date', 'DESC')->orderBy('id', 'DESC');
+        $transactionsQuery = $component->transactions()->orderBy('date', 'DESC')->orderBy('id', 'DESC');
+        if (!is_null($date)) {
+            $transfersQuery->inMonth($date);
+            $transactionsQuery->inMonth($date);
+        }
+        $transfers = $transfersQuery->get();
+        echo count($transfers);
+        $transactions = $transactionsQuery->get();
+
+        if (count($transfers) > 0 && count($transactions) > 0) {
+            $list = array_merge($transactions->toArray(), $transfers->toArray());
+            usort($list, 'CompareSortMutations');
+        } else {
+            $list = [];
+        }
+        return $list;
+
+
+
+
+    }
+
     /**
      * Generate an array containing all months starting one
      * year ago up until now, detailing various statistics of said month.
@@ -14,7 +41,7 @@ class ComponentHelper
      *
      * @return array
      */
-    public static function generateOverviewOfMonths(Component $component)
+    public static function overviewOfMonths(Component $component)
     {
         $end = new Carbon;
         $end->addMonth();
@@ -167,6 +194,33 @@ class ComponentHelper
         }
         return null;
 
+    }
+
+}
+
+function CompareSortMutations($a, $b)
+{
+    $dateObjectA = new Carbon($a['date']);
+    $dateObjectB = new Carbon($b['date']);
+    $createdAtObjectA = new Carbon($a['created_at']);
+    $createdAtObjectB = new Carbon($b['created_at']);
+
+    if ($dateObjectA == $dateObjectB) {
+        if ($createdAtObjectA == $createdAtObjectB) {
+            return 0;
+        } else {
+            if ($createdAtObjectA < $createdAtObjectB) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+    } else {
+        if ($dateObjectA < $dateObjectB) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 
 }

@@ -38,7 +38,6 @@ class HomeController extends BaseController
      */
     public function showHome($year = null, $month = null)
     {
-        $earliest = Toolkit::getEarliestEvent();
         $today = Toolkit::parseDate($year, $month, new Carbon);
         $actual = new Carbon;
         // fix $today if it's in this month:
@@ -55,35 +54,10 @@ class HomeController extends BaseController
         $accounts = HomeHelper::homeAccountList($today);
         $allowance = HomeHelper::getAllowance($today);
         $predictables = HomeHelper::getPredictables($today);
-        // budget overview.
         $budgets = HomeHelper::budgetOverview($today);
-
-        // TODO move to homehelper
-        $transactions = Auth::user()->transactions()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth(
-            $today
-        )->get();
-        $transfers = Auth::user()->transfers()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($today)
-            ->get();
-
-
-        // build a history:
-        $history = [];
-        $now = new Carbon;
-        $now->addMonth();
-        while ($now > $earliest) {
-
-
-            $url = URL::Route('home', [$now->format('Y'), $now->format('n')]);
-            $entry = [];
-            $entry['url'] = $url;
-            $entry['title'] = $now->format('F Y');
-            if ($now->format('m') == '1') {
-                $entry['newline'] = true;
-            }
-            $history[] = $entry;
-            $now->subMonth();
-        }
-
+        $transactions = HomeHelper::transactions($today);
+        $transfers = HomeHelper::transfers($today);
+        $history = HomeHelper::history();
 
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(
             'history', $history

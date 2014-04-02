@@ -92,7 +92,7 @@ class TransactionController extends BaseController
             return Redirect::route('addtransaction')->withInput()->withErrors($validator);
         }
         $result = $transaction->save();
-        if(!$result) {
+        if (!$result) {
             Session::flash('error', 'Could not save transaction.');
             return Redirect::route('addtransaction')->withInput()->withErrors($validator);
         }
@@ -127,7 +127,7 @@ class TransactionController extends BaseController
             'transaction', $transaction
         )->with('accounts', $accounts)->with(
                 'title', 'Edit transaction ' . $transaction->description
-            )->with('prefilled',$prefilled);
+            )->with('prefilled', $prefilled);
     }
 
     /**
@@ -172,7 +172,14 @@ class TransactionController extends BaseController
             $transaction->attachComponent($budget);
             $transaction->attachComponent($category);
 
-            $transaction->save();
+            $result = $transaction->save();
+            if (!$result) {
+                Session::flash('error', 'The transaction could not be saved.');
+                Log::debug('These rules failed: ' . print_r($validator->messages()->all(), true));
+                return Redirect::route('edittransaction', $transaction->id)
+                    ->withInput()->withErrors($validator);
+            }
+            Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
             Session::flash('success', 'The transaction has been saved.');
 
             return Redirect::to(Session::get('previous'));

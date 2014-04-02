@@ -21,7 +21,7 @@ class ComponentHelperTest extends TestCase
         $now->addMonth();
         $diff = $now->diffInMonths($start) + 1;
         $component = Auth::user()->components()->first();
-        $list = ComponentHelper::generateOverviewOfMonths($component);
+        $list = ComponentHelper::overviewOfMonths($component);
         $this->assertCount($diff,$list);
     }
 

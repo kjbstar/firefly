@@ -55,7 +55,7 @@ class ComponentController extends BaseController
     /**
      * Shows all transactions without component of type X.
      *
-     * @param int $year The year
+     * @param int $year  The year
      * @param int $month the month
      *
      * @return View
@@ -91,7 +91,7 @@ class ComponentController extends BaseController
         return View::make('components.add')->with('title', 'Add new ' . OBJ)
             ->with(
                 'parents', $parents
-            )->with('prefilled',$prefilled);
+            )->with('prefilled', $prefilled);
     }
 
     /**
@@ -166,7 +166,7 @@ class ComponentController extends BaseController
         $parents = ComponentHelper::getParentList(OBJ, $component);
         return View::make('components.edit')->with('object', $component)->with(
             'parents', $parents
-        )->with('title', 'Edit ' . OBJ . ' ' . $component->name)->with('prefilled',$prefilled);
+        )->with('title', 'Edit ' . OBJ . ' ' . $component->name)->with('prefilled', $prefilled);
     }
 
     /**
@@ -205,8 +205,7 @@ class ComponentController extends BaseController
                     'Could not save the ' . OBJ . '. Is the name unique?'
                 );
 
-                return Redirect::route('edit' . OBJ, $component->id)->withInput(
-                )->withErrors($validator);
+                return Redirect::route('edit' . OBJ, $component->id)->withInput()->withErrors($validator);
             }
 
 
@@ -261,39 +260,42 @@ class ComponentController extends BaseController
     ) {
         $forceMontly = Input::get('monthly') == 'true' ? true : false;
         $date = Toolkit::parseDate($year, $month);
-        $parent = is_null($component->parent_component_id) ? null
-            : $component->parentComponent()->first();
+        $parent = is_null($component->parent_component_id) ? null : $component->parentComponent()->first();
+        $count = $component->transactions()->count() + $component->transfers()->count();
 
-        // switch on the presence of a date:
-        $display = 'transactions';
-        if (is_null($date)) {
-            // count the list of transactions:
-            $count = $component->transactions()->count();
-            if ($count > 50 || $forceMontly) {
-                $display = 'months';
-                $entries = ComponentHelper::generateOverviewOfMonths(
-                    $component
-                );
-            } else {
-                $entries = $component->transactions()->orderBy('date', 'DESC')
-                    ->get();
-            }
+        // forced month view:
+        if (($forceMontly || $count > 50) && is_null($date)) {
+            // display overview grouped on months.
+            $display = 'months';
+            $entries = ComponentHelper::overviewOfMonths($component);
         } else {
-            $entries = ComponentHelper::generateTransactionListByMonth(
-                $component, $date
-            );
+            // display overview of current month or all transactions + transfers
+            $display = 'mutations';
+            $entries = ComponentHelper::mutations($component, $date);
         }
+        // switch on the presence of a date:
+//
+//        if (is_null($date)) {
+//            // count the list of transactions:
+//
+//            if ($count > 50 || $forceMontly) {
+//
+//
+//            } else {
+//                $entries = $component->transactions()->orderBy('date', 'DESC')->get();
+//            }
+//        } else {
+//            $entries = ComponentHelper::generateTransactionListByMonth($component, $date);
+//        }
         $title = 'Overview for ' . OBJ . ' "' . $component->name . '"';
         if (!is_null($date)) {
             $title .= ' in ' . $date->format('F Y');
         }
 
 
-        return View::make('components.overview')->with('title', $title)->with(
-            'component', $component
-        )->with('transactions', $entries)->with('parent', $parent)->with(
-                'date', $date
-            )->with('display', $display);
+        return View::make('components.overview')->with('title', $title)->with('component', $component)->with(
+            'transactions', $entries
+        )->with('parent', $parent)->with('date', $date)->with('display', $display);
     }
 
     /**
@@ -309,7 +311,7 @@ class ComponentController extends BaseController
             $name = $o->name;
             $parent = $o->parentComponent()->first();
             if ($parent) {
-                $name = $parent->name.'/'.$name;
+                $name = $parent->name . '/' . $name;
             }
             $return[] = $name;
         }

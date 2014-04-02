@@ -14,7 +14,7 @@
         <h3>Child of {{{$parent->name}}}</h3>
         @endif
 
-        @if(is_null($date) && $display == 'transactions')
+        @if(is_null($date) && $display == 'mutations')
         <p>
             <a href="{{URL::Route(OBJ.'overview',$component->id)}}?monthly=true" class="btn btn-default"><span class="glyphicon glyphicon-time"></span> Force montly overview</a>
         </p>
