@@ -1552,6 +1552,8 @@ return array(
     'PHP_CodeSniffer_Tokenizers_JS' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/Tokenizers/JS.php',
     'PHP_CodeSniffer_Tokenizers_PHP' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/Tokenizers/PHP.php',
     'PHP_CodeSniffer_Tokens' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/Tokens.php',
+    'PHP_Invoker' => $vendorDir . '/phpunit/php-invoker/PHP/Invoker.php',
+    'PHP_Invoker_TimeoutException' => $vendorDir . '/phpunit/php-invoker/PHP/Invoker/TimeoutException.php',
     'PHP_Timer' => $vendorDir . '/phpunit/php-timer/PHP/Timer.php',
     'PHP_Token' => $vendorDir . '/phpunit/php-token-stream/PHP/Token.php',
     'PHP_TokenWithScope' => $vendorDir . '/phpunit/php-token-stream/PHP/Token.php',
