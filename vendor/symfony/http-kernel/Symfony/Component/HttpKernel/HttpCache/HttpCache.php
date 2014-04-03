@@ -308,7 +308,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if ($this->options['allow_reload'] && $request->isNoCache()) {
             $this->record($request, 'reload');
 
-            return $this->fetch($request);
+            return $this->fetch($request, $catch);
         }
 
         try {
@@ -522,7 +522,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     protected function lock(Request $request, Response $entry)
     {
         // try to acquire a lock to call the backend
-        $lock = $this->store->lock($request, $entry);
+        $lock = $this->store->lock($request);
 
         // there is already another process calling the backend
         if (true !== $lock) {

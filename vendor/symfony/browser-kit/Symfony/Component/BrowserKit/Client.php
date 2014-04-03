@@ -97,9 +97,7 @@ abstract class Client
     public function insulate($insulated = true)
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
-            // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
-            // @codeCoverageIgnoreEnd
         }
 
         $this->insulated = (Boolean) $insulated;
@@ -297,6 +295,15 @@ abstract class Client
         }
 
         $uri = $this->getAbsoluteUri($uri);
+
+        if (isset($server['HTTP_HOST'])) {
+            $uri = preg_replace('{^(https?\://)'.parse_url($uri, PHP_URL_HOST).'}', '\\1'.$server['HTTP_HOST'], $uri);
+        }
+
+        if (isset($server['HTTPS'])) {
+            $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
+        }
+
         $server = array_merge($this->server, $server);
 
         if (!$this->history->isEmpty()) {
@@ -384,9 +391,7 @@ abstract class Client
      */
     protected function getScript($request)
     {
-        // @codeCoverageIgnoreStart
         throw new \LogicException('To insulate requests, you need to override the getScript() method.');
-        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -513,7 +518,7 @@ abstract class Client
         }
 
         $server = $request->getServer();
-        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
+        $server = $this->updateServerFromUri($server, $this->redirect);
 
         $this->isMainRequest = false;
 
@@ -594,5 +599,15 @@ abstract class Client
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
+    }
+
+    private function updateServerFromUri($server, $uri)
+    {
+        $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
+        $scheme = parse_url($uri, PHP_URL_SCHEME);
+        $server['HTTPS'] = null === $scheme ? $server['HTTPS'] : 'https' == $scheme;
+        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
+
+        return $server;
     }
 }

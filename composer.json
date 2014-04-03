@@ -10,9 +10,7 @@
         "squizlabs/php_codesniffer": "1.*",
         "barryvdh/laravel-ide-helper": "1.*",
         "davejamesmiller/laravel-breadcrumbs": "2.*",
-        "phpunit/phpunit": "4.*",
-        "phpunit/php-invoker": "1.*",
-        "phpunit/php-code-coverage": "2.1.*"
+        "phpunit/phpunit": "4.*"
 
     },
     "autoload": {
