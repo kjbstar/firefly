@@ -1,10 +1,16 @@
 <?php
 
 
+/**
+ * Class PiggybankHelper
+ */
 class PiggybankHelper
 {
 
 
+    /**
+     * @return array
+     */
     public static function emptyPrefilledAray()
     {
         return [
@@ -14,6 +20,9 @@ class PiggybankHelper
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function prefilledFromOldInput()
     {
         return [
@@ -23,6 +32,11 @@ class PiggybankHelper
         ];
     }
 
+    /**
+     * @param Piggybank $pig
+     *
+     * @return array
+     */
     public static function prefilledFromPiggybank(Piggybank $pig)
     {
         return [

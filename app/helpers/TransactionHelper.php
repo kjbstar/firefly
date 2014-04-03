@@ -1,8 +1,14 @@
 <?php
 
 
+/**
+ * Class TransactionHelper
+ */
 class TransactionHelper
 {
+    /**
+     * @return array
+     */
     public static function emptyPrefilledAray()
     {
         return [
@@ -19,6 +25,11 @@ class TransactionHelper
         ];
     }
 
+    /**
+     * @param Predictable $predictable
+     *
+     * @return array
+     */
     public static function prefilledFromPredictable(Predictable $predictable)
     {
         $dayOfMonth = sprintf('%02d', $predictable->dom);
@@ -36,6 +47,11 @@ class TransactionHelper
         ];
     }
 
+    /**
+     * @param Transaction $transaction
+     *
+     * @return array
+     */
     public static function prefilledFromTransaction(Transaction $transaction)
     {
         return [
@@ -52,6 +68,9 @@ class TransactionHelper
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function prefilledFromOldInput()
     {
         return ['description'      => Input::old('description'),

@@ -9,7 +9,7 @@
         in {{$date->format('F Y')}}
         @endif
         </h2>
-        @include('list.transactions')
+        @include('list.mutations')
     </div>
 </div>
 @stop

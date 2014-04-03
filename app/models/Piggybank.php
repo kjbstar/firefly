@@ -3,14 +3,14 @@
 /**
  * An Eloquent Model: 'Piggybank'
  *
- * @property integer $id
+ * @property integer        $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property integer $user_id
- * @property string $name
- * @property float $amount
- * @property float $target
- * @property-read \User $user
+ * @property integer        $user_id
+ * @property string         $name
+ * @property float          $amount
+ * @property float          $target
+ * @property-read \User     $user
  * @method static \Illuminate\Database\Query\Builder|\Piggybank whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\Piggybank whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\Piggybank whereUpdatedAt($value)
@@ -30,24 +30,38 @@ class Piggybank extends Eloquent
         = ['name', 'amount', 'target', 'user_id'];
 
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo('User');
     }
 
+    /**
+     * @param $value
+     *
+     * @return string
+     */
     public function getNameAttribute($value)
     {
         return Crypt::decrypt($value);
     }
 
+    /**
+     * @param $value
+     */
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = Crypt::encrypt($value);
     }
 
+    /**
+     * @return float|int
+     */
     public function pctFilled()
     {
-        if (is_null($this->target)) {
+        if (is_null($this->target) || $this->target == 0) {
             return 0;
         } else {
             $pct = round(($this->amount / $this->target) * 100);

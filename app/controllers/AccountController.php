@@ -231,10 +231,7 @@ class AccountController extends BaseController
 
         // catch debug request:
         if (Input::get('debug') == 'true') {
-            echo '<pre>';
-            print_r($chart->getData());
-            echo '</pre>';
-            return;
+            return '<pre>'.print_r($chart->getData(),true).'</pre>';
         } else {
             return $chart->getData();
         }
@@ -293,6 +290,8 @@ class AccountController extends BaseController
         $now = new Carbon;
         if ($now < $date) {
             $balance = $account->balanceOnDate($date);
+            $above = $balance;
+            $below = $balance;
         }
 
 
@@ -308,9 +307,12 @@ class AccountController extends BaseController
                 // predict the future:
                 $certain = false;
                 $prediction = $account->predictOnDate($current);
-                $above = ($balance - $prediction['least']);
-                $below = ($balance - $prediction['most']);
+                /** @noinspection PhpUndefinedVariableInspection */
+                $above -= $prediction['least'];
+                /** @noinspection PhpUndefinedVariableInspection */
+                $below -= $prediction['most'];
 
+                /** @noinspection PhpUndefinedVariableInspection */
                 $balance -= $prediction['prediction'];
             }
             // get the marked transactions:
@@ -322,10 +324,7 @@ class AccountController extends BaseController
         $chart->generate();
 
         if (Input::get('debug') == 'true') {
-            echo '<pre>';
-            print_r($chart->getData());
-            echo '</pre>';
-            return;
+            return '<pre>'.print_r($chart->getData(),true).'</pre>';
         } else {
             return $chart->getData();
         }

@@ -52,6 +52,7 @@ class TransferController extends BaseController
      */
     public function postAdd()
     {
+        /** @noinspection PhpUndefinedFieldInspection */
         $data = ['description'    => Input::get('description'),
                  'amount'         => floatval(Input::get('amount')),
                  'accountfrom_id' => intval(Input::get('accountfrom_id')),

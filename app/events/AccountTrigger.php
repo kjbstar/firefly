@@ -124,8 +124,7 @@ class AccountTrigger
         $account->balancemodifiers()->beforeDay($newDate)->delete();
 
         // update one on new date (if it exists, it doesn't have to).
-        $balanceModifier = $account->balancemodifiers()->onDay($newDate)->first(
-        );
+        $balanceModifier = $account->balancemodifiers()->onDay($newDate)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier();
             $balanceModifier->account()->associate($account);
@@ -186,10 +185,15 @@ class AccountTrigger
         return true;
     }
 
+    /**
+     * @param Account $account
+     *
+     * @return bool
+     */
     public function validateAccountName(Account $account)
     {
         $user = Auth::user();
-        if(is_null(Auth::user())) {
+        if (is_null(Auth::user())) {
             $user = User::find($account->user_id);
         }
         if (is_null($account->id)) {

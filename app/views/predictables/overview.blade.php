@@ -7,7 +7,7 @@
         <p>
             Predictable "{{$predictable->description}}" triggers on amounts between
         {{mf($predictable->amount*(1-($predictable->pct/100)),true)}}
-         and {{mf($predictable->amount*(1+($predictable->pct/100)),true)}} and will occur on or around the {{$predictable->dom_display}}.
+         and {{mf($predictable->amount*(1+($predictable->pct/100)),true)}} and will occur on or around the {{$predictable->domDisplay}}.
         </p>
         <p>
             @if($predictable->components()->count() > 0)

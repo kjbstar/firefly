@@ -17,25 +17,29 @@ class ComponentController extends BaseController
      */
     public function showIndex()
     {
-        $objects = Auth::user()->components()->whereNull('parent_component_id')
-            ->where('type', OBJ)->get();
+        $objects = Auth::user()->components()->whereNull('parent_component_id')->with('childrencomponents')->where(
+            'type', OBJ
+        )->get();
         $result = [];
-        $parents = []; // for multisort.
+        $parents = []; // used in for multisort.
         foreach ($objects as $obj) {
-            $current = [];
             $parents[] = $obj->name;
-            $current['id'] = $obj->id;
-            $current['name'] = $obj->name;
-            $current['children'] = [];
 
-            $children = $obj->childrenComponents()->get();
+            $current = [
+                'id'       => $obj->id,
+                'name'     => $obj->name,
+                'children' => []
+            ];
 
-            $names = []; // for multisort.
-            foreach ($children as $c) {
-                $child = [];
+            // used in for multisort.
+            $names = [];
+            foreach ($obj->childrencomponents as $c) {
+
                 $names[] = $c->name;
-                $child['id'] = $c->id;
-                $child['name'] = $c->name;
+                $child = [
+                    'id'   => $c->id,
+                    'name' => $c->name
+                ];
                 // add to array:
                 $current['children'][] = $child;
             }
@@ -46,10 +50,7 @@ class ComponentController extends BaseController
 
         array_multisort($parents, SORT_STRING, $result);
 
-        return View::make('components.index')->with('title', 'All ' . OBJS)
-            ->with(
-                'objects', $result
-            );
+        return View::make('components.index')->with('title', 'All ' . OBJS)->with('objects', $result);
     }
 
     /**
@@ -66,11 +67,8 @@ class ComponentController extends BaseController
 
         $list = ComponentHelper::transactionsWithoutComponent(OBJ, $date);
 
-        return View::make('components.empty')->with(
-            'title', 'Transactions without a ' . OBJ
-        )->with(
-                'transactions', $list
-            )->with('date', $date);
+        return View::make('components.empty')->with('title', 'Transactions without a ' . OBJ)->with('mutations', $list)
+            ->with('date', $date);
     }
 
     /**
@@ -88,10 +86,9 @@ class ComponentController extends BaseController
         }
         $parents = ComponentHelper::getParentList(OBJ);
 
-        return View::make('components.add')->with('title', 'Add new ' . OBJ)
-            ->with(
-                'parents', $parents
-            )->with('prefilled', $prefilled);
+        return View::make('components.add')->with('title', 'Add new ' . OBJ)->with('parents', $parents)->with(
+            'prefilled', $prefilled
+        );
     }
 
     /**
@@ -101,50 +98,35 @@ class ComponentController extends BaseController
      */
     public function postAdd()
     {
-        $parentID = intval(Input::get('parent_component_id')) > 0 ? intval(
-            Input::get('parent_component_id')
-        ) : null;
-        $data = [];
-
-        $data['name'] = Input::get('name');
-        $data['parent_component_id'] = $parentID;
-        $data['user_id'] = Auth::user()->id;
-        $data['reporting'] = Input::get('reporting') == '1' ? 1 : 0;
-        $data['type'] = OBJ;
+        $parentID = intval(Input::get('parent_component_id')) > 0 ? intval(Input::get('parent_component_id')) : null;
+        /** @noinspection PhpUndefinedFieldInspection */
+        $data = [
+            'name'                => Input::get('name'),
+            'parent_component_id' => $parentID,
+            'user_id'             => Auth::user()->id,
+            'reporting'           => Input::get('reporting') == '1' ? 1 : 0,
+            'type'                => OBJ
+        ];
 
 
         $object = new Component($data);
         $validator = Validator::make($object->toArray(), Component::$rules);
+        // validation fails!
         if ($validator->fails()) {
-            Log::error(
-                'Could not save component: ' . print_r(
-                    $validator->messages()->all(), true
-                )
-            );
-            Session::flash(
-                'error', 'Could not save the new ' . OBJ
-            );
-
-            return Redirect::route('add' . OBJ)->withErrors($validator)
-                ->withInput();
+            Log::error('Could not save component: ' . print_r($validator->messages()->all(), true));
+            Session::flash('error', 'Could not save the new ' . OBJ);
+            return Redirect::route('add' . OBJ)->withErrors($validator)->withInput();
         } else {
             $result = $object->save();
-            if ($result) {
-                Session::flash(
-                    'success', 'The new ' . OBJ . ' has been saved.'
-                );
-
-                return Redirect::to(Session::get('previous'));
-            } else {
+            // it fails again!
+            if (!$result) {
                 Log::error('Could not save component, trigger failure!');
-                Session::flash(
-                    'error',
-                    'Could not save the new ' . OBJ . '. Is the name unique?'
-                );
+                Session::flash('error', 'Could not save the new ' . OBJ . '. Is the name unique?');
+                return Redirect::route('add' . OBJ)->withErrors($validator)->withInput();
 
-                return Redirect::route('add' . OBJ)->withErrors($validator)
-                    ->withInput();
             }
+            Session::flash('success', 'The new ' . OBJ . ' has been saved.');
+            return Redirect::to(Session::get('previous'));
         }
     }
 
@@ -164,9 +146,9 @@ class ComponentController extends BaseController
             $prefilled = ComponentHelper::prefilledFromOldInput();
         }
         $parents = ComponentHelper::getParentList(OBJ, $component);
-        return View::make('components.edit')->with('object', $component)->with(
-            'parents', $parents
-        )->with('title', 'Edit ' . OBJ . ' ' . $component->name)->with('prefilled', $prefilled);
+        return View::make('components.edit')->with('object', $component)->with('parents', $parents)->with(
+            'title', 'Edit ' . OBJ . ' ' . $component->name
+        )->with('prefilled', $prefilled);
     }
 
     /**
@@ -179,34 +161,23 @@ class ComponentController extends BaseController
     public function postEdit(Component $component)
     {
         $component->parent_component_id
-            = intval(Input::get('parent_component_id')) > 0 ? intval(
-            Input::get('parent_component_id')
-        ) : null;
+            = intval(Input::get('parent_component_id')) > 0 ? intval(Input::get('parent_component_id')) : null;
         $component->name = Input::get('name');
         $component->reporting = Input::get('reporting') == '1' ? 1 : 0;
         $validator = Validator::make($component->toArray(), Component::$rules);
+        // it fails!
         if ($validator->fails()) {
-            Session::flash(
-                'error',
-                'Could not save the ' . OBJ . '.'
-            );
-            return Redirect::route('edit' . OBJ, $component->id)->withErrors(
-                $validator
-            )->withInput();
+            Session::flash('error', 'Could not save the ' . OBJ . '.');
+            return Redirect::route('edit' . OBJ, $component->id)->withErrors($validator)->withInput();
         } else {
             $result = $component->save();
-            if ($result) {
-                Session::flash('success', 'The ' . OBJ . ' has been updated.');
-
-                return Redirect::to(Session::get('previous'));
-            } else {
-                Session::flash(
-                    'error',
-                    'Could not save the ' . OBJ . '. Is the name unique?'
-                );
-
+            // it fails again!
+            if (!$result) {
+                Session::flash('error', 'Could not save the ' . OBJ . '. Is the name unique?');
                 return Redirect::route('edit' . OBJ, $component->id)->withInput()->withErrors($validator);
             }
+            Session::flash('success', 'The ' . OBJ . ' has been updated.');
+            return Redirect::to(Session::get('previous'));
 
 
         }
@@ -225,10 +196,9 @@ class ComponentController extends BaseController
             Session::put('previous', URL::previous());
         }
 
-        return View::make('components.delete')->with('object', $component)
-            ->with(
-                'title', 'Delete ' . OBJ . ' ' . $component->name
-            );
+        return View::make('components.delete')->with('object', $component)->with(
+            'title', 'Delete ' . OBJ . ' ' . $component->name
+        );
     }
 
     /**
@@ -247,55 +217,36 @@ class ComponentController extends BaseController
     }
 
     /**
-     * Show a general overview of the object.
+     * @param Component $component
      *
-     * @param Component $component The component
-     * @param int       $year      The year
-     * @param int       $month     The month
-     *
-     * @return string
+     * @return \Illuminate\View\View
      */
-    public function showOverview(
-        Component $component, $year = null, $month = null
-    ) {
-        $forceMontly = Input::get('monthly') == 'true' ? true : false;
-        $date = Toolkit::parseDate($year, $month);
+    public function showOverview(Component $component)
+    {
         $parent = is_null($component->parent_component_id) ? null : $component->parentComponent()->first();
-        $count = $component->transactions()->count() + $component->transfers()->count();
-
-        // forced month view:
-        if (($forceMontly || $count > 50) && is_null($date)) {
-            // display overview grouped on months.
-            $display = 'months';
-            $entries = ComponentHelper::overviewOfMonths($component);
-        } else {
-            // display overview of current month or all transactions + transfers
-            $display = 'mutations';
-            $entries = ComponentHelper::mutations($component, $date);
-        }
-        // switch on the presence of a date:
-//
-//        if (is_null($date)) {
-//            // count the list of transactions:
-//
-//            if ($count > 50 || $forceMontly) {
-//
-//
-//            } else {
-//                $entries = $component->transactions()->orderBy('date', 'DESC')->get();
-//            }
-//        } else {
-//            $entries = ComponentHelper::generateTransactionListByMonth($component, $date);
-//        }
+        $months = ComponentHelper::months($component);
         $title = 'Overview for ' . OBJ . ' "' . $component->name . '"';
-        if (!is_null($date)) {
-            $title .= ' in ' . $date->format('F Y');
-        }
-
 
         return View::make('components.overview')->with('title', $title)->with('component', $component)->with(
-            'transactions', $entries
-        )->with('parent', $parent)->with('date', $date)->with('display', $display);
+            'months', $months
+        )->with('parent', $parent);
+    }
+
+    /**
+     * @param Component $component
+     * @param           $year
+     * @param           $month
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showOverviewByMonth(Component $component, $year, $month)
+    {
+        $date = Toolkit::parseDate($year, $month);
+        $mutations = ComponentHelper::mutations($component, $date);
+        $title = 'Overview for ' . OBJ . ' "' . $component->name . '" in ' . $date->format('F Y');
+        return View::make('components.overview-by-month')->with('component', $component)->with('title', $title)->with(
+            'mutations', $mutations
+        )->with('date', $date);
     }
 
     /**

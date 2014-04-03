@@ -39,6 +39,12 @@ class Limit extends Eloquent
         return $this->belongsTo('Component');
     }
 
+    /**
+     * @param        $query
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
     public function scopeInMonth($query, Carbon $date)
     {
         return $query->where(
@@ -56,6 +62,11 @@ class Limit extends Eloquent
         return ['created_at', 'updated_at', 'date'];
     }
 
+    /**
+     * @param $value
+     *
+     * @return float
+     */
     public function getAmountAttribute($value)
     {
         return floatval($value);

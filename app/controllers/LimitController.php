@@ -49,13 +49,15 @@ class LimitController extends BaseController
         );
 
         $validator = Validator::make($limit->toArray(), Limit::$rules);
+        // it fails!
         if ($validator->fails()) {
             Session::flash('error', 'Could not add ' . OBJ . ' limit.');
 
             return Redirect::route(OBJ . 'overview', [$component->id]);
         } else {
-            Session::flash('success', 'Limit saved!');
             $limit->save();
+            Session::flash('success', 'Limit saved!');
+
 
             return Redirect::to(Session::get('previous'));
         }

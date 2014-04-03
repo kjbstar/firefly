@@ -43,10 +43,8 @@ Route::get('/home/account/{account}/delete',['uses' => 'AccountController@delete
 
 Route::get('/home/account/{account}/overview/chart/{year}/{month}',['uses' => 'AccountController@showOverviewChartByMonth']);
 
-
 Route::get('/home/account/{account}/overview/{year}/{month}',['uses' => 'AccountController@showOverviewByMonth', 'as' => 'accountoverviewmonth']);
 Route::get('/home/account/{account}/overview',['uses' => 'AccountController@showOverview', 'as' => 'accountoverview']);
-
 
 Route::get('/home/account/{account}/overview/chart',['uses' => 'AccountController@showOverviewChart']);
 
@@ -99,7 +97,8 @@ foreach ($objects as $o) {
             Route::get('/{component}/edit',['uses' => 'ComponentController@edit', 'as' => 'edit' . $o]);
             Route::get('/{component}/delete',['uses' => 'ComponentController@delete', 'as' => 'delete' . $o]);
             Route::get('/{component}/overview/chart/{year?}/{month?}',['uses' => 'ComponentController@showOverviewChart','as'   => $o . 'overviewchart']);
-            Route::get('/{component}/overview/{year?}/{month?}',['uses' => 'ComponentController@showOverview','as'   => $o . 'overview']);
+            Route::get('/{component}/overview/{year}/{month}',['uses' => 'ComponentController@showOverviewByMonth','as'   => $o . 'overviewmonth']);
+            Route::get('/{component}/overview',['uses' => 'ComponentController@showOverview','as'   => $o . 'overview']);
             Route::get('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@addLimit','as'   => 'add' . $o . 'limit']);
             Route::get('/limit/edit/{limit}', ['uses' => 'LimitController@editLimit','as'   => 'edit' . $o . 'limit']);
             Route::get('/limit/delete/{limit}',['uses' => 'LimitController@deleteLimit','as'   => 'delete' . $o . 'limit']);

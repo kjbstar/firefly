@@ -34,11 +34,9 @@ class SettingsController extends BaseController
         }
 
 
-        return View::make('settings.index')->with('title', 'Settings')->with(
-            'predictionStart', $predictionStart
-        )->with(
-                'accountList', $accountList
-            )->with('frontpageAccount', $frontpageAccount);
+        return View::make('settings.index')->with('title', 'Settings')->with('predictionStart', $predictionStart)->with(
+            'accountList', $accountList
+        )->with('frontpageAccount', $frontpageAccount);
 
     }
 
@@ -81,15 +79,11 @@ class SettingsController extends BaseController
         $defaultAllowance->value = floatval($defaultAllowance->value);
 
         // specific allowances:
-        $allowances = Auth::user()->settings()->orderBy(
-            'date', 'ASC'
-        )->where(
-                'name', 'specificAllowance'
-            )->get();
+        $allowances = Auth::user()->settings()->orderBy('date', 'ASC')->where('name', 'specificAllowance')->get();
 
-        return View::make('settings.allowances')->with(
-            'defaultAllowance', $defaultAllowance
-        )->with('allowances', $allowances)->with('title', 'Allowances');
+        return View::make('settings.allowances')->with('defaultAllowance', $defaultAllowance)->with(
+            'allowances', $allowances
+        )->with('title', 'Allowances');
     }
 
     /**
@@ -109,6 +103,11 @@ class SettingsController extends BaseController
     }
 
 
+    /**
+     * Add a allowance.
+     *
+     * @return \Illuminate\View\View
+     */
     public function addAllowance()
     {
         if (!Input::old()) {
@@ -120,6 +119,11 @@ class SettingsController extends BaseController
         );
     }
 
+    /**
+     * Post add allowance.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postAddAllowance()
     {
         $date = new Carbon(Input::get('date') . '-01');
@@ -153,6 +157,13 @@ class SettingsController extends BaseController
 
     }
 
+    /**
+     * Edit a allowance
+     *
+     * @param Setting $setting
+     *
+     * @return \Illuminate\View\View
+     */
     public function editAllowance(Setting $setting)
     {
         if (!Input::old()) {
@@ -164,6 +175,13 @@ class SettingsController extends BaseController
         );
     }
 
+    /**
+     * Post edit allowance.
+     *
+     * @param Setting $setting
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postEditAllowance(Setting $setting)
     {
         $setting->value = floatval(Input::get('value'));
@@ -184,6 +202,13 @@ class SettingsController extends BaseController
         return Redirect::to(Session::get('previous'));
     }
 
+    /**
+     * Delete allowance.
+     *
+     * @param Setting $setting
+     *
+     * @return \Illuminate\View\View
+     */
     public function deleteAllowance(Setting $setting)
     {
         if (!Input::old()) {
@@ -195,6 +220,13 @@ class SettingsController extends BaseController
         );
     }
 
+    /**
+     * Post delete allowance.
+     *
+     * @param Setting $setting
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postDeleteAllowance(Setting $setting)
     {
         $setting->delete();

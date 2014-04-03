@@ -35,14 +35,12 @@ class TransactionController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
             $prefilled = TransactionHelper::emptyPrefilledAray();
+        } else {
+            $prefilled = TransactionHelper::prefilledFromOldInput();
         }
         // prefill from predictable:
         if (!is_null($predictable)) {
             $prefilled = TransactionHelper::prefilledFromPredictable($predictable);
-        }
-        // prefill from old input:
-        if (Input::old()) {
-            $prefilled = TransactionHelper::prefilledFromOldInput();
         }
 
 
@@ -123,11 +121,9 @@ class TransactionController extends BaseController
         }
         $accounts = AccountHelper::accountsAsSelectList();
 
-        return View::make('transactions.edit')->with(
-            'transaction', $transaction
-        )->with('accounts', $accounts)->with(
-                'title', 'Edit transaction ' . $transaction->description
-            )->with('prefilled', $prefilled);
+        return View::make('transactions.edit')->with('transaction', $transaction)->with('accounts', $accounts)->with(
+            'title', 'Edit transaction ' . $transaction->description
+        )->with('prefilled', $prefilled);
     }
 
     /**

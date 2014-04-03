@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class ReportHelper
+ */
 class ReportHelper
 {
 
@@ -32,13 +35,13 @@ class ReportHelper
 
 
         $list = [];
-        foreach($result as $row) {
-            switch($type) {
+        foreach ($result as $row) {
+            switch ($type) {
                 case 'incomes':
                     $list[$row->month] = $row->total;
                     break;
                 case 'expenses':
-                    $list[$row->month] = $row->total*-1;
+                    $list[$row->month] = $row->total * -1;
 
 
                     break;

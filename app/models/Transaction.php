@@ -226,6 +226,12 @@ class Transaction extends Eloquent
         return $query->where('amount', '<', 0.0);
     }
 
+    /**
+     * @param        $query
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
     public function scopeAfterDate($query, Carbon $date)
     {
         return $query->where(
@@ -233,6 +239,12 @@ class Transaction extends Eloquent
         );
     }
 
+    /**
+     * @param        $query
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
     public function scopeBeforeDate($query, Carbon $date)
     {
         return $query->where(

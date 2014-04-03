@@ -1,38 +1,42 @@
 <?php
 
+/**
+ * Class ComponentTrigger
+ */
 class ComponentTrigger
 {
 
+    /**
+     * @param Component $component
+     *
+     * @return bool
+     */
     public function validateComponent(Component $component)
     {
         $user = Auth::user();
-        if(is_null(Auth::user())) {
+        if (is_null(Auth::user())) {
             $user = User::find($component->user_id);
         }
         // find a similar component
         if (is_null($component->id)) {
-            $components = $user->components()->where(
-                'type', $component->type
-            )->get();
+            $components = $user->components()->where('type', $component->type)->get();
         } else {
-            $components = $user->components()->where(
-                'type', $component->type
-            )->where(
-                'id', '!=', $component->id
-            )->get();
+            $components = $user->components()->where('type', $component->type)->where('id', '!=', $component->id)->get(
+            );
         }
-         foreach ($components as $dbc) {
+        foreach ($components as $dbc) {
 
             if ($component->name == $dbc->name) {
-                Log::debug('Found a duplicate component: ' . $component->name.' matches existing ' . $dbc->name);
+                Log::debug('Found a duplicate component: ' . $component->name . ' matches existing ' . $dbc->name);
                 return false;
             }
         }
         // component cannot be attached to itself:
         // but both can be NULL
-        if ($component->parent_component_id == $component->id
-            && !is_null($component->parent_component_id)
-            && !is_null($component->id)
+        if ($component->parent_component_id == $component->id && !is_null($component->parent_component_id)
+            && !is_null(
+                $component->id
+            )
         ) {
             Log::debug('Found a parent_component problem.');
             return false;

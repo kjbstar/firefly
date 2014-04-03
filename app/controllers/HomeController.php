@@ -31,7 +31,7 @@ class HomeController extends BaseController
     /**
      * Show the homepage. Can be for another month.
      *
-     * @param int $year  The year
+     * @param int $year The year
      * @param int $month The month
      *
      * @return View
@@ -62,8 +62,8 @@ class HomeController extends BaseController
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(
             'history', $history
         )->with('allowance', $allowance)->with('transactions', $transactions)->with('fpAccount', $fpAccount)->with(
-                'budgets', $budgets
-            )->with('predictables', $predictables)->with('transfers', $transfers);
+            'budgets', $budgets
+        )->with('predictables', $predictables)->with('transfers', $transfers);
     }
 
     /**

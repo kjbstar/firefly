@@ -19,7 +19,7 @@ class PredictableController extends BaseController
         $predictables = Auth::user()->predictables()->get()->each(
             function ($predictable) {
                 $date = new Carbon('2001-01-' . $predictable->dom);
-                $predictable->dom_display = $date->format('jS');
+                $predictable->domDisplay = $date->format('jS');
             }
         );
 
@@ -29,16 +29,30 @@ class PredictableController extends BaseController
 
     }
 
+    /**
+     * Overview for predictable.
+     *
+     * @param Predictable $predictable
+     *
+     * @return \Illuminate\View\View
+     */
     public function overview(Predictable $predictable)
     {
         $date = new Carbon('2001-01-' . $predictable->dom);
-        $predictable->dom_display = $date->format('jS');
+        $predictable->domDisplay = $date->format('jS');
 
         return View::make('predictables.overview')->with(
             'title', 'Overview for ' . $predictable->description
         )->with('predictable', $predictable);
     }
 
+    /**
+     * Add a new predictable based on a transaction.
+     *
+     * @param Transaction $transaction
+     *
+     * @return \Illuminate\View\View
+     */
     public function add(Transaction $transaction = null)
     {
         if (!Input::old() && is_null($transaction)) {
@@ -59,6 +73,13 @@ class PredictableController extends BaseController
         )->with('components', $list)->with('prefilled', $prefilled);
     }
 
+    /**
+     * Post process adding of a predictable.
+     *
+     * @param Transaction $transaction
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postAdd(Transaction $transaction = null)
     {
         $data = ['description' => Input::get('description'),
@@ -121,6 +142,13 @@ class PredictableController extends BaseController
         }
     }
 
+    /**
+     * Edit predictable.
+     *
+     * @param Predictable $predictable
+     *
+     * @return \Illuminate\View\View
+     */
     public function edit(Predictable $predictable)
     {
         if (!Input::old()) {
@@ -137,6 +165,13 @@ class PredictableController extends BaseController
         )->with('predictable', $predictable)->with('components', $list)->with('prefilled', $prefilled);
     }
 
+    /**
+     * Post edit predictable.
+     *
+     * @param Predictable $predictable
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postEdit(Predictable $predictable)
     {
 
@@ -232,6 +267,11 @@ class PredictableController extends BaseController
         return Redirect::to(Session::get('previous'));
     }
 
+    /**
+     * @param Predictable $predictable
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function rescan(Predictable $predictable)
     {
         Queue::push('PredictableQueue@scan', ['predictable_id' => $predictable->id]);
@@ -242,6 +282,11 @@ class PredictableController extends BaseController
         return Redirect::route('predictableoverview', $predictable->id);
     }
 
+    /**
+     * @param Predictable $predictable
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function rescanAll(Predictable $predictable)
     {
         Queue::push('PredictableQueue@scanAll', ['predictable_id' => $predictable->id]);

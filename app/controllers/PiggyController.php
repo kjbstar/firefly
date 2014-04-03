@@ -14,6 +14,11 @@ class PiggyController extends BaseController
     public static $pigWidth = 252;
     public static $pigHeight = 200;
 
+    /**
+     * Index for piggies.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
     public function index()
     {
         $piggyAccount = Setting::getSetting('piggyAccount');
@@ -28,25 +33,26 @@ class PiggyController extends BaseController
 
         foreach ($piggies as $pig) {
             $balance -= $pig->amount;
-            $pct_filled = $pig->pctFilled();
-            $pct_left = 100 - $pct_filled;
+            $pctFilled = $pig->pctFilled();
+            $pctLeft = 100 - $pctFilled;
             // heigth of animation
             $step = $this::$pigHeight / 100;
             // calculate the height we need:
-            $drawHeight = $pct_left * $step;
+            $drawHeight = $pctLeft * $step;
 
             $pig->drawHeight = $drawHeight;
         }
 
 
-        return View::make('piggy.index')->with('pigWidth', $this::$pigWidth)
-            ->with('pigHeight', $this::$pigHeight)->with('title', 'Piggy banks')
-
-            ->with(
-                'piggies', $piggies
-            )->with('balance', $balance);
+        return View::make('piggy.index')->with('pigWidth', $this::$pigWidth)->with('pigHeight', $this::$pigHeight)
+            ->with('title', 'Piggy banks')->with('piggies', $piggies)->with('balance', $balance);
     }
 
+    /**
+     * Add new piggy
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
     public function add()
     {
         if (!Input::old()) {
@@ -65,6 +71,11 @@ class PiggyController extends BaseController
         return View::make('piggy.add')->with('title', 'Add new piggy bank')->with('prefilled', $prefilled);
     }
 
+    /**
+     * Post process piggy adding.
+     *
+     * @return \Illuminate\Http\RedirectResponse]
+     */
     public function postAdd()
     {
         $piggy = new Piggybank;
@@ -72,24 +83,13 @@ class PiggyController extends BaseController
         $piggy->user()->associate(Auth::user());
         $piggy->name = Input::get('name');
         $piggy->amount = 0;
-        $target = is_null(Input::get('target'))
-        || intval(
-            Input::get
-                (
-                    'target'
-                )
-        ) == 0
-            ? null
-            : floatval(
-                Input::get('target')
-            );
-        $piggy->target = $target;
+        $piggy->target = intval(Input::get('target'));;
+
         $validator = Validator::make($piggy->toArray(), Piggybank::$rules);
+        // failed!
         if ($validator->fails()) {
             Session::flash('error', 'Could not add piggy');
-            return Redirect::route('addpiggybank')->withErrors(
-                $validator
-            )->withInput();
+            return Redirect::route('addpiggybank')->withErrors($validator)->withInput();
         }
         $piggy->save();
         Session::flash('success', 'Piggy bank created');
@@ -97,6 +97,13 @@ class PiggyController extends BaseController
         return Redirect::to(Session::get('previous'));
     }
 
+    /**
+     * Delete piggy.
+     *
+     * @param Piggybank $pig
+     *
+     * @return \Illuminate\View\View
+     */
     public function delete(Piggybank $pig)
     {
         if (!Input::old()) {
@@ -105,6 +112,13 @@ class PiggyController extends BaseController
         return View::make('piggy.delete')->with('piggy', $pig)->with('title', 'Delete piggy bank ' . $pig->name);
     }
 
+    /**
+     * Post delete piggy
+     *
+     * @param Piggybank $pig
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postDelete(Piggybank $pig)
     {
         $pig->delete();
@@ -112,6 +126,12 @@ class PiggyController extends BaseController
         return Redirect::to(Session::get('previous'));
     }
 
+
+    /**
+     * Select a account.
+     *
+     * @return \Illuminate\View\View
+     */
     public function selectAccount()
     {
 
@@ -121,11 +141,14 @@ class PiggyController extends BaseController
             $accountList[$account->id] = $account->name;
         }
 
-        return View::make('piggy.select')->with(
-            'title', 'Piggy banks'
-        )->with('accounts', $accountList);
+        return View::make('piggy.select')->with('title', 'Piggy banks')->with('accounts', $accountList);
     }
 
+    /**
+     * Process account selection.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postSelectAccount()
     {
         $piggyAccount = Setting::getSetting('piggyAccount');
@@ -143,6 +166,13 @@ class PiggyController extends BaseController
 
     }
 
+    /**
+     * Post edit piggy bank.
+     *
+     * @param Piggybank $pig
+     *
+     * @return \Illuminate\View\View
+     */
     public function edit(Piggybank $pig)
     {
         if (!Input::old()) {
@@ -153,11 +183,17 @@ class PiggyController extends BaseController
 
         }
 
-        return View::make('piggy.edit')->with('pig', $pig)->with(
-            'title', 'Edit piggy bank "' . $pig->name . '"'
-        )->with('prefilled',$prefilled);
+        return View::make('piggy.edit')->with('pig', $pig)->with('title', 'Edit piggy bank "' . $pig->name . '"')->with(
+            'prefilled', $prefilled
+        );
     }
 
+    /**
+     * Post edit piggy bank
+     * @param Piggybank $pig
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postEdit(Piggybank $pig)
     {
         $pig->name = Input::get('name');
@@ -168,9 +204,8 @@ class PiggyController extends BaseController
         }
         $validator = Validator::make($pig->toArray(), Piggybank::$rules);
         if ($validator->fails()) {
-            return Redirect::route('editpiggy', $pig->id)->withErrors(
-                $validator
-            )->withInput();
+            Session::flash('error', 'Could not edit piggy!');
+            return Redirect::route('editpiggy', $pig->id)->withErrors($validator)->withInput();
         }
         $pig->save();
         Session::flash('success', 'Piggy bank updated');
@@ -178,6 +213,11 @@ class PiggyController extends BaseController
         return Redirect::to(Session::get('previous'));
     }
 
+    /**
+     * @param Piggybank $pig
+     *
+     * @return \Illuminate\View\View
+     */
     public function updateAmount(Piggybank $pig)
     {
         // calculate the amount of money left to devide:
@@ -195,11 +235,14 @@ class PiggyController extends BaseController
         }
 
 
-        return View::make('piggy.amount')->with('pig', $pig)->with(
-            'balance', $balance
-        );
+        return View::make('piggy.amount')->with('pig', $pig)->with('balance', $balance);
     }
 
+    /**
+     * @param Piggybank $pig
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function postUpdateAmount(Piggybank $pig)
     {
         $amount = floatval(Input::get('amount'));

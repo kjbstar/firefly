@@ -1,12 +1,20 @@
 <?php
 
+/**
+ * Class PiggyTrigger
+ */
 class PiggyTrigger
 {
 
+    /**
+     * @param Piggybank $piggy
+     *
+     * @return bool
+     */
     public function validatePiggy(Piggybank $piggy)
     {
         $user = Auth::user();
-        if(is_null(Auth::user())) {
+        if (is_null(Auth::user())) {
             $user = User::find($piggy->user_id);
         }
         // find a similar component
@@ -27,6 +35,9 @@ class PiggyTrigger
         return true;
     }
 
+    /**
+     * @param \Illuminate\Events\Dispatcher $events
+     */
     public function subscribe(Illuminate\Events\Dispatcher $events)
     {
         $events->listen(

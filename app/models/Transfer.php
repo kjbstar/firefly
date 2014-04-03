@@ -154,6 +154,12 @@ class Transfer extends Eloquent
         );
     }
 
+    /**
+     * @param        $query
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
     public function scopeInYear($query, Carbon $date)
     {
         return $query->where(
@@ -207,6 +213,12 @@ class Transfer extends Eloquent
         return ['created_at', 'updated_at', 'date'];
     }
 
+    /**
+     * @param        $query
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
     public function scopeBeforeDate($query, Carbon $date)
     {
         return $query->where(

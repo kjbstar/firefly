@@ -8,31 +8,6 @@ class ComponentHelper
 {
 
 
-    public static function mutations(Component $component, Carbon $date = null)
-    {
-        $transfersQuery = $component->transfers()->orderBy('date', 'DESC')->orderBy('id', 'DESC');
-        $transactionsQuery = $component->transactions()->orderBy('date', 'DESC')->orderBy('id', 'DESC');
-        if (!is_null($date)) {
-            $transfersQuery->inMonth($date);
-            $transactionsQuery->inMonth($date);
-        }
-        $transfers = $transfersQuery->get();
-        echo count($transfers);
-        $transactions = $transactionsQuery->get();
-
-        if (count($transfers) > 0 && count($transactions) > 0) {
-            $list = array_merge($transactions->toArray(), $transfers->toArray());
-            usort($list, 'CompareSortMutations');
-        } else {
-            $list = [];
-        }
-        return $list;
-
-
-
-
-    }
-
     /**
      * Generate an array containing all months starting one
      * year ago up until now, detailing various statistics of said month.
@@ -41,7 +16,7 @@ class ComponentHelper
      *
      * @return array
      */
-    public static function overviewOfMonths(Component $component)
+    public static function months(Component $component)
     {
         $end = new Carbon;
         $end->addMonth();
@@ -49,19 +24,16 @@ class ComponentHelper
         $list = [];
         while ($end > $start) {
             $query = $component->transactions()->inMonth($end);
-            $url = URL::Route(
-                OBJ . 'overview',
-                [$component->id, $end->format('Y'), $end->format('m')]
-            );
-            $entry = [];
-            $entry['title'] = $end->format('F Y');
-            $entry['url'] = $url;
-            $entry['sum'] = $query->sum('amount');
-            $entry['avg'] = $query->avg('amount');
-            $entry['count'] = $query->count();
-            $entry['month'] = $end->format('m');
-            $entry['year'] = $end->format('Y');
-            $entry['limit'] = null;
+            $url = URL::Route(OBJ . 'overviewmonth', [$component->id, $end->format('Y'), $end->format('m')]);
+            $entry = [
+                'title' => $end->format('F Y'),
+                'url'   => $url,
+                'sum'   => $query->sum('amount'),
+                'count' => $query->count(),
+                'month' => $end->format('m'),
+                'year'  => $end->format('Y'),
+                'limit' => null
+            ];
             $limit = $component->limits()->inMonth($end)->first();
             if ($limit) {
                 $entry['limit'] = $limit->amount;
@@ -73,6 +45,25 @@ class ComponentHelper
         }
 
         return $list;
+    }
+
+    /**
+     * @param Component $component
+     * @param Carbon    $date
+     *
+     * @return mixed
+     */
+    public static function mutations(Component $component, Carbon $date)
+    {
+        $transactions = $component->transactions()->inMonth($date)->get();
+        $transfers = $component->transfers()->inMonth($date)->get();
+        $result = $transactions->merge($transfers);
+        $result = $result->sortBy(
+            function ($a) {
+                return $a->created_at;
+            }
+        )->reverse();
+        return $result;
     }
 
     /**
@@ -102,19 +93,20 @@ class ComponentHelper
     public static function transactionsWithoutComponent(
         $type, Carbon $date = null
     ) {
-        $query = Auth::user()->transactions()->orderBy('date', 'DESC');
+
+        $query = Auth::user()->transactions()->whereNotIn(
+            'id', function ($query) use ($type) {
+                $query->select('transactions.id')->from('transactions')->leftJoin(
+                    'component_transaction', 'component_transaction.transaction_id', '=', 'transactions.id'
+                )->leftJoin('components', 'components.id', '=', 'component_transaction.component_id')->where(
+                        'components.type', $type
+                    );
+            }
+        );
         if (!is_null($date)) {
             $query->inMonth($date);
         }
-        $list = [];
-        foreach ($query->get() as $tr) {
-            if (is_null($tr->$type)) {
-                $list[] = $tr;
-            }
-        }
-
-        return $list;
-
+        return $query->get();
     }
 
     /**
@@ -147,6 +139,9 @@ class ComponentHelper
         return $parents;
     }
 
+    /**
+     * @return array
+     */
     public static function emptyPrefilledAray()
     {
         return [
@@ -156,6 +151,9 @@ class ComponentHelper
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function prefilledFromOldInput()
     {
         return [
@@ -165,6 +163,11 @@ class ComponentHelper
         ];
     }
 
+    /**
+     * @param Component $component
+     *
+     * @return array
+     */
     public static function prefilledFromComponent(Component $component)
     {
         return [
@@ -174,6 +177,12 @@ class ComponentHelper
         ];
     }
 
+    /**
+     * @param $type
+     * @param $name
+     *
+     * @return Component|null
+     */
     public static function saveComponentFromText($type, $name)
     {
         $parts = explode('/', $name);
@@ -198,6 +207,12 @@ class ComponentHelper
 
 }
 
+/**
+ * @param $a
+ * @param $b
+ *
+ * @return int
+ */
 function CompareSortMutations($a, $b)
 {
     $dateObjectA = new Carbon($a['date']);

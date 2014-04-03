@@ -71,6 +71,7 @@ class Component extends Eloquent
                 return $c;
             }
         }
+        /** @noinspection PhpUndefinedFieldInspection */
         $component = new Component(['name'    => $name,
                                     'user_id' => Auth::user()->id,
                                     'type'    => $type]);
@@ -188,6 +189,11 @@ class Component extends Eloquent
         return ['created_at', 'updated_at'];
     }
 
+    /**
+     * @param $query
+     *
+     * @return mixed
+     */
     public function scopeReporting($query)
     {
         return $query->where('reporting', 1);

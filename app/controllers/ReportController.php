@@ -12,6 +12,11 @@ use Carbon\Carbon as Carbon;
  */
 class ReportController extends BaseController
 {
+    /**
+     * Index for report controller
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         $first = Toolkit::getEarliestEvent();
@@ -34,6 +39,14 @@ class ReportController extends BaseController
         );
     }
 
+    /**
+     * Report for a month.
+     *
+     * @param $year
+     * @param $month
+     *
+     * @return \Illuminate\View\View
+     */
     public function month($year, $month)
     {
         $start = new Carbon($year . '-' . $month . '-01');
@@ -60,10 +73,10 @@ class ReportController extends BaseController
                 $id = $transaction->category->id;
                 $name = $transaction->category->name;
             }
-            if(!isset($notPredictedGrouped[$id])) {
+            if (!isset($notPredictedGrouped[$id])) {
                 $notPredictedGrouped[$id] = [
-                    'category' => [
-                        'id' => $id,
+                    'category'     => [
+                        'id'   => $id,
                         'name' => $name
                     ],
                     'transactions' => []
@@ -81,11 +94,8 @@ class ReportController extends BaseController
         // sums:
         $sumOut = floatval($notPredictedSum + $predictedSum);
 
-        $sumIn
-            = floatval(
-            Auth::user()->transactions()->inMonth($start)->orderBy(
-                'date', 'ASC'
-            )->incomes()->sum('amount')
+        $sumIn = floatval(
+            Auth::user()->transactions()->inMonth($start)->orderBy('date', 'ASC')->incomes()->sum('amount')
         );
 
         // TODO what did the shared accounts get us?
@@ -126,15 +136,18 @@ class ReportController extends BaseController
         }
 
 
-        return View::make('reports.month')->with(
-            'title', 'Report for ' . $start->format('F Y')
-        )->with('start', $start)->with('transactions', $transactions)->with(
-                'sums', $sums
-            )->with('netWorth', $netWorth)->with('end', $end)->with(
-                'incomes', $incomes
-            )->with('components', $components);
+        return View::make('reports.month')->with('title', 'Report for ' . $start->format('F Y'))->with('start', $start)
+            ->with('transactions', $transactions)->with('sums', $sums)->with('netWorth', $netWorth)->with('end', $end)
+            ->with('incomes', $incomes)->with('components', $components);
     }
 
+    /**
+     * Year report.
+     *
+     * @param $year
+     *
+     * @return \Illuminate\View\View
+     */
     public function year($year)
     {
         // get net worth at start of year.
@@ -154,18 +167,12 @@ class ReportController extends BaseController
 
         // get the X biggest fans
         $result = Auth::user()->components()->leftJoin(
-            'component_transaction', 'component_transaction.component_id', '=',
-            'components.id'
-        )->leftJoin(
-                'transactions', 'component_transaction.transaction_id', '=',
-                'transactions.id'
-            )->whereNull('transactions.predictable_id')->where(
-                'components.type', 'beneficiary'
-            )->where(
-                DB::Raw('DATE_FORMAT(transactions.date,"%Y")'), $year
-            )->groupBy('components.id')->orderBy('total')->take(10)->get(
-                ['components.name',
-                 DB::Raw('SUM(`transactions`.`amount`) as `total`')]
+            'component_transaction', 'component_transaction.component_id', '=', 'components.id'
+        )->leftJoin('transactions', 'component_transaction.transaction_id', '=', 'transactions.id')->whereNull(
+                'transactions.predictable_id'
+            )->where('components.type', 'beneficiary')->where(DB::Raw('DATE_FORMAT(transactions.date,"%Y")'), $year)
+            ->groupBy('components.id')->orderBy('total')->take(10)->get(
+                ['components.name', DB::Raw('SUM(`transactions`.`amount`) as `total`')]
             );
 
         // total income, total expenses
@@ -203,6 +210,11 @@ class ReportController extends BaseController
     }
 
 
+    /**
+     * @param $year
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function yearIeChart($year)
     {
         // dates
@@ -242,6 +254,12 @@ class ReportController extends BaseController
         return Response::json($chart->getData());
     }
 
+    /**
+     * @param $yearOne
+     * @param $yearTwo
+     *
+     * @return \Illuminate\View\View
+     */
     public function yearCompare($yearOne, $yearTwo)
     {
         $one = new Carbon($yearOne . '-01-01');
@@ -256,6 +274,14 @@ class ReportController extends BaseController
         )->with('one', $one)->with('two', $two);
     }
 
+    /**
+     * @param $yearOne
+     * @param $monthOne
+     * @param $yearTwo
+     * @param $monthTwo
+     *
+     * @return \Illuminate\View\View
+     */
     public function monthCompare($yearOne, $monthOne, $yearTwo, $monthTwo)
     {
         $one = Toolkit::parseDate($yearOne, $monthOne);
@@ -351,9 +377,16 @@ class ReportController extends BaseController
             ->with('components', $components);
     }
 
-    public function monthCompareAccountChart(
-        $yearOne, $monthOne, $yearTwo, $monthTwo
-    ) {
+    /**
+     * @param $yearOne
+     * @param $monthOne
+     * @param $yearTwo
+     * @param $monthTwo
+     *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View
+     */
+    public function monthCompareAccountChart($yearOne, $monthOne, $yearTwo, $monthTwo)
+    {
         $one = Toolkit::parseDate($yearOne, $monthOne);
         $two = Toolkit::parseDate($yearTwo, $monthTwo);
         if ($one->eq($two)) {
@@ -385,6 +418,11 @@ class ReportController extends BaseController
 
     }
 
+    /**
+     * @param $year
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function yearComponentsChart($year)
     {
         $start = new Carbon($year . '-01-01');

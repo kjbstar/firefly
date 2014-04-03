@@ -31,9 +31,13 @@ class Toolkit
         return $default;
     }
 
+    /**
+     * @return mixed
+     */
     public static function getFrontpageAccount()
     {
-        $key = Auth::user()->id.'frontPageAccount';
+        /** @noinspection PhpUndefinedFieldInspection */
+        $key = Auth::user()->id . 'frontPageAccount';
         if (Cache::has($key)) {
             return Cache::get($key);
         } else {
@@ -48,6 +52,9 @@ class Toolkit
         }
     }
 
+    /**
+     * @return string
+     */
     public static function getPredictionStart()
     {
         $setting = Setting::getSetting('predictionStart');
@@ -55,9 +62,13 @@ class Toolkit
 
     }
 
+    /**
+     * @return Carbon|mixed
+     */
     public static function getEarliestEvent()
     {
-        $key = Auth::user()->id.'getEarliestEvent';
+        /** @noinspection PhpUndefinedFieldInspection */
+        $key = Auth::user()->id . 'getEarliestEvent';
         if (Cache::has($key)) {
             return Cache::get($key);
         } else {

@@ -31,6 +31,11 @@ class Setting extends Eloquent
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable = ['user_id', 'name', 'date','type', 'value'];
 
+    /**
+     * @param $name
+     *
+     * @return mixed
+     */
     public static function findSetting($name)
     {
         return Auth::user()->settings()->where(
@@ -48,6 +53,7 @@ class Setting extends Eloquent
      */
     public static function getSetting($name)
     {
+        /** @noinspection PhpUndefinedFieldInspection */
         $key = Auth::user()->id.'setting'.$name;
         if(Cache::has($key)) {
             return Cache::get($key);
@@ -123,6 +129,11 @@ class Setting extends Eloquent
         return $this->belongsTo('User');
     }
 
+    /**
+     * Get the attributes that should be converted to dates.
+     *
+     * @return array
+     */
     public function getDates()
     {
         return ['created_at', 'updated_at', 'date'];

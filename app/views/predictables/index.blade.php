@@ -29,7 +29,7 @@
                 </td>
                 <td>{{mf($p->amount*(1-($p->pct/100)))}}</td>
                 <td>{{mf($p->amount*(1+($p->pct/100)))}}</td>
-                <td>{{$p->dom_display}}</td>
+                <td>{{$p->domDisplay}}</td>
                 <td>
                     <div class="btn-group">
                         <a href="{{URL::Route('editpredictable',[$p->id])}}" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>

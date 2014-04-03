@@ -1,8 +1,14 @@
 <?php
 
 
+/**
+ * Class TransferHelper
+ */
 class TransferHelper
 {
+    /**
+     * @return array
+     */
     public static function emptyPrefilledAray()
     {
         return [
@@ -17,6 +23,9 @@ class TransferHelper
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function prefilledFromOldInput()
     {
         return [
@@ -31,7 +40,13 @@ class TransferHelper
         ];
     }
 
-    public static function prefilledFromTransfer(Transfer $transfer) {
+    /**
+     * @param Transfer $transfer
+     *
+     * @return array
+     */
+    public static function prefilledFromTransfer(Transfer $transfer)
+    {
         return [
             'description'    => $transfer->description,
             'amount'         => floatval($transfer->amount),

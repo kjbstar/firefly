@@ -1,9 +1,16 @@
 <?php
 
 
+/**
+ * Class PredictableQueue
+ */
 class PredictableQueue
 {
 
+    /**
+     * @param $job
+     * @param $payload
+     */
     public function scan($job, $payload)
     {
         $predictable = Predictable::find($payload['predictable_id']);
@@ -14,9 +21,14 @@ class PredictableQueue
         }
 
         $query = $user->transactions()->whereNull('predictable_id');
+        /** @noinspection PhpParamsInspection */
         $this->processPredictable($job, $predictable, $query);
     }
 
+    /**
+     * @param $job
+     * @param $payload
+     */
     public function scanAll($job, $payload)
     {
         $predictable = Predictable::find($payload['predictable_id']);
@@ -27,9 +39,15 @@ class PredictableQueue
         }
 
         $query = $user->transactions();
+        /** @noinspection PhpParamsInspection */
         $this->processPredictable($job, $predictable, $query);
     }
 
+    /**
+     * @param                                                 $job
+     * @param Predictable                                     $predictable
+     * @param \Illuminate\Database\Eloquent\Relations\HasMany $set
+     */
     public function processPredictable(
         $job, Predictable $predictable,
         Illuminate\Database\Eloquent\Relations\HasMany $set
@@ -85,6 +103,10 @@ class PredictableQueue
         $job->delete();
     }
 
+    /**
+     * @param $job
+     * @param $payload
+     */
     public function processTransaction($job, $payload)
     {
         $transaction = Transaction::find($payload['transaction_id']);

@@ -51,6 +51,11 @@ class AccountHelper
 //            ->get();
 //    }
 
+    /**
+     * @param Account $account
+     *
+     * @return array
+     */
     public static function months(Account $account)
     {
         $end = new Carbon;
@@ -74,6 +79,12 @@ class AccountHelper
         return $list;
     }
 
+    /**
+     * @param Account $account
+     * @param Carbon  $date
+     *
+     * @return mixed
+     */
     public static function mutations(Account $account, Carbon $date)
     {
         $transactions = $account->transactions()->inMonth($date)->get();
@@ -144,6 +155,7 @@ class AccountHelper
         } else {
             $cacheTime = 1440;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
         $key = Auth::user()->id . $account->id . 'marked' . $start->format('Ymd') . $end->format('Ymd') . 'Marked';
         if (Cache::has($key)) {
             return Cache::has($key);
@@ -163,6 +175,9 @@ class AccountHelper
         }
     }
 
+    /**
+     * @return array
+     */
     public static function emptyPrefilledAray()
     {
         return [
@@ -174,6 +189,9 @@ class AccountHelper
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function prefilledFromOldInput()
     {
         return [
@@ -185,6 +203,11 @@ class AccountHelper
         ];
     }
 
+    /**
+     * @param Account $account
+     *
+     * @return array
+     */
     public static function prefilledFromAccount(Account $account)
     {
         return [

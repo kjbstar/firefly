@@ -37,6 +37,11 @@ class HomeHelper
         return $accounts;
     }
 
+    /**
+     * @param Carbon $date
+     *
+     * @return array
+     */
     public static function budgetOverview(Carbon $date)
     {
         $budgets = [];
@@ -114,6 +119,11 @@ class HomeHelper
 
     }
 
+    /**
+     * @param Carbon $date
+     *
+     * @return array
+     */
     public static function getAllowance(Carbon $date)
     {
         // get the allowance (setting) for this month, OR specific month.
@@ -163,6 +173,11 @@ class HomeHelper
         return $allowance;
     }
 
+    /**
+     * @param Carbon $date
+     *
+     * @return array
+     */
     public static function getPredictables(Carbon $date)
     {
         $predictables = Auth::user()->predictables()->active()->orderBy('dom', 'ASC')->get();
@@ -177,18 +192,31 @@ class HomeHelper
         return $list;
     }
 
+    /**
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
     public static function transactions(Carbon $date)
     {
         return Auth::user()->transactions()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
             ->get();
     }
 
+    /**
+     * @param Carbon $date
+     *
+     * @return mixed
+     */
     public static function transfers(Carbon $date)
     {
         return Auth::user()->transfers()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get(
         );
     }
 
+    /**
+     * @return array
+     */
     public static function history()
     {
         $earliest = Toolkit::getEarliestEvent();

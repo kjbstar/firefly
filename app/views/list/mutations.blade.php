@@ -1,4 +1,4 @@
-<table class="table table-bordered table-condensed">
+<table class="table table-bordered table-condensed table-striped">
     <tr>
         <th>Date</th>
         <th colspan="2">Description</th>

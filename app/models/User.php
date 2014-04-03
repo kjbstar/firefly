@@ -66,6 +66,9 @@ class User extends Eloquent implements UserInterface, RemindableInterface
         return $this->hasMany('Predictable');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function piggybanks()
     {
         return $this->hasMany('Piggybank');
