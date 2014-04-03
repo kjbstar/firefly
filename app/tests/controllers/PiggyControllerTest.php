@@ -12,7 +12,7 @@ class PiggyControllerTest extends TestCase
         $this->be($user);
     }
 
-    private $_target = 123.45;
+    private $_target = 123;
 
     public function testIndexBeforeSetting()
     {
@@ -105,6 +105,7 @@ class PiggyControllerTest extends TestCase
     public function testEmptyPostAdd()
     {
         $count = Auth::user()->piggybanks()->count();
+        Log::error('testEmptyPostAdd');
         $this->call('POST', 'home/piggy/add');
         $newCount = Auth::user()->piggybanks()->count();
         $this->assertEquals($count, $newCount);
@@ -116,8 +117,9 @@ class PiggyControllerTest extends TestCase
 
     public function testFilledPostAdd()
     {
+        Log::error('tesFilledPostAdd');
         $count = Auth::user()->piggybanks()->count();
-        $data = ['name' => 'NogEenTest', 'target' => $this->_target];
+        $data = ['name' => Str::random(15), 'target' => $this->_target];
         $this->call('POST', 'home/piggy/add', $data);
         $newCount = Auth::user()->piggybanks()->count();
         $this->assertResponseStatus(302);
@@ -129,6 +131,7 @@ class PiggyControllerTest extends TestCase
 
     public function testInvalidPostAdd()
     {
+        Log::error('tesInvalidPostAdd');
         $count = Auth::user()->piggybanks()->count();
         $data = ['target' => 200];
         $this->call('POST', 'home/piggy/add', $data);

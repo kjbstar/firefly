@@ -122,26 +122,6 @@ class TransactionControllerTest extends TestCase
         $this->assertSessionHas('success');
     }
 
-    public function testPostAddGrandParentComponents()
-    {
-        $count = Auth::user()->transactions()->count();
-        $account = Auth::user()->accounts()->first();
-        $data = ['account_id'  => $account->id, 'description' => 'Test',
-                 'category'    => 'TestCategory #1', // existing
-                 'beneficiary' => 'TestBeneficiary #1', // existing
-                 'budget'      => 'SomethingElse/Else/Wow', // new
-                 'amount'      => $this->_amount, 'date' => date('Y-m-d')
-
-        ];
-        $this->call('POST', 'home/transaction/add', $data);
-        $newCount = Auth::user()->transactions()->count();
-        $this->assertResponseStatus(302);
-        $this->assertSessionHas('error');
-        $this->assertRedirectedToRoute('addtransaction');
-        $this->assertEquals($count, $newCount);
-        $this->assertHasOldInput();
-    }
-
     public function testPostFailValidator()
     {
         $count = Auth::user()->transactions()->count();
@@ -282,27 +262,6 @@ class TransactionControllerTest extends TestCase
         $this->assertResponseStatus(302);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
-    }
-
-    public function testPostEditGrandParentComponents()
-    {
-        $transaction = Auth::user()->transactions()->first();
-        $account = Auth::user()->accounts()->first();
-        $data = ['description' => 'TestEdit', 'amount' => 20,
-                 'date'        => date('Y-m-d'), 'account_id' => $account->id,
-                 'category'    => 'TestCategory #1', // existing
-                 'beneficiary' => 'TestBeneficiary #1', // existing
-                 'budget'      => 'IAm2/Very2Special/Blabla', // new
-
-        ];
-
-        $this->call(
-            'POST', 'home/transaction/' . $transaction->id . '/edit', $data
-        );
-        $this->assertResponseStatus(302);
-        $this->assertSessionHas('error');
-        $this->assertHasOldInput();
-        $this->assertRedirectedToRoute('edittransaction', $transaction->id);
     }
 
     public function testDelete()

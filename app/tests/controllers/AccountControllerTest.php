@@ -120,9 +120,7 @@ class AccountControllerTest extends TestCase
      */
     public function testEdit()
     {
-        $account = Auth::user()->accounts()->where(
-            'openingbalance', $this->_balance
-        )->first();
+        $account = Auth::user()->accounts()->where('openingbalance', $this->_balance)->first();
         $crawler = $this->client->request('GET', 'home/account/' . $account->id . '/edit');
         $this->assertCount(1, $crawler->filter('h2:contains("Edit ' . $account->name . '")'));
         $this->assertCount(1, $crawler->filter('title:contains("Edit account ' . $account->name . '")'));
@@ -131,6 +129,19 @@ class AccountControllerTest extends TestCase
 
         $this->assertResponseStatus(200);
         $this->assertSessionHas('previous');
+    }
+
+    public function testEditWithOldData()
+    {
+        $this->session(['_old_input' => ['name' => 'Test', 'openingbalance' => 100, 'shared' => '1']]);
+        $account = Auth::user()->accounts()->where('openingbalance', $this->_balance)->first();
+        $crawler = $this->client->request('GET', 'home/account/' . $account->id . '/edit');
+        $this->assertCount(1, $crawler->filter('h2:contains("Edit ' . $account->name . '")'));
+        $this->assertCount(1, $crawler->filter('title:contains("Edit account ' . $account->name . '")'));
+        $this->assertCount(1, $crawler->filter('input[name="shared"]'));
+        $this->assertCount(1, $crawler->filter('label[for="inputShared"]'));
+
+        $this->assertResponseStatus(200);
     }
 
     public function testPostEdit()
@@ -223,7 +234,7 @@ class AccountControllerTest extends TestCase
         );
         $view = $response->original;
         $this->assertResponseStatus(200);
-        $this->assertEquals($view['title'], 'Overview for ' . $account->name);
+        $this->assertEquals($view['title'], 'Overview for account "' . $account->name.'"');
         $this->assertEquals($view['account']->name, $account->name);
 
         // the app falls back to
@@ -231,7 +242,7 @@ class AccountControllerTest extends TestCase
         $date = new Carbon\Carbon($start['value']);
         $diff = $date->diffInMonths(new Carbon\Carbon);
 
-        $this->assertCount(($diff + 1), $view['transactions']);
+        $this->assertCount(($diff + 1), $view['months']);
     }
 
     public function testShowOverviewByMonth()
@@ -242,13 +253,12 @@ class AccountControllerTest extends TestCase
         );
         $view = $response->original;
         $this->assertResponseStatus(200);
-        $this->assertEquals(
-            $view['title'],
-            'Overview for ' . $account->name . ' in ' . date('F Y')
-        );
+        $this->assertEquals($view['title'], 'Overview for account "' . $account->name.'" in '.date('F Y'));
         $this->assertEquals($view['account']->name, $account->name);
         $count = $account->transactions()->inMonth(new Carbon\Carbon)->count();
-        $this->assertCount($count, $view['transactions']);
+        $count += $account->transfersTo()->inMonth(new Carbon\Carbon)->count();
+        $count += $account->transfersFrom()->inMonth(new Carbon\Carbon)->count();
+        $this->assertCount($count, $view['mutations']);
     }
 
     public function testShowChartOverview()
@@ -264,7 +274,8 @@ class AccountControllerTest extends TestCase
         $responseData = json_decode($jsonResponse, true);
         $this->assertArrayHasKey('cols', $responseData);
         $this->assertArrayHasKey('rows', $responseData);
-        $this->assertCount(7, $responseData['cols']);
+        // if not by month only account name and balance.
+        $this->assertCount(2, $responseData['cols']);
     }
 
     public function testShowChartOverviewDebug()
@@ -283,6 +294,25 @@ class AccountControllerTest extends TestCase
         $response = $this->call(
             'GET',
             'home/account/' . $account->id . '/overview/chart/' . date('Y/m')
+        );
+        $this->assertResponseStatus(200);
+        $this->assertNotNull($response);
+
+        $jsonResponse = $this->client->getResponse()->getContent();
+        $responseData = json_decode($jsonResponse, true);
+        $this->assertArrayHasKey('cols', $responseData);
+        $this->assertArrayHasKey('rows', $responseData);
+        $this->assertCount(7, $responseData['cols']);
+    }
+
+    public function testShowChartOverviewByMonthFutureDate()
+    {
+        $future = new Carbon\Carbon;
+        $future->addMonths(3);
+        $account = Auth::user()->accounts()->first();
+        $response = $this->call(
+            'GET',
+            'home/account/' . $account->id . '/overview/chart/' . $future->format('Y/m')
         );
         $this->assertResponseStatus(200);
         $this->assertNotNull($response);

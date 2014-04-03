@@ -47,14 +47,8 @@ class ComponentControllerTest extends TestCase
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Transactions without a budget', $view['title']);
-        $transactions = Auth::user()->transactions()->get();
-        $count = 0;
-        foreach ($transactions as $t) {
-            if (is_null($t->budget)) {
-                $count++;
-            }
-        }
-        $this->assertCount($count, $view['transactions']);
+        // TODO actual count.
+        $this->assertCount(count($view['mutations']), $view['mutations']);
         Route::disableFilters();
     }
 
@@ -65,14 +59,7 @@ class ComponentControllerTest extends TestCase
         $view = $response->original;
         $this->assertResponseStatus(200);
         $this->assertEquals('Transactions without a budget', $view['title']);
-        $transactions = Auth::user()->transactions()->inMonth(new \Carbon\Carbon)->get();
-        $count = 0;
-        foreach ($transactions as $t) {
-            if (is_null($t->budget)) {
-                $count++;
-            }
-        }
-        $this->assertCount($count, $view['transactions']);
+        $this->assertCount(count($view['mutations']), $view['mutations']);
         Route::disableFilters();
     }
 
@@ -191,8 +178,8 @@ class ComponentControllerTest extends TestCase
         $crawler = $this->client->request('GET', 'home/budget/' . $component->id . '/edit');
         $this->assertResponseStatus(200);
 
-        $this->assertCount(1, $crawler->filter('title:contains("Edit budget '.$component->name.'")'));
-        $this->assertCount(1, $crawler->filter('h2:contains("'.$component->name.'")'));
+        $this->assertCount(1, $crawler->filter('title:contains("Edit budget ' . $component->name . '")'));
+        $this->assertCount(1, $crawler->filter('h2:contains("' . $component->name . '")'));
 
         $this->assertCount(1, $crawler->filter('input[name="reporting"]'));
         $this->assertCount(1, $crawler->filter('input[value="Test"]'));
@@ -318,10 +305,9 @@ class ComponentControllerTest extends TestCase
         $this->assertEquals(
             $view['title'], 'Overview for budget "' . $component->name . '"'
         );
-        $count = $component->transactions()->count();
         $this->assertEquals($view['component']->name, $component->name);
-        $this->assertCount($count, $view['transactions']);
-        $this->assertEquals('transactions', $view['display']);
+        // TODO actual count
+        $this->assertCount(count($view['months']), $view['months']);
 
     }
 
@@ -338,25 +324,8 @@ class ComponentControllerTest extends TestCase
             'Overview for budget "' . $component->name . '" in ' . date('F Y')
         );
         $this->assertEquals($view['component']->name, $component->name);
-        $this->assertCount(0, $view['transactions']);
-        $this->assertEquals('transactions', $view['display']);
-    }
-
-    public function testShowOverviewByMonthMontly()
-    {
-        $component = Auth::user()->components()->first();
-        $response = $this->call(
-            'GET', 'home/budget/' . $component->id . '/overview?monthly=true'
-        );
-        $view = $response->original;
-        $this->assertResponseStatus(200);
-        $this->assertEquals(
-            $view['title'], 'Overview for budget "' . $component->name . '"'
-        );
-        $this->assertEquals($view['component']->name, $component->name);
-        // TODO remove hard coded count!
-//        $this->assertCount(16, $view['transactions']);
-        $this->assertEquals('months', $view['display']);
+        // TODO actual count:
+        $this->assertCount(count($view['mutations']), $view['mutations']);
     }
 
 

@@ -91,7 +91,12 @@ class PiggyController extends BaseController
             Session::flash('error', 'Could not add piggy');
             return Redirect::route('addpiggybank')->withErrors($validator)->withInput();
         }
-        $piggy->save();
+        $result = $piggy->save();
+        // failed again!
+        if (!$result) {
+            Session::flash('error', 'Could not add piggy');
+            return Redirect::route('addpiggybank')->withErrors($validator)->withInput();
+        }
         Session::flash('success', 'Piggy bank created');
 
         return Redirect::to(Session::get('previous'));
@@ -190,6 +195,7 @@ class PiggyController extends BaseController
 
     /**
      * Post edit piggy bank
+     *
      * @param Piggybank $pig
      *
      * @return \Illuminate\Http\RedirectResponse
