@@ -3,3 +3,4 @@ app/config/testing/cache.php
 app/config/testing/database.php
 app/config/testing/mail.php
 app/config/testing/session.php
+vendor
