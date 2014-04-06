@@ -15,7 +15,7 @@ return array(
     $vendorDir . '/phpunit/php-file-iterator',
     $vendorDir . '/phpunit/phpunit-mock-objects',
     $vendorDir . '/phpunit/php-code-coverage',
+    $vendorDir . '/phpunit/php-invoker',
     $vendorDir . '/phpunit/phpunit',
     $vendorDir . '/symfony/yaml',
-    $vendorDir . '/phpunit/php-invoker',
 );

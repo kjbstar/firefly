@@ -632,7 +632,9 @@ class Crawler extends \SplObjectStorage
     public function filter($selector)
     {
         if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
+            // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector is not installed (you can use filterXPath instead).');
+            // @codeCoverageIgnoreEnd
         }
 
         return $this->filterXPath(CssSelector::toXPath($selector));
@@ -816,9 +818,11 @@ class Crawler extends \SplObjectStorage
             if ($i == $position) {
                 return $node;
             }
+        // @codeCoverageIgnoreStart
         }
 
         return null;
+        // @codeCoverageIgnoreEnd
     }
 
     /**

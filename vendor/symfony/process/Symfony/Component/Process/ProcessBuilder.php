@@ -29,7 +29,6 @@ class ProcessBuilder
     private $options = array();
     private $inheritEnv = true;
     private $prefix = array();
-    private $outputDisabled = false;
 
     public function __construct(array $arguments = array())
     {
@@ -155,30 +154,6 @@ class ProcessBuilder
         return $this;
     }
 
-    /**
-     * Disables fetching output and error output from the underlying process.
-     *
-     * @return Process
-     */
-    public function disableOutput()
-    {
-        $this->outputDisabled = true;
-
-        return $this;
-    }
-
-    /**
-     * Enables fetching output and error output from the underlying process.
-     *
-     * @return Process
-     */
-    public function enableOutput()
-    {
-        $this->outputDisabled = false;
-
-        return $this;
-    }
-
     public function getProcess()
     {
         if (0 === count($this->prefix) && 0 === count($this->arguments)) {
@@ -197,12 +172,6 @@ class ProcessBuilder
             $env = $this->env;
         }
 
-        $process = new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
-
-        if ($this->outputDisabled) {
-            $process->disableOutput();
-        }
-
-        return $process;
+        return new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
     }
 }

@@ -67,7 +67,6 @@ class Application
     private $helperSet;
     private $dispatcher;
     private $terminalDimensions;
-    private $defaultCommand;
 
     /**
      * Constructor.
@@ -81,7 +80,6 @@ class Application
     {
         $this->name = $name;
         $this->version = $version;
-        $this->defaultCommand = 'list';
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
 
@@ -147,8 +145,9 @@ class Application
             if ($exitCode > 255) {
                 $exitCode = 255;
             }
-
+            // @codeCoverageIgnoreStart
             exit($exitCode);
+            // @codeCoverageIgnoreEnd
         }
 
         return $exitCode;
@@ -181,8 +180,8 @@ class Application
         }
 
         if (!$name) {
-            $name = $this->defaultCommand;
-            $input = new ArrayInput(array('command' => $this->defaultCommand));
+            $name = 'list';
+            $input = new ArrayInput(array('command' => 'list'));
         }
 
         // the command name MUST be the first element of the input
@@ -1098,15 +1097,5 @@ class Application
         asort($alternatives);
 
         return array_keys($alternatives);
-    }
-
-    /**
-     * Sets the default Command name.
-     *
-     * @param string $commandName The Command name
-     */
-    public function setDefaultCommand($commandName)
-    {
-        $this->defaultCommand = $commandName;
     }
 }
