@@ -15,10 +15,10 @@ var accountChartOptions = {
         trigger: 'selection'
     },
     interval: {
-        'i10': {style: 'line', color: '#01DF01'}, // optimistic!
-        'i11': {style: 'line', color: 'red'}, // pessimistic
-        'i12': {style: 'line', color: '#31B404'}, // alt 1
-        'i13': {style: 'line', color: '#298A08'} // alt 2
+        'i10': {style: 'line', color: '#16D620'}, // very optimistic!
+        'i11': {style: 'line', color: '#8B0707'}, // pessimistic
+        'i12': {style: 'line', color: '#66AA00'}, // least optimistic
+        'i13': {style: 'line', color: '#329262'} // more optimistic
 
     }
 
