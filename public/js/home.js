@@ -1,5 +1,5 @@
 // load google
-google.load('visualization', '1.1', {'packages': ['corechart', 'table', 'gauge']});
+google.load('visualization', '1', {'packages': ['corechart']});
 google.setOnLoadCallback(drawCharts);
 
 

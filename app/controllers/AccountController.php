@@ -281,6 +281,8 @@ class AccountController extends BaseController
         $chart->addCertainty(1);
         $chart->addInterval(1);
         $chart->addInterval(1);
+        $chart->addInterval(1);
+        $chart->addInterval(1);
 
         // all annotations:
         $marked = AccountHelper::getMarkedTransactions($account, $date, $end);
@@ -292,6 +294,8 @@ class AccountController extends BaseController
             $balance = $account->balanceOnDate($date);
             $above = $balance;
             $below = $balance;
+            $alt1  = $balance;
+            $alt2  = $balance;
         }
 
 
@@ -303,6 +307,8 @@ class AccountController extends BaseController
                 $balance = $account->balanceOnDate($current);
                 $above = $balance;
                 $below = $balance;
+                $alt1  = $balance;
+                $alt2  = $balance;
             } else {
                 // predict the future:
                 $certain = false;
@@ -312,12 +318,16 @@ class AccountController extends BaseController
                 /** @noinspection PhpUndefinedVariableInspection */
                 $below -= $prediction['most'];
 
+                $alt1 -= $prediction['prediction_alt1'];
+
+                $alt2 -= $prediction['prediction_alt2'];
+
                 /** @noinspection PhpUndefinedVariableInspection */
                 $balance -= $prediction['prediction'];
             }
             // get the marked transactions:
             $annotation = isset($marked[$current->format('Y-m-d')]) ? $marked[$current->format('Y-m-d')] : null;
-            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $below);
+            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $below,$alt1,$alt2);
             $date->addDay();
         }
 
@@ -331,62 +341,4 @@ class AccountController extends BaseController
 
     }
 
-    /**
-     * Chart for all months.
-     *
-     * @param $year
-     * @param $month
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function showChartAllOverview($year, $month)
-    {
-        $start = Toolkit::parseDate($year, $month);
-        $end = clone $start;
-        $end->endOfMonth();
-        $realDay = new Carbon;
-
-        // make chart
-        $chart = App::make('gchart');
-        $chart->addColumn('Day', 'date');
-
-        $marked = [];
-        $balances = [];
-        $accounts = Auth::user()->accounts()->notHidden()->where('openingbalancedate', '<=', $start->format('Y-m-d'))
-            ->get();
-        foreach ($accounts as $account) {
-            $x = $chart->addColumn($account->name . ' Balance', 'number');
-            $chart->addAnnotation($x);
-            $marked[$account->id] = AccountHelper::getMarkedTransactions($account, $start, $end);
-            $balances[$account->id] = $account->balanceOnDate($start);
-        }
-        // loop again for data:
-        $current = clone $start;
-
-        while ($current <= $end) {
-            $row = [];
-            $row[] = clone $current;
-            if ($current <= $realDay) {
-
-                foreach ($accounts as $account) {
-                    $balances[$account->id] = $account->balanceOnDate($current);
-                    $annotation = isset($marked[$account->id][$current->format('Y-m-d')])
-                        ? $marked[$account->id][$current->format('Y-m-d')] : null;
-                    // add to row:
-                    $row[] = $balances[$account->id];
-                    $row[] = $annotation[0];
-                    $row[] = $annotation[1];
-
-                }
-            } else {
-                $row[] = null;
-                $row[] = null;
-                $row[] = null;
-            }
-            $chart->addRowArray($row);
-            $current->addDay();
-        }
-        $chart->generate();
-        return Response::json($chart->getData());
-    }
 }

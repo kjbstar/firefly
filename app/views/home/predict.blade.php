@@ -9,11 +9,15 @@
     <tr>
         <th>Pessimistic</th>
         <th>Prediction</th>
+        <th>Alt1</th>
+        <th>Alt2</th>
         <th>Optimistic</th>
     </tr>
     <tr>
         <td>{{mf($prediction['prediction']['most']*-1,true)}}</td>
         <td>{{mf($prediction['prediction']['prediction']*-1,true)}}</td>
+        <td>{{mf($prediction['prediction']['prediction_alt1']*-1,true)}}</td>
+        <td>{{mf($prediction['prediction']['prediction_alt2']*-1,true)}}</td>
         <td>{{mf($prediction['prediction']['least']*-1,true)}}</td>
     </tr>
 </table>

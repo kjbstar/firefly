@@ -1,7 +1,7 @@
 var accountChartOptions = {
     height: 250,
     legend: {position: 'none'},
-    lineWidth: 1,
+    lineWidth: 2,
     curveType: 'function',
     axisTitlesPosition: 'none',
     chartArea: {
@@ -14,7 +14,13 @@ var accountChartOptions = {
     tooltip: {isHtml: true,
         trigger: 'selection'
     },
-        intervals: { style: 'area'}
+    interval: {
+        'i10': {style: 'line', color: '#01DF01'}, // optimistic!
+        'i11': {style: 'line', color: 'red'}, // pessimistic
+        'i12': {style: 'line', color: '#31B404'}, // alt 1
+        'i13': {style: 'line', color: '#298A08'} // alt 2
+
+    }
 
 
 

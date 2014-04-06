@@ -38,6 +38,7 @@ class HomeController extends BaseController
      */
     public function showHome($year = null, $month = null)
     {
+
         $today = Toolkit::parseDate($year, $month, new Carbon);
         $actual = new Carbon;
         // fix $today if it's in this month:

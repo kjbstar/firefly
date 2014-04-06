@@ -272,9 +272,14 @@ class Account extends Eloquent
         }
 
 
-        // the actual prediction:
+        // the actual prediction (three ways of doing it):
+        // TODO switch by setting?
+
         $data['prediction']['prediction'] = array_sum([$data['prediction']['most'] + $data['prediction']['least']]) / 2;
-        $data['prediction']['prediction'] = $influences > 0 ? $sum / $influences : $sum;
+        $data['prediction']['prediction_alt1'] = $influences > 0 ? $sum / $influences : $sum;
+        $data['prediction']['prediction_alt2'] = count($days) > 0 ? $sum / count($days) : $sum;
+
+
 
         // in order to spice up the charts, we add two intermediate lines called
         // (how original)

@@ -37,6 +37,32 @@
 
         <div class="panel panel-info">
             <div class="panel-heading">
+                <h3 class="panel-title">Prediction style</h3>
+            </div>
+            <div class="panel-body">
+                <p>
+                    Firefly tries to predict your balance day-by-day. It looks at the same days, in the previous month.
+                    For example: 10th of May, 10th of April, 10th of March. This is not perfect, but it works pretty
+                    well.
+                </p>
+                <p>
+
+                </p>
+                <ol>
+                    <li>Simply take the average of the difference between the day</li>
+                </ol>
+
+                <p>
+                    <input type="date" name="predictionStart"
+                           value="{{$predictionStart->format('Y-m-d')}}"
+                           class="form-control"/>
+                </p>
+
+            </div>
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
                 <h3 class="panel-title">Frontpage account</h3>
             </div>
             <div class="panel-body">

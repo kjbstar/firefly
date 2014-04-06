@@ -302,7 +302,7 @@ class AccountControllerTest extends TestCase
         $responseData = json_decode($jsonResponse, true);
         $this->assertArrayHasKey('cols', $responseData);
         $this->assertArrayHasKey('rows', $responseData);
-        $this->assertCount(7, $responseData['cols']);
+        $this->assertCount(9, $responseData['cols']);
     }
 
     public function testShowChartOverviewByMonthFutureDate()
@@ -321,7 +321,7 @@ class AccountControllerTest extends TestCase
         $responseData = json_decode($jsonResponse, true);
         $this->assertArrayHasKey('cols', $responseData);
         $this->assertArrayHasKey('rows', $responseData);
-        $this->assertCount(7, $responseData['cols']);
+        $this->assertCount(9, $responseData['cols']);
     }
 
     public function testShowChartOverviewByMonthDebug()
@@ -335,25 +335,4 @@ class AccountControllerTest extends TestCase
         $this->assertResponseStatus(200);
         $this->assertNotNull($response);
     }
-
-    public function testShowChartAllOverview()
-    {
-        $response = $this->call(
-            'GET', 'home/account/overview/chart/' . date('Y/m')
-        );
-        $this->assertResponseStatus(200);
-        $this->assertNotNull($response);
-
-        $accounts = Auth::user()->accounts()->count();
-        $columns = $accounts * 3 + 1;
-
-        $jsonResponse = $this->client->getResponse()->getContent();
-        $responseData = json_decode($jsonResponse, true);
-        $this->assertArrayHasKey('cols', $responseData);
-        $this->assertArrayHasKey('rows', $responseData);
-        $this->assertCount($columns, $responseData['cols']);
-
-    }
-
-
 }

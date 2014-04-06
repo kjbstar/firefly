@@ -40,6 +40,11 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     protected function tearDown()
     {
         parent::tearDown();
+        parent::tearDown();
 
+        // workaround for https://github.com/symfony/symfony/issues/2531
+        if (ob_get_length() == 0 ) {
+            ob_start();
+        }
     }
 }

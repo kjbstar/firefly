@@ -89,6 +89,7 @@ class TransactionController extends BaseController
             Session::flash('error', 'Could not save transaction.');
             return Redirect::route('addtransaction')->withInput()->withErrors($validator);
         }
+
         $result = $transaction->save();
         if (!$result) {
             Session::flash('error', 'Could not save transaction.');
@@ -99,6 +100,9 @@ class TransactionController extends BaseController
         $transaction->attachComponent($beneficiary);
         $transaction->attachComponent($budget);
         $transaction->attachComponent($category);
+
+        Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
+
         Session::flash('success', 'The transaction has been created.');
 
         return Redirect::to(Session::get('previous'));

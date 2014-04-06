@@ -214,7 +214,7 @@ class ComponentControllerTest extends TestCase
 
     public function testPostEdit()
     {
-        $component = Auth::user()->components()->whereNull('parent_component_id')->orderBy('ID', 'DESC')->first();
+        $component = Auth::user()->components()->whereNull('parent_component_id')->orderBy('id', 'DESC')->first();
         $data = ['name' => 'EditedComponent'];
         $this->call('POST', 'home/budget/' . $component->id . '/edit', $data);
         $this->assertResponseStatus(302);
