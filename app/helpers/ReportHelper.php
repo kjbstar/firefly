@@ -1,4 +1,5 @@
 <?php
+use Carbon\Carbon as Carbon;
 
 /**
  * Class ReportHelper
@@ -6,72 +7,254 @@
 class ReportHelper
 {
 
-    /**
-     * @param $type
-     * @param $predictables
-     */
-    public static function ieList($type, $predictables)
+    public static function summary(Carbon $date, $period)
     {
-        $query = Auth::user()->transactions()->groupBy('month');
-        switch ($type) {
-            case 'incomes':
-                $query->incomes();
+        $start = clone $date;
+        $start->subDay();
+        $end = clone $date;
+        switch ($period) {
+            default:
+            case 'month':
+                $endOf = 'endOfMonth';
+                $startOf = 'startOfMonth';
+                $inPeriod = 'inMonth';
                 break;
-            case 'expenses':
-                $query->expenses();
+            case 'year':
+                $endOf = 'endOfYear';
+                $startOf = 'startOfYear';
+                $inPeriod = 'inYear';
                 break;
         }
-        if ($predictables === true) {
-            $query->whereNotNull('predictable_id');
-        } else {
-            $query->whereNull('predictable_id');
-        }
-        $result = $query->get(
-            [DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),
-             DB::Raw('SUM(`amount`) as `total`')]
+        $date->$startOf();
+        $end->$endOf();
+
+        // get the incomes:
+        $income = floatval(Auth::user()->transactions()->$inPeriod($date)->incomes()->sum('amount'));
+
+        // get the expenses:
+        $expenses = floatval(Auth::user()->transactions()->$inPeriod($date)->expenses()->sum('amount'));
+
+        // received in total from shared accounts (this might be income):
+        $receivedFromShared = floatval(
+            Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountfrom_id')->where(
+                'accounts.shared', 1
+            )->$inPeriod(
+                    $date
+                )->sum('amount')
         );
 
-        // TODO also include either incomes or expenses for transfers from/to shared accounts:
+        $sentToShared = floatval(
+            Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')->where(
+                'accounts.shared', 1
+            )->$inPeriod(
+                    $date
+                )->sum('amount')
+        );
+        $shared = ($receivedFromShared - $sentToShared);
+
+        // received more: income!
+        if ($shared > 0) {
+            $income += $shared;
+        } else {
+            // spent more, expense!
+            $expenses -= $shared;
+        }
+
+        // get the net worth:
+        $nwEnd = 0;
+        $nwStart = 0;
+        foreach (Auth::user()->accounts()->notHidden()->notShared()->get() as $account) {
+            $nwEnd += $account->balanceOnDate($end);
+            $nwStart += $account->balanceOnDate($start);
+        }
 
 
-        $list = [];
-        foreach ($result as $row) {
-            switch ($type) {
-                case 'incomes':
-                    $list[$row->month] = $row->total;
-                    break;
-                case 'expenses':
-                    $list[$row->month] = $row->total * -1;
+        $data = [
+            'income'   => [
+                'income'  => $income,
+                'expense' => $expenses,
+            ],
+            'networth' => [
+                'start'     => $nwStart,
+                'startdate' => $date,
+                'end'       => $nwEnd,
+                'enddate'   => $end
+            ]
+        ];
 
+        return $data;
+    }
 
-                    break;
+    public static function biggestExpenses(Carbon $date, $period)
+    {
+
+        switch ($period) {
+            default:
+            case 'month':
+                $inPeriod = 'inMonth';
+                break;
+            case 'year':
+                $inPeriod = 'inYear';
+                break;
+        }
+        $transactions = Auth::user()->transactions()->expenses()->orderBy('amount', 'ASC')->whereNull('predictable_id')
+            ->take(10)->$inPeriod(
+                $date
+            )->get();
+        $transfers = Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')
+            ->where('accounts.shared', 1)->$inPeriod(
+                $date
+            )->get();
+        $mutations = [];
+
+        // we have both:
+        if (count($transfers) > 0 && count($transactions) > 0) {
+            $mutations = $transactions->merge($transfers);
+            $mutations = $mutations->sortBy(
+                function ($a) {
+                    return $a->amount;
+                }
+            )->reverse();
+        }
+        // we have transactions:
+        if (count($transfers) == 0 && count($transactions) > 0) {
+            $mutations = $transactions;
+        }
+        // we have transfers:
+        if (count($transactions) == 0 && count($transfers) > 0) {
+            $mutations = $transfers;
+        }
+
+        return $mutations;
+    }
+
+    public static function predicted($date)
+    {
+        $transactions = Auth::user()->transactions()->expenses()->orderBy('amount', 'ASC')->whereNotNull(
+            'predictable_id'
+        )->take(10)->inMonth($date)->get();
+        $transactions->each(
+            function (Transaction $t) {
+                $t->predicted = $t->predictable()->first()->amount;
             }
+        );
+
+
+        return $transactions;
+    }
+
+    public static function months(Carbon $date)
+    {
+        $date->startOfYear();
+        $end = clone $date;
+        $end->endOfYear();
+        $current = clone $date;
+        $list = [];
+
+        while ($current <= $end) {
+
+            $out = Auth::user()->transactions()->inMonth($current)->expenses()->sum('amount');
+            $in = Auth::user()->transactions()->inMonth($current)->incomes()->sum('amount');
+
+            $list[] = [
+                'date' => $current->format('F Y'),
+                'in'   => $in,
+                'out'  => $out,
+                'url'  => URL::Route('monthreport', [$current->format('Y'), $current->format('m')])
+            ];
+
+            $current->addMonth();
         }
         return $list;
+
     }
-    /**
-     * // query + array for all predictable expenses:
-     * $result = Auth::user()->transactions()->groupBy('month')->expenses()
-     * ->get(
-     * [DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),
-     * DB::Raw('SUM(`amount`) as `total`')]
-     * );
-     * $expenses = [];
-     * foreach ($result as $row) {
-     * $expenses[$row->month] = floatval($row->total) * -1;
-     * }
-     * unset($result);
-     *
-     * // same for all incomes:
-     * $result = Auth::user()->transactions()->groupBy('month')->incomes()
-     * ->get(
-     * [DB::Raw('DATE_FORMAT(date,"%m-%Y") as `month`'),
-     * DB::Raw('SUM(`amount`) as `total`')]
-     * );
-     * $incomes = [];
-     * foreach ($result as $row) {
-     * $incomes[$row->month] = floatval($row->total);
-     * }
-     * unset($result);
-     */
+
+    public static function expenses(Carbon $date)
+    {
+        $data = [];
+        $transactions = Auth::user()->transactions()->whereNull('predictable_id')->expenses()->with(
+            ['components' => function ($query) {
+                    $query->where('type', 'category');
+                }]
+        )->inMonth($date)->get();
+
+        foreach ($transactions as $t) {
+            $key = $t->category->id;
+            if (isset($data[$key])) {
+                $data[$key]['transactions'][] = $t;
+            } else {
+                $data[$key] = [
+                    'category'     => [
+                        'id'   => $key,
+                        'name' => $t->category->name
+                    ],
+                    'transactions' => [$t]
+                ];
+            }
+        }
+        return $data;
+    }
+
+    public static function incomes(Carbon $date, $period)
+    {
+        switch ($period) {
+            case 'month':
+                $inPeriod = 'inMonth';
+                break;
+            case 'year':
+                $inPeriod = 'inYear';
+                break;
+        }
+
+        $data = [];
+        $transactions = Auth::user()->transactions()->incomes()->with(
+            ['components' => function ($query) {
+                    $query->where('type', 'beneficiary');
+                }]
+        )->$inPeriod($date)->get();
+
+        foreach ($transactions as $t) {
+            $key = is_null($t->beneficiary) ? 0 : $t->beneficiary->id;
+            if (isset($data[$key])) {
+                $data[$key]['transactions'][] = $t;
+            } else {
+                $data[$key] = [
+                    'beneficiary'  => [
+                        'id'   => $key,
+                        'name' => is_null($t->beneficiary) ? '(no beneficiary)' : $t->beneficiary->name
+                    ],
+                    'transactions' => [$t]
+                ];
+            }
+        }
+        return $data;
+    }
+
+    public static function budgets(Carbon $date)
+    {
+        $transactions = Auth::user()->transactions()->expenses()->with(
+            ['components'        => function ($query) {
+                    $query->where('type', 'budget');
+                },
+             'components.limits' => function ($query) use ($date) {
+                     $query->inMonth($date);
+                 }
+            ]
+        )->inMonth($date)->get();
+        $budgets = [];
+        foreach ($transactions as $t) {
+            $key = is_null($t->budget) ? 0 : $t->budget->id;
+
+            if (isset($budgets[$key])) {
+                $budgets[$key]['amount'] += $t->amount;
+            } else {
+                $budgets[$key] = [
+                    'budget' => $t->budget,
+                    'amount' => $t->amount
+                ];
+            }
+        }
+        return $budgets;
+
+    }
 }

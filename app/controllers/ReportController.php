@@ -58,6 +58,21 @@ class ReportController extends BaseController
      */
     public function month($year, $month)
     {
+        $date = Toolkit::parseDate($year, $month);
+        $title = 'Report for ' . $date->format('F Y');
+
+        $summary = ReportHelper::summary($date, 'month');
+        $biggest = ReportHelper::biggestExpenses($date, 'month');
+        $predicted = ReportHelper::predicted($date);
+        $expenses = ReportHelper::expenses($date);
+        $budgets = ReportHelper::budgets($date);
+        $incomes = ReportHelper::incomes($date, 'month');
+
+        return View::make('reports.month')->with('date', $date)->with('title', $title)->with('summary', $summary)->with(
+            'biggest', $biggest
+        )->with('predicted', $predicted)->with('expenses', $expenses)->with('budgets', $budgets)->with(
+                'incomes', $incomes
+            );
     }
 
     /**
@@ -69,37 +84,117 @@ class ReportController extends BaseController
      */
     public function year($year)
     {
+        $date = Toolkit::parseDate($year, 1);
+        $title = 'Report for ' . $date->format('Y');
+
+        $summary = ReportHelper::summary($date, 'year');
+        $biggest = ReportHelper::biggestExpenses($date, 'year');
+        $incomes = ReportHelper::incomes($date, 'year');
+        $months = ReportHelper::months($date);
+
+        return View::make('reports.year')->with('date', $date)->with('title', $title)->with('summary', $summary)->with(
+            'biggest', $biggest
+        )->with(
+                'incomes', $incomes
+            )->with('months', $months);
+
     }
 
-
-    /**
-     * @param $year
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function yearIeChart($year)
+    public function monthAccounts($year, $month)
     {
+        // cache!
+        $key = Auth::user()->id . '-month-account-' . $year . $month . 'aac';
+        if (Cache::has($key)) {
+            return Response::json(Cache::get($key));
+        }
+
+        // dates!
+        $start = Toolkit::parseDate($year, $month);
+        $end = clone $start;
+        $end->endOfMonth();
+        $now = new Carbon;
+        $current = clone $start;
+
+        // all relevant accounts!
+        $accounts = Auth::user()->accounts()->notHidden()->notShared()->where(
+            'openingbalancedate', '<', $end->format('Y-m-d')
+        )->get();
+
+        // create a chart!
+        $chart = App::make('gchart');
+        $chart->addColumn('Day', 'date');
+        foreach ($accounts as $account) {
+            $chart->addColumn($account->name, 'number');
+        }
+
+
+        while ($current <= $end) {
+            $row = [clone $current];
+
+            foreach ($accounts as $account) {
+                if ($current <= $now) {
+                    $row[] = $account->balanceOnDate($current);
+                } else {
+                    $row[] = null;
+                }
+            }
+            $chart->addRowArray($row);
+            $current->addDay();
+        }
+
+        $chart->generate();
+        $data = $chart->getData();
+        Cache::put($key, $data, 1440);
+        return Response::json($data);
     }
 
-    /**
-     * @param $yearOne
-     * @param $yearTwo
-     *
-     * @return \Illuminate\View\View
-     */
-    public function yearCompare($yearOne, $yearTwo)
+    public function yearAccounts($year)
     {
+        // cache!
+        $key = Auth::user()->id . '-year-account-' . $year . 'aac';
+        if (Cache::has($key)) {
+            return Response::json(Cache::get($key));
+        }
+
+        // dates!
+        $start = Toolkit::parseDate($year, 1);
+        $start->startOfYear();
+        $end = clone $start;
+        $end->endOfYear();
+        $now = new Carbon;
+        $current = clone $start;
+
+        // all relevant accounts!
+        $accounts = Auth::user()->accounts()->notHidden()->notShared()->where(
+            'openingbalancedate', '<', $end->format('Y-m-d')
+        )->get();
+
+        // create a chart!
+        $chart = App::make('gchart');
+        $chart->addColumn('Month', 'date');
+        foreach ($accounts as $account) {
+            $chart->addColumn($account->name, 'number');
+        }
+
+
+        while ($current <= $end) {
+            $row = [clone $current];
+
+            foreach ($accounts as $account) {
+                if ($current <= $now) {
+                    $row[] = $account->balanceOnDate($current);
+                } else {
+                    $row[] = null;
+                }
+            }
+            $chart->addRowArray($row);
+            $current->addMonth();
+        }
+
+        $chart->generate();
+        $data = $chart->getData();
+        Cache::put($key, $data, 1440);
+        return Response::json($data);
     }
 
-    /**
-     * @param $yearOne
-     * @param $monthOne
-     * @param $yearTwo
-     * @param $monthTwo
-     *
-     * @return \Illuminate\View\View
-     */
-    public function monthCompare($yearOne, $monthOne, $yearTwo, $monthTwo)
-    {
-    }
 }
