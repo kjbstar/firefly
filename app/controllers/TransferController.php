@@ -74,10 +74,15 @@ class TransferController extends BaseController
             return Redirect::route('addtransfer')->withInput()->withErrors($validator);
         } else {
             $result = $transfer->save();
+
+            // this can't actually fail.
+
+            // @codeCoverageIgnoreStart
             if (!$result) {
                 Session::flash('error', 'Could not add transfer.');
                 return Redirect::route('addtransfer')->withInput()->withErrors($validator);
             }
+            // @codeCoverageIgnoreEnd
             // attach the beneficiary, if it is set:
             $transfer->attachComponent($beneficiary);
             $transfer->attachComponent($budget);

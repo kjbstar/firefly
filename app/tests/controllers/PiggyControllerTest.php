@@ -119,13 +119,29 @@ class PiggyControllerTest extends TestCase
     {
         Log::error('tesFilledPostAdd');
         $count = Auth::user()->piggybanks()->count();
-        $data = ['name' => Str::random(15), 'target' => $this->_target];
+        $data = ['name' => 'RandomStringOfzo', 'target' => $this->_target];
         $this->call('POST', 'home/piggy/add', $data);
         $newCount = Auth::user()->piggybanks()->count();
         $this->assertResponseStatus(302);
         $this->assertEquals($count + 1, $newCount);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
+
+    }
+
+    /**
+     * @depends testFilledPostAdd
+     */
+    public function testFilledDoublePostAdd()
+    {
+        Log::error('tesFilledPostAdd');
+        $count = Auth::user()->piggybanks()->count();
+        $data = ['name' => 'RandomStringOfzo', 'target' => $this->_target];
+        $this->call('POST', 'home/piggy/add', $data);
+        $newCount = Auth::user()->piggybanks()->count();
+        $this->assertResponseStatus(302);
+        $this->assertEquals($count, $newCount);
+        $this->assertSessionHas('error');
 
     }
 
@@ -233,5 +249,6 @@ class PiggyControllerTest extends TestCase
     public static function tearDownAfterClass()
     {
         DB::table('settings')->delete();
+        DB::table('piggybanks')->where('target',123)->delete();
     }
 }

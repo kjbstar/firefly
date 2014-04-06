@@ -30,11 +30,12 @@ function drawAccountChart() {
                 selection = chart.getSelection()[0];
                 // build some sort of modal dialog?
                 var date = gdata.getValue(selection.row,0);
+                var balance = gdata.getValue(selection.row,1);
                 console.log('Before add day: ' + date);
                 //date.setDate(date.getDate()+1);
                 console.log('after add day: ' + date);
                 var dateString = date.getFullYear()+'/'+ (date.getMonth()+1) + '/' +date.getDate();
-                var URL = '/home/predict/' + dateString;
+                var URL = '/home/predict/' + dateString + '?balance=' + balance;
                 $('#PopupModal').modal(
                     {
                         remote: URL

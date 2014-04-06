@@ -78,12 +78,19 @@ class HomeController extends BaseController
      */
     public function predict($year, $month, $day)
     {
+        $balance = floatval(Input::get('balance'));
+
         $date = new Carbon($year . '-' . $month . '-' . $day);
         $account = Toolkit::getFrontpageAccount();
         $prediction = $account->predictOnDateExpanded($date);
 
+        if($balance != 0) {
+            // previous balance without prediction:
+            $balance += $prediction['prediction']['prediction'];
+        }
+
         // do a prediction, but "visible":
         return View::make('home.predict')->with('prediction', $prediction)
-            ->with('date', $date);
+            ->with('date', $date)->with('balance',$balance);
     }
 }

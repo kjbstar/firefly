@@ -89,11 +89,13 @@ class PiggyController extends BaseController
         // failed!
         if ($validator->fails()) {
             Session::flash('error', 'Could not add piggy');
+            Log::error('Piggy errors: ' . print_r($validator->messages()->all(),true));
             return Redirect::route('addpiggybank')->withErrors($validator)->withInput();
         }
         $result = $piggy->save();
         // failed again!
         if (!$result) {
+            Log::error('Trigger error on piggy.');
             Session::flash('error', 'Could not add piggy');
             return Redirect::route('addpiggybank')->withErrors($validator)->withInput();
         }

@@ -28,6 +28,7 @@ class PiggyTrigger
         foreach ($piggies as $dbp) {
 
             if ($piggy->name == $dbp->name) {
+                Log::error('Piggy trigger: ' . $piggy->name.' exists already (#'.$dbp->id.')');
                 return false;
             }
         }

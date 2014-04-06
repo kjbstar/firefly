@@ -91,10 +91,12 @@ class TransactionController extends BaseController
         }
 
         $result = $transaction->save();
+        // @codeCoverageIgnoreStart
         if (!$result) {
             Session::flash('error', 'Could not save transaction.');
             return Redirect::route('addtransaction')->withInput()->withErrors($validator);
         }
+        // @codeCoverageIgnoreEnd
 
         // attach the beneficiary, if it is set:
         $transaction->attachComponent($beneficiary);
@@ -173,12 +175,14 @@ class TransactionController extends BaseController
             $transaction->attachComponent($category);
 
             $result = $transaction->save();
+            // @codeCoverageIgnoreStart
             if (!$result) {
                 Session::flash('error', 'The transaction could not be saved.');
                 Log::debug('These rules failed: ' . print_r($validator->messages()->all(), true));
                 return Redirect::route('edittransaction', $transaction->id)
                     ->withInput()->withErrors($validator);
             }
+            // @codeCoverageIgnoreEnd
             Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
             Session::flash('success', 'The transaction has been saved.');
 

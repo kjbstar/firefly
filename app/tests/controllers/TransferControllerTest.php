@@ -108,6 +108,22 @@ class TransferControllerTest extends TestCase
         $this->assertCount($accounts, $view['accounts']);
     }
 
+    public function testEditWithOldInput()
+    {
+        $this->session(['_old_input' => ['description' => 'Test', 'amount' => 100]]);
+        $accounts = Auth::user()->accounts()->count();
+        $transfer = Auth::user()->transfers()->where('amount', $this->_amount)->first();
+        $response = $this->call(
+            'GET', 'home/transfer/' . $transfer->id . '/edit'
+        );
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertEquals(
+            $view['title'], 'Edit transfer ' . $transfer->description
+        );
+        $this->assertCount($accounts, $view['accounts']);
+    }
+
     public function testPostEdit()
     {
         $transfer = Auth::user()->transfers()->where('amount', $this->_amount)->first();
@@ -120,6 +136,20 @@ class TransferControllerTest extends TestCase
         $this->assertResponseStatus(302);
         $this->assertSessionHas('success');
         $this->assertRedirectedToRoute('index');
+    }
+
+    public function testPostEditFailTrigger()
+    {
+        $transfer = Auth::user()->transfers()->where('amount', $this->_amount)->first();
+        $date = $transfer->accountto()->first()->openingbalancedate;
+        $date->subMonth();
+        $data = ['description'    => 'TestEdit', 'amount' => $this->_amount,
+                 'date'           => $date->format('Y-m-d'),
+                 'accountfrom_id' => $transfer->accountto_id,
+                 'accountto_id'   => $transfer->accountfrom_id];
+
+        $this->call('POST', 'home/transfer/' . $transfer->id . '/edit', $data);
+        $this->assertResponseStatus(302);
     }
 
     public function testPostFailedEdit()

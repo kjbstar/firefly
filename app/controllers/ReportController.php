@@ -105,7 +105,9 @@ class ReportController extends BaseController
         // cache!
         $key = Auth::user()->id . '-month-account-' . $year . $month . 'aac';
         if (Cache::has($key)) {
+            // @codeCoverageIgnoreStart
             return Response::json(Cache::get($key));
+            // @codeCoverageIgnoreEnd
         }
 
         // dates!
@@ -153,7 +155,9 @@ class ReportController extends BaseController
         // cache!
         $key = Auth::user()->id . '-year-account-' . $year . 'aac';
         if (Cache::has($key)) {
+            // @codeCoverageIgnoreStart
             return Response::json(Cache::get($key));
+            // @codeCoverageIgnoreEnd
         }
 
         // dates!

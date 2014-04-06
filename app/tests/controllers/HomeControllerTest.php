@@ -93,6 +93,16 @@ class HomeControllerTest extends TestCase
         $this->assertEquals($carbon, $view['date']);
     }
 
+    public function testPredictWithBalance()
+    {
+        $response = $this->call('GET', '/home/predict/' . date('Y/m/d').'?balance=12');
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertCount(3, $view['prediction']);
+        $carbon = new Carbon\Carbon(date('Y-m-d'));
+        $this->assertEquals($carbon, $view['date']);
+    }
+
     public function testShowNotLoggedInIndex()
     {
         $this->client->request('GET', '/logout');

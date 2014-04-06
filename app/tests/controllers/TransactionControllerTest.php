@@ -165,6 +165,25 @@ class TransactionControllerTest extends TestCase
     /**
      * @depends testPostAdd
      */
+    public function testEditWithOldInput()
+    {
+        $this->session(['_old_input' => ['description' => 'Test', 'amount' => 100, 'ignoreprediction' => '1']]);
+        $accounts = Auth::user()->accounts()->count();
+        $transaction = Auth::user()->transactions()->where('amount', $this->_amount)->first();
+        $response = $this->call(
+            'GET', 'home/transaction/' . $transaction->id . '/edit'
+        );
+        $view = $response->original;
+        $this->assertResponseStatus(200);
+        $this->assertEquals(
+            $view['title'], 'Edit transaction ' . $transaction->description
+        );
+        $this->assertCount($accounts, $view['accounts']);
+    }
+
+    /**
+     * @depends testPostAdd
+     */
     public function testPostEdit()
     {
         $transaction = Auth::user()->transactions()->where('amount', $this->_amount)->first();
