@@ -48,7 +48,6 @@ Route::get('/home/account/{account}/overview',['uses' => 'AccountController@show
 
 Route::get('/home/account/{account}/overview/chart',['uses' => 'AccountController@showOverviewChart']);
 
-Route::get('/home/account/overview/chart/{year?}/{month?}',['uses' => 'AccountController@showChartAllOverview','as'   => 'allaccountoverviewchart']);
 Route::post('/home/account/add',['uses' => 'AccountController@postAdd', 'before' => 'csrf']);
 Route::post('/home/account/{account}/edit',['uses' => 'AccountController@postEdit', 'before' => 'csrf']);
 Route::post('/home/account/{account}/delete',['uses' => 'AccountController@postDelete', 'before' => 'csrf']);
@@ -92,7 +91,6 @@ foreach ($objects as $o) {
             Route::get('',['uses' => 'ComponentController@showIndex', 'as' => Str::plural($o)]);
             Route::get('/add', ['uses' => 'ComponentController@add', 'as' => 'add' . $o]);
             Route::get('/empty/{year?}/{month?}',['uses' => 'ComponentController@showEmpty', 'as' => 'empty' . $o]);
-            Route::get('/index/average', ['uses' => 'ComponentController@showAverageChart']);
             Route::get('/typeahead', ['uses' => 'ComponentController@typeahead']);
             Route::get('/{component}/edit',['uses' => 'ComponentController@edit', 'as' => 'edit' . $o]);
             Route::get('/{component}/delete',['uses' => 'ComponentController@delete', 'as' => 'delete' . $o]);
@@ -145,14 +143,17 @@ Route::get('/home/reports',['uses' => 'ReportController@index', 'as' => 'reports
 Route::get('/home/reports/period/{year}',['uses' => 'ReportController@year', 'as' => 'yearreport']);
 Route::get('/home/reports/period/{year}/{month}',['uses' => 'ReportController@month', 'as' => 'monthreport']);
 
+Route::get('/home/reports/period/{year}/{month}/chart',['uses' => 'ReportController@monthAccounts', 'as' => 'monthreportchart']);
+Route::get('/home/reports/period/{year}/chart',['uses' => 'ReportController@yearAccounts', 'as' => 'yearreportchart']);
+
 // compares:
-Route::get('/home/reports/compare/{year}/{otheryear}',['uses' => 'ReportController@yearCompare', 'as' => 'yearcompare']);
-Route::get('/home/reports/compare/{year}-{month}/{otheryear}-{othermonth}',['uses' => 'ReportController@monthCompare', 'as' => 'monthcompare']);
+#Route::get('/home/reports/compare/{year}/{otheryear}',['uses' => 'ReportController@yearCompare', 'as' => 'yearcompare']);
+#Route::get('/home/reports/compare/{year}-{month}/{otheryear}-{othermonth}',['uses' => 'ReportController@monthCompare', 'as' => 'monthcompare']);
 
 // charts:
-Route::get('/home/reports/year/{year}/ie',['uses' => 'ReportController@yearIeChart']);
-Route::get('/home/reports/year/{year}/components',['uses' => 'ReportController@yearComponentsChart']);
-Route::get('/home/reports/compare/{year}-{month}/{otheryear}-{othermonth}/account',['uses' => 'ReportController@monthCompareAccountChart']);
+#Route::get('/home/reports/year/{year}/ie',['uses' => 'ReportController@yearIeChart']);
+#Route::get('/home/reports/year/{year}/components',['uses' => 'ReportController@yearComponentsChart']);
+#Route::get('/home/reports/compare/{year}-{month}/{otheryear}-{othermonth}/account',['uses' => 'ReportController@monthCompareAccountChart']);
 
 
 
@@ -211,3 +212,7 @@ Route::post('/login', ['uses' => 'UserController@postLogin', 'before' => 'csrf']
 Route::post('/register', ['uses' => 'UserController@postRegister', 'before' => 'csrf']);
 
 
+Route::get('/test',function() {
+       //return     dd( Route::getRoutes() );
+
+    });
