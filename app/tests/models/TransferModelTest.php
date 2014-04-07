@@ -11,6 +11,50 @@ class TransferModelTest extends TestCase
         $this->be($user);
     }
 
+    public function testGetEmptyAttributes()
+    {
+        $transfers = Auth::user()->transfers()->get();
+        $found = false;
+        foreach ($transfers as $t) {
+            $count = DB::table('component_transfer')->where('transfer_id', $t->id)->count();
+            if ($count == 0) {
+                $this->assertNull($t->beneficiary);
+                $this->assertNull($t->category);
+                $this->assertNull($t->budget);
+                $found = true;
+                break;
+            }
+
+        }
+        if (!$found) {
+            $this->assertTrue(false, 'No transfers found to test in testGetEmptyAttributes');
+        }
+    }
+
+    public function testGetFilledAttributes()
+    {
+        $transfers = Auth::user()->transfers()->get();
+        $found = false;
+        foreach ($transfers as $t) {
+            $count = DB::table('component_transfer')->where('transfer_id', $t->id)->count();
+            if ($count >= 3) {
+                $this->assertNotNull($t->beneficiary);
+                $this->assertNotNull($t->category);
+                $this->assertNotNull($t->budget);
+
+                $this->assertEquals('beneficiary', $t->beneficiary->type);
+                $this->assertEquals('budget', $t->budget->type);
+                $this->assertEquals('category', $t->category->type);
+                $found = true;
+                break;
+            }
+
+        }
+        if (!$found) {
+            $this->assertTrue(false, 'No transfers found to test in testGetFilledAttributes');
+        }
+    }
+
     public function testAccountfrom()
     {
         $transfer = Auth::user()->transfers()->first();
@@ -58,5 +102,51 @@ class TransferModelTest extends TestCase
         $this->assertInstanceOf('\Carbon\Carbon', $transfer->updated_at);
         $this->assertInstanceOf('\Carbon\Carbon', $transfer->created_at);
         $this->assertInstanceOf('\Carbon\Carbon', $transfer->date);
+    }
+
+    public function testAttachComponent()
+    {
+        $transfer = Auth::user()->transfers()->orderBy(DB::Raw('RAND()'))->first();
+        $count = DB::table('component_transfer')->where('transfer_id', $transfer->id)->count();
+        // attach a component:
+        $budget = Auth::user()->components()->where('type', 'budget')->first();
+        $transfer->attachComponent($budget);
+        $newCount = DB::table('component_transfer')->where('transfer_id', $transfer->id)->count();
+        $this->assertEquals($count + 1, $newCount);
+        $this->assertEquals($budget->id, $transfer->budget->id);
+
+    }
+
+    public function testScopeBeforeDate()
+    {
+        $date = new \Carbon\Carbon();
+        $date->subYear();
+        $raw = Auth::user()->transfers()->where('date', '<=', $date->format('Y-m-d'))->count();
+        $count = Auth::user()->transfers()->beforeDate($date)->count();
+        $this->assertEquals($raw, $count);
+
+    }
+
+    public function testScopeInYear()
+    {
+        $date = new \Carbon\Carbon();
+        $date->subYear();
+        $raw = Auth::user()->transfers()->where(DB::Raw('DATE_FORMAT(`date`,"%Y")'), '=', $date->format('Y'))->count(
+        );
+        $count = Auth::user()->transfers()->inYear($date)->count();
+        $this->assertEquals($raw, $count);
+    }
+
+
+    public function testAttachEmptyComponent()
+    {
+        $transfer = Auth::user()->transfers()->orderBy(DB::Raw('RAND()'))->first();
+        $count = DB::table('component_transfer')->where('transfer_id', $transfer->id)->count();
+        // attach a component:
+        $transfer->attachComponent(null);
+        $newCount = DB::table('component_transfer')->where('transfer_id', $transfer->id)->count();
+        $this->assertEquals($count, $newCount);
+        $this->assertNull($transfer->budget);
+
     }
 } 

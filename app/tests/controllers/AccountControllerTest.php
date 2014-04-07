@@ -15,20 +15,13 @@ class AccountControllerTest extends TestCase
 
     private $_balance = 543.21; // used to find the right account.
 
+    /**
+     * @covers AccountController::showIndex
+     */
     public function testShowIndex()
     {
-        //$accounts = Auth::user()->accounts()->count();
         $this->call('GET', 'home/account');
         $this->assertResponseStatus(200);
-//        $this->assertCount(1, $crawler->filter('title:contains("All accounts")'));
-        // number of row matches the number of accounts:
-//        $this->assertCount($accounts, $crawler->filter('table.table > tr > td:first-child'));
-//
-//        // if there is a shared account, icon should exist.
-//        $shared = Auth::user()->accounts()->shared()->count();
-//        if ($shared > 0) {
-//            $this->assertCount($shared, $crawler->filter('table.table > tr > td:first-child img'));
-//        }
     }
 
     public function testAdd()

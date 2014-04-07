@@ -146,6 +146,16 @@ class TransactionModelTest extends TestCase
 
     }
 
+    public function testScopeBeforeDate()
+    {
+        $date = new \Carbon\Carbon();
+        $date->subYear();
+        $raw = Auth::user()->transactions()->where('date', '<=', $date->format('Y-m-d'))->count();
+        $count = Auth::user()->transactions()->beforeDate($date)->count();
+        $this->assertEquals($raw, $count);
+
+    }
+
     public function testScopeIncomes()
     {
         $raw = Auth::user()->transactions()->where('amount', '>',0.0)->count();

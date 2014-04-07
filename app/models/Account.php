@@ -103,8 +103,11 @@ class Account extends Eloquent
         $key = $date->format('Y-m-d') . Auth::user()->id . $this->id . '-balanceOndate';
 
         if (cache::has($key)) {
+            // @codeCoverageIgnoreStart
             return Cache::get($key);
+            // @codeCoverageIgnoreEnd
         } else {
+
             $r = floatval($this->balancemodifiers()->where('date', '<=', $date->format('Y-m-d'))->sum('balance'));
             Cache::put($key, $r, $cacheTime);
             return $r;

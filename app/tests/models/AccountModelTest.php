@@ -128,7 +128,6 @@ class AccountModelTest extends TestCase
     }
 
 
-
     public function testPredictOnDate()
     {
         // simply to hit the code
@@ -143,7 +142,26 @@ class AccountModelTest extends TestCase
         // is accurate (randomness in the test seeds)
         // but at least we can check the content of the result array.
 
-        $this->assertCount(3,$result);
+        $this->assertCount(5, $result);
+        $this->assertLessThanOrEqual($result['most'], $result['prediction']);
+        $this->assertLessThanOrEqual($result['prediction'], $result['least']);
+    }
+
+    public function testPredictOnDateAfterMonthEnd()
+    {
+        // simply to hit the code
+        // TODO write tests.
+
+
+        $account = Auth::user()->accounts()->first();
+        $date = Carbon\Carbon::create(2014, 03, 30);
+        $result = $account->predictOnDate($date);
+
+        // I have no way of seeing if the predicted result
+        // is accurate (randomness in the test seeds)
+        // but at least we can check the content of the result array.
+
+        $this->assertCount(5,$result);
         $this->assertLessThanOrEqual($result['most'],$result['prediction']);
         $this->assertLessThanOrEqual($result['prediction'],$result['least']);
     }
@@ -194,8 +212,15 @@ class AccountModelTest extends TestCase
 
     public function testScopeShared()
     {
-        $raw = Auth::user()->accounts()->where('shared',1)->count();
+        $raw = Auth::user()->accounts()->where('shared', 1)->count();
         $count = Auth::user()->accounts()->shared()->count();
+        $this->assertEquals($raw, $count);
+    }
+
+    public function testScopeNotShared()
+    {
+        $raw = Auth::user()->accounts()->where('shared',0)->count();
+        $count = Auth::user()->accounts()->notShared()->count();
         $this->assertEquals($raw,$count);
     }
 } 

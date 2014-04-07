@@ -92,6 +92,16 @@ class ComponentModelTest extends TestCase
         }
     }
 
+    public function testTransfers()
+    {
+        $components = Auth::user()->components()->get();
+        foreach ($components as $c) {
+            $raw = DB::table('component_transfer')->where('component_id', $c->id)->count();
+            $count = $c->transfers()->count();
+            $this->assertEquals($raw, $count);
+        }
+    }
+
     public function testPredictables()
     {
         $components = Auth::user()->components()->get();

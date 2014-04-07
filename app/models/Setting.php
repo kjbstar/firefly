@@ -56,7 +56,9 @@ class Setting extends Eloquent
         /** @noinspection PhpUndefinedFieldInspection */
         $key = Auth::user()->id.'setting'.$name;
         if(Cache::has($key)) {
+            // @codeCoverageIgnoreStart
             return Cache::get($key);
+            // @codeCoverageIgnoreEnd
         } else {
         $userSetting = Auth::user()->settings()->where('name', $name)->first();
 
