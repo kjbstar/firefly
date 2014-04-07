@@ -18,8 +18,6 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
         $testEnvironment = 'testing';
 
-
-
         return require __DIR__ . '/../../bootstrap/start.php';
 
 
@@ -31,7 +29,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
     public static function setUpBeforeClass()
     {
-//        parent::setUpBeforeClass();
+        parent::setUpBeforeClass();
 //        $test = new self;
 //        $test->setUp();
 //        $test->seed();
@@ -39,7 +37,6 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
     protected function tearDown()
     {
-        parent::tearDown();
         parent::tearDown();
 
         // workaround for https://github.com/symfony/symfony/issues/2531
