@@ -54,7 +54,7 @@ class AccountController extends BaseController
             $prefilled = AccountHelper::prefilledFromOldInput();
         }
 
-        return View::make('accounts.add')->with('title', 'Add account')->with('prefilled', $prefilled);
+        return View::make('accounts.add')->with('title', 'Add a new account')->with('prefilled', $prefilled);
     }
 
     /**
@@ -117,7 +117,9 @@ class AccountController extends BaseController
         if (Input::old()) {
             $prefilled = AccountHelper::prefilledFromOldInput();
         }
-        return View::make('accounts.edit')->with('title', 'Edit account ' . $account->name)->with('account', $account)
+        return View::make('accounts.edit')->with('title', 'Edit account "' . $account->name . '"')->with(
+            'account', $account
+        )
             ->with('prefilled', $prefilled);
     }
 
@@ -176,7 +178,7 @@ class AccountController extends BaseController
         }
 
         return View::make('accounts.delete')->with('account', $account)->with(
-            'title', 'Delete account ' . $account->name
+            'title', 'Delete account "' . $account->name.'"'
         );
     }
 
@@ -231,7 +233,7 @@ class AccountController extends BaseController
 
         // catch debug request:
         if (Input::get('debug') == 'true') {
-            return '<pre>'.print_r($chart->getData(),true).'</pre>';
+            return '<pre>' . print_r($chart->getData(), true) . '</pre>';
         } else {
             return $chart->getData();
         }
@@ -294,8 +296,8 @@ class AccountController extends BaseController
             $balance = $account->balanceOnDate($date);
             $above = $balance;
             $below = $balance;
-            $alt1  = $balance;
-            $alt2  = $balance;
+            $alt1 = $balance;
+            $alt2 = $balance;
         }
 
 
@@ -307,8 +309,8 @@ class AccountController extends BaseController
                 $balance = $account->balanceOnDate($current);
                 $above = $balance;
                 $below = $balance;
-                $alt1  = $balance;
-                $alt2  = $balance;
+                $alt1 = $balance;
+                $alt2 = $balance;
             } else {
                 // predict the future:
                 $certain = false;
@@ -327,16 +329,16 @@ class AccountController extends BaseController
             }
             // get the marked transactions:
             $annotation = isset($marked[$current->format('Y-m-d')]) ? $marked[$current->format('Y-m-d')] : null;
-            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $below,$alt1,$alt2);
+            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $below, $alt1, $alt2);
             $date->addDay();
         }
 
         $chart->generate();
 
         if (Input::get('debug') == 'true') {
-            return '<pre>'.print_r($chart->getData(),true).'</pre>';
+            return '<pre>' . print_r($chart->getData(), true) . '</pre>';
         } else {
-            return $chart->getData();
+            return Response::json($chart->getData());
         }
 
     }
