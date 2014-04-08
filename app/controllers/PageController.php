@@ -5,6 +5,13 @@
  */
 class PageController extends BaseController
 {
+
+    public function flush()
+    {
+        Cache::flush();
+        return Redirect::to('/');
+    }
+
     /**
      * Recalculated EVERY balancemodifier.
      */

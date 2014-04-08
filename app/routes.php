@@ -59,6 +59,7 @@ Route::get('/', ['uses' => 'HomeController@showIndex', 'as' => 'index']);
 Route::get('/home/{year?}/{month?}',['uses' => 'HomeController@showHome', 'as' => 'home']);
 Route::get('/home/predict/{year}/{month}/{day}',['uses' => 'HomeController@predict', 'as' => 'predictDay']);
 Route::get('/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']);
+Route::get('/home/flush', ['uses' => 'PageController@flush', 'as' => 'flush']);
 
 
 
