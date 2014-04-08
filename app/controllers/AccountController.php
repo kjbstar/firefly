@@ -1,8 +1,10 @@
 <?php
+// @codeCoverageIgnoreStart
 /** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/AccountHelper.php');
 /** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/Toolkit.php');
+// @codeCoverageIgnoreEnd
 use Carbon\Carbon as Carbon;
 
 /**
@@ -233,7 +235,9 @@ class AccountController extends BaseController
 
         // catch debug request:
         if (Input::get('debug') == 'true') {
+            // @codeCoverageIgnoreStart
             return '<pre>' . print_r($chart->getData(), true) . '</pre>';
+            // @codeCoverageIgnoreEnd
         } else {
             return $chart->getData();
         }
@@ -336,7 +340,9 @@ class AccountController extends BaseController
         $chart->generate();
 
         if (Input::get('debug') == 'true') {
+            // @codeCoverageIgnoreStart
             return '<pre>' . print_r($chart->getData(), true) . '</pre>';
+            // @codeCoverageIgnoreEnd
         } else {
             return Response::json($chart->getData());
         }

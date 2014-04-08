@@ -337,7 +337,7 @@ class AccountControllerTest extends TestCase
         $this->assertCount($transactions + $transfers, $view['mutations']);
 
         // check date
-        $this->assertEquals($date->format('Y-m-d'),$view['date']->format('Y-m-d'));
+        $this->assertEquals($date->format('Y-m-d'), $view['date']->format('Y-m-d'));
 
         // check account object:
         $this->assertEquals(Crypt::decrypt($account->name), $view['account']->name);
@@ -368,7 +368,238 @@ class AccountControllerTest extends TestCase
         // scan JSON response:
         $this->assertCount(intval($date->format('t')), $json->rows); // number of days in month
         $this->assertCount(9, $json->cols); // 9 columns (date, name, 4x interval, 2x anno, 1x certainty
+    }
 
+    /**
+     * @covers AccountController::add
+     */
+    public function testAddWithOldInput()
+    {
+        // array with old input:
+        $data = [
+            'name'               => Str::random(16),
+            'openingbalance'     => 1234,
+            'openingbalancedate' => date('Y-m-d'),
+            'shared'             => 1
+        ];
+        $this->session(['_old_input' => $data]);
+
+        $response = $this->action('GET', 'AccountController@add');
+        $view = $response->original;
+
+        // is OK?
+        $this->assertResponseOk();
+
+        // empty prefilled array should have five entries:
+        $this->assertCount(5, $view['prefilled']);
+
+        // check some variables in the prefilled array:
+        $this->assertEquals($data['name'], $view['prefilled']['name']);
+        $this->assertEquals($data['openingbalance'], $view['prefilled']['openingbalance']);
+        $this->assertEquals($data['openingbalancedate'], $view['prefilled']['openingbalancedate']);
+
+        // check the title:
+        $this->assertEquals('Add a new account', $view['title']);
+
+    }
+
+    /**
+     * @covers AccountController::postAdd
+     */
+    public function testPostAddWithInvalidData()
+    {
+        // count the number of accounts
+        $current = DB::table('accounts')->whereUserId($this->_user->id)->count();
+
+        // the data we will create a new account with:
+        $data = [
+            'name'               => null,
+            'openingbalance'     => null,
+            'openingbalancedate' => null,
+            'hidden'             => null,
+            'shared'             => null
+        ];
+
+        // fire!
+        $this->action('POST', 'AccountController@postAdd', $data);
+
+        // is OK?
+        $this->assertResponseStatus(302);
+
+        // count again
+        $new = DB::table('accounts')->whereUserId($this->_user->id)->count();
+
+        $this->assertSessionHas('error');
+        $this->assertEquals($current, $new);
+        $this->assertRedirectedToAction('AccountController@add');
+
+    }
+
+    /**
+     * @covers AccountController::postAdd
+     */
+    public function testPostAddFailsTrigger()
+    {
+        // count the number of accounts
+        $current = DB::table('accounts')->whereUserId($this->_user->id)->count();
+
+        // get an account, we'll use its name as input (which should subsequently fail)
+        $account = DB::table('accounts')->whereUserId($this->_user->id)->first();
+
+        // the data we will create a new account with:
+        $data = [
+            'name'               => Crypt::decrypt($account->name),
+            'openingbalance'     => 100,
+            'openingbalancedate' => date('Y-m-d'),
+            'hidden'             => 0,
+            'shared'             => 0
+        ];
+
+        // fire!
+        $this->action('POST', 'AccountController@postAdd', $data);
+
+        // is OK?
+        $this->assertResponseStatus(302);
+
+        // count again
+        $new = DB::table('accounts')->whereUserId($this->_user->id)->count();
+
+        $this->assertSessionHas('error');
+        $this->assertEquals($current, $new);
+        $this->assertRedirectedToAction('AccountController@add');
+
+    }
+
+    /**
+     * @covers AccountController::edit
+     */
+    public function testEditWithOldInput()
+    {
+        // array with old input:
+        $data = [
+            'name'               => Str::random(16),
+            'openingbalance'     => 1234,
+            'openingbalancedate' => date('Y-m-d'),
+            'shared'             => 1
+        ];
+        $this->session(['_old_input' => $data]);
+
+        // find account to edit:
+        $account = DB::table('accounts')->whereUserId($this->_user->id)->first();
+
+        // fire!
+        $response = $this->action('get', 'AccountController@edit', $account);
+        $view = $response->original;
+
+        // is OK?
+        $this->assertResponseOk();
+
+        // prefilled array should have five entries:
+        $this->assertCount(5, $view['prefilled']);
+
+        // prefilled array should match our pre-filled array:
+        $this->assertEquals($data['name'], $view['prefilled']['name']);
+        $this->assertEquals($data['openingbalance'], $view['prefilled']['openingbalance']);
+        $this->assertEquals($data['openingbalancedate'], $view['prefilled']['openingbalancedate']);
+
+        // account object should match our object:
+        $this->assertEquals(Crypt::decrypt($account->name), $view['account']->name);
+        $this->assertEquals($account->currentbalance, $view['account']->currentbalance);
+
+        // check the title
+        $this->assertEquals('Edit account "' . Crypt::decrypt($account->name) . '"', $view['title']);
+
+
+    }
+
+    /**
+     * @covers AccountController::postEdit
+     */
+    public function testPostEditWithInvalidData()
+    {
+        // find account to edit:
+        $account = DB::table('accounts')->whereUserId($this->_user->id)->first();
+
+        // the data to update the account with:
+        $data = [
+            'name'               => null,
+            'openingbalance'     => null,
+            'openingbalancedate' => null,
+            'shared'             => null,
+            'hidden'             => null
+        ];
+
+        // fire the update!
+        $this->call('POST', 'home/account/' . $account->id . '/edit', $data);
+
+        // result should be OK
+        $this->assertResponseStatus(302);
+
+        // session should be faulty:
+        $this->assertSessionHas('error');
+
+        // redirect back.
+        $this->assertRedirectedToRoute('editaccount',$account->id);
+
+    }
+
+    /**
+     * @covers AccountController::postEdit
+     */
+    public function testPostEditFailsTrigger()
+    {
+        // find account to edit:
+        $account = DB::table('accounts')->whereUserId($this->_user->id)->first();
+
+        // find another account:
+        $secondAccount = DB::table('accounts')->where('id', '!=', $account->id)->whereUserId($this->_user->id)->first();
+
+        // the data to update the account with:
+        $data = [
+            'name'               => Crypt::decrypt($secondAccount->name),
+            'openingbalance'     => rand(20, 2000),
+            'openingbalancedate' => $this->_date,
+            'shared'             => 1,
+            'hidden'             => 1
+        ];
+
+        // fire the update!
+        $this->call('POST', 'home/account/' . $account->id . '/edit', $data);
+
+        // result should be OK
+        $this->assertResponseStatus(302);
+
+        // session should be faulty:
+        $this->assertSessionHas('error');
+
+        // redirect back.
+        $this->assertRedirectedToRoute('editaccount',$account->id);
+
+    }
+
+    /**
+     * @covers AccountController::showOverviewChartByMonth
+     */
+    public function testShowOverviewChartByMonthFutureMonth()
+    {
+        // the month we wish to see:
+        $date = new Carbon;
+        $date->addYear();
+        $date->startOfMonth();
+        // find an account:
+        $account = DB::table('accounts')->whereUserId($this->_user->id)->first();
+
+        // fire!
+        $response = $this->call('GET', 'home/account/' . $account->id . '/overview/chart/' . $date->format('Y/m'));
+        $raw = $response->getContent();
+        // decode JSON response:
+        $json = json_decode($raw);
+
+        //print_r($json);
+
+        // scan JSON response:
+        $this->assertCount(intval($date->format('t')), $json->rows); // number of days in month
+        $this->assertCount(9, $json->cols); // 9 columns (date, name, 4x interval, 2x anno, 1x certainty
 
     }
 }
