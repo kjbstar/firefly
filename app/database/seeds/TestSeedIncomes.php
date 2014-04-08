@@ -7,6 +7,7 @@ class TestSeedIncomes extends Seeder
         $user = User::first();
 
         $today = new Carbon\Carbon;
+        $today->subMonth();
         $twoYears = clone $today;
         $twoYears->subYears(2);
         $current = clone $twoYears;
