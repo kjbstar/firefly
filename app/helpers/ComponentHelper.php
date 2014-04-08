@@ -102,7 +102,7 @@ class ComponentHelper
                         'components.type', $type
                     );
             }
-        );
+        )->orderBy('date','DESC');
         if (!is_null($date)) {
             $query->inMonth($date);
         }

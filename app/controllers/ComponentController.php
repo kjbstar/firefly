@@ -147,7 +147,7 @@ class ComponentController extends BaseController
         }
         $parents = ComponentHelper::getParentList(OBJ, $component);
         return View::make('components.edit')->with('object', $component)->with('parents', $parents)->with(
-            'title', 'Edit ' . OBJ . ' ' . $component->name
+            'title', 'Edit ' . OBJ . ' "' . $component->name.'"'
         )->with('prefilled', $prefilled);
     }
 
@@ -197,7 +197,7 @@ class ComponentController extends BaseController
         }
 
         return View::make('components.delete')->with('object', $component)->with(
-            'title', 'Delete ' . OBJ . ' ' . $component->name
+            'title', 'Delete ' . OBJ . ' "' . $component->name.'"'
         );
     }
 

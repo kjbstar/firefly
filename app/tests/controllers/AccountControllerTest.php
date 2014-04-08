@@ -294,7 +294,7 @@ class AccountControllerTest extends TestCase
         // is OK?
         $this->assertResponseOk();
 
-        // it's a PHP array response (JSON):
+        // it's a PHP array response (json):
         $this->assertCount(2, $view); // rows and columns
         $this->assertCount($diff, $view['rows']); // +/- 50 months
         $this->assertCount(2, $view['cols']); // 2 columns
