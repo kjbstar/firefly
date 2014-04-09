@@ -333,7 +333,7 @@ class AccountController extends BaseController
             }
             // get the marked transactions:
             $annotation = isset($marked[$current->format('Y-m-d')]) ? $marked[$current->format('Y-m-d')] : null;
-            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $below, $alt1, $alt2);
+            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain,$above,$alt2,$alt1,$below);
             $date->addDay();
         }
 

@@ -10,7 +10,7 @@ class AccountControllerTest extends TestCase
 
     protected $_user;
     protected $_openingbalance = 234.56;
-    protected $_date = '2010-02-28';
+    protected $_date = null;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -21,6 +21,11 @@ class AccountControllerTest extends TestCase
         parent::setUp();
         $this->_user = User::whereUsername('test')->first();
         $this->be($this->_user);
+
+        $account = DB::table('accounts')->whereUserId($this->_user->id)->orderBy(
+            'openingbalancedate', 'ASC'
+        )->first();
+        $this->_date = $account->openingbalancedate;
     }
 
     /**

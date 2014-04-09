@@ -11,7 +11,7 @@ class ComponentControllerTest extends TestCase
      * @var User
      */
     protected $_user;
-    protected $_date = '2012-01-01';
+    protected $_date = null;
 
 
     /**
@@ -23,6 +23,9 @@ class ComponentControllerTest extends TestCase
         parent::setUp();
         $this->_user = User::whereUsername('test')->first();
         $this->be($this->_user);
+
+        $account = DB::table('accounts')->whereUserId($this->_user->id)->orderBy('openingbalancedate', 'ASC')->first();
+        $this->_date = $account->openingbalancedate;
     }
 
     /**
@@ -333,12 +336,12 @@ class ComponentControllerTest extends TestCase
 
         // check mutations:
         $transfers = DB::table('component_transfer')->where('component_id', $component->id)
-            ->leftJoin('transfers', 'transfers.id','=', 'component_transfer.transfer_id')
-            ->where(DB::Raw('DATE_FORMAT(transfers.date,"%m-%Y")'),'=', $date->format('m-Y'))
+            ->leftJoin('transfers', 'transfers.id', '=', 'component_transfer.transfer_id')
+            ->where(DB::Raw('DATE_FORMAT(transfers.date,"%m-%Y")'), '=', $date->format('m-Y'))
             ->count();
         $transactions = DB::table('component_transaction')->where('component_id', $component->id)
-            ->leftJoin('transactions', 'transactions.id','=', 'component_transaction.transaction_id')
-            ->where(DB::Raw('DATE_FORMAT(transactions.date,"%m-%Y")'),'=', $date->format('m-Y'))
+            ->leftJoin('transactions', 'transactions.id', '=', 'component_transaction.transaction_id')
+            ->where(DB::Raw('DATE_FORMAT(transactions.date,"%m-%Y")'), '=', $date->format('m-Y'))
             ->count();
         $this->assertCount($transactions + $transfers, $view['mutations']);
 
@@ -352,7 +355,6 @@ class ComponentControllerTest extends TestCase
 
     /**
      * @covers ComponentController::typeahead
-     * @todo   Implement testTypeahead().
      */
     public function testTypeahead()
     {
@@ -369,7 +371,209 @@ class ComponentControllerTest extends TestCase
         // is OK?
         $this->assertResponseOk();
 
-
         $this->assertCount($count, $json); // rows and columns
     }
+
+    /**
+     * @covers ComponentController::add
+     */
+    public function testAddWithOldInput()
+    {
+        Route::enableFilters();
+
+        // array with old input:
+        $data = [
+            'name'                => Str::random(16),
+            'reporting'           => true,
+            'parent_component_id' => 0,
+        ];
+        $this->session(['_old_input' => $data]);
+
+        // this defaults to beneficiary (somehow).
+        $response = $this->action('GET', 'ComponentController@add');
+        $view = $response->original;
+
+        // is OK?
+        $this->assertResponseOk();
+
+        // Title
+        $this->assertEquals('Add new beneficiary', $view['title']);
+
+        // count and test parents:
+        $count = DB::table('components')->where('type', 'beneficiary')->whereNull('parent_component_id')->whereUserId(
+                $this->_user->id
+            )->count() + 1;
+        $this->assertCount($count, $view['parents']);
+
+        // check and count prefilled array:
+        $this->assertCount(3, $view['prefilled']);
+        $this->assertEquals($data['name'], $view['prefilled']['name']);
+        $this->assertEquals($data['parent_component_id'], $view['prefilled']['parent_component_id']);
+        $this->assertTrue($view['prefilled']['reporting']);
+
+    }
+
+    /**
+     * @covers ComponentController::postAdd
+     */
+    public function testPostAddWithInvalidData()
+    {
+
+        // count the number of beneficiaries
+        $current = DB::table('components')->where('type', 'beneficiary')->whereUserId($this->_user->id)->count();
+
+        // the data we will create a new component with:
+        $data = [
+            'name'                => null,
+            'reporting'           => null,
+            'parent_component_id' => null,
+        ];
+
+        // fire!
+        $this->action('POST', 'ComponentController@postAdd', $data);
+
+        // is OK?
+        $this->assertResponseStatus(302);
+
+        // count again
+        $new = DB::table('components')->where('type', 'beneficiary')->whereUserId($this->_user->id)->count();
+
+        $this->assertSessionHas('error');
+        $this->assertEquals($current, $new);
+        $this->assertRedirectedToAction('ComponentController@add');
+
+    }
+
+    /**
+     * @covers ComponentController::postAdd
+     */
+    public function testPostAddFailsTrigger()
+    {
+
+        // count the number of beneficiaries
+        $current = DB::table('components')->where('type', 'beneficiary')->whereUserId($this->_user->id)->count();
+
+        // get a component, we'll use its name as input (which should subsequently fail)
+        $component = DB::table('components')->where('type', 'beneficiary')->whereUserId($this->_user->id)->first();
+
+        // the data we will create a new component with:
+        $data = [
+            'name'                => Crypt::decrypt($component->name),
+            'reporting'           => 0,
+            'parent_component_id' => null,
+        ];
+
+        // fire!
+        $this->action('POST', 'ComponentController@postAdd', $data);
+
+        // is OK?
+        $this->assertResponseStatus(302);
+
+        // count again
+        $new = DB::table('components')->where('type', 'beneficiary')->whereUserId($this->_user->id)->count();
+
+        $this->assertSessionHas('error');
+        $this->assertEquals($current, $new);
+        $this->assertRedirectedToAction('ComponentController@add');
+    }
+
+    /**
+     * @covers ComponentController::postEdit
+     */
+    public function testPostEditWithInvalidData()
+    {
+        // find account to edit:
+        $component = DB::table('components')->where('type', 'beneficiary')->whereUserId($this->_user->id)->first();
+
+        // the data to update the account with:
+        $data = [
+            'name'                => null,
+            'parent_component_id' => null,
+            'reporting'           => null,
+        ];
+
+        // fire the update!
+        $this->call('POST', 'home/beneficiary/' . $component->id . '/edit', $data);
+
+        // result should be OK
+        $this->assertResponseStatus(302);
+
+        // session also OK:
+        $this->assertSessionHas('error');
+
+        $this->assertRedirectedToAction('ComponentController@edit', $component->id);
+    }
+
+
+    /**
+     * @covers ComponentController::postEdit
+     */
+    public function testPostEditFailsTrigger()
+    {
+        // find component to edit:
+        $component = DB::table('components')->where('type', 'beneficiary')->whereUserId($this->_user->id)->first();
+
+        // get a component, we'll use its name as input (which should subsequently fail)
+        $input = DB::table('components')->where('id', '!=', $component->id)->where('type', 'beneficiary')->whereUserId(
+            $this->_user->id
+        )->first();
+
+        // the data to update the component with:
+        $data = [
+            'name'                => Crypt::decrypt($input->name),
+            'parent_component_id' => null,
+            'reporting'           => 1,
+        ];
+
+        // fire the update!
+        $this->call('POST', 'home/beneficiary/' . $component->id . '/edit', $data);
+
+        // result should be OK
+        $this->assertResponseStatus(302);
+
+        // session also OK:
+        $this->assertSessionHas('error');
+
+        $this->assertRedirectedToAction('ComponentController@edit', $component->id);
+    }
+
+    /**
+     * @covers ComponentController::edit
+     */
+    public function testEditWithOldInput()
+    {
+        // array with old input:
+        $data = [
+            'name'                => Str::random(16),
+            'reporting'           => true,
+            'parent_component_id' => 0,
+        ];
+        $this->session(['_old_input' => $data]);
+
+        // find component to edit:
+        $component = DB::table('components')->where('type', 'beneficiary')->whereUserId($this->_user->id)->first();
+
+        // fire!
+        $response = $this->action('get', 'ComponentController@edit', $component);
+        $view = $response->original;
+
+        // is OK?
+        $this->assertResponseOk();
+
+        // prefilled array should have five entries:
+        $this->assertCount(3, $view['prefilled']);
+
+        // prefilled array should match our account:
+        $this->assertEquals($data['name'], $view['prefilled']['name']);
+        $this->assertEquals($data['parent_component_id'], $view['prefilled']['parent_component_id']);
+        $this->assertEquals($data['reporting'], $view['prefilled']['reporting']);
+
+        $this->assertEquals(Crypt::decrypt($component->name), $view['object']->name);
+        $this->assertEquals($component->reporting, $view['object']->reporting);
+
+        // check the title
+        $this->assertEquals('Edit ' . $component->type . ' "' . Crypt::decrypt($component->name) . '"', $view['title']);
+    }
+
+
 }

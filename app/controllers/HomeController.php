@@ -1,8 +1,10 @@
 <?php
+// @codeCoverageIgnoreStart
 /** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/HomeHelper.php');
 /** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/Toolkit.php');
+// @codeCoverageIgnoreEnd
 
 use Carbon\Carbon as Carbon;
 
@@ -31,7 +33,7 @@ class HomeController extends BaseController
     /**
      * Show the homepage. Can be for another month.
      *
-     * @param int $year The year
+     * @param int $year  The year
      * @param int $month The month
      *
      * @return View
@@ -63,8 +65,8 @@ class HomeController extends BaseController
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(
             'history', $history
         )->with('allowance', $allowance)->with('transactions', $transactions)->with('fpAccount', $fpAccount)->with(
-            'budgets', $budgets
-        )->with('predictables', $predictables)->with('transfers', $transfers);
+                'budgets', $budgets
+            )->with('predictables', $predictables)->with('transfers', $transfers);
     }
 
     /**
@@ -78,19 +80,22 @@ class HomeController extends BaseController
      */
     public function predict($year, $month, $day)
     {
-        $balance = floatval(Input::get('balance'));
+        $input = [
+            'balance'     => floatval(Input::get('balance')),
+            'pessimistic' => floatval(Input::get('pessimistic')),
+            'optimistic' => floatval(Input::get('optimistic')),
+            'alt1' => floatval(Input::get('alt1')),
+            'alt2' => floatval(Input::get('alt2')),
+
+        ];
+
 
         $date = new Carbon($year . '-' . $month . '-' . $day);
         $account = Toolkit::getFrontpageAccount();
         $prediction = $account->predictOnDateExpanded($date);
 
-        if($balance != 0) {
-            // previous balance without prediction:
-            $balance += $prediction['prediction']['prediction'];
-        }
-
         // do a prediction, but "visible":
         return View::make('home.predict')->with('prediction', $prediction)
-            ->with('date', $date)->with('balance',$balance);
+            ->with('date', $date)->with('input', $input);
     }
 }

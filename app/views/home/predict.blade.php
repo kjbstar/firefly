@@ -2,37 +2,33 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabeXl">Prediction for {{$date->format('j F Y')}}
-                @if($balance != 0)
-                    <small>{{mf($balance)}}</small>
-                </h4>
-                @endif
+                <h4 class="modal-title" id="myModalLabeXl">Prediction for {{$date->format('j F Y')}}</h4>
             </div>
             <div class="modal-body">
 <table class="table">
     <tr>
-        <th>Pessimistic</th>
         <th>Prediction</th>
+        <th>Optimistic</th>
         <th>Alt1</th>
         <th>Alt2</th>
-        <th>Optimistic</th>
+        <th>Pessimistic</th>
+
     </tr>
     <tr>
+        <td><strong>{{mf($prediction['prediction']['prediction']*-1,true)}}</strong></td>
         <td>{{mf($prediction['prediction']['most']*-1,true)}}</td>
-        <td>{{mf($prediction['prediction']['prediction']*-1,true)}}</td>
         <td>{{mf($prediction['prediction']['prediction_alt1']*-1,true)}}</td>
         <td>{{mf($prediction['prediction']['prediction_alt2']*-1,true)}}</td>
         <td>{{mf($prediction['prediction']['least']*-1,true)}}</td>
     </tr>
-    @if($balance != 0)
     <tr>
-        <td>{{mf($balance - $prediction['prediction']['most'],true)}}</td>
-        <td>{{mf($balance - $prediction['prediction']['prediction'],true)}}</td>
-        <td>{{mf($balance - $prediction['prediction']['prediction_alt1'],true)}}</td>
-        <td>{{mf($balance - $prediction['prediction']['prediction_alt2'],true)}}</td>
-        <td>{{mf($balance - $prediction['prediction']['least'],true)}}</td>
+        <td><strong>{{mf($input['balance'],true)}}</strong></td>
+        <td>{{mf($input['optimistic'],true)}}</td>
+        <td>{{mf($input['alt1'],true)}}</td>
+        <td>{{mf($input['alt2'],true)}}</td>
+        <td>{{mf($input['pessimistic'],true)}}</td>
+
     </tr>
-    @endif
 </table>
 
 <h5>Based on these transactions</h5>
