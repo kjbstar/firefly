@@ -14,7 +14,7 @@ $('#PopupModal').on('hidden.bs.modal', function () {
 
 function drawAccountChart() {
 
-    $.getJSON('home/account/'+fpAccount+'/overview/chart/' + year + '/' + month).success(function (data) {
+    $.getJSON('home/account/' + fpAccount + '/overview/chart/' + year + '/' + month).success(function (data) {
         gdata = new google.visualization.DataTable(data);
         var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
         for (i = 1; i < gdata.getNumberOfColumns(); i++) {
@@ -26,31 +26,37 @@ function drawAccountChart() {
         chart.setAction({
             id: 'prediction',                  // An id is mandatory for all actions.
             text: 'More information',       // The text displayed in the tooltip.
-            action: function() {           // When clicked, the following runs.
-                selection = chart.getSelection()[0];
+            action: function () {           // When clicked, the following runs.
+                var selection = chart.getSelection()[0];
                 // build some sort of modal dialog?
-                var date = gdata.getValue(selection.row,0);
-                var balance = gdata.getValue(selection.row,1);
-                console.log(gdata.getColumnRole(2));
-                var dateString = date.getFullYear()+'/'+ (date.getMonth()+1) + '/' +date.getDate();
-                var URL = '/home/predict/' + dateString + '?balance=' + balance;
+                var date = gdata.getValue(selection.row, 0);
+                var params = {
+                    balance: gdata.getValue(selection.row, 1),
+                    optimistic: gdata.getValue(selection.row, 5),
+                    alt1: gdata.getValue(selection.row, 6),
+                    alt2: gdata.getValue(selection.row, 7),
+                    pessimistic: gdata.getValue(selection.row, 8)
+
+
+
+                };
+
+                var query = $.param(params);
+
+
+                var dateString = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+                var URL = '/home/predict/' + dateString + '?' + query;
+
+
                 $('#PopupModal').modal(
                     {
                         remote: URL
 
                     }
                 )
-
-
-
             }
         });
-
-
-
         chart.draw(gdata, accountChartOptions);
-
-
 
     }).fail(function () {
         $('#home-accounts-chart').addClass('load-error');
