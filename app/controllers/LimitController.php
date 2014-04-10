@@ -50,18 +50,21 @@ class LimitController extends BaseController
         );
 
         $validator = Validator::make($limit->toArray(), Limit::$rules);
+
         // it fails!
         if ($validator->fails()) {
             Session::flash('error', 'Could not add ' . OBJ . ' limit.');
-
             return Redirect::route(OBJ . 'overview', [$component->id]);
         } else {
-            $limit->save();
-            Session::flash('success', 'Limit saved!');
-
-
-            return Redirect::to(Session::get('previous'));
+            $result = $limit->save();
+            // failed again!
+            if (!$result) {
+                Session::flash('error', 'Could not add ' . OBJ . ' limit.');
+                return Redirect::route(OBJ . 'overview', [$component->id]);
+            }
         }
+        Session::flash('success', 'Limit saved!');
+        return Redirect::to(Session::get('previous'));
 
     }
 
@@ -79,9 +82,7 @@ class LimitController extends BaseController
         }
         $object = Auth::user()->components()->find($limit->component_id);
 
-        return View::make('meta-limit.edit')->with('object', $object)->with(
-            'limit', $limit
-        );
+        return View::make('meta-limit.edit')->with('object', $object)->with('limit', $limit);
     }
 
     /**
@@ -140,4 +141,4 @@ class LimitController extends BaseController
 
         return Redirect::to(Session::get('previous'));
     }
-} 
+}

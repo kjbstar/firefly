@@ -4,10 +4,11 @@
  */
 class PageControllerTest extends TestCase
 {
+
     /**
-     * @var PageController
+     * @var User
      */
-    protected $object;
+    protected $_user;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -16,7 +17,8 @@ class PageControllerTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->object = new PageController;
+        $this->_user = User::whereUsername('test')->first();
+        $this->be($this->_user);
     }
 
     /**
@@ -25,6 +27,7 @@ class PageControllerTest extends TestCase
      */
     protected function tearDown()
     {
+
     }
 
     /**
@@ -33,9 +36,35 @@ class PageControllerTest extends TestCase
      */
     public function testRecalculate()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->action('GET', 'PageController@recalculate');
+
+        // is ok!
+        $this->assertResponseStatus(302);
+
+        // is redirect to index!
+        $this->assertRedirectedToAction('HomeController@showIndex');
+
+
+    }
+
+    /**
+     * @covers PageController::flush
+     * @todo   Implement testRecalculate().
+     */
+    public function testFlush()
+    {
+        Cache::put('testkey','testvalue',10);
+
+        $this->assertTrue(Cache::has('testkey'));
+        $this->action('GET', 'PageController@flush');
+        $this->assertFalse(Cache::has('testkey'));
+
+        // TODO validate empty cache
+
+        // is ok!
+        $this->assertResponseStatus(302);
+
+        // is redirect to index!
+        $this->assertRedirectedToAction('HomeController@showIndex');
     }
 }

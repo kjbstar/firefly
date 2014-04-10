@@ -93,7 +93,8 @@ class HomeControllerTest extends TestCase
         $this->assertCount(4, $view['allowance']);
         $this->assertEquals(0, $view['allowance']['amount']);
         $this->assertFalse($view['allowance']['over']);
-        $this->assertEquals(intval($date->format('t')), $view['allowance']['days']);
+        $days = round((intval($date->format('d')) / intval($date->format('t'))) * 100);
+        $this->assertEquals($days, $view['allowance']['days']);
 
         // check and validate the predictables
         $this->assertArrayHasKey('predictables', $view);

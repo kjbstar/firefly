@@ -105,6 +105,7 @@ if (!function_exists('mf')) {
 require app_path() . '/filters.php';
 Event::subscribe(new AccountTrigger);
 Event::subscribe(new ComponentTrigger);
+Event::subscribe(new LimitTrigger);
 Event::subscribe(new PredictableTrigger);
 Event::subscribe(new TransactionTrigger);
 Event::subscribe(new PiggyTrigger);
