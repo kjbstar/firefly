@@ -9,7 +9,8 @@
         </h1>
         @if($balance > 0)
         <p class="lead">
-            Left to divide: {{mf($balance,true)}}
+            Left to divide: {{mf($balance,true)}} <br />
+            <small>Total target: {{mf($totalTarget)}}</small>
         </p>
         @endif
         <a href="{{URL::Route('addpiggybank')}}" class="btn btn-default"><span
