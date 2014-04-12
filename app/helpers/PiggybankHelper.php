@@ -27,8 +27,8 @@ class PiggybankHelper
     {
         return [
             'name'   => Input::old('name'),
-            'target' => intval(Input::old('target')),
-            'amount' => intval(Input::old('amount')),
+            'target' => floatval(Input::old('target')),
+            'amount' => floatval(Input::old('amount')),
         ];
     }
 
@@ -41,8 +41,8 @@ class PiggybankHelper
     {
         return [
             'name'   => $pig->name,
-            'target' => intval($pig->target),
-            'amount' => intval($pig->amount),
+            'target' => floatval($pig->target),
+            'amount' => floatval($pig->amount),
         ];
     }
 } 

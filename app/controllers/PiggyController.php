@@ -1,9 +1,10 @@
 <?php
 use Carbon\Carbon as Carbon;
 
+// @codeCoverageIgnoreStart
 /** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/PiggybankHelper.php');
-
+// @codeCoverageIgnoreEnd
 
 /**
  * Class PiggyController
@@ -23,6 +24,7 @@ class PiggyController extends BaseController
     {
         $piggyAccount = Setting::getSetting('piggyAccount');
         if (intval($piggyAccount->value) == 0) {
+            Log::error('Found no piggy account');
             return Redirect::route('piggyselect');
         }
         // get piggy banks:
@@ -31,8 +33,10 @@ class PiggyController extends BaseController
         $account = Auth::user()->accounts()->find($piggyAccount->value);
         $balance = $account->balanceOnDate(new Carbon);
 
+        $totalTarget = 0;
         foreach ($piggies as $pig) {
             $balance -= $pig->amount;
+            $totalTarget += floatval($pig->target);
             $pctFilled = $pig->pctFilled();
             $pctLeft = 100 - $pctFilled;
             // heigth of animation
@@ -45,7 +49,9 @@ class PiggyController extends BaseController
 
 
         return View::make('piggy.index')->with('pigWidth', $this::$pigWidth)->with('pigHeight', $this::$pigHeight)
-            ->with('title', 'Piggy banks')->with('piggies', $piggies)->with('balance', $balance);
+            ->with('title', 'Piggy banks')->with('piggies', $piggies)->with('balance', $balance)->with(
+                'totalTarget', $totalTarget
+            );
     }
 
     /**
@@ -55,13 +61,12 @@ class PiggyController extends BaseController
      */
     public function add()
     {
+        $prefilled = PiggybankHelper::prefilledFromOldInput();
+
         if (!Input::old()) {
             Session::put('previous', URL::previous());
             $prefilled = PiggybankHelper::emptyPrefilledAray();
-        } else {
-            $prefilled = PiggybankHelper::prefilledFromOldInput();
         }
-
 
         $piggyAccount = Setting::getSetting('piggyAccount');
         if (intval($piggyAccount->value) == 0) {
@@ -78,18 +83,24 @@ class PiggyController extends BaseController
      */
     public function postAdd()
     {
+
+        $piggyAccount = Setting::getSetting('piggyAccount');
+        if (intval($piggyAccount->value) == 0) {
+            return Redirect::route('piggyselect');
+        }
+
         $piggy = new Piggybank;
         /** @noinspection PhpParamsInspection */
         $piggy->user()->associate(Auth::user());
         $piggy->name = Input::get('name');
         $piggy->amount = 0;
-        $piggy->target = intval(Input::get('target'));;
+        $piggy->target = floatval(Input::get('target'));;
 
         $validator = Validator::make($piggy->toArray(), Piggybank::$rules);
         // failed!
         if ($validator->fails()) {
             Session::flash('error', 'Could not add piggy');
-            Log::error('Piggy errors: ' . print_r($validator->messages()->all(),true));
+            Log::error('Piggy errors: ' . print_r($validator->messages()->all(), true));
             return Redirect::route('addpiggybank')->withErrors($validator)->withInput();
         }
         $result = $piggy->save();
@@ -113,6 +124,12 @@ class PiggyController extends BaseController
      */
     public function delete(Piggybank $pig)
     {
+
+        $piggyAccount = Setting::getSetting('piggyAccount');
+        if (intval($piggyAccount->value) == 0) {
+            return Redirect::route('piggyselect');
+        }
+
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
@@ -128,6 +145,12 @@ class PiggyController extends BaseController
      */
     public function postDelete(Piggybank $pig)
     {
+
+        $piggyAccount = Setting::getSetting('piggyAccount');
+        if (intval($piggyAccount->value) == 0) {
+            return Redirect::route('piggyselect');
+        }
+
         $pig->delete();
         Session::flash('success', 'Piggy bank deleted.');
         return Redirect::to(Session::get('previous'));
@@ -182,6 +205,12 @@ class PiggyController extends BaseController
      */
     public function edit(Piggybank $pig)
     {
+
+        $piggyAccount = Setting::getSetting('piggyAccount');
+        if (intval($piggyAccount->value) == 0) {
+            return Redirect::route('piggyselect');
+        }
+
         if (!Input::old()) {
             Session::put('previous', URL::previous());
             $prefilled = PiggybankHelper::prefilledFromPiggybank($pig);
@@ -204,6 +233,12 @@ class PiggyController extends BaseController
      */
     public function postEdit(Piggybank $pig)
     {
+        $piggyAccount = Setting::getSetting('piggyAccount');
+        if (intval($piggyAccount->value) == 0) {
+            return Redirect::route('piggyselect');
+        }
+
+
         $pig->name = Input::get('name');
         $pig->amount = floatval(Input::get('amount'));
         $target = floatval(Input::get('target'));
@@ -228,6 +263,12 @@ class PiggyController extends BaseController
      */
     public function updateAmount(Piggybank $pig)
     {
+
+        $piggyAccount = Setting::getSetting('piggyAccount');
+        if (intval($piggyAccount->value) == 0) {
+            return Redirect::route('piggyselect');
+        }
+
         // calculate the amount of money left to devide:
         $piggies = Auth::user()->piggybanks()->get();
         if (!Input::old()) {
@@ -253,6 +294,12 @@ class PiggyController extends BaseController
      */
     public function postUpdateAmount(Piggybank $pig)
     {
+
+        $piggyAccount = Setting::getSetting('piggyAccount');
+        if (intval($piggyAccount->value) == 0) {
+            return Redirect::route('piggyselect');
+        }
+
         $amount = floatval(Input::get('amount'));
         $pig->amount += $amount;
         $pig->save();
