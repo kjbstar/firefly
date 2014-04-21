@@ -24,10 +24,12 @@ class Piggybank extends Eloquent
 
     public static $rules
         = ['name'   => 'required|between:1,50', 'amount' => 'required|numeric',
-           'target' => 'numeric', 'user_id' => 'required|exists:users,id',];
+           'target' => 'numeric', 'user_id' => 'required|exists:users,id',
+           'order'  => 'numeric|min:0'
+        ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
-        = ['name', 'amount', 'target', 'user_id'];
+        = ['name', 'amount', 'target', 'user_id', 'order'];
 
 
     /**

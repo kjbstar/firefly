@@ -4,7 +4,10 @@
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <h2>Reports</h2>
-
+        </div>
+    </div>
+<div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-12">
         <h3>Yearly overview</h3>
         @if(count($years) > 0)
         @foreach($years as $year => $months)
@@ -22,11 +25,24 @@
 
 
     </div>
-</div>
-<div class="row">
-    <div class="col-lg-6 col-md-12 col-sm-12">
-        <h4>Compare periods with each other</h4>
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <h3>Compare periods</h3>
+        <h4>Compare years</h4>
+        @if(count($years) > 0)
+        <ul>
+            @foreach($years as $year => $months)
+            <li>Compare {{$year}} with
+                @foreach($years as $year_two => $months_two)
+                    @if($year != $year_two)
+                        {{$year_two}}
+                    @endif
+                @endforeach
+            </li>
+            @endforeach
+        </ul>
+        @endif
 
+        <h4>Compare months</h4>
         <table class="table">
             <tr>
                 <th>Compare</th>

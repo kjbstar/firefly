@@ -6,6 +6,11 @@
 class PageController extends BaseController
 {
 
+    /**
+     * Flushes the cache.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function flush()
     {
         Cache::flush();

@@ -3,6 +3,7 @@
 use Illuminate\Auth\Reminders\RemindableInterface;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+
 /**
  * Class User
  *
@@ -39,7 +40,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
     public static $rules
         = ['username' => 'required|unique:users,username',
-        'email' => 'required|email|unique:users,email'];
+           'email'    => 'required|email|unique:users,email'];
     protected $fillable
         = ['username', 'email', 'activation', 'password', 'reset', 'origin'];
     protected $softDelete = true;
@@ -227,6 +228,38 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     public function getDates()
     {
         return ['created_at', 'updated_at'];
+    }
+
+    /**
+     * Get the token value for the "remember me" session.
+     *
+     * @return string
+     */
+    public function getRememberToken()
+    {
+        return $this->remember_token;
+    }
+
+    /**
+     * Set the token value for the "remember me" session.
+     *
+     * @param  string $value
+     *
+     * @return void
+     */
+    public function setRememberToken($value)
+    {
+        $this->remember_token = $value;
+    }
+
+    /**
+     * Get the column name for the "remember me" token.
+     *
+     * @return string
+     */
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
     }
 
 }

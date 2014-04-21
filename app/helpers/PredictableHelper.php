@@ -54,7 +54,8 @@ class PredictableHelper
             'beneficiary' => 0,
             'category'    => 0,
             'budget'      => 0,
-            'inactive'    => false
+            'inactive'    => false,
+            'account_id' => 0
         ];
     }
 
@@ -71,7 +72,8 @@ class PredictableHelper
             'beneficiary' => intval(Input::old('beneficiary_id')),
             'category'    => intval(Input::old('category_id')),
             'budget'      => intval(Input::old('budget_id')),
-            'inactive'    => intval(Input::old('inactive')) == 1 ? true : false
+            'inactive'    => intval(Input::old('inactive')) == 1 ? true : false,
+            'account_id'  => intval(Input::old('account_id')),
 
         ];
     }
@@ -91,7 +93,8 @@ class PredictableHelper
             'inactive'    => false,
             'beneficiary' => is_null($transaction->beneficiary) ? 0 : $transaction->beneficiary->id,
             'category'    => is_null($transaction->category) ? 0 : $transaction->category->id,
-            'budget'      => is_null($transaction->budget) ? 0 : $transaction->budget->id
+            'budget'      => is_null($transaction->budget) ? 0 : $transaction->budget->id,
+            'account_id'  => $transaction->account_id
         ];
     }
 
@@ -110,7 +113,8 @@ class PredictableHelper
             'inactive'    => intval($predictable->inactive) == 1 ? true : false,
             'beneficiary' => is_null($predictable->beneficiary) ? 0 : $predictable->beneficiary->id,
             'category'    => is_null($predictable->category) ? 0 : $predictable->category->id,
-            'budget'      => is_null($predictable->budget) ? 0 : $predictable->budget->id
+            'budget'      => is_null($predictable->budget) ? 0 : $predictable->budget->id,
+            'account_id'  => $predictable->account_id
         ];
     }
 

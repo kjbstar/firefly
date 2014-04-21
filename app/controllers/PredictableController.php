@@ -4,6 +4,9 @@ use Carbon\Carbon as Carbon;
 /** @noinspection PhpIncludeInspection */
 include_once(app_path() . '/helpers/PredictableHelper.php');
 
+/** @noinspection PhpIncludeInspection */
+include_once(app_path() . '/helpers/AccountHelper.php');
+
 /**
  * Class PredictableController
  */
@@ -160,9 +163,13 @@ class PredictableController extends BaseController
         }
         $list = PredictableHelper::componentList();
 
+        $accounts = AccountHelper::accountsAsSelectList();
+
         return View::make('predictables.edit')->with(
             'title', 'Edit predictable "' . $predictable->description . '"'
-        )->with('predictable', $predictable)->with('components', $list)->with('prefilled', $prefilled);
+        )->with('predictable', $predictable)->with('components', $list)->with('prefilled', $prefilled)->with(
+                'accounts', $accounts
+            );
     }
 
     /**
@@ -179,7 +186,9 @@ class PredictableController extends BaseController
         $predictable->amount = floatval(Input::get('amount'));
         $predictable->dom = intval(Input::get('dom'));
         $predictable->pct = intval(Input::get('pct'));
+        $predictable->account_id = intval(Input::get('account_id'));
         $predictable->inactive = intval(Input::get('inactive')) == 1 ? 1 : 0;
+
 
         // we use drop downs to select these components:
         $ben = Auth::user()->components()->where('type', 'beneficiary')->find(

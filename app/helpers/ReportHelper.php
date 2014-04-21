@@ -169,32 +169,6 @@ class ReportHelper
 
     }
 
-    public static function expenses(Carbon $date)
-    {
-        $data = [];
-        $transactions = Auth::user()->transactions()->whereNull('predictable_id')->expenses()->with(
-            ['components' => function ($query) {
-                    $query->where('type', 'category');
-                }]
-        )->inMonth($date)->get();
-
-        foreach ($transactions as $t) {
-            $key = $t->category->id;
-            if (isset($data[$key])) {
-                $data[$key]['transactions'][] = $t;
-            } else {
-                $data[$key] = [
-                    'category'     => [
-                        'id'   => $key,
-                        'name' => $t->category->name
-                    ],
-                    'transactions' => [$t]
-                ];
-            }
-        }
-        return $data;
-    }
-
     public static function incomes(Carbon $date, $period)
     {
         switch ($period) {
@@ -211,7 +185,9 @@ class ReportHelper
             ['components' => function ($query) {
                     $query->where('type', 'beneficiary');
                 }]
-        )->$inPeriod($date)->get();
+        )->$inPeriod(
+                $date
+            )->get();
 
         foreach ($transactions as $t) {
             $key = is_null($t->beneficiary) ? 0 : $t->beneficiary->id;
@@ -230,31 +206,73 @@ class ReportHelper
         return $data;
     }
 
-    public static function budgets(Carbon $date)
+    public static function categories(Carbon $date)
     {
-        $transactions = Auth::user()->transactions()->expenses()->with(
-            ['components'        => function ($query) {
-                    $query->where('type', 'budget');
-                },
-             'components.limits' => function ($query) use ($date) {
-                     $query->inMonth($date);
-                 }
-            ]
+        $data = [];
+        $transactions = Auth::user()->transactions()->whereNull('predictable_id')->expenses()->with(
+            ['components' => function ($query) {
+                    $query->where('type', 'category');
+                }]
         )->inMonth($date)->get();
-        $budgets = [];
-        foreach ($transactions as $t) {
-            $key = is_null($t->budget) ? 0 : $t->budget->id;
 
-            if (isset($budgets[$key])) {
-                $budgets[$key]['amount'] += $t->amount;
+        foreach ($transactions as $t) {
+            $key = $t->category->id;
+            if (isset($data[$key])) {
+                $data[$key]['transactions'][] = $t;
+                $data[$key]['category']['sum'] += $t->amount;
             } else {
-                $budgets[$key] = [
-                    'budget' => $t->budget,
-                    'amount' => $t->amount
+                $data[$key] = [
+                    'category'     => [
+                        'id'   => $key,
+                        'name' => $t->category->name,
+                        'sum'  => $t->amount
+                    ],
+                    'transactions' => [$t]
                 ];
             }
         }
-        return $budgets;
+        return $data;
+    }
 
+    public static function expensesGrouped($date, $period, $type)
+    {
+        $data = [];
+        $transactions = Auth::user()->transactions()->expenses()->with(
+            ['components' => function ($query) use ($type) {
+                    $query->where('type', $type);
+                }]
+        )->inMonth($date)->get();
+
+        foreach ($transactions as $t) {
+            $key = is_null($t->$type) ? 0 : $t->$type->id;
+            if (isset($data[$key])) {
+                $data[$key]['transactions'][] = $t;
+                $data[$key]['component']['sum'] += $t->amount;
+            } else {
+                $data[$key] = [
+                    'component'    => [
+                        'id'   => $key,
+                        'name' => is_null($t->$type) ? '(no ' . $type . ')' : $t->$type->name,
+                        'sum'  => $t->amount
+                    ],
+                    'transactions' => [$t]
+                ];
+            }
+        }
+        // collect sums:
+        uasort($data, 'ReportHelper::sortExpenses');
+
+
+        return $data;
+    }
+
+    public static function sortExpenses($a, $b)
+    {
+        $sumA = $a['component']['sum'];
+        $sumB = $b['component']['sum'];
+        if ($sumA == $sumB) {
+            return 0;
+        }
+        return ($sumA < $sumB) ? -1 : 1;
     }
 }

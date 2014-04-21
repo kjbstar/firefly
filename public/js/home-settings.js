@@ -11,6 +11,11 @@ var accountChartOptions = {
         height: 200
     },
 
+    animation:{
+        duration: 1000,
+        easing: 'out'
+    },
+
     tooltip: {isHtml: true,
         trigger: 'selection'
     },

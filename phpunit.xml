@@ -27,12 +27,13 @@
         </whitelist>
 
     </filter>
+    <!--
         <logging>
 
             <log type="coverage-html" target="./app/storage/logs/report"
                  highlight="true"  />
-        </logging>
-    <testsuites>
+        </logging>-->
+        <testsuites>
         <testsuite name="Application Test Suite">
             <directory>./app/tests/</directory>
         </testsuite>

@@ -71,6 +71,11 @@ class Account extends Eloquent
         return $this->hasMany('Transfer', 'accountto_id');
     }
 
+    public function predictables()
+    {
+        return $this->hasMany('Predictable');
+    }
+
     /**
      * Returns the transfers going away from this account.
      *
@@ -232,7 +237,7 @@ class Account extends Eloquent
         // now we have the amount for the current day,
         // and we work on the predictables for this day:
 
-        $predictables = Auth::user()->predictables()->active()->where('dom', $dateDay)->get();
+        $predictables = $this->predictables()->active()->where('dom', $dateDay)->get();
         Log::debug('Found ' . count($predictables) . ' predictable expenses for ' . $date->format('M jS Y'));
 
         // if there are predictables for this day, it does influence the number of days:

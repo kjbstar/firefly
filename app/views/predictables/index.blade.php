@@ -10,6 +10,7 @@
         <table class="table table-bordered table-striped">
             <tr>
                 <th>Description</th>
+                <th>Account</th>
                 <th>Required components</th>
                 <th colspan="2">Amount</th>
                 <th>Day of month</th>
@@ -22,6 +23,7 @@
             <tr>
             @endif
                 <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{{$p->description}}}</a> <span class="label label-info">{{$p->transactions()->count()}}</span></td>
+                <td><a href="{{URL::Route('accountoverview',$p->account_id)}}">{{{$p->account()->first()->name}}}</a></td>
                 <td>
                     @foreach($p->components as $c)
                         {{{ucfirst($c->type)}}}<a href="{{URL::Route($c->type.'overview',$c->id)}}">: {{{$c->name}}}</a><br />

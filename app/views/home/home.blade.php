@@ -21,7 +21,20 @@
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <h3>Accounts</h3>
+        <p>
+            <select name="selectedAccount" style="width:200px;" id="accountChartSelector">
+                @foreach($accounts as $account)
+                @if($fpAccount->id == $account['id'])
+                    <option selected="selected" value="{{$account['id']}}" label="{{{$account['name']}}}">{{{$account['name']}}}</option>
+                @else
+                    <option value="{{$account['id']}}" label="{{{$account['name']}}}">{{{$account['name']}}}</option>
+                @endif
+
+                @endforeach
+            </select>
+        </p>
         <div id="home-accounts-chart"></div>
+
     </div>
 </div>
 
@@ -80,19 +93,19 @@
                 @if(isset($budget['limit']) && $budget['limit'] < $budget['spent'])
                 <!-- overspent bar -->
                 <div class="progress">
-                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{$budget['pct']}}%;"></div>
+                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{$budget['pct']}}%;">{{mf($budget['spent'])}}</div>
                     <div class="progress-bar progress-bar-danger" role="progressbar" style="width: {{100-$budget['pct']}}%;"></div>
                 </div>
                 @elseif(isset($budget['limit']) && $budget['limit'] >= $budget['spent'])
                 <!-- normal bar -->
                 <div class="progress">
-                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{$budget['pct']}}%;"></div>
+                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{$budget['pct']}}%;">{{mf($budget['spent'])}}</div>
 
                 </div>
                 @elseif(!isset($budget['limit']))
                 <!-- full blue bar -->
                 <div class="progress">
-                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%;"></div>
+                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%;">{{mf($budget['spent'])}}</div>
                 </div>
                 @endif
             </td>
@@ -144,6 +157,7 @@
     </div>
     <!-- PREDICTABES -->
     <div class="col-lg-6 col-md-12 col-sm-12">
+        @if(count($predictables) > 0)
         <h4>Predictables</h4>
         <table class="table table-condensed table-striped">
             <?php $sum=0; ?>
@@ -151,6 +165,7 @@
             <?php $sum += $p->amount; ?>
             <tr>
                 <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{{$p->description}}}</a></td>
+                <td><a href="{{URL::Route('accountoverview',$p->account_id)}}">{{{$p->account()->first()->name}}}</a></td>
                 <td>{{mf($p->amount,true)}}</td>
                 <td>{{$p->date->format('jS')}}</td>
                 <td><a href="{{URL::Route('addtransaction',$p->id)}}" class="btn btn-default btn-xs" title="Add transaction from predictable"><span class="glyphicon glyphicon-plus-sign"></span></a></td>
@@ -162,6 +177,7 @@
                 <td></td>
             </tr>
         </table>
+        @endif
     </div>
 </div>
 

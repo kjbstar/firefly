@@ -7,12 +7,12 @@
         <h1>Firefly
             <small>Piggy banks</small>
         </h1>
-        @if($balance > 0)
         <p class="lead">
+        @if($balance > 0)
             Left to divide: {{mf($balance,true)}} <br />
-            <small>Total target: {{mf($totalTarget)}}</small>
-        </p>
         @endif
+        <small>Total target: {{mf($totalTarget)}}</small>
+        </p>
         <a href="{{URL::Route('addpiggybank')}}" class="btn btn-default"><span
                 class="glyphicon
         glyphicon-plus"></span>Add piggy bank</a>

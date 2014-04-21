@@ -2,6 +2,7 @@
 google.load('visualization', '1', {'packages': ['corechart']});
 google.setOnLoadCallback(drawCharts);
 
+var chart;
 
 function drawCharts() {
     drawAccountChart();
@@ -11,16 +12,30 @@ $('#PopupModal').on('hidden.bs.modal', function () {
     $(this).removeData();
 })
 
+// bla bla select thing.
+$( document ).ready(function() {
+    $('#accountChartSelector').on('change',updateSelectedAccount);
+});
+
+function updateSelectedAccount() {
+    fpAccount = $('#accountChartSelector').val();
+    drawAccountChart();
+}
+
 
 function drawAccountChart() {
 
-    $.getJSON('home/account/' + fpAccount + '/overview/chart/' + year + '/' + month).success(function (data) {
+    var URL = 'home/account/' + fpAccount + '/overview/chart/' + year + '/' + month;
+
+    $.getJSON(URL).success(function (data) {
         gdata = new google.visualization.DataTable(data);
         var money = new google.visualization.NumberFormat({decimalSymbol: ',', groupingSymbol: '.', prefix: '€ '});
         for (i = 1; i < gdata.getNumberOfColumns(); i++) {
             money.format(gdata, i);
         }
-        chart = new google.visualization.LineChart(document.getElementById('home-accounts-chart'));
+        if(chart == undefined) {
+            chart = new google.visualization.LineChart(document.getElementById('home-accounts-chart'));
+        }
 
         // tooltip for prediction info:
         chart.setAction({

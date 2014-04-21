@@ -36,6 +36,7 @@ class Predictable extends Eloquent
            'user_id'     => 'required|exists:users,id',
            'dom'         => 'required|numeric|between:1,31',
            'amount'      => 'required|numeric|not_in:0',
+           'account_id' => 'required|exists:accounts,id',
            'inactive'    => 'required|numeric|between:0,1'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
@@ -49,6 +50,11 @@ class Predictable extends Eloquent
     public function user()
     {
         return $this->belongsTo('User');
+    }
+
+    public function account()
+    {
+        return $this->belongsTo('Account');
     }
 
     /**

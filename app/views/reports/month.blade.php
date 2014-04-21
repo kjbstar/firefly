@@ -121,16 +121,65 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-6 col-md-6 col-sm-6">
-        <h4>All expenses <small>Grouped on category</small></h4>
+    @foreach($expenses as $type => $data)
+    <div class="col-lg-4 col-md-6 col-sm-6">
+        <h4>All expenses <small>Grouped on {{$type}}</small></h4>
+
+        <div class="pie-chart" id="{{$type}}-piechart" rel="{{$type}}"></div>
 
         <div class="panel-group" id="accordion-expenses">
-        @foreach($expenses as $row)
+            @foreach($data as $row)
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion-{{$type}}" href="#{{$type}}-{{{Str::slug($row['component']['name'])}}}">
+                            {{{$row['component']['name']}}}
+                            <span class="pull-right"><small>{{mf($row['component']['sum'],true)}}</small></span>
+                        </a>
+                    </h5>
+                </div>
+                <div id="{{$type}}-{{{Str::slug($row['component']['name'])}}}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <table class="table table-condensed table-bordered table-striped">
+                            <tr>
+                                <th style="width:15%;">Day</th>
+                                <th>Description</th>
+                                <th style="width:30%;">Amount</th>
+                            </tr>
+                            @foreach($row['transactions'] as $t)
+                            <tr>
+                                <td>{{$t->date->format('jS')}}</td>
+                                <td><a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit transaction '{{{$t->description}}}'">{{{$t->description}}}</a></td>
+                                <td>{{mf($t->amount,true)}}</td>
+                            </tr>
+                            @endforeach
+                            @if(count($row['transactions']) > 1)
+                            <tr>
+                                <td colspan="2">&nbsp;</td>
+                                <td>{{mf($row['component']['sum'],true)}}</td>
+                            </tr>
+                            @endif
+                            </table>
+                        </div>
+                    </div>
+            </div>
+            @endforeach
+            </div>
+    </div>
+    @endforeach
+    </div>
+{{--
+
+
+
+
+        @foreach($categories as $row)
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h5 class="panel-title">
                         <a data-toggle="collapse" data-parent="#accordion-expenses" href="#category-{{{Str::slug($row['category']['name'])}}}">
                             {{{$row['category']['name']}}}
+                            <span class="pull-right"><small>{{mf($row['category']['sum'],true)}}</small></span>
                         </a>
                     </h5>
                 </div>
@@ -140,26 +189,19 @@
                 <tr>
                     <th style="width:15%;">Day</th>
                     <th>Description</th>
-                    <th style="width:20%;">Amount</th>
+                    <th style="width:30%;">Amount</th>
                 </tr>
-                <?php
-                $sum = 0;
-                $count = count($row['transactions']);
-                ?>
                 @foreach($row['transactions'] as $t)
-                <?php
-                $sum += $t->amount;
-                ?>
                     <tr>
                         <td>{{$t->date->format('jS')}}</td>
                         <td><a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit transaction '{{{$t->description}}}'">{{{$t->description}}}</a></td>
                         <td>{{mf($t->amount,true)}}</td>
                     </tr>
                 @endforeach
-                @if($count > 1)
+                @if(count($row['transactions']) > 1)
                 <tr>
                     <td colspan="2">&nbsp;</td>
-                    <td>{{mf($sum,true)}}</td>
+                    <td>{{mf($row['category']['sum'],true)}}</td>
                 </tr>
                 @endif
             </table>
@@ -170,42 +212,56 @@
 
         </div>
     </div>
-    <div class="col-lg-6 col-md-6 col-sm-6">
-        <h4>Budget breakdown</h4>
+    <div class="col-lg-4 col-md-6 col-sm-6">
+        <h4>All expenses <small>Grouped on budget</small></h4>
+        <div class="panel-group" id="accordion-budgets">
         @foreach($budgets as $row)
-        @if(is_null($row['budget']))
-            <h5>(no budget)</h5>
-        @else
-            <h5>{{{$row['budget']->name}}}</h5>
-        @endif
-        <table class="table table-condensed table-bordered table-hover">
-            <tr>
-                <th>Spent:</th>
-                <td style="width:20%;">{{mf($row['amount'],true)}}</td>
-
-            </tr>
-            @if(!is_null($row['budget']) && count($row['budget']->limits) == 1)
-            <?php
-            $left = $row['budget']->limits->first()->amount + $row['amount']
-            ?>
-                @if($left < 0)
-                <tr class="danger">
-                    <th>Left:</th>
-                    <td style="width:20%;">{{mf($left,true)}}</td>
-                </tr>
-                @else
-                <tr>
-                    <th>Left:</th>
-                    <td style="width:20%;">{{mf($left,true)}}</td>
-                </tr>
-                @endif
-            @endif
-        </table>
-
-
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h5 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion-budgets" href="#budget-{{{Str::slug($row['budget']['name'])}}}">
+                        {{{$row['budget']['name']}}}
+                        <span class="pull-right"><small>{{mf($row['budget']['sum'],true)}}</small></span>
+                    </a>
+                </h5>
+            </div>
+            <div id="budget-{{{Str::slug($row['budget']['name'])}}}" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <table class="table table-condensed table-bordered table-striped">
+                        <tr>
+                            <th style="width:15%;">Day</th>
+                            <th>Description</th>
+                            <th style="width:30%;">Amount</th>
+                        </tr>
+                        <?php
+                        $sum = 0;
+                        ?>
+                        @foreach($row['transactions'] as $t)
+                        <tr>
+                            <td>{{$t->date->format('jS')}}</td>
+                            <td><a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit transaction '{{{$t->description}}}'">{{{$t->description}}}</a></td>
+                            <td>{{mf($t->amount,true)}}</td>
+                        </tr>
+                        @endforeach
+                        @if(count($row['transactions']) > 1)
+                        <tr>
+                            <td colspan="2">&nbsp;</td>
+                            <td>{{mf($row['budget']['sum'],true)}}</td>
+                        </tr>
+                        @endif
+                    </table>
+                </div>
+            </div>
+        </div>
         @endforeach
+            </div>
     </div>
+    <div class="col-lg-4 col-md-6 col-sm-6">
+        <h4>All expenses <small>Grouped on beneficiary</small></h4>
+    </div>
+
 </div>
+--}}
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <h3>Shared accounts <small>{{$date->format('F Y')}}</small></h3>

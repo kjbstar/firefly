@@ -27,6 +27,7 @@ class HomeHelper
             $url = URL::Route('accountoverview', [$account->id, $date->format('Y'), $date->format('m')]);
             $accounts[] = [
                 'name'    => $account->name,
+                'id'      => $account->id,
                 'url'     => $url,
                 'current' => $account->balanceOnDate($date),
                 'shared'  => $account->shared == 1 ? true : false,

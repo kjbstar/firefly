@@ -227,7 +227,7 @@ class AccountController extends BaseController
         $months = AccountHelper::months($account);
         $chart = App::make('gchart');
         $chart->addColumn('date', 'date');
-        $chart->addColumn('Balance for "' . $account->name . '"', 'number');
+        $chart->addColumn('Balance', 'number');
         foreach ($months as $month) {
             $chart->addRow($month['date'], $month['balance']);
         }
@@ -282,7 +282,7 @@ class AccountController extends BaseController
         // all columns:
         $chart = App::make('gchart');
         $chart->addColumn('date', 'date');
-        $chart->addColumn('Balance for "' . $account->name . '"', 'number');
+        $chart->addColumn('Balance', 'number');
         $chart->addAnnotation(1);
         $chart->addCertainty(1);
         $chart->addInterval(1);

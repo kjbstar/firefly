@@ -102,8 +102,8 @@ class PiggyControllerTest extends TestCase
         // is OK?
         $this->assertResponseOk();
 
-        // prefilled should have three entries:
-        $this->assertCount(3, $view['prefilled']);
+        // prefilled should have four entries:
+        $this->assertCount(4, $view['prefilled']);
 
         // validate title:
         $this->assertEquals('Add new piggy bank', $view['title']);
@@ -131,8 +131,8 @@ class PiggyControllerTest extends TestCase
         // is OK?
         $this->assertResponseOk();
 
-        // prefilled should have three entries:
-        $this->assertCount(3, $view['prefilled']);
+        // prefilled should have four entries:
+        $this->assertCount(4, $view['prefilled']);
 
         // prefilled must match $data
         $this->assertEquals($data['name'], $view['prefilled']['name']);
@@ -322,7 +322,8 @@ class PiggyControllerTest extends TestCase
                 'name'    => Crypt::encrypt(Str::random(16)),
                 'amount'  => 100,
                 'target'  => 100,
-                'user_id' => $this->_user->id
+                'user_id' => $this->_user->id,
+                'order' => 10
             ]
         );
         $piggy = DB::table('piggybanks')->find($id);
@@ -452,7 +453,7 @@ class PiggyControllerTest extends TestCase
         $this->assertEquals('Edit piggy bank "' . Crypt::decrypt($piggy->name) . '"', $view['title']);
 
         // is prefilled filled?
-        $this->assertCount(3, $view['prefilled']);
+        $this->assertCount(4, $view['prefilled']);
 
         // is prefilled matching?
         $this->assertEquals(Crypt::decrypt($piggy->name), $view['prefilled']['name']);
@@ -492,7 +493,7 @@ class PiggyControllerTest extends TestCase
         $this->assertEquals('Edit piggy bank "' . Crypt::decrypt($piggy->name) . '"', $view['title']);
 
         // is prefilled filled?
-        $this->assertCount(3, $view['prefilled']);
+        $this->assertCount(4, $view['prefilled']);
 
         // is prefilled matching?
         $this->assertEquals($data['name'], $view['prefilled']['name']);

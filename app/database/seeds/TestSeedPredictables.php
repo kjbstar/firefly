@@ -6,6 +6,7 @@ class TestSeedPredictables extends Seeder
     {
         DB::table('predictables')->delete();
         $user = User::first();
+        $account = Account::first();
 
         //simply create two predictables.
 //        $p = Predictable::create(
@@ -41,25 +42,25 @@ class TestSeedPredictables extends Seeder
         // predictable for rent:
         Predictable::create(
             ['user_id' => $user->id, 'description' => 'Rent',
-             'amount'  => -500, 'pct' => 5, 'dom' => 1, 'inactive' => 0]
+             'amount'  => -500, 'pct' => 5, 'dom' => 1, 'inactive' => 0,'account_id' => $account->id]
         );
 
         // predictable for insurance:
         Predictable::create(
             ['user_id' => $user->id, 'description' => 'Insurance',
-             'amount'  => -120, 'pct' => 5, 'dom' => 2, 'inactive' => 0]
+             'amount'  => -120, 'pct' => 5, 'dom' => 2, 'inactive' => 0,'account_id' => $account->id]
         );
 
         // small predictable for test purposes.
         Predictable::create(
             ['user_id' => $user->id, 'description' => 'Something small',
-             'amount'  => -10, 'pct' => 5, 'dom' => 3, 'inactive' => 0]
+             'amount'  => -10, 'pct' => 5, 'dom' => 3, 'inactive' => 0,'account_id' => $account->id]
         );
 
         // average predictable for test purposes.
         Predictable::create(
             ['user_id' => $user->id, 'description' => 'Something average',
-             'amount'  => -20, 'pct' => 5, 'dom' => 4, 'inactive' => 0]
+             'amount'  => -20, 'pct' => 5, 'dom' => 4, 'inactive' => 0,'account_id' => $account->id]
         );
 
         // predictable with components for test purposes:
@@ -69,7 +70,7 @@ class TestSeedPredictables extends Seeder
 
         $filled = Predictable::create(
             ['user_id' => $user->id, 'description' => 'Something filled',
-             'amount'  => -20, 'pct' => 5, 'dom' => 5, 'inactive' => 0]
+             'amount'  => -20, 'pct' => 5, 'dom' => 5, 'inactive' => 0,'account_id' => $account->id]
         );
         $filled->components()->save($beneficiary);
         $filled->components()->save($category);

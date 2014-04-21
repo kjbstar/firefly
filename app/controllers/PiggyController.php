@@ -28,7 +28,7 @@ class PiggyController extends BaseController
             return Redirect::route('piggyselect');
         }
         // get piggy banks:
-        $piggies = Auth::user()->piggybanks()->get();
+        $piggies = Auth::user()->piggybanks()->orderBy('order','ASC')->get();
         // get account:
         $account = Auth::user()->accounts()->find($piggyAccount->value);
         $balance = $account->balanceOnDate(new Carbon);
@@ -94,7 +94,12 @@ class PiggyController extends BaseController
         $piggy->user()->associate(Auth::user());
         $piggy->name = Input::get('name');
         $piggy->amount = 0;
-        $piggy->target = floatval(Input::get('target'));;
+        $piggy->target = floatval(Input::get('target'));
+
+        // always add piggy to the end of the line:
+        $max = Auth::user()->piggybanks()->max('order');
+        $piggy->order = ($max+1);
+
 
         $validator = Validator::make($piggy->toArray(), Piggybank::$rules);
         // failed!
@@ -206,6 +211,8 @@ class PiggyController extends BaseController
     public function edit(Piggybank $pig)
     {
 
+        $order = PiggybankHelper::getOrders();
+
         $piggyAccount = Setting::getSetting('piggyAccount');
         if (intval($piggyAccount->value) == 0) {
             return Redirect::route('piggyselect');
@@ -221,7 +228,7 @@ class PiggyController extends BaseController
 
         return View::make('piggy.edit')->with('pig', $pig)->with('title', 'Edit piggy bank "' . $pig->name . '"')->with(
             'prefilled', $prefilled
-        );
+        )->with('order',$order);
     }
 
     /**
@@ -241,6 +248,10 @@ class PiggyController extends BaseController
 
         $pig->name = Input::get('name');
         $pig->amount = floatval(Input::get('amount'));
+
+        // move everything on position $order and higher one place up
+        // to make room for this one.
+
         $target = floatval(Input::get('target'));
         if ($target > 0) {
             $pig->target = $target;

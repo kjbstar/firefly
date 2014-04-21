@@ -76,7 +76,7 @@ class ReportHelperTest extends TestCase
     }
 
     /**
-     * @covers ReportHelper::expenses
+     * @covers ReportHelper::categories
      * @todo   Implement testExpenses().
      */
     public function testExpenses()

@@ -7,6 +7,14 @@
 class PiggybankHelper
 {
 
+    public static function getOrders() {
+        $max = Auth::user()->piggybanks()->max('order');
+        $arr = [];
+        for($i=1;$i<=$max;$i++) {
+            $arr[$i] = '#'.$i;
+        }
+        return $arr;
+    }
 
     /**
      * @return array
@@ -17,6 +25,7 @@ class PiggybankHelper
             'name'   => '',
             'target' => '',
             'amount' => '',
+            'order' => ''
         ];
     }
 
@@ -29,6 +38,7 @@ class PiggybankHelper
             'name'   => Input::old('name'),
             'target' => floatval(Input::old('target')),
             'amount' => floatval(Input::old('amount')),
+            'order' => intval(Input::old('order')),
         ];
     }
 
@@ -43,6 +53,7 @@ class PiggybankHelper
             'name'   => $pig->name,
             'target' => floatval($pig->target),
             'amount' => floatval($pig->amount),
+            'order' => intval($pig->order),
         ];
     }
 } 

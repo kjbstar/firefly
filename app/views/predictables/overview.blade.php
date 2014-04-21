@@ -9,19 +9,34 @@
         {{mf($predictable->amount*(1-($predictable->pct/100)),true)}}
          and {{mf($predictable->amount*(1+($predictable->pct/100)),true)}} and will occur on or around the {{$predictable->domDisplay}}.
         </p>
-        <p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6 col-md-6">
+        <table class="table">
+            <tr>
+                <td>Account</td>
+                <td><a href="{{URL::Route('accountoverview',$predictable->account_id)}}">{{{$predictable->account()->first()->name}}}</a></td>
+            </tr>
             @if($predictable->components()->count() > 0)
             @foreach($predictable->components()->get() as $c)
-                {{ucfirst($c->type)}}: <a href="{{URL::Route($c->type.'overview',$c->id)}}">{{$c->name}}</a><br />
+            <tr>
+                <td>{{ucfirst($c->type)}}</td>
+                <td><a href="{{URL::Route($c->type.'overview',$c->id)}}">{{$c->name}}</a></td>
+            </tr>
             @endforeach
             @endif
-        </p>
+        </table>
         <p>
             <div class="btn-group">
                 <a href="{{URL::Route('editpredictable',[$predictable->id])}}" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
                 <a href="{{URL::Route('deletepredictable',[$predictable->id])}}" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</a>
             </div>
         </p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12">
         <h4>Transactions</h4>
 
         <table class="table table-bordered table-striped">

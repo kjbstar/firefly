@@ -72,6 +72,22 @@
                 @endif
             </div>
         </div>
+
+        <!-- ORDER -->
+        <div class="form-group
+        @if($errors->has('target'))
+        has-error
+        @endif
+        ">
+            <label for="inputOrder" class="col-sm-3
+            control-label">Order</label>
+            <div class="col-sm-9">
+                {{Form::select('order',$order,$prefilled['order'],['class' => 'form-control','id' => 'inputOrder'])}}
+                @if($errors->has('order'))
+                <span class="text-danger">{{$errors->first('order')}}</span>
+                @endif
+            </div>
+            </div>
     </div>
 
 </div>
