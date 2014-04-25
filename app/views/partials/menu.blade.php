@@ -16,6 +16,18 @@
         </div>
     <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav">
+            @if(Route::getCurrentRoute()->getName() == 'home')
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{{$fpAccount->name}}} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                @foreach($accounts as $account)
+                    @if($account['name'] != $fpAccount->name)
+                        <li><a href="{{$account['homeurl']}}">{{{$account['name']}}}</a></li>
+                    @endif
+                @endforeach
+            </ul>
+            </li>
+            @endif
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add
                     <b class="caret"></b></a>

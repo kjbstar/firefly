@@ -135,6 +135,23 @@
             </div>
         </div>
 
+        <!-- ignore in allowance (default is zero) -->
+        <div class="form-group">
+            <label for="inputIgnoreAllowance" class="col-sm-3
+            control-label">Allowance</label>
+            <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        @if($prefilled['ignoreallowance'])
+                        <input type="checkbox" name="ignoreallowance" value="1" checked="checked" />
+                        @else
+                        <input type="checkbox" name="ignoreallowance" value="1" />
+                        @endif
+                        Do not substract this transaction
+                        from the allowance (if set).</label></div>
+            </div>
+        </div>
+
     </div>
 
 </div>

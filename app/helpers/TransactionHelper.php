@@ -80,9 +80,9 @@ class TransactionHelper
                 'beneficiary'      => intval(Input::old('beneficiary_id')),
                 'category'         => intval(Input::old('category_id')),
                 'budget'           => intval(Input::old('budget_id')),
-                'ignoreprediction' => intval(Input::old('ignoreprediction')),
-                'ignoreallowance'  => intval(Input::old('ignoreallowance')),
-                'mark'             => intval(Input::old('mark'))
+                'ignoreprediction' => intval(Input::old('ignoreprediction')) == 1 ? true : false,
+                'ignoreallowance'  => intval(Input::old('ignoreallowance')) == 1 ? true : false,
+                'mark'             => intval(Input::old('mark')) == 1 ? true : false
 
         ];
     }

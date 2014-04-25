@@ -4,6 +4,9 @@ use Carbon\Carbon as Carbon;
 /** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/Toolkit.php');
 
+/** @noinspection PhpIncludeInspection */
+require_once(app_path() . '/helpers/AccountHelper.php');
+
 
 /**
  * Class SettingsController
@@ -110,13 +113,14 @@ class SettingsController extends BaseController
      */
     public function addAllowance()
     {
+
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
 
-        return View::make('settings.add-allowance')->with(
-            'title', 'Add a new allowance'
-        );
+        $accounts = AccountHelper::accountsAsSelectList();
+
+        return View::make('settings.add-allowance')->with('title', 'Add a new allowance')->with('accounts',$accounts);
     }
 
     /**
@@ -136,13 +140,16 @@ class SettingsController extends BaseController
         $setting->value = $amount;
         $setting->type = 'float';
         $setting->name = 'specificAllowance';
+        if(!is_null(Input::get('account_id'))) {
+            $setting->account_id = intval(Input::get('account_id'));
+        }
         // validate
         $validator = Validator::make($setting->toArray(), Setting::$rules);
         if ($validator->fails() || $amount == 0) {
             Session::flash(
-                'error', 'Because of an error,
-            the allowance could not be added.'
+                'error', $validator->messages()->all()
             );
+
 
             return Redirect::to(Session::get('previous'));
         } else {

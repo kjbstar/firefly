@@ -17,6 +17,7 @@ class CreatePredictables extends Migration {
 			$table->increments('id');
 			$table->timestamps();
             $table->integer('user_id')->unsigned();
+            $table->integer('account_id')->unsigned();
             $table->string('description', 500);
             $table->decimal('amount', 10, 2);
             $table->smallInteger('dom')->unsigned()->default(1);
@@ -25,6 +26,10 @@ class CreatePredictables extends Migration {
 
             $table->foreign('user_id')
                 ->references('id')->on('users')
+                ->onDelete('cascade');
+
+            $table->foreign('account_id')
+                ->references('id')->on('accounts')
                 ->onDelete('cascade');
 		});
 	}

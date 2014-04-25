@@ -125,11 +125,11 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                <input type="checkbox" name="ignoreprediction" value="1"
-                    @if($prefilled['ignoreprediction'])
-                        checked="checked"
+                        @if($prefilled['ignoreprediction'])
+                            <input type="checkbox" name="ignoreprediction" value="1" checked="checked" />
+                        @else
+                            <input type="checkbox" name="ignoreprediction" value="1" />
                     @endif
-                    >
                         Ignores this transaction in predictions.
                     </label>
                 </div>
@@ -143,11 +143,11 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="ignoreallowance" value="1"
                         @if($prefilled['ignoreallowance'])
-                        checked="checked"
+                        <input type="checkbox" name="ignoreallowance" value="1" checked="checked" />
+                        @else
+                        <input type="checkbox" name="ignoreallowance" value="1" />
                         @endif
-                            >
                         Do not substract this transaction
                         from the allowance (if set).</label></div>
             </div>
@@ -159,12 +159,12 @@
             <div class="col-sm-9">
                 <div class="checkbox">
                     <label>
-                <input type="checkbox" name="mark" value="1"
-
                         @if($prefilled['mark'])
-                        checked="checked"
+                        <input type="checkbox" name="mark" value="1" checked="checked" />
+                        @else
+                        <input type="checkbox" name="mark" value="1" />
                         @endif
-                    >Marks
+                    Marks
                     this transaction in certain charts.
                     </label>
                     </div>

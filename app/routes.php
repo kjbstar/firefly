@@ -56,7 +56,7 @@ Route::post('/home/account/{account}/delete',['uses' => 'AccountController@postD
  * HOMECONTROLLER
  */
 Route::get('/', ['uses' => 'HomeController@showIndex', 'as' => 'index']);
-Route::get('/home/{year?}/{month?}',['uses' => 'HomeController@showHome', 'as' => 'home']);
+Route::get('/home/{year?}/{month?}/{account?}',['uses' => 'HomeController@showHome', 'as' => 'home']);
 Route::get('/home/predict/{year}/{month}/{day}',['uses' => 'HomeController@predict', 'as' => 'predictDay']);
 Route::get('/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']);
 Route::get('/home/flush', ['uses' => 'PageController@flush', 'as' => 'flush']);
@@ -119,7 +119,7 @@ Route::post('/home/piggy/select',['uses' => 'PiggyController@postSelectAccount',
 Route::post('/home/piggy/edit/{piggybank}',['uses' => 'PiggyController@postEdit','before' => 'csrf']);
 Route::post('/home/piggy/delete/{piggybank}',['uses' => 'PiggyController@postDelete','before' => 'csrf']);
 Route::post('/home/piggy/amount/{piggybank}',['uses' => 'PiggyController@postUpdateAmount','before' => 'csrf']);
-
+Route::post('/home/piggy/drop',['uses' => 'PiggyController@dropPiggy']);
 /**
  * PREDICTABLE CONTROLLER
  */
@@ -147,6 +147,8 @@ Route::get('/home/reports/period/{year}/{month}',['uses' => 'ReportController@mo
 Route::get('/home/reports/period/{year}/{month}/chart',['uses' => 'ReportController@monthAccounts', 'as' => 'monthreportchart']);
 Route::get('/home/reports/period/{year}/{month}/pie/{type}',['uses' => 'ReportController@monthPieChart', 'as' => 'monthreportpie']);
 Route::get('/home/reports/period/{year}/chart',['uses' => 'ReportController@yearAccounts', 'as' => 'yearreportchart']);
+
+Route::get('/home/reports/compare/{year}/{otheryear}',['uses' => 'ReportController@compareYear', 'as' => 'compareyear']);
 
 // compares:
 #Route::get('/home/reports/compare/{year}/{otheryear}',['uses' => 'ReportController@yearCompare', 'as' => 'yearcompare']);

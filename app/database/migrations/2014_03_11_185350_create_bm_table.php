@@ -24,6 +24,8 @@ class CreateBmTable extends Migration {
                 ->references('id')->on('accounts')
                 ->onDelete('cascade');
 
+            $table->unique(['account_id','date']);
+
 		});
 	}
 

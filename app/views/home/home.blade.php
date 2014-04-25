@@ -21,18 +21,6 @@
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <h3>Accounts</h3>
-        <p>
-            <select name="selectedAccount" style="width:200px;" id="accountChartSelector">
-                @foreach($accounts as $account)
-                @if($fpAccount->id == $account['id'])
-                    <option selected="selected" value="{{$account['id']}}" label="{{{$account['name']}}}">{{{$account['name']}}}</option>
-                @else
-                    <option value="{{$account['id']}}" label="{{{$account['name']}}}">{{{$account['name']}}}</option>
-                @endif
-
-                @endforeach
-            </select>
-        </p>
         <div id="home-accounts-chart"></div>
 
     </div>

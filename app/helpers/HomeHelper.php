@@ -24,11 +24,13 @@ class HomeHelper
         $accounts = [];
 
         foreach ($query as $account) {
-            $url = URL::Route('accountoverview', [$account->id, $date->format('Y'), $date->format('m')]);
+            $url = URL::Route('accountoverviewmonth', [$account->id, $date->format('Y'), $date->format('m')]);
+            $homeURL = URL::Route('home',[$date->format('Y'), $date->format('m'),$account->id]);
             $accounts[] = [
                 'name'    => $account->name,
                 'id'      => $account->id,
                 'url'     => $url,
+                'homeurl' => $homeURL,
                 'current' => $account->balanceOnDate($date),
                 'shared'  => $account->shared == 1 ? true : false,
             ];
@@ -43,10 +45,10 @@ class HomeHelper
      *
      * @return array
      */
-    public static function budgetOverview(Carbon $date)
+    public static function budgetOverview(Carbon $date,Account $account)
     {
         $budgets = [];
-        $transactions = Auth::user()->transactions()->expenses()->inMonth($date)
+        $transactions = $account->transactions()->expenses()->inMonth($date)
             ->beforeDate($date)->get();
         foreach ($transactions as $t) {
             // get the budget
@@ -72,7 +74,9 @@ class HomeHelper
         }
 
         // Add transfers to shared accounts as expenses:
-        $transfers = Auth::user()->transfers()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+        $transfers = $account->transfersfrom()->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+        ->leftJoin('accounts','accounts.id','=','transfers.accountto_id')->
+            where('accounts.shared',1)
             ->beforeDate($date)->get(['transfers.*']);
         foreach ($transfers as $t) {
             // get the budget
@@ -125,14 +129,14 @@ class HomeHelper
      *
      * @return array
      */
-    public static function getAllowance(Carbon $date)
+    public static function getAllowance(Carbon $date,Account $account)
     {
         // get the allowance (setting) for this month, OR specific month.
         // and grab the value:
         $defaultAllowance = Setting::getSetting('defaultAllowance');
         $specificAllowance = Auth::user()->settings()->where('name', 'specificAllowance')->where(
             'date', $date->format('Y-m') . '-01'
-        )->first();
+        )->where('account_id',$account->id)->first();
         $amount = !is_null($specificAllowance) ? $specificAllowance->value : $defaultAllowance->value;
         unset($specificAllowance, $defaultAllowance);
 
@@ -150,16 +154,14 @@ class HomeHelper
         if ($amount > 0) {
             // get all transactions and ignore transactions from shared accounts:
             $spent = floatval(
-                    Auth::user()->transactions()->inMonth($date)->expenses()->where('ignoreallowance', 0)->leftJoin(
-                        'accounts', 'accounts.id', '=', 'transactions.account_id'
-                    )->where('accounts.shared', 0)->sum('amount')
+                    $account->transactions()->inMonth($date)->expenses()->where('ignoreallowance', 0)->sum('amount')
                 ) * -1;
 
             // also count transfers that went to a shared account:
             $spentOnShared = floatval(
                 Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')->where(
                     'accounts.shared', 1
-                )->inMonth($date)->sum('amount')
+                )->where('accountto_id',$account->id)->inMonth($date)->where('ignoreallowance',0)->sum('amount')
             );
 
             // save it as the spent amount:
@@ -179,9 +181,9 @@ class HomeHelper
      *
      * @return array
      */
-    public static function getPredictables(Carbon $date)
+    public static function getPredictables(Carbon $date,Account $account)
     {
-        $predictables = Auth::user()->predictables()->active()->orderBy('dom', 'ASC')->get();
+        $predictables = $account->predictables()->active()->orderBy('dom', 'ASC')->get();
         $list = [];
         foreach ($predictables as $p) {
             $count = $p->transactions()->inMonth($date)->count();
@@ -198,9 +200,9 @@ class HomeHelper
      *
      * @return mixed
      */
-    public static function transactions(Carbon $date)
+    public static function transactions(Carbon $date,Account $account)
     {
-        return Auth::user()->transactions()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+        return $account->transactions()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
             ->get();
     }
 
@@ -209,10 +211,12 @@ class HomeHelper
      *
      * @return mixed
      */
-    public static function transfers(Carbon $date)
+    public static function transfers(Carbon $date,Account $account)
     {
-        return Auth::user()->transfers()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get(
-        );
+        $from = $account->transfersfrom()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
+        $to = $account->transfersto()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
+        $result = $from->merge($to);
+        return $result;
     }
 
     /**

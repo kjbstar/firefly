@@ -22,6 +22,7 @@ class CreateTransfers extends Migration {
             $table->string('description', 500);
             $table->decimal('amount', 10, 2)->unsigned();
             $table->date('date');
+            $table->boolean('ignoreallowance')->default(false);
 
             $table->foreign('user_id')
                 ->references('id')->on('users')

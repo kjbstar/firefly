@@ -31,13 +31,16 @@
         @if(count($years) > 0)
         <ul>
             @foreach($years as $year => $months)
-            <li>Compare {{$year}} with
+
                 @foreach($years as $year_two => $months_two)
                     @if($year != $year_two)
-                        {{$year_two}}
+                <!-- compareyear -->
+            <li>
+                <a href="{{URL::route('compareyear',[$year,$year_two])}}">Compare {{$year}} with {{$year_two}}</a>
+            </li>
                     @endif
                 @endforeach
-            </li>
+
             @endforeach
         </ul>
         @endif

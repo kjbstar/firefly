@@ -72,3 +72,5 @@
     border-radius: 6px;
     line-height: 1.33;
 }
+
+#sortable h4 {cursor:move;}

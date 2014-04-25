@@ -53,12 +53,14 @@ class TransferController extends BaseController
     public function postAdd()
     {
         /** @noinspection PhpUndefinedFieldInspection */
-        $data = ['description'    => Input::get('description'),
-                 'amount'         => floatval(Input::get('amount')),
-                 'accountfrom_id' => intval(Input::get('accountfrom_id')),
-                 'accountto_id'   => intval(Input::get('accountto_id')),
-                 'date'           => Input::get('date'),
-                 'user_id'        => Auth::user()->id];
+        $data = ['description'     => Input::get('description'),
+                 'amount'          => floatval(Input::get('amount')),
+                 'accountfrom_id'  => intval(Input::get('accountfrom_id')),
+                 'accountto_id'    => intval(Input::get('accountto_id')),
+                 'date'            => Input::get('date'),
+                 'user_id'         => Auth::user()->id,
+                 'ignoreallowance' => intval(Input::get('ignoreallowance'))
+        ];
         $transfer = new Transfer($data);
 
         // explode every object at the / and see if there is one.
@@ -134,6 +136,7 @@ class TransferController extends BaseController
 
         $transfer->description = Input::get('description');
         $transfer->amount = floatval(Input::get('amount'));
+        $transfer->ignoreallowance = intval(Input::get('ignoreallowance'));
         $transfer->date = Input::get('date');
         if ($fromAccount) {
             $transfer->accountfrom()->associate($fromAccount);

@@ -7,6 +7,22 @@ use Carbon\Carbon as Carbon;
 class ReportHelper
 {
 
+    public static function summaryCompared(Carbon $dateOne, Carbon $dateTwo) {
+        $data = [
+            $dateOne->format('Y') => self::summary($dateOne,'year'),
+            $dateTwo->format('Y') => self::summary($dateTwo,'year')
+        ];
+        return $data;
+    }
+
+    public static function monthsCompared(Carbon $dateOne,Carbon $dateTwo) {
+        $data = [
+            $dateOne->format('Y') => self::months($dateOne,'year'),
+            $dateTwo->format('Y') => self::months($dateTwo,'year')
+        ];
+        return $data;
+    }
+
     public static function summary(Carbon $date, $period)
     {
         $start = clone $date;
@@ -29,10 +45,17 @@ class ReportHelper
         $end->$endOf();
 
         // get the incomes:
-        $income = floatval(Auth::user()->transactions()->$inPeriod($date)->incomes()->sum('amount'));
+        $income = floatval(Auth::user()->transactions()->$inPeriod($date)->incomes()
+                ->leftJoin('accounts','accounts.id','=','transactions.account_id')
+                ->where('accounts.shared',0)
+                ->sum('amount'));
 
         // get the expenses:
-        $expenses = floatval(Auth::user()->transactions()->$inPeriod($date)->expenses()->sum('amount'));
+        $expenses = floatval(Auth::user()->transactions()->$inPeriod($date)->expenses()
+                ->leftJoin('accounts','accounts.id','=','transactions.account_id')
+                ->where('accounts.shared',0)
+                ->sum('amount'));
+
 
         // received in total from shared accounts (this might be income):
         $receivedFromShared = floatval(
@@ -57,7 +80,7 @@ class ReportHelper
             $income += $shared;
         } else {
             // spent more, expense!
-            $expenses -= $shared;
+            $expenses += $shared;
         }
 
         // get the net worth:
@@ -104,7 +127,7 @@ class ReportHelper
         $transfers = Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')
             ->where('accounts.shared', 1)->$inPeriod(
                 $date
-            )->get();
+            )->get(['transfers.*',DB::Raw('amount *-1 AS amount')]);
         $mutations = [];
 
         // we have both:
@@ -114,7 +137,7 @@ class ReportHelper
                 function ($a) {
                     return $a->amount;
                 }
-            )->reverse();
+            );
         }
         // we have transactions:
         if (count($transfers) == 0 && count($transactions) > 0) {
@@ -187,7 +210,10 @@ class ReportHelper
                 }]
         )->$inPeriod(
                 $date
-            )->get();
+            )
+            ->leftJoin('accounts','accounts.id','=','transactions.account_id')
+            ->where('accounts.shared',0)
+            ->get();
 
         foreach ($transactions as $t) {
             $key = is_null($t->beneficiary) ? 0 : $t->beneficiary->id;
@@ -237,13 +263,35 @@ class ReportHelper
     public static function expensesGrouped($date, $period, $type)
     {
         $data = [];
+        // get the transfers with this $type and $date
         $transactions = Auth::user()->transactions()->expenses()->with(
             ['components' => function ($query) use ($type) {
                     $query->where('type', $type);
                 }]
         )->inMonth($date)->get();
 
-        foreach ($transactions as $t) {
+        // get the transfers TO a shared account
+        // with this $type and $date.
+        $transfers = Auth::user()->transfers()->with(
+            ['components' => function ($query) use ($type) {
+                    $query->where('type', $type);
+                }]
+        )->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')
+            ->where('accounts.shared', 1)->inMonth(
+                $date
+            )->get(['transfers.*',DB::Raw('`amount` * -1 AS `amount`')]);
+        // merge the two lists:
+        $mutations = $transactions->merge($transfers);
+        $mutations = $mutations->sortBy(
+            function ($a) {
+                return $a->amount;
+            }
+        );
+
+
+
+
+        foreach ($mutations as $t) {
             $key = is_null($t->$type) ? 0 : $t->$type->id;
             if (isset($data[$key])) {
                 $data[$key]['transactions'][] = $t;

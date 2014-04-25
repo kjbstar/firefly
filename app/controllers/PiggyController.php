@@ -12,8 +12,8 @@ require_once(app_path() . '/helpers/PiggybankHelper.php');
 class PiggyController extends BaseController
 {
 
-    public static $pigWidth = 252;
-    public static $pigHeight = 200;
+    public static $pigWidth = 63;
+    public static $pigHeight = 50;
 
     /**
      * Index for piggies.
@@ -28,7 +28,7 @@ class PiggyController extends BaseController
             return Redirect::route('piggyselect');
         }
         // get piggy banks:
-        $piggies = Auth::user()->piggybanks()->orderBy('order','ASC')->get();
+        $piggies = Auth::user()->piggybanks()->orderBy('order', 'ASC')->get();
         // get account:
         $account = Auth::user()->accounts()->find($piggyAccount->value);
         $balance = $account->balanceOnDate(new Carbon);
@@ -43,7 +43,8 @@ class PiggyController extends BaseController
             $step = $this::$pigHeight / 100;
             // calculate the height we need:
             $drawHeight = $pctLeft * $step;
-
+            $pig->pctFilled = $pctFilled;
+            $pig->pctLeft = $pctLeft;
             $pig->drawHeight = $drawHeight;
         }
 
@@ -98,7 +99,7 @@ class PiggyController extends BaseController
 
         // always add piggy to the end of the line:
         $max = Auth::user()->piggybanks()->max('order');
-        $piggy->order = ($max+1);
+        $piggy->order = ($max + 1);
 
 
         $validator = Validator::make($piggy->toArray(), Piggybank::$rules);
@@ -228,7 +229,7 @@ class PiggyController extends BaseController
 
         return View::make('piggy.edit')->with('pig', $pig)->with('title', 'Edit piggy bank "' . $pig->name . '"')->with(
             'prefilled', $prefilled
-        )->with('order',$order);
+        )->with('order', $order);
     }
 
     /**
@@ -317,6 +318,15 @@ class PiggyController extends BaseController
         Session::flash('success', 'Amount for piggy bank updated.');
 
         return Redirect::to(Session::get('previous'));
+    }
+
+    public function dropPiggy()
+    {
+        $id = intval(Input::get('id'));
+        $position = intval(Input::get('position'));
+        $pig = Auth::user()->piggybanks()->find($id);
+        $pig->order = $position;
+        $pig->save();
     }
 
 } 

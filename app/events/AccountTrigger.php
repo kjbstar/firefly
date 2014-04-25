@@ -175,12 +175,15 @@ class AccountTrigger
      */
     public function createAccount(Account $account)
     {
-        // create new BM for that day.
-        $balanceModifier = new Balancemodifier;
-        $balanceModifier->date = $account->openingbalancedate;
-        $balanceModifier->account()->associate($account);
-        $balanceModifier->balance = $account->openingbalance;
-        $balanceModifier->save();
+        // create new BM for that day (if necessary).
+        $count = Balancemodifier::whereAccountId($account->id)->whereDate($account->openingbalancedate)->count();
+        if ($count == 0) {
+            $balanceModifier = new Balancemodifier;
+            $balanceModifier->date = $account->openingbalancedate;
+            $balanceModifier->account()->associate($account);
+            $balanceModifier->balance = $account->openingbalance;
+            $balanceModifier->save();
+        }
 
         return true;
     }

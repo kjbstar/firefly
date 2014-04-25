@@ -121,7 +121,7 @@
                 <div class="checkbox">
                     <label>
 
-                       @if($transaction->ignoreprediction == true)
+                       @if($prefilled['ignoreprediction'] == true)
                         <input type="checkbox" name="ignoreprediction" value="1" checked="checked" />
                         @else
                         <input type="checkbox" name="ignoreprediction" value="1" />
@@ -139,7 +139,7 @@
                 <div class="checkbox">
                     <label>
 
-                        @if($transaction->ignoreallowance == true)
+                        @if($prefilled['ignoreallowance'] == true)
                         <input type="checkbox" name="ignoreallowance" value="1" checked="checked" />
                         @else
                         <input type="checkbox" name="ignoreallowance" value="1" />
@@ -155,7 +155,7 @@
                 <div class="checkbox">
                     <label>
 
-                       @if($transaction->mark == true)
+                        @if($prefilled['mark'] == true)
                         <input type="checkbox" name="mark" value="1" checked="checked" />
                         @else
                         <input type="checkbox" name="mark" value="1"  />

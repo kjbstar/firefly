@@ -36,15 +36,18 @@ class Transfer extends Eloquent
 {
 
     public static $rules
-        = ['user_id'        => 'required|exists:users,id',
-           'description'    => 'required|between:1,500',
-           'date'           => 'required|before:2038-01-01|after:1980-01-01',
-           'amount'         => 'required|numeric|between:0.01,65536',
-           'accountfrom_id' => 'required|integer|exists:accounts,id|different:accountto_id',
-           'accountto_id'   => 'required|integer|exists:accounts,id',];
+        = ['user_id'         => 'required|exists:users,id',
+           'description'     => 'required|between:1,500',
+           'date'            => 'required|before:2038-01-01|after:1980-01-01',
+           'amount'          => 'required|numeric|between:0.01,65536',
+           'accountfrom_id'  => 'required|integer|exists:accounts,id|different:accountto_id',
+           'accountto_id'    => 'required|integer|exists:accounts,id',
+           'ignoreallowance' => 'required|numeric|between:0,1',
+
+        ];
     protected $fillable
         = ['date', 'amount', 'description', 'accountfrom_id', 'accountto_id',
-           'user_id'];
+           'user_id','ignoreallowance'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $appends = ['beneficiary', 'category', 'budget'];
 

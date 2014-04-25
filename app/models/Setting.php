@@ -25,11 +25,15 @@ use Carbon\Carbon as Carbon;
 class Setting extends Eloquent
 {
     public static $rules
-        = ['name'    => 'required|between:1,500',
-           'user_id' => 'required|exists:users,id',
-           'type'    => 'in:date,float,string,int', 'value' => 'required'];
+        = [
+            'name'       => 'required|between:1,500',
+            'user_id'    => 'required|exists:users,id',
+            'type'       => 'in:date,float,string,int',
+            'value'      => 'required',
+            'account_id' => 'exists:accounts,id'
+        ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
-    protected $fillable = ['user_id', 'name', 'date','type', 'value'];
+    protected $fillable = ['user_id', 'name', 'date', 'type', 'value','account_id'];
 
     /**
      * @param $name
@@ -45,6 +49,16 @@ class Setting extends Eloquent
     }
 
     /**
+     * Which account does this setting belong to?
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function account()
+    {
+        return $this->belongsTo('Account');
+    }
+
+    /**
      * Return a setting by name.
      *
      * @param $name
@@ -54,30 +68,31 @@ class Setting extends Eloquent
     public static function getSetting($name)
     {
         /** @noinspection PhpUndefinedFieldInspection */
-        $key = Auth::user()->id.'setting'.$name;
-        if(Cache::has($key)) {
+        $key = Auth::user()->id . 'setting' . $name;
+        if (Cache::has($key)) {
             // @codeCoverageIgnoreStart
             return Cache::get($key);
             // @codeCoverageIgnoreEnd
         } else {
-        $userSetting = Auth::user()->settings()->where('name', $name)->first();
+            $userSetting = Auth::user()->settings()->where('name', $name)->first();
 
-        if (is_null($userSetting)) {
-            // create a new setting with the default
-            // value from a config file:
-            $configInfo = Config::get('firefly.' . $name);
-            if (!is_null($configInfo)) {
-                $userSetting = new Setting;
-                $userSetting->name = $name;
-                $userSetting->type = $configInfo['type'];
-                $userSetting->value = $configInfo['value'];
-                /** @noinspection PhpParamsInspection */
-                $userSetting->user()->associate(Auth::user());
-                $userSetting->save();
+            if (is_null($userSetting)) {
+                // create a new setting with the default
+                // value from a config file:
+                $configInfo = Config::get('firefly.' . $name);
+                if (!is_null($configInfo)) {
+                    $userSetting = new Setting;
+                    $userSetting->name = $name;
+                    $userSetting->account_id = null;
+                    $userSetting->type = $configInfo['type'];
+                    $userSetting->value = $configInfo['value'];
+                    /** @noinspection PhpParamsInspection */
+                    $userSetting->user()->associate(Auth::user());
+                    $userSetting->save();
+                }
             }
-        }
-        Cache::put($key,$userSetting,2880);
-        return $userSetting;
+            Cache::put($key, $userSetting, 2880);
+            return $userSetting;
         }
     }
 

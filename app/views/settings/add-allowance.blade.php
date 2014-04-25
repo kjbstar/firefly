@@ -18,6 +18,14 @@
 
     {{Form::open(['class' => 'form-horizontal','role' => 'form'])}}
 
+    <div class="form-group">
+        <label class="col-sm-4 control-label"
+               for="inputAmount">Account (optional)</label>
+        <div class="col-sm-8">
+            {{Form::select('account_id',$accounts,null,['class' => 'form-control'])}}
+        </div>
+    </div>
+
         <div class="form-group">
             <label class="col-sm-4 control-label"
                    for="inputAmount">Amount</label>

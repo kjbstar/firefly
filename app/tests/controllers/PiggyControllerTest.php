@@ -687,7 +687,7 @@ class PiggyControllerTest extends TestCase
 
     /**
      * @covers PiggyController::postUpdateAmount
-     * @todo   Implement testPostUpdateAmountNoSetting().
+     * @todo further implementation
      */
     public function testPostUpdateAmountNoSetting()
     {
@@ -704,6 +704,23 @@ class PiggyControllerTest extends TestCase
         $this->assertRedirectedToRoute('piggyselect');
     }
 
+    /**
+     * @covers PiggyController::dropPiggy
+     * @todo further implementation
+     */
+    public function testDropPiggy() {
+        $piggy = DB::table('piggybanks')->whereUserId($this->_user->id)->first();
+        $data = [
+            'id' =>$piggy->id,
+            'position' => $piggy->order
+        ];
+        $this->action('POST', 'PiggyController@dropPiggy', $data);
+
+        // is OK?
+        $this->assertResponseOk();
+
+    }
+
     private function _createPiggySetting()
     {
         $r = DB::table('settings')->insert(
@@ -718,4 +735,6 @@ class PiggyControllerTest extends TestCase
             ]
         );
     }
+
+
 }

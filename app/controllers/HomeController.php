@@ -38,9 +38,8 @@ class HomeController extends BaseController
      *
      * @return View
      */
-    public function showHome($year = null, $month = null)
+    public function showHome($year = null, $month = null,Account $fpAccount = null)
     {
-
         $today = Toolkit::parseDate($year, $month, new Carbon);
         $actual = new Carbon;
         // fix $today if it's in this month:
@@ -49,17 +48,23 @@ class HomeController extends BaseController
 
         }
         unset($actual);
-
-
-        $fpAccount = Toolkit::getFrontpageAccount();
-
+        /**
+         * Instead of having a "frontpage" account, the
+         * frontpage account setting is a default, and can be substituted for
+         * any account there is. This means that an account can have a limit
+         * as well, signifying the fact that an allowance can be set for each
+         * one.
+         */
+        if(is_null($fpAccount)) {
+            $fpAccount = Toolkit::getFrontpageAccount();
+        }
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
-        $allowance = HomeHelper::getAllowance($today);
-        $predictables = HomeHelper::getPredictables($today);
-        $budgets = HomeHelper::budgetOverview($today);
-        $transactions = HomeHelper::transactions($today);
-        $transfers = HomeHelper::transfers($today);
+        $allowance = HomeHelper::getAllowance($today,$fpAccount);
+        $predictables = HomeHelper::getPredictables($today,$fpAccount);
+        $budgets = HomeHelper::budgetOverview($today,$fpAccount);
+        $transactions = HomeHelper::transactions($today,$fpAccount);
+        $transfers = HomeHelper::transfers($today,$fpAccount);
         $history = HomeHelper::history();
 
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(

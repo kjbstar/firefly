@@ -252,5 +252,41 @@ class ReportController extends BaseController
         return Response::json($data);
     }
 
+    /**
+     * @param $yearOne
+     * @param $yearTwo
+     */
+    public function compareYear($yearOne,$yearTwo) {
+        $dateOne = new Carbon($yearOne.'-01-01');
+        $dateTwo = new Carbon($yearTwo.'-01-01');
+        $title = 'Comparing '.$dateOne->format('Y').' with '.$dateTwo->format('Y');
+
+        // income expenses for both years.
+        $summary = ReportHelper::summaryCompared($dateOne,$dateTwo);
+
+        // monthly list for both years.
+        $months = ReportHelper::monthsCompared($dateOne,$dateTwo);
+        $monthsFormatted = [];
+        foreach($months[$yearOne] as $month) {
+            $monthName = substr($month['date'],0,-5);
+            $monthsFormatted[$monthName][$yearOne] = $month;
+        }
+
+        foreach($months[$yearTwo] as $month) {
+            $monthName = substr($month['date'],0,-5);
+            $monthsFormatted[$monthName][$yearTwo] = $month;
+        }
+
+        return View::make('reports.year-compare')
+            ->with('dateOne',$dateOne)
+            ->with('dateTwo',$dateTwo)
+            ->with('title',$title)
+            ->with('summary',$summary)
+            ->with('yearOne',$dateOne->format('Y'))
+            ->with('yearTwo',$dateTwo->format('Y'))
+            ->with('months',$monthsFormatted)
+            ;
+    }
+
 
 }
