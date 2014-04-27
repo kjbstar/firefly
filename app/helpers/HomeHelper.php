@@ -89,7 +89,7 @@ class HomeHelper
             ->beforeDate($date)->get(['transfers.*']);
         foreach ($transfers as $t) {
             // get the budget
-            if ($t->budget) {
+            if (!is_null($t->budget)) {
                 // basic budget info:
                 $id = $t->budget->id;
                 if (isset($budgets[$id])) {

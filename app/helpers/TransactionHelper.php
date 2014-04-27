@@ -11,18 +11,20 @@ class TransactionHelper
      */
     public static function emptyPrefilledAray()
     {
-        return [
+        $data = [
             'description'      => '',
             'amount'           => '',
             'date'             => date('Y-m-d'),
             'account_id'       => null,
-            'beneficiary'      => '',
-            'category'         => '',
-            'budget'           => '',
             'ignoreprediction' => 0,
             'ignoreallowance'  => 0,
             'mark'             => 0
         ];
+        foreach (Type::get() as $type) {
+            $data[$type->type] = '';
+        }
+        return $data;
+
     }
 
     /**
@@ -33,18 +35,20 @@ class TransactionHelper
     public static function prefilledFromPredictable(Predictable $predictable)
     {
         $dayOfMonth = sprintf('%02d', $predictable->dom);
-        return [
+        $data = [
             'description'      => $predictable->description,
             'amount'           => $predictable->amount,
             'date'             => date('Y-m-') . $dayOfMonth,
             'account_id'       => null,
-            'beneficiary'      => is_null($predictable->beneficiary) ? '' : $predictable->beneficiary->name,
-            'category'         => is_null($predictable->category) ? '' : $predictable->category->name,
-            'budget'           => is_null($predictable->budget) ? '' : $predictable->budget->name,
             'ignoreprediction' => 0,
             'ignoreallowance'  => 0,
             'mark'             => 0
         ];
+        foreach (Type::get() as $type) {
+            $t = $type->type;
+            $data[$t] = is_null($predictable->$t) ? '' : $predictable->$t->name;
+        }
+        return $data;
     }
 
     /**
@@ -54,18 +58,24 @@ class TransactionHelper
      */
     public static function prefilledFromTransaction(Transaction $transaction)
     {
-        return [
+        $data = [
             'description'      => $transaction->description,
             'amount'           => $transaction->amount,
             'date'             => $transaction->date->format('Y-m-d'),
             'account_id'       => $transaction->account_id,
-            'beneficiary'      => is_null($transaction->beneficiary) ? '' : $transaction->beneficiary->name,
-            'category'         => is_null($transaction->category) ? '' : $transaction->category->name,
-            'budget'           => is_null($transaction->budget) ? '' : $transaction->budget->name,
             'ignoreprediction' => intval($transaction->ignoreprediction) == 1 ? true : false,
             'ignoreallowance'  => intval($transaction->ignoreallowance) == 1 ? true : false,
             'mark'             => intval($transaction->mark) == 1 ? true : false,
         ];
+//        'beneficiary'      => is_null($transaction->beneficiary) ? '' : $transaction->beneficiary->name,
+//            'category'         => is_null($transaction->category) ? '' : $transaction->category->name,
+//            'budget'           => is_null($transaction->budget) ? '' : $transaction->budget->name,
+        foreach (Type::get() as $type) {
+            $t = $type->type;
+            $data[$t] = is_null($transaction->$t) ? '' : $transaction->$t->name;
+        }
+        return $data;
+
     }
 
     /**

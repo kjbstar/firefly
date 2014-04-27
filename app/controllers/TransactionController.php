@@ -76,14 +76,10 @@ class TransactionController extends BaseController
         $transaction->ignoreallowance = intval(Input::get('ignoreallowance'));
         $transaction->mark = intval(Input::get('mark'));
 
-        // explode every object at the / and see if there is one.
-        // more than one? return to Transaction:
-        $beneficiary = ComponentHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
-        $category = ComponentHelper::saveComponentFromText('category', Input::get('category'));
-        $budget = ComponentHelper::saveComponentFromText('budget', Input::get('budget'));
 
 
-        // save and / or create the beneficiary:
+
+
         $validator = Validator::make($transaction->toArray(), Transaction::$rules);
         if ($validator->fails()) {
             Session::flash('error', 'Could not save transaction.');
@@ -98,10 +94,21 @@ class TransactionController extends BaseController
         }
         // @codeCoverageIgnoreEnd
 
-        // attach the beneficiary, if it is set:
-        $transaction->attachComponent($beneficiary);
-        $transaction->attachComponent($budget);
-        $transaction->attachComponent($category);
+        // now we can finally add the components:
+        // save all components (if any):
+        foreach (Type::get() as $type) {
+            // split and get second part of Input:
+            $input = Input::get($type->type);
+            $parts = explode('/',$input);
+            $name = isset($parts[1]) ? $parts[1] : $parts[0];
+
+            $component = Component::firstOrCreate(
+                ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
+            );
+            if(!is_null($component->id)) {
+                $transaction->components()->attach($component);
+            }
+        }
 
         Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
 

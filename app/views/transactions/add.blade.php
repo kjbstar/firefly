@@ -17,11 +17,11 @@
         <h4>Mandatory fields</h4>
 
         <!-- description -->
-        <div class="form-group
-             @if($errors->has('description'))
-             has-error
-             @endif
-             ">
+        @if($errors->has('description'))
+        <div class="form-group has-error">
+        @else
+        <div class="form-group">
+        @endif
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
                 <input type="text" name="description" class="form-control"
@@ -92,33 +92,16 @@
     <div class="col-lg-6">
         <h4>Optional fields</h4>
 
-        <!-- beneficiary (can be created) --> 
+        <!-- all component types in a loop! -->
+        @foreach(Type::get() as $type)
         <div class="form-group">
-            <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
+            <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
             <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['beneficiary']}}}"
-                       name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
+                <input type="text" value="{{{$prefilled[$type->type]}}}"
+                       name="{{$type->type}}" class="form-control" id="input{{$type->type}}" autocomplete="off" />
             </div>
         </div>
-        
-        <!-- category (can be created) -->
-        <div class="form-group">
-            <label for="inputCategory" class="col-sm-3 control-label">Category</label>
-            <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['category']}}}"
-                       name="category" class="form-control" id="inputCategory" autocomplete="off" />
-            </div>
-        </div>
-
-        <!-- budget (can be created) --> 
-        <div class="form-group">
-            <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
-            <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['budget']}}}"
-                       name="budget" class="form-control" id="inputBudget" autocomplete="off" />
-            </div>
-        </div>
-
+        @endforeach
         <!-- ignore in transactions (default is zero) -->
         <div class="form-group">
             <label for="inputIgnore" class="col-sm-3 control-label">Ignore</label>
@@ -152,7 +135,7 @@
                         from the allowance (if set).</label></div>
             </div>
         </div>
-        
+
         <!-- mark in charts -->
         <div class="form-group">
             <label for="inputMark" class="col-sm-3 control-label">Mark</label>
@@ -185,11 +168,40 @@
 
 </div>
 
-{{Form::close()}}   
+{{Form::close()}}
 @stop
 @section('scripts')
 <script src="js/typeahead.min.js"></script>
 <script src="js/transactions.js"></script>
+    <script type="text/javascript">
+        $( document ).ready(function() {
+
+            @foreach(Type::get() as $type)
+            $('input[name="{{$type->type}}"]').typeahead({
+                name: '{{$type->type}}_{{Auth::user()->id}}',
+                prefetch: 'home/type/{{$type->id}}/typeahead',
+                limit: 10
+            });
+            @endforeach
+
+        });
+//            $('input[name="beneficiary"]').typeahead({
+//            name: 'beneficiary',
+//            prefetch: 'home/beneficiary/typeahead',
+//            limit: 10
+//        });
+//        $('input[name="category"]').typeahead({
+//            name: 'category',
+//            prefetch: 'home/category/typeahead',
+//            limit: 10
+//        });
+//
+//        $('input[name="budget"]').typeahead({
+//            name: 'budget',
+//            prefetch: 'home/budget/typeahead',
+//            limit: 10
+//        });
+    </script>
 @stop
 @section('styles')
 <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">

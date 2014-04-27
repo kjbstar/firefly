@@ -4,23 +4,16 @@
         <th colspan="2">Description</th>
         <th>Amount</th>
         <th>Account</th>
-        <th>Beneficiary</th>
-        <th>Budget</th>
-        <th>Category</th>
-
         <th>&nbsp;</th>
     </tr>
+    <?php
+    $types = Type::get();
+    ?>
 
     @foreach($transactions as $t)
     <?php
     // prep some vars to save on queries:
-    $ben = $t->beneficiary;
-    $bud = $t->budget;
-    $cat = $t->category;
-    $pBen = !is_null($ben) && !is_null($ben->parent_component_id) ? $ben->parentComponent()->first() : null;
-    $pBud = !is_null($bud) && !is_null($bud->parent_component_id) ? $bud->parentComponent()->first() : null;
-    $pCat = !is_null($cat) && !is_null($cat->parent_component_id) ? $cat->parentComponent()->first() : null;
-    $accountName = $t->account()->first()->name;
+    $accountName = $t->account->name;
     $accountID = $t->account_id;
     $hasDate = isset($date) ? true : false;
 
@@ -33,21 +26,12 @@
             @else
         <td>
             @endif
-            <!-- icons for ben,cat,bud -->
 
-            @if($ben && $ben->hasIcon())
-            {{$ben->iconTag()}}
+            @foreach($types as $type)
+            @if($t->{$type->type} && $t->{$type->type}->hasIcon())
+            {{$t->{$type->type}->iconTag()}}
             @endif
-
-            @if($cat && $cat->hasIcon())
-            {{$cat->iconTag()}}
-            @endif
-
-
-            @if($bud && $bud->hasIcon())
-            {{$bud->iconTag()}}
-            @endif
-
+            @endforeach
             <a href="{{URL::Route('edittransaction',[$t->id])}}">{{{$t->description}}}</a></td>
         @if($t->ignoreprediction == 1 || $t->ignoreallowance == 1 || $t->mark == 1 || !is_null($t->predictable_id))
         <td>
@@ -70,78 +54,7 @@
 
         <td>{{mf($t->amount,true)}}</td>
         <td><a href="{{URL::Route('accountoverview',$accountID)}}" title="Overview for {{{$accountName}}}">{{{$accountName}}}</a></td>
-        <td>
-            @if($ben)
-            <!-- show parent if exists -->
-            @if(!is_null($pBen))
-            <!-- date specific URL if relevant -->
-            @if($hasDate)
-            <small><a href="{{URL::Route('beneficiaryoverview',[$pBen->id,$date->format('Y'),$date->format('m')])}}"
-                      title="Overview for {{{$pBen->name}}} in {{$date->format('F Y')}}">{{{$pBen->name}}}</a></small>
-            <br/>
-            @else
-            <small><a href="{{URL::Route('beneficiaryoverview',[$pBen->id])}}" title="Overview for {{{$pBen->name}}}}}">{{{$pBen->name}}}</a>
-            </small>
-            <br/>
-            @endif
-            @endif
-            <!-- show component if exists: -->
-            @if($hasDate)
-            <a href="{{URL::Route('beneficiaryoverview',[$ben->id,$date->format('Y'),$date->format('m')])}}"
-               title="Overview for {{{$ben->name}}} in {{$date->format('F Y')}}">{{{$ben->name}}}</a>
-            @else
-            <a href="{{URL::Route('beneficiaryoverview',[$ben->id])}}" title="Overview for {{{$ben->name}}}}}">{{{$ben->name}}}</a>
-            @endif
-            @endif
-        </td>
-        <td>
-            @if($bud)
-            <!-- show parent if exists -->
-            @if(!is_null($pBud))
-            <!-- date specific URL if relevant -->
-            @if($hasDate)
-            <small><a href="{{URL::Route('budgetoverview',[$pBud->id,$date->format('Y'),$date->format('m')])}}"
-                      title="Overview for {{{$pBud->name}}} in {{$date->format('F Y')}}">{{{$pBud->name}}}</a></small>
-            <br/>
-            @else
-            <small><a href="{{URL::Route('budgetoverview',[$pBud->id])}}" title="Overview for {{{$pBud->name}}}}}">{{{$pBud->name}}}</a>
-            </small>
-            <br/>
-            @endif
-            @endif
-            <!-- show component if exists: -->
-            @if($hasDate)
-            <a href="{{URL::Route('budgetoverview',[$bud->id,$date->format('Y'),$date->format('m')])}}"
-               title="Overview for {{{$bud->name}}} in {{$date->format('F Y')}}">{{{$bud->name}}}</a>
-            @else
-            <a href="{{URL::Route('budgetoverview',[$bud->id])}}" title="Overview for {{{$bud->name}}}}}">{{{$bud->name}}}</a>
-            @endif
-            @endif
-        </td>
-        <td>
-            @if($cat)
-            <!-- show parent if exists -->
-            @if(!is_null($pCat))
-            <!-- date specific URL if relevant -->
-            @if($hasDate)
-            <small><a href="{{URL::Route('categoryoverview',[$pCat->id,$date->format('Y'),$date->format('m')])}}"
-                      title="Overview for {{{$pCat->name}}} in {{$date->format('F Y')}}">{{{$pCat->name}}}</a></small>
-            <br/>
-            @else
-            <small><a href="{{URL::Route('categoryoverview',[$pCat->id])}}" title="Overview for {{{$pCat->name}}}}}">{{{$pCat->name}}}</a>
-            </small>
-            <br/>
-            @endif
-            @endif
-            <!-- show component if exists: -->
-            @if($hasDate)
-            <a href="{{URL::Route('categoryoverview',[$cat->id,$date->format('Y'),$date->format('m')])}}"
-               title="Overview for {{{$cat->name}}} in {{$date->format('F Y')}}">{{{$cat->name}}}</a>
-            @else
-            <a href="{{URL::Route('categoryoverview',[$cat->id])}}" title="Overview for {{{$cat->name}}}}}">{{{$cat->name}}}</a>
-            @endif
-            @endif
-        </td>
+
 
         <td><a href="{{URL::Route('deletetransaction',[$t->id])}}" class="btn btn-default btn-xs"><span
                     class="glyphicon glyphicon-trash"></span></a></td>

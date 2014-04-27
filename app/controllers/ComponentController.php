@@ -280,9 +280,9 @@ class ComponentController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function typeahead()
+    public function typeahead(Type $type)
     {
-        $components = Auth::user()->components()->where('type', OBJ)->get();
+        $components = Auth::user()->components()->where('type_id', $type->id)->get();
         $return = [];
         foreach ($components as $o) {
             $name = $o->name;

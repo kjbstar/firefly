@@ -73,7 +73,7 @@
         <table class="table">
         @foreach($budgets as $id => $budget)
         <tr>
-            <th><a href="{{URL::Route('budgetoverview',$id)}}" title="Overview for {{{$budget['name']}}}">{{{$budget['name']}}}</a></th>
+            <th><a href="{{URL::Route('componentoverview',$id)}}" title="Overview for {{{$budget['name']}}}">{{{$budget['name']}}}</a></th>
         </tr>
         <tr>
             <td>

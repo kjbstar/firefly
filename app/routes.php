@@ -109,8 +109,9 @@ $objects = ['beneficiary', 'budget', 'category'];
 //    );
 //}
 /**
- * URL for component icons:
+ * URL for components:
  */
+Route::get('/home/type/{type}/typeahead',['uses' => 'ComponentController@typeahead']);
 Route::get('/home/component/{type}/index',['uses' => 'ComponentController@index','as' => 'components']);
 Route::get('/home/component/{type}/add',['uses' => 'ComponentController@add','as' => 'addcomponent']);
 Route::get('/home/component/{component}/overview',['uses' => 'ComponentController@overview','as' => 'componentoverview']);

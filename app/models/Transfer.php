@@ -127,7 +127,7 @@ class Transfer extends Eloquent
             return Cache::get($key);
         }
         foreach ($this->components as $component) {
-            if ($component->type == 'beneficiary') {
+            if ($component->type->type == 'beneficiary') {
                 Cache::forever($key,$component);
                 return $component;
             }
@@ -148,7 +148,7 @@ class Transfer extends Eloquent
             return Cache::get($key);
         }
         foreach ($this->components as $component) {
-            if ($component->type == 'category') {
+            if ($component->type->type == 'category') {
                 Cache::forever($key,$component);
                 return $component;
             }
@@ -170,7 +170,7 @@ class Transfer extends Eloquent
             return Cache::get($key);
         }
         foreach ($this->components as $component) {
-            if ($component->type == 'budget') {
+            if ($component->type->type == 'budget') {
                 Cache::forever($key,$component);
                 return $component;
             }

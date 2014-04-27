@@ -13,14 +13,21 @@ class ComponentTrigger
      */
     public function validateComponent(Component $component)
     {
+
         $user = Auth::user();
         if (is_null(Auth::user())) {
             $user = User::find($component->user_id);
         }
 
+        // also run the validator again.
+        $validator = Validator::make($component->toArray(),Component::$rules);
+        if($validator->fails()) {
+            Log::error('Validator failed while making component: ' . print_r($validator->messages()->all(),true));
+            return false;
+        }
+
         // find a similar component
         if (is_null($component->id)) {
-
             $components = $user->components()->where('type_id', $component->type_id)->get();
         } else {
             $components = $user->components()->where('type_id', $component->type_id)->where('id', '!=', $component->id)

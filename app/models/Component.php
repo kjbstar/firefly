@@ -36,13 +36,13 @@ class Component extends Eloquent
     public static $rules
         = ['name'                => 'required|between:1,500',
            'user_id'             => 'required|exists:users,id',
-           'reporting'           => 'required|numeric|between:0,1',
+           'reporting'           => 'numeric|between:0,1',
            'parent_component_id' => 'exists:components,id',
            'mime'                => 'between:0,50'
         ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
-        = ['reporting', 'name', 'user_id', 'parent_component_id'];
+        = ['reporting', 'name', 'user_id', 'type_id','parent_component_id'];
 
     /**
      * This method either finds a component by the name $name or creates it

@@ -134,6 +134,21 @@ class Transaction extends Eloquent
     }
 
     /**
+     * To get the account from attribute, we use this
+     * caching function.
+     * @return mixed
+     */
+    public function getAccountAttribute() {
+        $key = $this->id.'-transaction-account';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
+        $var = $this->account()->first();
+        Cache::forever($key,$var);
+        return $var;
+    }
+
+    /**
      * Which account does this transaction belong to?
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
