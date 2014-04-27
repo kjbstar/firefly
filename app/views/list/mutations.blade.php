@@ -67,16 +67,16 @@
             @if(!is_null($pBen))
             <!-- date specific URL if relevant -->
             @if($hasDate)
-            <small><a href="{{URL::Route('beneficiaryoverview',[$pBen->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$pBen->name}}} in {{$date->format('F Y')}}">{{{$pBen->name}}}</a></small><br />
+            <small><a href="{{URL::Route('componentoverviewmonth',[$pBen->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$pBen->name}}} in {{$date->format('F Y')}}">{{{$pBen->name}}}</a></small><br />
             @else
-            <small><a href="{{URL::Route('beneficiaryoverview',[$pBen->id])}}" title="Overview for {{{$pBen->name}}}}}">{{{$pBen->name}}}</a></small><br />
+            <small><a href="{{URL::Route('componentoverview',[$pBen->id])}}" title="Overview for {{{$pBen->name}}}}}">{{{$pBen->name}}}</a></small><br />
             @endif
             @endif
             <!-- show component if exists: -->
             @if($hasDate)
-            <a href="{{URL::Route('beneficiaryoverview',[$ben->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$ben->name}}} in {{$date->format('F Y')}}">{{{$ben->name}}}</a>
+            <a href="{{URL::Route('componentoverviewmonth',[$ben->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$ben->name}}} in {{$date->format('F Y')}}">{{{$ben->name}}}</a>
             @else
-            <a href="{{URL::Route('beneficiaryoverview',[$ben->id])}}" title="Overview for {{{$ben->name}}}}}">{{{$ben->name}}}</a>
+            <a href="{{URL::Route('componentoverview',[$ben->id])}}" title="Overview for {{{$ben->name}}}}}">{{{$ben->name}}}</a>
             @endif
             @endif
         </td>
@@ -86,16 +86,16 @@
             @if(!is_null($pBud))
             <!-- date specific URL if relevant -->
             @if($hasDate)
-            <small><a href="{{URL::Route('budgetoverview',[$pBud->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$pBud->name}}} in {{$date->format('F Y')}}">{{{$pBud->name}}}</a></small><br />
+            <small><a href="{{URL::Route('componentoverviewmonth',[$pBud->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$pBud->name}}} in {{$date->format('F Y')}}">{{{$pBud->name}}}</a></small><br />
             @else
-            <small><a href="{{URL::Route('budgetoverview',[$pBud->id])}}" title="Overview for {{{$pBud->name}}}}}">{{{$pBud->name}}}</a></small><br />
+            <small><a href="{{URL::Route('componentoverview',[$pBud->id])}}" title="Overview for {{{$pBud->name}}}}}">{{{$pBud->name}}}</a></small><br />
             @endif
             @endif
             <!-- show component if exists: -->
             @if($hasDate)
-            <a href="{{URL::Route('budgetoverview',[$bud->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$bud->name}}} in {{$date->format('F Y')}}">{{{$bud->name}}}</a>
+            <a href="{{URL::Route('componentoverviewmonth',[$bud->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$bud->name}}} in {{$date->format('F Y')}}">{{{$bud->name}}}</a>
             @else
-            <a href="{{URL::Route('budgetoverview',[$bud->id])}}" title="Overview for {{{$bud->name}}}}}">{{{$bud->name}}}</a>
+            <a href="{{URL::Route('componentoverview',[$bud->id])}}" title="Overview for {{{$bud->name}}}}}">{{{$bud->name}}}</a>
             @endif
             @endif
         </td>
@@ -105,16 +105,16 @@
             @if(!is_null($pCat))
             <!-- date specific URL if relevant -->
             @if($hasDate)
-            <small><a href="{{URL::Route('categoryoverview',[$pCat->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$pCat->name}}} in {{$date->format('F Y')}}">{{{$pCat->name}}}</a></small><br />
+            <small><a href="{{URL::Route('componentoverviewmonth',[$pCat->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$pCat->name}}} in {{$date->format('F Y')}}">{{{$pCat->name}}}</a></small><br />
             @else
-            <small><a href="{{URL::Route('categoryoverview',[$pCat->id])}}" title="Overview for {{{$pCat->name}}}}}">{{{$pCat->name}}}</a></small><br />
+            <small><a href="{{URL::Route('componentoverview',[$pCat->id])}}" title="Overview for {{{$pCat->name}}}}}">{{{$pCat->name}}}</a></small><br />
             @endif
             @endif
             <!-- show component if exists: -->
             @if($hasDate)
-            <a href="{{URL::Route('categoryoverview',[$cat->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$cat->name}}} in {{$date->format('F Y')}}">{{{$cat->name}}}</a>
+            <a href="{{URL::Route('componentoverviewmonth',[$cat->id,$date->format('Y'),$date->format('m')])}}" title="Overview for {{{$cat->name}}} in {{$date->format('F Y')}}">{{{$cat->name}}}</a>
             @else
-            <a href="{{URL::Route('categoryoverview',[$cat->id])}}" title="Overview for {{{$cat->name}}}}}">{{{$cat->name}}}</a>
+            <a href="{{URL::Route('componentoverview',[$cat->id])}}" title="Overview for {{{$cat->name}}}}}">{{{$cat->name}}}</a>
             @endif
             @endif
         </td>

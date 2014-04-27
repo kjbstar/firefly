@@ -9,7 +9,6 @@
         <h1>Firefly
             <small>The current state of affairs</small>
         </h1>
-
         <div class="btn-group">
             <a href="{{URL::Route('addtransaction')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
               <a href="{{URL::Route('addtransfer')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transfer</a>
@@ -110,19 +109,11 @@
             <tr>
                 <td>{{$t->date->format('j-M')}}</td>
                 <td>
-                    @if($t->beneficiary && $t->beneficiary->hasIcon())
-                    {{$t->beneficiary->iconTag()}}
+                    @foreach($t->components as $c)
+                    @if($c->hasIcon())
+                        {{$c->iconTag()}}
                     @endif
-
-                    @if($t->category && $t->category->hasIcon())
-                    {{$t->category->iconTag()}}
-                    @endif
-
-
-                    @if($t->budget && $t->budget->hasIcon())
-                    {{$t->budget->iconTag()}}
-                    @endif
-
+                    @endforeach
                     <a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit {{{$t->description}}}">{{{$t->description}}}</a></td>
                 <td>{{mf($t->amount,true)}}</td>
             </tr>

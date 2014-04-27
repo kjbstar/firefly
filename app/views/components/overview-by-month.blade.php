@@ -1,9 +1,9 @@
 @extends('layouts.default')
-@section('breadcrumbs', Breadcrumbs::render(OBJ,$component,$date))
+@section('breadcrumbs', Breadcrumbs::render('componentoverviewmonth',$component,$date))
 @section('content')
 <div class="row">
-    <div class="col-lg-6">
-        <h2>Overview for {{OBJ}} {{{$component->name}}}
+    <div class="col-lg-12">
+        <h2>Overview for {{$component->type->type}} {{{$component->name}}}
             in {{{$date->format('F Y')}}}
         </h2>
     </div>

@@ -73,28 +73,79 @@ Breadcrumbs::register(
 );
 
 Breadcrumbs::register(
-    'report_year', function ($breadcrumbs,$year) {
+    'report_year', function ($breadcrumbs, $year) {
         $breadcrumbs->parent('reports');
-        $breadcrumbs->push('Report for '.$year, route('yearreport',$year));
+        $breadcrumbs->push('Report for ' . $year, route('yearreport', $year));
     }
 );
 
 Breadcrumbs::register(
-    'report_month', function ($breadcrumbs,Carbon $date) {
-        $breadcrumbs->parent('report_year',$date->format('Y'));
-        $breadcrumbs->push('Report for '.$date->format('F, Y'), route('monthreport',[$date->format('Y'),$date->format('m')]));
+    'report_month', function ($breadcrumbs, Carbon $date) {
+        $breadcrumbs->parent('report_year', $date->format('Y'));
+        $breadcrumbs->push(
+            'Report for ' . $date->format('F, Y'), route('monthreport', [$date->format('Y'), $date->format('m')])
+        );
     }
 );
 Breadcrumbs::register(
-    'report_compare_month', function ($breadcrumbs,Carbon $one,Carbon $two) {
+    'report_compare_month', function ($breadcrumbs, Carbon $one, Carbon $two) {
         $breadcrumbs->parent('reports');
         $breadcrumbs->push('Comparing ' . $one->format('F Y') . ' with ' . $two->format('F Y'));
     }
 );
 Breadcrumbs::register(
-    'report_compare_year', function ($breadcrumbs,Carbon $one,Carbon $two) {
+    'report_compare_year', function ($breadcrumbs, Carbon $one, Carbon $two) {
         $breadcrumbs->parent('reports');
         $breadcrumbs->push('Comparing ' . $one->format('Y') . ' with ' . $two->format('Y'));
+    }
+);
+
+/**
+ * ALL COMPONENT BREAD CRUMBS
+ */
+Breadcrumbs::register(
+    'components', function ($breadcrumbs, Type $type) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push(
+            'All ' . Str::plural($type->type), route('components', $type->id)
+        );
+    }
+);
+
+Breadcrumbs::register(
+    'addcomponent', function ($breadcrumbs, Type $type) {
+        $breadcrumbs->parent('components', $type);
+        $breadcrumbs->push(
+            'Add ' . $type->type, route('addcomponent', $type->id)
+        );
+    }
+);
+
+Breadcrumbs::register(
+    'componentoverview', function ($breadcrumbs, Component $component) {
+        $breadcrumbs->parent('components', $component->type);
+        $breadcrumbs->push(
+            ucfirst($component->type->type) . ' overview', route('componentoverview', $component->id)
+        );
+    }
+);
+
+Breadcrumbs::register(
+    'componentoverviewmonth', function ($breadcrumbs, Component $component, Carbon $date) {
+        $breadcrumbs->parent('componentoverview', $component);
+        $breadcrumbs->push(
+            $component->type->type . ' overview for ' . $date->format('F Y'),
+            route('componentoverview', [$component->id, $date->format('Y'), $date->format('m')])
+        );
+    }
+);
+
+Breadcrumbs::register(
+    'editcomponent', function ($breadcrumbs, Component $component) {
+        $breadcrumbs->parent('components', $component->type);
+        $breadcrumbs->push(
+            'Edit ' . $component->type->type . ' "' . $component->name . '"', route('editcomponent', $component->id)
+        );
     }
 );
 
@@ -102,10 +153,7 @@ Breadcrumbs::register(
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),
 //category (fake)
 
-$objects = ['account', 'beneficiary', 'transaction', 'budget', 'transfer',
-            'category', 'predictable'];
-
-
+$objects = ['account', 'transaction', 'transfer', 'predictable'];
 foreach ($objects as $object) {
 
     // route to list of everything:

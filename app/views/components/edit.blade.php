@@ -1,23 +1,23 @@
 @extends('layouts.default')
-@section('breadcrumbs', Breadcrumbs::render('edit'.OBJ,$object))
+@section('breadcrumbs', Breadcrumbs::render('editcomponent',$component))
 @section('content')
 <div class="row">
   <div class="col-lg-6 col-md-12">
-    <h2>Edit {{OBJ}} "{{{$object->name}}}"</h2>
+    <h2>Edit {{$component->type->type}} "{{{$component->name}}}"</h2>
 
       {{Form::open(['class' => 'form-horizontal','files' => true])}}
     <div class="form-group">
-      <label for="inputName" class="col-sm-4 control-label">{{ucfirst(OBJ)}} name</label>
+      <label for="inputName" class="col-sm-4 control-label">{{ucfirst($component->type->type)}} name</label>
         <div class="col-sm-8">
       <input type="text" name="name" class="form-control" id="inputName"
-             placeholder="{{{$object->name}}}" value="{{{$prefilled['name']}}}"><br
+             placeholder="{{{$component->name}}}" value="{{{$prefilled['name']}}}"><br
             />
       <span class="text-danger">{{$errors->first('name')}}</span>
             </div>
     </div>
 
     <div class="form-group">
-      <label for="inputBalance" class="col-sm-4 control-label">Parent {{OBJ}}
+      <label for="inputBalance" class="col-sm-4 control-label">Parent {{$component->type->type}}
           <small>(optional)</small></label>
         <div class="col-sm-8">
       {{Form::select('parent_component_id',$parents,$prefilled['parent_component_id'],
@@ -39,7 +39,7 @@
                       @else
                       <input type="checkbox" name="reporting" value="1">
                       @endif
-                      Show this {{OBJ}} in reports.
+                      Show this {{$component->type->type}} in reports.
                   </label>
               </div>
           </div>
@@ -59,7 +59,7 @@
       </div>
 
 
-      <button type="submit" class="btn btn-default">Save edits to {{OBJ}}</button>
+      <button type="submit" class="btn btn-default">Save edits to {{$component->type->type}}</button>
 
     {{Form::close()}}
 

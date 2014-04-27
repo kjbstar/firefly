@@ -5,6 +5,7 @@ Route::when('/home*', 'auth');
 
 // models:
 Route::model('user', 'User');
+Route::model('type', 'Type');
 Route::bind('account', function ($value, $route) {return Auth::user()->accounts()->find($value);});
 Route::bind('component', function ($value, $route) {return Auth::user()->components()->find($value);});
 Route::bind('piggybank', function ($value, $route) {return Auth::user()->piggybanks()->find($value);});
@@ -12,6 +13,7 @@ Route::bind('setting', function ($value, $route) {return Auth::user()->settings(
 Route::bind('transaction', function ($value, $route) {return Auth::user()->transactions()->find($value);});
 Route::bind('transfer', function ($value, $route) {return Auth::user()->transfers()->find($value);});
 Route::bind('predictable', function ($value, $route) {return Auth::user()->predictables()->find($value);});
+
 
 
 Route::bind('limit', function ($value, $route) {
@@ -71,45 +73,60 @@ Route::get('/home/moveComponents',['uses' => 'PageController@moveComponents','as
 $objects = ['beneficiary', 'budget', 'category'];
 
 
-foreach ($objects as $o) {
-
-    /**
-     * ALL POST META ROUTES:
-     */
-    Route::group(
-        ['before' => 'meta|csrf', 'prefix' => 'home/' . $o], function () {
-            Route::post('/{component}/edit', ['uses' => 'ComponentController@postEdit']);
-            Route::post('/{component}/delete', ['uses' => 'ComponentController@postDelete']);
-            Route::post('/add', ['uses' => 'ComponentController@postAdd']);
-            Route::post('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@postAddLimit']);
-            Route::post('/limit/edit/{limit}',['uses' => 'LimitController@postEditLimit']);
-            Route::post('/limit/delete/{limit}',['uses' => 'LimitController@postDeleteLimit']);
-        }
-    );
-    /**
-     * ALL GET META ROUTES
-     */
-    Route::group(
-        ['before' => 'meta', 'prefix' => 'home/' . $o], function () use ($o) {
-            Route::get('',['uses' => 'ComponentController@showIndex', 'as' => Str::plural($o)]);
-            Route::get('/add', ['uses' => 'ComponentController@add', 'as' => 'add' . $o]);
-            Route::get('/empty/{year?}/{month?}',['uses' => 'ComponentController@showEmpty', 'as' => 'empty' . $o]);
-            Route::get('/typeahead', ['uses' => 'ComponentController@typeahead']);
-            Route::get('/{component}/edit',['uses' => 'ComponentController@edit', 'as' => 'edit' . $o]);
-            Route::get('/{component}/delete',['uses' => 'ComponentController@delete', 'as' => 'delete' . $o]);
-            Route::get('/{component}/overview/chart/{year?}/{month?}',['uses' => 'ComponentController@showOverviewChart','as'   => $o . 'overviewchart']);
-            Route::get('/{component}/overview/{year}/{month}',['uses' => 'ComponentController@showOverviewByMonth','as'   => $o . 'overviewmonth']);
-            Route::get('/{component}/overview',['uses' => 'ComponentController@showOverview','as'   => $o . 'overview']);
-            Route::get('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@addLimit','as'   => 'add' . $o . 'limit']);
-            Route::get('/limit/edit/{limit}', ['uses' => 'LimitController@editLimit','as'   => 'edit' . $o . 'limit']);
-            Route::get('/limit/delete/{limit}',['uses' => 'LimitController@deleteLimit','as'   => 'delete' . $o . 'limit']);
-        }
-    );
-}
+//foreach ($objects as $o) {
+//
+//    /**
+//     * ALL POST META ROUTES:
+//     */
+//    Route::group(
+//        ['before' => 'meta|csrf', 'prefix' => 'home/' . $o], function () {
+//            Route::post('/{component}/edit', ['uses' => 'ComponentController@postEdit']);
+//            Route::post('/{component}/delete', ['uses' => 'ComponentController@postDelete']);
+//            Route::post('/add', ['uses' => 'ComponentController@postAdd']);
+//            Route::post('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@postAddLimit']);
+//            Route::post('/limit/edit/{limit}',['uses' => 'LimitController@postEditLimit']);
+//            Route::post('/limit/delete/{limit}',['uses' => 'LimitController@postDeleteLimit']);
+//        }
+//    );
+//    /**
+//     * ALL GET META ROUTES
+//     */
+//    Route::group(
+//        ['before' => 'meta', 'prefix' => 'home/' . $o], function () use ($o) {
+//            Route::get('',['uses' => 'ComponentController@showIndex', 'as' => Str::plural($o)]);
+//            Route::get('/add', ['uses' => 'ComponentController@add', 'as' => 'add' . $o]);
+//            Route::get('/empty/{year?}/{month?}',['uses' => 'ComponentController@showEmpty', 'as' => 'empty' . $o]);
+//            Route::get('/typeahead', ['uses' => 'ComponentController@typeahead']);
+//            Route::get('/{component}/edit',['uses' => 'ComponentController@edit', 'as' => 'edit' . $o]);
+//            Route::get('/{component}/delete',['uses' => 'ComponentController@delete', 'as' => 'delete' . $o]);
+//            Route::get('/{component}/overview/chart/{year?}/{month?}',['uses' => 'ComponentController@showOverviewChart','as'   => $o . 'overviewchart']);
+//            Route::get('/{component}/overview/{year}/{month}',['uses' => 'ComponentController@showOverviewByMonth','as'   => $o . 'overviewmonth']);
+//            Route::get('/{component}/overview',['uses' => 'ComponentController@showOverview','as'   => $o . 'overview']);
+//            Route::get('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@addLimit','as'   => 'add' . $o . 'limit']);
+//            Route::get('/limit/edit/{limit}', ['uses' => 'LimitController@editLimit','as'   => 'edit' . $o . 'limit']);
+//            Route::get('/limit/delete/{limit}',['uses' => 'LimitController@deleteLimit','as'   => 'delete' . $o . 'limit']);
+//        }
+//    );
+//}
 /**
  * URL for component icons:
  */
-Route::get('/component/icon/{component}',['uses' => 'ComponentController@renderIcon', 'as' => 'componenticon']);
+Route::get('/home/component/{type}/index',['uses' => 'ComponentController@index','as' => 'components']);
+Route::get('/home/component/{type}/add',['uses' => 'ComponentController@add','as' => 'addcomponent']);
+Route::get('/home/component/{component}/overview',['uses' => 'ComponentController@overview','as' => 'componentoverview']);
+Route::get('/home/component/{component}/overview/{year}/{month}',['uses' => 'ComponentController@overviewByMonth','as' => 'componentoverviewmonth']);
+Route::get('/home/component/{component}/edit',['uses' => 'ComponentController@edit','as' => 'editcomponent']);
+Route::get('/home/component/{component}/delete',['uses' => 'ComponentController@delete','as' => 'deletecomponent']);
+Route::get('/home/component/icon/{component}',['uses' => 'ComponentController@renderIcon', 'as' => 'componenticon']);
+
+Route::post('/home/component/{component}/delete',['uses' => 'ComponentController@postDelete','before' => 'csrf']);
+Route::post('/home/component/{component}/edit',['uses' => 'ComponentController@postEdit','before' => 'csrf']);
+Route::post('/home/component/{type}/add',['uses' => 'ComponentController@postAdd','before' => 'csrf']);
+
+// URLS for LIMITS:
+Route::get('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@add','as'   => 'addcomponentlimit']);
+Route::get('/limit/edit/{limit}', ['uses' => 'LimitController@edit','as'   => 'editcomponentlimit']);
+Route::get('/limit/delete/{limit}',['uses' => 'LimitController@delete','as'   => 'deletecomponentlimit']);
 
 
 /**

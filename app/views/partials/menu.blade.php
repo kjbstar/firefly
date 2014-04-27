@@ -1,3 +1,7 @@
+<?php
+$types = Type::get();
+?>
+
 <nav class="navbar navbar-default" role="navigation">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -36,15 +40,12 @@
                                 class="glyphicon glyphicon-plus"></span> Add
                             account
                         </a></li>
-                    <li><a href="{{URL::Route('addbeneficiary')}}"><span
+                    @foreach($types as $type)
+                    <li><a href="{{URL::Route('addcomponent',$type->id)}}"><span
                                 class="glyphicon glyphicon-plus"></span>
-                            Add beneficiary</a></li>
-                    <li><a href="{{URL::Route('addbudget')}}"><span
-                                class="glyphicon
-                                glyphicon-plus"></span> Add budget</a></li>
-                    <li><a href="{{URL::Route('addcategory')}}"><span
-                                class="glyphicon glyphicon-plus"></span>
-                            Add category</a></li>
+                            Add {{$type->type}}</a></li>
+                    @endforeach
+
                     <li><a href="{{URL::Route('addpredictable')}}"><span
                                 class="glyphicon glyphicon-plus"></span>
                             Add predictable</a></li>
@@ -63,12 +64,11 @@
             <ul class="dropdown-menu">
               <li><a href="{{URL::Route('accounts')}}"><span class="glyphicon
               glyphicon-list"></span> Accounts</a></li>
-              <li><a href="{{URL::Route('beneficiaries')}}"><span class="glyphicon
-              glyphicon-list"></span> Beneficiaries</a></li>
-              <li><a href="{{URL::Route('budgets')}}"><span class="glyphicon
-              glyphicon-list"></span> Budgets</a></li>
-              <li><a href="{{URL::Route('categories')}}"><span class="glyphicon
-              glyphicon-list"></span> Categories</a></li>
+                @foreach($types as $type)
+                <li><a href="{{URL::Route('components',$type->id)}}"><span class="glyphicon
+              glyphicon-list"></span> {{ucfirst(Str::plural($type->type))}}</a></li>
+                @endforeach
+
                 <li><a href="{{URL::Route('predictables')}}"><span class="glyphicon
               glyphicon-list"></span> Predictables</a></li>
                 <li><a href="{{URL::Route('transactions')}}"><span class="glyphicon

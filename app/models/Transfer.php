@@ -35,6 +35,7 @@ use Carbon\Carbon as Carbon;
  * @method static \Illuminate\Database\Query\Builder|\Transfer whereIgnoreallowance($value)
  * @method static \Transfer inYear($date)
  * @method static \Transfer beforeDate($date)
+ * @method static \Transfer afterDate($date) 
  */
 class Transfer extends Eloquent
 {

@@ -28,6 +28,8 @@
  * @method static \Illuminate\Database\Query\Builder|\Component whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\Component whereReporting($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]    $transfers
+ * @property integer                                                      $type_id
+ * @method static \Illuminate\Database\Query\Builder|\Component whereTypeId($value)
  */
 class Component extends Eloquent
 {
@@ -109,7 +111,25 @@ class Component extends Eloquent
      */
     public function type()
     {
+
         return $this->belongsTo('Type');
+    }
+
+    /**
+     * Get the type
+     *
+     * @return Type|null
+     */
+    public function getTypeAttribute()
+    {
+
+        $key = $this->id . '-component-type';
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
+        $type = $this->type()->first();
+        Cache::forever($key, $type);
+        return $type;
     }
 
     /**
@@ -218,7 +238,8 @@ class Component extends Eloquent
         return '';
     }
 
-    public function iconFileLocation() {
+    public function iconFileLocation()
+    {
         return self::getDestinationPath() . DIRECTORY_SEPARATOR . $this->id . '.png';
     }
 

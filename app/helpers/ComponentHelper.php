@@ -24,7 +24,7 @@ class ComponentHelper
         $list = [];
         while ($end > $start) {
             $query = $component->transactions()->inMonth($end);
-            $url = URL::Route(OBJ . 'overviewmonth', [$component->id, $end->format('Y'), $end->format('m')]);
+            $url = URL::Route('componentoverviewmonth', [$component->id, $end->format('Y'), $end->format('m')]);
             $entry = [
                 'title' => $end->format('F Y'),
                 'url'   => $url,
@@ -122,7 +122,7 @@ class ComponentHelper
 
         $parents = [0 => 'No parent'];
         $query = Auth::user()->components()->whereNull('parent_component_id')
-            ->where('type', $type);
+            ->where('type_id', $type->id);
         if (!is_null($component)) {
             if ($component->childrenComponents()->count() > 0) {
                 return $parents;

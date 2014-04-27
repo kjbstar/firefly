@@ -1,11 +1,11 @@
 @extends('layouts.default')
-@section('breadcrumbs', Breadcrumbs::render(OBJS))
+@section('breadcrumbs', Breadcrumbs::render('components',$type))
 @section('content')
 <div class="row">
   <div class="col-lg-12 col-md-12 col-sm-12">
-    <h2>All {{OBJS}}</h2>
+    <h2>All {{Str::plural($type->type)}}</h2>
     <p>
-      <a href="{{URL::Route('add'.OBJ)}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add new {{OBJ}}</a>
+      <a href="{{URL::Route('addcomponent',$type->id)}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add new {{$type->type}}</a>
     </p>
 
       <table class="table table-bordered table-striped">
@@ -13,33 +13,33 @@
               <th>Name</th>
               <th>&nbsp;</th>
           </tr>
-          @foreach($objects as $o)
+          @foreach($components as $c)
           <tr>
               <td>
-                  {{$o['iconTag']}}
-                  <a href="{{URL::Route(OBJ.'overview',$o['id'])}}">{{{$o['name']}}}</a></td>
+                  {{$c['iconTag']}}
+                  <a href="{{URL::Route('componentoverview',$c['id'])}}">{{{$c['name']}}}</a></td>
               <td>
               <div class="btn-group">
-                  <a href="{{URL::Route('edit'.OBJ,$o['id'])}}" class="btn btn-default"><span
-                          class="glyphicon glyphicon-pencil"></span></a> <a href="{{URL::Route('delete'.OBJ,[$o['id']])}}"
+                  <a href="{{URL::Route('editcomponent',$c['id'])}}" class="btn btn-default"><span
+                          class="glyphicon glyphicon-pencil"></span></a> <a href="{{URL::Route('deletecomponent',[$c['id']])}}"
                                                                             class="btn btn-default btn-danger"><span
                           class="glyphicon glyphicon-trash"></span></a>
               </div>
               </td>
           </tr>
           <!-- loop the children -->
-          @if(count($o['children']) > 0)
-          @foreach($o['children'] as $child)
+          @if(count($c['children']) > 0)
+          @foreach($c['children'] as $child)
           <tr>
               <td>&nbsp;&nbsp;&nbsp;&nbsp;
                   {{$child['iconTag']}}
-                  <a href="{{URL::Route(OBJ.'overview',array($child['id']))}}">{{{$child['name']}}}</a>
+                  <a href="{{URL::Route('componentoverview',$child['id'])}}">{{{$child['name']}}}</a>
               </td>
               <td>
                   <div class="btn-group">
-                      <a href="{{URL::Route('edit'.OBJ,[$child['id']])}}" class="btn btn-default"><span
+                      <a href="{{URL::Route('editcomponent',$child['id'])}}" class="btn btn-default"><span
                               class="glyphicon glyphicon-pencil"></span></a> <a
-                          href="{{URL::Route('delete'.OBJ,[$child['id']])}}" class="btn btn-default btn-danger"><span
+                          href="{{URL::Route('deletecomponent',$child['id'])}}" class="btn btn-default btn-danger"><span
                               class="glyphicon glyphicon-trash"></span></a>
                   </div>
               </td>
@@ -51,8 +51,8 @@
       </table>
 
     <p>
-      <a href="{{URL::Route('add'.OBJ)}}" class="btn btn-default"><span
-          class="glyphicon glyphicon-plus-sign"></span> Add new {{OBJ}}</a>
+      <a href="{{URL::Route('addcomponent',$type->id)}}" class="btn btn-default"><span
+          class="glyphicon glyphicon-plus-sign"></span> Add new {{$type->type}}</a>
     </p>
   </div>
 </div>

@@ -17,15 +17,16 @@ class ComponentTrigger
         if (is_null(Auth::user())) {
             $user = User::find($component->user_id);
         }
+
         // find a similar component
         if (is_null($component->id)) {
-            $components = $user->components()->where('type', $component->type)->get();
+
+            $components = $user->components()->where('type_id', $component->type_id)->get();
         } else {
-            $components = $user->components()->where('type', $component->type)->where('id', '!=', $component->id)->get(
-            );
+            $components = $user->components()->where('type_id', $component->type_id)->where('id', '!=', $component->id)
+                ->get();
         }
         foreach ($components as $dbc) {
-
             if ($component->name == $dbc->name) {
                 Log::debug('Found a duplicate component: ' . $component->name . ' matches existing ' . $dbc->name);
                 return false;
