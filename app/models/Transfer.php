@@ -31,6 +31,10 @@ use Carbon\Carbon as Carbon;
  * @method static \Illuminate\Database\Query\Builder|\Transfer whereDescription($value)
  * @method static \Illuminate\Database\Query\Builder|\Transfer whereAmount($value)
  * @method static \Illuminate\Database\Query\Builder|\Transfer whereDate($value)
+ * @property boolean $ignoreallowance
+ * @method static \Illuminate\Database\Query\Builder|\Transfer whereIgnoreallowance($value)
+ * @method static \Transfer inYear($date)
+ * @method static \Transfer beforeDate($date)
  */
 class Transfer extends Eloquent
 {
@@ -62,6 +66,35 @@ class Transfer extends Eloquent
     }
 
     /**
+     * To get the account from attribute, we use this
+     * caching function.
+     * @return mixed
+     */
+    public function getAccountfromAttribute() {
+        $key = $this->id.'-transfer-accountfrom';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
+        $var = $this->accountfrom()->first();
+        Cache::forever($key,$var);
+        return $var;
+    }
+
+    /**
+     * And the other way around.
+     * @return mixed
+     */
+    public function getAccounttoAttribute() {
+        $key = $this->id . '-transfer-accountto';
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
+        $var = $this->accountto()->first();
+        Cache::forever($key, $var);
+        return $var;
+    }
+
+    /**
      * What account is the transfer going to?
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -88,14 +121,18 @@ class Transfer extends Eloquent
      */
     public function getBeneficiaryAttribute()
     {
+        $key = $this->id.'-transfer-beneficiary';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         foreach ($this->components as $component) {
             if ($component->type == 'beneficiary') {
+                Cache::forever($key,$component);
                 return $component;
             }
         }
 
         return null;
-
     }
 
     /**
@@ -105,14 +142,18 @@ class Transfer extends Eloquent
      */
     public function getCategoryAttribute()
     {
+        $key = $this->id.'-transfer-category';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         foreach ($this->components as $component) {
             if ($component->type == 'category') {
+                Cache::forever($key,$component);
                 return $component;
             }
         }
 
         return null;
-
     }
 
     /**
@@ -123,8 +164,13 @@ class Transfer extends Eloquent
     public function getBudgetAttribute()
     {
 
-        foreach ($this->components()->get() as $component) {
+        $key = $this->id.'-transfer-budget';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
+        foreach ($this->components as $component) {
             if ($component->type == 'budget') {
+                Cache::forever($key,$component);
                 return $component;
             }
         }
@@ -172,18 +218,6 @@ class Transfer extends Eloquent
 
 
     /**
-     * Get the unencrypted description.
-     *
-     * @param $value
-     *
-     * @return string
-     */
-    public function getDescriptionAttribute($value)
-    {
-        return Crypt::decrypt($value);
-    }
-
-    /**
      * Add the component to the transaction.
      *
      * @param Component $component
@@ -197,13 +231,16 @@ class Transfer extends Eloquent
     }
 
     /**
-     * Encrypt the description.
+     * @param        $query
+     * @param Carbon $date
      *
-     * @param $value
+     * @return mixed
      */
-    public function setDescriptionAttribute($value)
+    public function scopeAfterDate($query, Carbon $date)
     {
-        $this->attributes['description'] = Crypt::encrypt($value);
+        return $query->where(
+            'date', '>=', $date->format('Y-m-d')
+        );
     }
 
     /**

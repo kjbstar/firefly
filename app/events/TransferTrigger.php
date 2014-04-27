@@ -52,7 +52,7 @@ class TransferTrigger
         // add it:
         $balanceModifierFrom->balance -= $transfer->amount;
         $balanceModifierFrom->save();
-        Cache::flush();
+        Cache::userFlush();
 
         return true;
         // add it to the to account
@@ -106,7 +106,7 @@ class TransferTrigger
         if ($transfer->amount != floatval($transfer->getOriginal('amount'))) {
             $this->triggerAmountChanged($transfer);
         }
-        Cache::flush();
+        Cache::userFlush();
 
         return true;
     }
@@ -372,7 +372,7 @@ class TransferTrigger
         // add it:
         $bmf->balance += $transfer->amount;
         $bmf->save();
-        Cache::flush();
+        Cache::userFlush();
     }
 
     /**

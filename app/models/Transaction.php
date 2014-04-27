@@ -75,8 +75,13 @@ class Transaction extends Eloquent
      */
     public function getBeneficiaryAttribute()
     {
+        $key = $this->id.'-transaction-beneficiary';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         foreach ($this->components as $component) {
             if ($component->type == 'beneficiary') {
+                Cache::forever($key,$component);
                 return $component;
             }
         }
@@ -92,8 +97,13 @@ class Transaction extends Eloquent
      */
     public function getCategoryAttribute()
     {
+        $key = $this->id.'-transaction-category';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         foreach ($this->components as $component) {
             if ($component->type == 'category') {
+                Cache::forever($key,$component);
                 return $component;
             }
         }
@@ -109,8 +119,13 @@ class Transaction extends Eloquent
      */
     public function getBudgetAttribute()
     {
+        $key = $this->id.'-transaction-budget';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         foreach ($this->components as $component) {
             if ($component->type == 'budget') {
+                Cache::forever($key,$component);
                 return $component;
             }
         }
@@ -283,86 +298,6 @@ class Transaction extends Eloquent
     {
         return $this->belongsTo('Predictable');
     }
-
-    /**
-     * Get the component name decrypted.
-     *
-     * @param $value
-     *
-     * @return string
-     */
-    public function getDescriptionAttribute($value)
-    {
-        if (is_null($value)) {
-            return null;
-        }
-        return Crypt::decrypt($value);
-    }
-
-    /**
-     * Encrypt the name while setting it.
-     *
-     * @param $value
-     */
-    public function setDescriptionAttribute($value)
-    {
-        if (strlen($value) > 0) {
-            $this->attributes['description'] = Crypt::encrypt($value);
-        } else {
-            $this->attributes['description'] = null;
-        }
-    }
-
-    /**
-     * Set the ignoreprediction value no matter its input:
-     *
-     * @param $value
-     */
-//    public function setIgnorepredictionAttribute($value)
-//    {
-//        if ($value === 1 || $value == '1' || $value == true
-//            || $value == 'true'
-//        ) {
-//            $this->attributes['ignoreprediction'] = 1;
-//        } else {
-//            $this->attributes['ignoreprediction'] = 0;
-//        }
-//
-//    }
-
-    /**
-     * Set the ignoreallowance value no matter its input:
-     *
-     * @param $value
-     */
-//    public function setIgnoreallowanceAttribute($value)
-//    {
-//        if ($value == 1 || $value == '1' || $value == true
-//            || $value == 'true'
-//        ) {
-//            $this->attributes['ignoreallowance'] = 1;
-//        } else {
-//            $this->attributes['ignoreallowance'] = 0;
-//        }
-//
-//    }
-
-    /**
-     * Set the ignoreallowance value no matter its input:
-     *
-     * @param $value
-     */
-//    public function setMarkAttribute($value)
-//    {
-//        if ($value == 1 || $value == '1' || $value == true
-//            || $value == 'true'
-//        ) {
-//            $this->attributes['mark'] = 1;
-//        } else {
-//            $this->attributes['mark'] = 0;
-//        }
-//
-//    }
 
     /**
      * These date/time fields must be Carbon objects.

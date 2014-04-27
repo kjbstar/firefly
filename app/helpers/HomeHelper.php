@@ -20,6 +20,10 @@ class HomeHelper
      */
     public static function homeAccountList(Carbon $date)
     {
+        $key = 'homeAccountList'.$date->format('Ymd');
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         $query = Auth::user()->accounts()->notHidden()->get();
         $accounts = [];
 
@@ -37,6 +41,7 @@ class HomeHelper
         }
 
         unset($query);
+        Cache::forever($key,$accounts);
         return $accounts;
     }
 
@@ -47,6 +52,10 @@ class HomeHelper
      */
     public static function budgetOverview(Carbon $date,Account $account)
     {
+        $key = 'budgetOverview'.$date->format('Ymd').$account->id;
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         $budgets = [];
         $transactions = $account->transactions()->expenses()->inMonth($date)
             ->beforeDate($date)->get();
@@ -120,6 +129,7 @@ class HomeHelper
         }
 
         // let's do some percentages:
+        Cache::forever($key,$budgets);
         return $budgets;
 
     }
@@ -131,6 +141,10 @@ class HomeHelper
      */
     public static function getAllowance(Carbon $date,Account $account)
     {
+        $key = 'getAllowance'.$date->format('Ymd').$account->id;
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         // get the allowance (setting) for this month, OR specific month.
         // and grab the value:
         $defaultAllowance = Setting::getSetting('defaultAllowance');
@@ -172,7 +186,7 @@ class HomeHelper
             }
             $allowance['pct'] = round(($spent / $amount) * 100);
         }
-
+        Cache::forever($key,$allowance);
         return $allowance;
     }
 
@@ -183,6 +197,10 @@ class HomeHelper
      */
     public static function getPredictables(Carbon $date,Account $account)
     {
+        $key = 'getPredictables'.$date->format('Ymd').$account->id;
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         $predictables = $account->predictables()->active()->orderBy('dom', 'ASC')->get();
         $list = [];
         foreach ($predictables as $p) {
@@ -192,6 +210,7 @@ class HomeHelper
                 $list[] = $p;
             }
         }
+        Cache::forever($key,$list);
         return $list;
     }
 
@@ -202,7 +221,7 @@ class HomeHelper
      */
     public static function transactions(Carbon $date,Account $account)
     {
-        return $account->transactions()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+        return $account->transactions()->remember(20)->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
             ->get();
     }
 
@@ -213,8 +232,8 @@ class HomeHelper
      */
     public static function transfers(Carbon $date,Account $account)
     {
-        $from = $account->transfersfrom()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
-        $to = $account->transfersto()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
+        $from = $account->transfersfrom()->remember(20)->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
+        $to = $account->transfersto()->take(5)->remember(20)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
         $result = $from->merge($to);
         return $result;
     }

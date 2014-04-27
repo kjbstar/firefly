@@ -97,6 +97,17 @@
                 </li>
 
         </ul>
+        {{Form::open(['action' => 'search', 'class' => 'navbar-form navbar-left','method' => 'get'])}}
+        <form class="" role="search">
+            <div class="form-group">
+                @if(isset($query))
+                <input type="text" name="query" class="form-control" placeholder="Search" value="{{{$query}}}">
+                @else
+                <input type="text" name="query" class="form-control" placeholder="Search">
+                @endif
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/logout">Logout {{{Auth::user()->username}}}</a></li>
           </ul>

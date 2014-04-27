@@ -109,7 +109,21 @@
             @foreach($transactions as $t)
             <tr>
                 <td>{{$t->date->format('j-M')}}</td>
-                <td><a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit {{{$t->description}}}">{{{$t->description}}}</a></td>
+                <td>
+                    @if($t->beneficiary && $t->beneficiary->hasIcon())
+                    {{$t->beneficiary->iconTag()}}
+                    @endif
+
+                    @if($t->category && $t->category->hasIcon())
+                    {{$t->category->iconTag()}}
+                    @endif
+
+
+                    @if($t->budget && $t->budget->hasIcon())
+                    {{$t->budget->iconTag()}}
+                    @endif
+
+                    <a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit {{{$t->description}}}">{{{$t->description}}}</a></td>
                 <td>{{mf($t->amount,true)}}</td>
             </tr>
             @endforeach
@@ -153,7 +167,7 @@
             <?php $sum += $p->amount; ?>
             <tr>
                 <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{{$p->description}}}</a></td>
-                <td><a href="{{URL::Route('accountoverview',$p->account_id)}}">{{{$p->account()->first()->name}}}</a></td>
+                <td><a href="{{URL::Route('accountoverview',$p->account_id)}}">{{{$p->account->name}}}</a></td>
                 <td>{{mf($p->amount,true)}}</td>
                 <td>{{$p->date->format('jS')}}</td>
                 <td><a href="{{URL::Route('addtransaction',$p->id)}}" class="btn btn-default btn-xs" title="Add transaction from predictable"><span class="glyphicon glyphicon-plus-sign"></span></a></td>

@@ -33,6 +33,21 @@
             @else
         <td>
             @endif
+            <!-- icons for ben,cat,bud -->
+
+            @if($ben && $ben->hasIcon())
+            {{$ben->iconTag()}}
+            @endif
+
+            @if($cat && $cat->hasIcon())
+            {{$cat->iconTag()}}
+            @endif
+
+
+            @if($bud && $bud->hasIcon())
+            {{$bud->iconTag()}}
+            @endif
+
             <a href="{{URL::Route('edittransaction',[$t->id])}}">{{{$t->description}}}</a></td>
         @if($t->ignoreprediction == 1 || $t->ignoreallowance == 1 || $t->mark == 1 || !is_null($t->predictable_id))
         <td>

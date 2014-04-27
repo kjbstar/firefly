@@ -47,6 +47,7 @@ class HomeController extends BaseController
             $today = new Carbon;
 
         }
+
         unset($actual);
         /**
          * Instead of having a "frontpage" account, the
@@ -65,13 +66,16 @@ class HomeController extends BaseController
         $budgets = HomeHelper::budgetOverview($today,$fpAccount);
         $transactions = HomeHelper::transactions($today,$fpAccount);
         $transfers = HomeHelper::transfers($today,$fpAccount);
+
         $history = HomeHelper::history();
+
 
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(
             'history', $history
         )->with('allowance', $allowance)->with('transactions', $transactions)->with('fpAccount', $fpAccount)->with(
                 'budgets', $budgets
             )->with('predictables', $predictables)->with('transfers', $transfers);
+        return;
     }
 
     /**

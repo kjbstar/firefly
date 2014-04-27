@@ -5,7 +5,7 @@
   <div class="col-lg-6 col-md-12">
     <h2>Edit {{OBJ}} "{{{$object->name}}}"</h2>
 
-      {{Form::open(['class' => 'form-horizontal'])}}
+      {{Form::open(['class' => 'form-horizontal','files' => true])}}
     <div class="form-group">
       <label for="inputName" class="col-sm-4 control-label">{{ucfirst(OBJ)}} name</label>
         <div class="col-sm-8">
@@ -42,6 +42,19 @@
                       Show this {{OBJ}} in reports.
                   </label>
               </div>
+          </div>
+      </div>
+
+      <!-- ICON FILE -->
+      <div class="form-group">
+          <label for="inputFile" class="col-sm-4 control-label">Icon</label>
+          <div class="col-sm-8">
+                      @if($prefilled['hasIcon'])
+                      {{$prefilled['iconTag']}}
+                      (remove button)
+                      @endif
+                        <input type="file" id="exampleInputFile" name="icon">
+                        <p class="help-block">Only png's accepted, 16x16!</p>
           </div>
       </div>
 

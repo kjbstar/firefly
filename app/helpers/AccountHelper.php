@@ -97,7 +97,7 @@ class AccountHelper
             $cacheTime = 1440;
         }
         /** @noinspection PhpUndefinedFieldInspection */
-        $key = Auth::user()->id . $account->id . 'marked' . $start->format('Ymd') . $end->format('Ymd') . 'Marked';
+        $key = $account->id . 'marked' . $start->format('Ymd') . $end->format('Ymd') . 'Marked';
         if (Cache::has($key)) {
             return Cache::has($key);
         } else {

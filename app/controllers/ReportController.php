@@ -81,6 +81,10 @@ class ReportController extends BaseController
 
     public function monthPieChart($year, $month, $type)
     {
+        $key = 'reportmonthPieChart'.$year.$month.$type;
+        if(Cache::has($key)) {
+            return Response::json(Cache::get($key));
+        }
         // get data:
         $date = Toolkit::parseDate($year, $month);
         $array = ['beneficiary', 'budget', 'category'];
@@ -106,7 +110,9 @@ class ReportController extends BaseController
         }
 
         $chart->generate();
-        return Response::json($chart->getData());
+        $data = $chart->getData();
+        Cache::forever($key,$data);
+        return Response::json($data);
 
     }
 
@@ -146,7 +152,7 @@ class ReportController extends BaseController
     public function monthAccounts($year, $month)
     {
         // cache!
-        $key = Auth::user()->id . '-month-account-' . $year . $month . 'aac';
+        $key = 'month-account-' . $year . $month . 'aac';
         if (Cache::has($key)) {
             // @codeCoverageIgnoreStart
             return Response::json(Cache::get($key));
@@ -189,7 +195,7 @@ class ReportController extends BaseController
 
         $chart->generate();
         $data = $chart->getData();
-        Cache::put($key, $data, 1440);
+        Cache::forever($key, $data);
         return Response::json($data);
     }
 
@@ -204,7 +210,7 @@ class ReportController extends BaseController
     public function yearAccounts($year)
     {
         // cache!
-        $key = Auth::user()->id . '-year-account-' . $year . 'aac';
+        $key = 'year-account-' . $year . 'aac';
         if (Cache::has($key)) {
             // @codeCoverageIgnoreStart
             return Response::json(Cache::get($key));
@@ -248,7 +254,7 @@ class ReportController extends BaseController
 
         $chart->generate();
         $data = $chart->getData();
-        Cache::put($key, $data, 1440);
+        Cache::forever($key, $data);
         return Response::json($data);
     }
 

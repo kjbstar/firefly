@@ -60,7 +60,9 @@ Route::get('/home/{year?}/{month?}/{account?}',['uses' => 'HomeController@showHo
 Route::get('/home/predict/{year}/{month}/{day}',['uses' => 'HomeController@predict', 'as' => 'predictDay']);
 Route::get('/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']);
 Route::get('/home/flush', ['uses' => 'PageController@flush', 'as' => 'flush']);
-
+Route::get('/home/decrypt', ['uses' => 'PageController@decrypt', 'as' => 'decrypt']);
+Route::get('/home/search', ['uses' => 'SearchController@search', 'as' => 'search']);
+Route::get('/home/moveComponents',['uses' => 'PageController@moveComponents','as' => 'moveComponents']);
 
 
 /**
@@ -104,6 +106,11 @@ foreach ($objects as $o) {
         }
     );
 }
+/**
+ * URL for component icons:
+ */
+Route::get('/component/icon/{component}',['uses' => 'ComponentController@renderIcon', 'as' => 'componenticon']);
+
 
 /**
  * PIGGY BANK CONTROLLER

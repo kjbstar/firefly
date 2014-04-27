@@ -1,1 +1,4 @@
 services.manifest
+cache/*
+components
+components/*

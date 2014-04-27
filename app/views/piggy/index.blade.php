@@ -50,7 +50,12 @@
 
             </div>
                 <div class="progress progress-striped" style="width:80%;">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="{{$pig->pctFilled}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$pig->pctFilled}}%;">
+                    <div class="progress-bar
+                    @if($pig->pctFilled == 100)
+                    progress-bar-success
+                    @endif
+                    " role="progressbar" aria-valuenow="{{$pig->pctFilled}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$pig->pctFilled}}%;">
+                        {{$pig->pctFilled}}%
                         <span class="sr-only">{{$pig->pctFilled}}% Complete</span>
                     </div>
                 </div>

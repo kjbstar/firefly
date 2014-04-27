@@ -102,7 +102,7 @@ class ComponentHelper
                         'components.type', $type
                     );
             }
-        )->orderBy('date','DESC');
+        )->orderBy('date', 'DESC');
         if (!is_null($date)) {
             $query->inMonth($date);
         }
@@ -148,6 +148,8 @@ class ComponentHelper
             'name'                => '',
             'parent_component_id' => 0,
             'reporting'           => false,
+            'hasIcon'             => false,
+            'iconTag'             => ''
         ];
     }
 
@@ -156,11 +158,15 @@ class ComponentHelper
      */
     public static function prefilledFromOldInput()
     {
-        return [
+        $data = [
             'name'                => Input::old('name'),
             'parent_component_id' => intval(Input::old('parent_component_id')),
             'reporting'           => intval(Input::old('reporting')) == 1 ? true : false,
+            'hasIcon'             => false,
+            'iconTag'             => ''
         ];
+        return $data;
+
     }
 
     /**
@@ -173,7 +179,9 @@ class ComponentHelper
         return [
             'name'                => $component->name,
             'parent_component_id' => intval($component->parent_component_id),
-            'reporting'           => $component->reporting == 1 ? true : false
+            'reporting'           => $component->reporting == 1 ? true : false,
+            'hasIcon'             => $component->hasIcon(),
+            'iconTag'             => $component->iconTag()
         ];
     }
 

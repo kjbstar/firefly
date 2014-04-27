@@ -21,6 +21,9 @@ use Carbon\Carbon as Carbon;
  * @method static \Illuminate\Database\Query\Builder|\Setting whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\Setting whereDate($value)
  * @method static \Illuminate\Database\Query\Builder|\Setting whereValue($value)
+ * @property integer $account_id
+ * @property-read \Account $account
+ * @method static \Illuminate\Database\Query\Builder|\Setting whereAccountId($value)
  */
 class Setting extends Eloquent
 {
@@ -68,7 +71,7 @@ class Setting extends Eloquent
     public static function getSetting($name)
     {
         /** @noinspection PhpUndefinedFieldInspection */
-        $key = Auth::user()->id . 'setting' . $name;
+        $key = 'setting' . $name;
         if (Cache::has($key)) {
             // @codeCoverageIgnoreStart
             return Cache::get($key);

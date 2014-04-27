@@ -77,7 +77,7 @@ class SettingsController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
-        Cache::flush();
+        Cache::userFlush();
         $defaultAllowance = Setting::getSetting('defaultAllowance');
         $defaultAllowance->value = floatval($defaultAllowance->value);
 

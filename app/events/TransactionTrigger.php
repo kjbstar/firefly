@@ -34,7 +34,7 @@ class TransactionTrigger
         }
         $balanceModifier->balance += floatval($transaction->amount);
         $balanceModifier->save();
-        Cache::flush();
+        Cache::userFlush();
 
         return true;
     }
@@ -65,7 +65,7 @@ class TransactionTrigger
         }
         $balanceModifier->balance -= floatval($transaction->amount);
         $balanceModifier->save();
-        Cache::flush();
+        Cache::userFlush();
 
         return true;
     }
@@ -131,7 +131,7 @@ class TransactionTrigger
         } else {
             Log::debug('No relevant changes, not triggering prediction.');
         }
-        Cache::flush();
+        Cache::userFlush();
 
         return true;
     }

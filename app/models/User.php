@@ -34,6 +34,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @method static \Illuminate\Database\Query\Builder|\User wherePassword($value)
  * @method static \Illuminate\Database\Query\Builder|\User whereActivation($value)
  * @method static \Illuminate\Database\Query\Builder|\User whereReset($value)
+ * @property string $remember_token
+ * @method static \Illuminate\Database\Query\Builder|\User whereRememberToken($value)
  */
 class User extends Eloquent implements UserInterface, RemindableInterface
 {

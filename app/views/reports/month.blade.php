@@ -80,7 +80,22 @@
             ?>
         <tr>
             <td>{{$m->date->format('jS')}}</td>
-            <td><a href="{{URL::Route('edit'.$class,$m->id)}}" title="Edit {{$class}} '{{{$m->description}}}'">{{{$m->description}}}</a></td>
+            <td>
+                @if($m->beneficiary && $m->beneficiary->hasIcon())
+                {{$m->beneficiary->iconTag()}}
+                @endif
+
+                @if($m->category && $m->category->hasIcon())
+                {{$m->category->iconTag()}}
+                @endif
+
+
+                @if($m->budget && $m->budget->hasIcon())
+                {{$m->budget->iconTag()}}
+                @endif
+
+
+                <a href="{{URL::Route('edit'.$class,$m->id)}}" title="Edit {{$class}} '{{{$m->description}}}'">{{{$m->description}}}</a></td>
             <td>{{mf($m->amount,true)}}</td>
         </tr>
         @endforeach
@@ -108,7 +123,21 @@
             ?>
             <tr>
                 <td>{{$p->date->format('jS')}}</td>
-                <td><a href="{{URL::Route('predictableoverview',$p->predictable_id)}}" title="Overview for predictable '{{{$p->description}}}'">{{{$p->description}}}</a></td>
+                <td>
+                    @if($p->beneficiary && $p->beneficiary->hasIcon())
+                    {{$p->beneficiary->iconTag()}}
+                    @endif
+
+                    @if($p->category && $p->category->hasIcon())
+                    {{$p->category->iconTag()}}
+                    @endif
+
+
+                    @if($p->budget && $p->budget->hasIcon())
+                    {{$p->budget->iconTag()}}
+                    @endif
+
+                    <a href="{{URL::Route('predictableoverview',$p->predictable_id)}}" title="Overview for predictable '{{{$p->description}}}'">{{{$p->description}}}</a></td>
                 <td>{{mf($p->predicted,true)}}</td>
                 <td>{{mf($p->amount,true)}}</td>
             </tr>

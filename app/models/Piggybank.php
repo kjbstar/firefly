@@ -18,6 +18,8 @@
  * @method static \Illuminate\Database\Query\Builder|\Piggybank whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\Piggybank whereAmount($value)
  * @method static \Illuminate\Database\Query\Builder|\Piggybank whereTarget($value)
+ * @property boolean $order
+ * @method static \Illuminate\Database\Query\Builder|\Piggybank whereOrder($value)
  */
 class Piggybank extends Eloquent
 {
@@ -38,24 +40,6 @@ class Piggybank extends Eloquent
     public function user()
     {
         return $this->belongsTo('User');
-    }
-
-    /**
-     * @param $value
-     *
-     * @return string
-     */
-    public function getNameAttribute($value)
-    {
-        return Crypt::decrypt($value);
-    }
-
-    /**
-     * @param $value
-     */
-    public function setNameAttribute($value)
-    {
-        $this->attributes['name'] = Crypt::encrypt($value);
     }
 
     /**

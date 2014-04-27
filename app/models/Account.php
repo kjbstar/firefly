@@ -35,6 +35,8 @@ require_once(app_path() . '/helpers/AccountHelper.php');
  * @method static \Illuminate\Database\Query\Builder|\Account whereHidden($value)
  * @method static \Illuminate\Database\Query\Builder|\Account whereShared($value)
  * @method static \Account shared()
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
+ * @method static \Account notShared()
  */
 class Account extends Eloquent
 {
@@ -105,7 +107,7 @@ class Account extends Eloquent
             $cacheTime = 10;
         }
         /** @noinspection PhpUndefinedFieldInspection */
-        $key = $date->format('Y-m-d') . Auth::user()->id . $this->id . '-balanceOndate';
+        $key = $date->format('Y-m-d'). $this->id . '-balanceOndate';
 
         if (cache::has($key)) {
             // @codeCoverageIgnoreStart
@@ -325,36 +327,6 @@ class Account extends Eloquent
     public function transactions()
     {
         return $this->hasMany('Transaction');
-    }
-
-    /**
-     * Decrypt the name on retrieval.
-     *
-     * @param $value
-     *
-     * @return string
-     */
-    public function getNameAttribute($value)
-    {
-        if (is_null($value)) {
-            return null;
-        }
-
-        return Crypt::decrypt($value);
-    }
-
-    /**
-     * Encrypt the name on storage.
-     *
-     * @param string $value The unencrypted name
-     */
-    public function setNameAttribute($value)
-    {
-        if (strlen($value) > 0) {
-            $this->attributes['name'] = Crypt::encrypt($value);
-        } else {
-            $this->attributes['name'] = null;
-        }
     }
 
     /**

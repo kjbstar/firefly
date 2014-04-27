@@ -21,6 +21,7 @@
             "app/models",
             "app/events",
             "app/helpers",
+            "app/extensions",
             "app/queue",
             "app/database/migrations",
             "app/database/seeds",

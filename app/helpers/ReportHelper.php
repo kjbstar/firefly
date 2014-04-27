@@ -25,6 +25,10 @@ class ReportHelper
 
     public static function summary(Carbon $date, $period)
     {
+        $key = $date->format('Ymd').'reportsummary'.$period;
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         $start = clone $date;
         $start->subDay();
         $end = clone $date;
@@ -104,12 +108,16 @@ class ReportHelper
                 'enddate'   => $end
             ]
         ];
-
+        Cache::forever($key,$data);
         return $data;
     }
 
     public static function biggestExpenses(Carbon $date, $period)
     {
+        $key = 'biggestExpenses'.$date->format('Ymd').$period;
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
 
         switch ($period) {
             default:
@@ -147,12 +155,16 @@ class ReportHelper
         if (count($transactions) == 0 && count($transfers) > 0) {
             $mutations = $transfers;
         }
-
+        Cache::forever($key,$mutations);
         return $mutations;
     }
 
     public static function predicted($date)
     {
+        $key = 'predicted'.$date->format('Ymd');
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         $transactions = Auth::user()->transactions()->expenses()->orderBy('amount', 'ASC')->whereNotNull(
             'predictable_id'
         )->take(10)->inMonth($date)->get();
@@ -162,7 +174,7 @@ class ReportHelper
             }
         );
 
-
+        Cache::forever($key,$transactions);
         return $transactions;
     }
 
@@ -194,6 +206,10 @@ class ReportHelper
 
     public static function incomes(Carbon $date, $period)
     {
+        $cacheKey = 'reportincomes'.$date->format('Ymd').$period;
+        if(Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
         switch ($period) {
             case 'month':
                 $inPeriod = 'inMonth';
@@ -229,6 +245,7 @@ class ReportHelper
                 ];
             }
         }
+        Cache::forever($cacheKey,$data);
         return $data;
     }
 
@@ -262,6 +279,10 @@ class ReportHelper
 
     public static function expensesGrouped($date, $period, $type)
     {
+        $cacheKey = 'reportexpensesGrouped'.$date->format('Ymd').$period.$type;
+        if(Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
         $data = [];
         // get the transfers with this $type and $date
         $transactions = Auth::user()->transactions()->expenses()->with(
@@ -310,7 +331,7 @@ class ReportHelper
         // collect sums:
         uasort($data, 'ReportHelper::sortExpenses');
 
-
+        Cache::forever($cacheKey,$data);
         return $data;
     }
 

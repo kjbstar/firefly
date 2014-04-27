@@ -27,6 +27,7 @@
  * @method static \Illuminate\Database\Query\Builder|\Component whereType($value)
  * @method static \Illuminate\Database\Query\Builder|\Component whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\Component whereReporting($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]    $transfers
  */
 class Component extends Eloquent
 {
@@ -34,10 +35,12 @@ class Component extends Eloquent
         = ['name'                => 'required|between:1,500',
            'user_id'             => 'required|exists:users,id',
            'reporting'           => 'required|numeric|between:0,1',
-           'parent_component_id' => 'exists:components,id',];
+           'parent_component_id' => 'exists:components,id',
+           'mime'                => 'between:0,50'
+        ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
-        = ['reporting', 'name', 'user_id', 'parent_component_id', 'type'];
+        = ['reporting', 'name', 'user_id', 'parent_component_id'];
 
     /**
      * This method either finds a component by the name $name or creates it
@@ -100,6 +103,16 @@ class Component extends Eloquent
     }
 
     /**
+     * Get the type
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function type()
+    {
+        return $this->belongsTo('Type');
+    }
+
+    /**
      * Get all limits for this component.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -150,36 +163,6 @@ class Component extends Eloquent
     }
 
     /**
-     * Get the component name decrypted.
-     *
-     * @param $value
-     *
-     * @return string
-     */
-    public function getNameAttribute($value)
-    {
-        if (is_null($value)) {
-            return null;
-        }
-
-        return Crypt::decrypt($value);
-    }
-
-    /**
-     * Encrypt the name while setting it.
-     *
-     * @param $value
-     */
-    public function setNameAttribute($value)
-    {
-        if (strlen($value) > 0) {
-            $this->attributes['name'] = Crypt::encrypt($value);
-        } else {
-            $this->attributes['name'] = null;
-        }
-    }
-
-    /**
      * All date fields that need to be converted to Carbon objects (and back).
      *
      * @return array
@@ -189,6 +172,7 @@ class Component extends Eloquent
         return ['created_at', 'updated_at'];
     }
 
+
     /**
      * @param $query
      *
@@ -197,6 +181,45 @@ class Component extends Eloquent
     public function scopeReporting($query)
     {
         return $query->where('reporting', 1);
+    }
+
+    /**
+     * Get the destination where the icon will be stored.
+     *
+     * @return string
+     */
+    public static function getDestinationPath()
+    {
+        return app_path('storage') . DIRECTORY_SEPARATOR . 'components';
+    }
+
+    /**
+     * Check if there is an icon present at the moment.
+     */
+    public function hasIcon()
+    {
+        if ($this->id) {
+            $file = $this->iconFileLocation();
+            return file_exists($file);
+        }
+        return false;
+    }
+
+    /**
+     * Returns the full <img> URL when there is an image present.
+     * Otherwise, returns "".
+     */
+    public function iconTag()
+    {
+        if ($this->hasIcon()) {
+            return '<img src="' . URL::Route('componenticon', $this->id) . '" alt="' . htmlentities($this->name)
+            . '" title="' . htmlentities($this->name) . '" />';
+        }
+        return '';
+    }
+
+    public function iconFileLocation() {
+        return self::getDestinationPath() . DIRECTORY_SEPARATOR . $this->id . '.png';
     }
 
 

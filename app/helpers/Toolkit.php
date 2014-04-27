@@ -37,7 +37,7 @@ class Toolkit
     public static function getFrontpageAccount()
     {
         /** @noinspection PhpUndefinedFieldInspection */
-        $key = Auth::user()->id . 'frontPageAccount';
+        $key = 'frontPageAccount';
         if (Cache::has($key)) {
             return Cache::get($key);
         } else {
@@ -68,7 +68,7 @@ class Toolkit
     public static function getEarliestEvent()
     {
         /** @noinspection PhpUndefinedFieldInspection */
-        $key = Auth::user()->id . 'getEarliestEvent';
+        $key = 'getEarliestEvent';
         if (Cache::has($key)) {
             return Cache::get($key);
         } else {

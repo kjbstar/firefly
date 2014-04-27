@@ -30,6 +30,8 @@ class ComponentController extends BaseController
             $current = [
                 'id'       => $obj->id,
                 'name'     => $obj->name,
+                'hasIcon' => $obj->hasIcon(),
+                'iconTag' => $obj->iconTag(),
                 'children' => []
             ];
 
@@ -40,7 +42,9 @@ class ComponentController extends BaseController
                 $names[] = $c->name;
                 $child = [
                     'id'   => $c->id,
-                    'name' => $c->name
+                    'name' => $c->name,
+                    'hasIcon' => $c->hasIcon(),
+                    'iconTag' => $c->iconTag(),
                 ];
                 // add to array:
                 $current['children'][] = $child;
@@ -100,6 +104,8 @@ class ComponentController extends BaseController
      */
     public function postAdd()
     {
+
+
         $parentID = intval(Input::get('parent_component_id')) > 0 ? intval(Input::get('parent_component_id')) : null;
         /** @noinspection PhpUndefinedFieldInspection */
         $data = [
@@ -145,11 +151,11 @@ class ComponentController extends BaseController
             Session::put('previous', URL::previous());
             $prefilled = ComponentHelper::prefilledFromComponent($component);
         } else {
-            $prefilled = ComponentHelper::prefilledFromOldInput();
+            $prefilled = ComponentHelper::prefilledFromOldInput($component);
         }
         $parents = ComponentHelper::getParentList(OBJ, $component);
         return View::make('components.edit')->with('object', $component)->with('parents', $parents)->with(
-            'title', 'Edit ' . OBJ . ' "' . $component->name.'"'
+            'title', 'Edit ' . OBJ . ' "' . $component->name . '"'
         )->with('prefilled', $prefilled);
     }
 
@@ -162,6 +168,22 @@ class ComponentController extends BaseController
      */
     public function postEdit(Component $component)
     {
+        if (Input::hasFile('icon')) {
+            $icon = Input::file('icon');
+            $mime = $icon->getMimeType();
+            if ($mime == 'image/png') {
+                // continue:
+                $path = $icon->getRealPath();
+                $size = getimagesize($path);
+                if ($size[0] == 16 && $size[1] == 16) {
+                    // continue again!
+                    $destinationPath = Component::getDestinationPath();
+                    $fileName = $component->id . '.png';
+                    $icon->move($destinationPath, $fileName);
+                }
+            }
+        }
+
         $component->parent_component_id
             = intval(Input::get('parent_component_id')) > 0 ? intval(Input::get('parent_component_id')) : null;
         $component->name = Input::get('name');
@@ -199,7 +221,7 @@ class ComponentController extends BaseController
         }
 
         return View::make('components.delete')->with('object', $component)->with(
-            'title', 'Delete ' . OBJ . ' "' . $component->name.'"'
+            'title', 'Delete ' . OBJ . ' "' . $component->name . '"'
         );
     }
 
@@ -273,5 +295,20 @@ class ComponentController extends BaseController
         return Response::json($return);
     }
 
+    public function renderIcon(Component $component)
+    {
+        if (!$component->hasIcon()) {
+            App::abort(404);
+        } else {
+            $im = imagecreatefrompng($component->iconFileLocation());
+            imageAlphaBlending($im, true);
+            imageSaveAlpha($im, true);
 
-} 
+            header('Content-Type: image/png');
+            imagepng($im);
+            imagedestroy($im);
+            exit();
+        }
+
+    }
+}

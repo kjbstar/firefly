@@ -1,5 +1,6 @@
 <?php
 
+
 /*
 |--------------------------------------------------------------------------
 | Register The Laravel Class Loader
@@ -110,16 +111,11 @@ Event::subscribe(new PredictableTrigger);
 Event::subscribe(new TransactionTrigger);
 Event::subscribe(new PiggyTrigger);
 Event::subscribe(new TransferTrigger);
+
 Cache::extend(
-    'authcache', function ($app) {
-        $encrypter = $app['encrypter'];
-        $table = $app['config']['cache.table'];
-
-        $config = $app['config']['cache.connection'];
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $connection = $app['db']->connection($config);
-
-        return new Illuminate\Cache\Repository(new AuthenticatedCacheStore($connection, $encrypter, $table));
+    'authfilecache', function ($app) {
+        $path = $app['config']['cache.path'];
+        $files = new Illuminate\Filesystem\Filesystem($app['files'], $path);
+        return new Illuminate\Cache\Repository(new AuthenticatedCacheFileStore($files,$path));
     }
 );

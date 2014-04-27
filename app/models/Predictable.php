@@ -17,7 +17,7 @@
  * @property-read mixed                                                   $beneficiary
  * @property-read mixed                                                   $category
  * @property-read mixed                                                   $budget
- * @property boolean $inactive
+ * @property boolean                                                      $inactive
  * @method static Predictable active()
  * @method static \Illuminate\Database\Query\Builder|\Predictable whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\Predictable whereCreatedAt($value)
@@ -28,6 +28,9 @@
  * @method static \Illuminate\Database\Query\Builder|\Predictable whereDom($value)
  * @method static \Illuminate\Database\Query\Builder|\Predictable wherePct($value)
  * @method static \Illuminate\Database\Query\Builder|\Predictable whereInactive($value)
+ * @property integer                                                      $account_id
+ * @property-read \Account                                                $account
+ * @method static \Illuminate\Database\Query\Builder|\Predictable whereAccountId($value)
  */
 class Predictable extends Eloquent
 {
@@ -36,7 +39,7 @@ class Predictable extends Eloquent
            'user_id'     => 'required|exists:users,id',
            'dom'         => 'required|numeric|between:1,31',
            'amount'      => 'required|numeric|not_in:0',
-           'account_id' => 'required|exists:accounts,id',
+           'account_id'  => 'required|exists:accounts,id',
            'inactive'    => 'required|numeric|between:0,1'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
@@ -76,8 +79,14 @@ class Predictable extends Eloquent
      */
     public function getBeneficiaryAttribute()
     {
+
+        $key = $this->id.'-predictable-beneficiary';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         foreach ($this->components as $component) {
             if ($component->type == 'beneficiary') {
+                Cache::forever($key,$component);
                 return $component;
             }
         }
@@ -93,8 +102,13 @@ class Predictable extends Eloquent
      */
     public function getCategoryAttribute()
     {
+        $key = $this->id . '-predictable-category';
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
         foreach ($this->components as $component) {
             if ($component->type == 'category') {
+                Cache::forever($key, $component);
                 return $component;
             }
         }
@@ -110,13 +124,33 @@ class Predictable extends Eloquent
      */
     public function getBudgetAttribute()
     {
+        $key = $this->id . '-predictable-budget';
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
         foreach ($this->components as $component) {
             if ($component->type == 'budget') {
+                Cache::forever($key, $component);
                 return $component;
             }
         }
 
         return null;
+    }
+
+    /**
+     * To get the account from attribute, we use this
+     * caching function.
+     * @return mixed
+     */
+    public function getAccountAttribute() {
+        $key = $this->id.'-predictable-account';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
+        $var = $this->account()->first();
+        Cache::forever($key,$var);
+        return $var;
     }
 
     /**
@@ -137,36 +171,6 @@ class Predictable extends Eloquent
     public function transactions()
     {
         return $this->hasMany('Transaction');
-    }
-
-    /**
-     * Get the component name decrypted.
-     *
-     * @param $value
-     *
-     * @return string
-     */
-    public function getDescriptionAttribute($value)
-    {
-        if (is_null($value)) {
-            return null;
-        }
-
-        return Crypt::decrypt($value);
-    }
-
-    /**
-     * Encrypt the name while setting it.
-     *
-     * @param $value
-     */
-    public function setDescriptionAttribute($value)
-    {
-        if (strlen($value) > 0) {
-            $this->attributes['description'] = Crypt::encrypt($value);
-        } else {
-            $this->attributes['description'] = null;
-        }
     }
 
     /**

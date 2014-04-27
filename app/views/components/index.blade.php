@@ -15,7 +15,9 @@
           </tr>
           @foreach($objects as $o)
           <tr>
-              <td><a href="{{URL::Route(OBJ.'overview',$o['id'])}}">{{{$o['name']}}}</a></td>
+              <td>
+                  {{$o['iconTag']}}
+                  <a href="{{URL::Route(OBJ.'overview',$o['id'])}}">{{{$o['name']}}}</a></td>
               <td>
               <div class="btn-group">
                   <a href="{{URL::Route('edit'.OBJ,$o['id'])}}" class="btn btn-default"><span
@@ -30,6 +32,7 @@
           @foreach($o['children'] as $child)
           <tr>
               <td>&nbsp;&nbsp;&nbsp;&nbsp;
+                  {{$child['iconTag']}}
                   <a href="{{URL::Route(OBJ.'overview',array($child['id']))}}">{{{$child['name']}}}</a>
               </td>
               <td>
