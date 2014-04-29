@@ -331,7 +331,9 @@ class ReportHelper
                     'component'    => [
                         'id'   => $key,
                         'name' => $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->name : '(no '.$type->type.')',
-                        'sum'  => $t->amount
+                        'sum'  => $t->amount,
+                        'hasIcon' => $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->hasIcon() : false,
+                        'iconTag' => $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->iconTag() : '',
                     ],
                     'transactions' => [$t]
                 ];

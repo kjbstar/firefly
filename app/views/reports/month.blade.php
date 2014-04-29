@@ -162,6 +162,9 @@
                 <div class="panel-heading">
                     <h5 class="panel-title">
                         <a data-toggle="collapse" data-parent="#accordion-{{$type}}" href="#{{$type}}-{{{Str::slug($row['component']['name'])}}}">
+                            @if($row['component']['hasIcon'])
+                            {{$row['component']['iconTag']}}
+                            @endif
                             {{{$row['component']['name']}}}
                             <span class="pull-right"><small>{{mf($row['component']['sum'],true)}}</small></span>
                         </a>

@@ -7,6 +7,12 @@
         @if($parent)
             <h3>Child of {{{$parent->name}}}</h3>
         @endif
+        <div class="btn-group">
+            <a href="{{URL::Route('editcomponent',$component->id)}}" class="btn btn-default"><span
+                    class="glyphicon glyphicon-pencil"></span></a> <a
+                href="{{URL::Route('deletecomponent',$component->id)}}" class="btn btn-default btn-danger"><span
+                    class="glyphicon glyphicon-trash"></span></a>
+        </div>
     </div>
 </div>
 <div class="row">

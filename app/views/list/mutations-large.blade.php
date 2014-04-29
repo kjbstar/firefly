@@ -13,7 +13,7 @@
         <td>
             @foreach($types as $type)
                 @if($m->hasComponentOfType($type))
-                    {{$m->getComponentOfType($type)->iconTag()}}
+                    <a href="{{URL::Route('componentoverview',$m->getComponentOfType($type)->id)}}">{{$m->getComponentOfType($type)->iconTag()}}</a>
                 @endif
             @endforeach
         </td>

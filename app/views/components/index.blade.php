@@ -16,7 +16,9 @@
           @foreach($components as $c)
           <tr>
               <td>
-                  {{$c['iconTag']}}
+                  @if($c['hasIcon'])
+                    {{$c['iconTag']}}
+                  @endif
                   <a href="{{URL::Route('componentoverview',$c['id'])}}">{{{$c['name']}}}</a></td>
               <td>
               <div class="btn-group">
@@ -32,7 +34,9 @@
           @foreach($c['children'] as $child)
           <tr>
               <td>&nbsp;&nbsp;&nbsp;&nbsp;
+                  @if($child['hasIcon'])
                   {{$child['iconTag']}}
+                  @endif
                   <a href="{{URL::Route('componentoverview',$child['id'])}}">{{{$child['name']}}}</a>
               </td>
               <td>
