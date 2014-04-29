@@ -7,26 +7,28 @@ use Carbon\Carbon as Carbon;
 class ReportHelper
 {
 
-    public static function summaryCompared(Carbon $dateOne, Carbon $dateTwo) {
+    public static function summaryCompared(Carbon $dateOne, Carbon $dateTwo)
+    {
         $data = [
-            $dateOne->format('Y') => self::summary($dateOne,'year'),
-            $dateTwo->format('Y') => self::summary($dateTwo,'year')
+            $dateOne->format('Y') => self::summary($dateOne, 'year'),
+            $dateTwo->format('Y') => self::summary($dateTwo, 'year')
         ];
         return $data;
     }
 
-    public static function monthsCompared(Carbon $dateOne,Carbon $dateTwo) {
+    public static function monthsCompared(Carbon $dateOne, Carbon $dateTwo)
+    {
         $data = [
-            $dateOne->format('Y') => self::months($dateOne,'year'),
-            $dateTwo->format('Y') => self::months($dateTwo,'year')
+            $dateOne->format('Y') => self::months($dateOne, 'year'),
+            $dateTwo->format('Y') => self::months($dateTwo, 'year')
         ];
         return $data;
     }
 
     public static function summary(Carbon $date, $period)
     {
-        $key = $date->format('Ymd').'reportsummary'.$period;
-        if(Cache::has($key)) {
+        $key = $date->format('Ymd') . 'reportsummary' . $period;
+        if (Cache::has($key)) {
             return Cache::get($key);
         }
         $start = clone $date;
@@ -49,16 +51,20 @@ class ReportHelper
         $end->$endOf();
 
         // get the incomes:
-        $income = floatval(Auth::user()->transactions()->$inPeriod($date)->incomes()
-                ->leftJoin('accounts','accounts.id','=','transactions.account_id')
-                ->where('accounts.shared',0)
-                ->sum('amount'));
+        $income = floatval(
+            Auth::user()->transactions()->$inPeriod($date)->incomes()
+                ->leftJoin('accounts', 'accounts.id', '=', 'transactions.account_id')
+                ->where('accounts.shared', 0)
+                ->sum('amount')
+        );
 
         // get the expenses:
-        $expenses = floatval(Auth::user()->transactions()->$inPeriod($date)->expenses()
-                ->leftJoin('accounts','accounts.id','=','transactions.account_id')
-                ->where('accounts.shared',0)
-                ->sum('amount'));
+        $expenses = floatval(
+            Auth::user()->transactions()->$inPeriod($date)->expenses()
+                ->leftJoin('accounts', 'accounts.id', '=', 'transactions.account_id')
+                ->where('accounts.shared', 0)
+                ->sum('amount')
+        );
 
 
         // received in total from shared accounts (this might be income):
@@ -108,14 +114,14 @@ class ReportHelper
                 'enddate'   => $end
             ]
         ];
-        Cache::forever($key,$data);
+        Cache::forever($key, $data);
         return $data;
     }
 
     public static function biggestExpenses(Carbon $date, $period)
     {
-        $key = 'biggestExpenses'.$date->format('Ymd').$period;
-        if(Cache::has($key)) {
+        $key = 'biggestExpenses' . $date->format('Ymd') . $period;
+        if (Cache::has($key)) {
             return Cache::get($key);
         }
 
@@ -135,7 +141,7 @@ class ReportHelper
         $transfers = Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')
             ->where('accounts.shared', 1)->$inPeriod(
                 $date
-            )->get(['transfers.*',DB::Raw('amount *-1 AS amount')]);
+            )->get(['transfers.*', DB::Raw('amount *-1 AS amount')]);
         $mutations = [];
 
         // we have both:
@@ -155,14 +161,14 @@ class ReportHelper
         if (count($transactions) == 0 && count($transfers) > 0) {
             $mutations = $transfers;
         }
-        Cache::forever($key,$mutations);
+        Cache::forever($key, $mutations);
         return $mutations;
     }
 
     public static function predicted($date)
     {
-        $key = 'predicted'.$date->format('Ymd');
-        if(Cache::has($key)) {
+        $key = 'predicted' . $date->format('Ymd');
+        if (Cache::has($key)) {
             return Cache::get($key);
         }
         $transactions = Auth::user()->transactions()->expenses()->orderBy('amount', 'ASC')->whereNotNull(
@@ -174,7 +180,7 @@ class ReportHelper
             }
         );
 
-        Cache::forever($key,$transactions);
+        Cache::forever($key, $transactions);
         return $transactions;
     }
 
@@ -206,9 +212,9 @@ class ReportHelper
 
     public static function incomes(Carbon $date, $period)
     {
-        $cacheKey = 'reportincomes'.$date->format('Ymd').$period;
-        if(Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
+        $cacheKey = 'reportincomes' . $date->format('Ymd') . $period;
+        if (Cache::has($cacheKey)) {
+//            return Cache::get($cacheKey);
         }
         switch ($period) {
             case 'month':
@@ -218,34 +224,38 @@ class ReportHelper
                 $inPeriod = 'inYear';
                 break;
         }
+        $beneficiaryType = Type::whereType('beneficiary')->first();
 
         $data = [];
         $transactions = Auth::user()->transactions()->incomes()->with(
-            ['components' => function ($query) {
-                    $query->where('type', 'beneficiary');
+            ['components' => function ($query) use ($beneficiaryType) {
+                    $query->where('type_id', $beneficiaryType->id);
                 }]
         )->$inPeriod(
                 $date
             )
-            ->leftJoin('accounts','accounts.id','=','transactions.account_id')
-            ->where('accounts.shared',0)
+            ->leftJoin('accounts', 'accounts.id', '=', 'transactions.account_id')
+            ->where('accounts.shared', 0)
             ->get();
 
+        /** @var $t Transaction */
         foreach ($transactions as $t) {
-            $key = is_null($t->beneficiary) ? 0 : $t->beneficiary->id;
+            $key = $t->hasComponentOfType($beneficiaryType) ? $t->getComponentOfType($beneficiaryType)->id : 0;
             if (isset($data[$key])) {
                 $data[$key]['transactions'][] = $t;
             } else {
                 $data[$key] = [
                     'beneficiary'  => [
                         'id'   => $key,
-                        'name' => is_null($t->beneficiary) ? '(no beneficiary)' : $t->beneficiary->name
+                        'name' => $t->hasComponentOfType($beneficiaryType) ? $t->getComponentOfType(
+                                $beneficiaryType
+                            )->name : '(no beneficiary)'
                     ],
                     'transactions' => [$t]
                 ];
             }
         }
-        Cache::forever($cacheKey,$data);
+        Cache::forever($cacheKey, $data);
         return $data;
     }
 
@@ -277,17 +287,17 @@ class ReportHelper
         return $data;
     }
 
-    public static function expensesGrouped($date, $period, $type)
+    public static function expensesGrouped($date, $period, Type $type)
     {
-        $cacheKey = 'reportexpensesGrouped'.$date->format('Ymd').$period.$type;
-        if(Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
+        $cacheKey = 'reportexpensesGrouped' . $date->format('Ymd') . $period . $type;
+        if (Cache::has($cacheKey)) {
+            //return Cache::get($cacheKey);
         }
         $data = [];
         // get the transfers with this $type and $date
         $transactions = Auth::user()->transactions()->expenses()->with(
             ['components' => function ($query) use ($type) {
-                    $query->where('type', $type);
+                    $query->where('type_id', $type->id);
                 }]
         )->inMonth($date)->get();
 
@@ -295,12 +305,12 @@ class ReportHelper
         // with this $type and $date.
         $transfers = Auth::user()->transfers()->with(
             ['components' => function ($query) use ($type) {
-                    $query->where('type', $type);
+                    $query->where('type_id', $type->id);
                 }]
         )->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')
             ->where('accounts.shared', 1)->inMonth(
                 $date
-            )->get(['transfers.*',DB::Raw('`amount` * -1 AS `amount`')]);
+            )->get(['transfers.*', DB::Raw('`amount` * -1 AS `amount`')]);
         // merge the two lists:
         $mutations = $transactions->merge($transfers);
         $mutations = $mutations->sortBy(
@@ -310,10 +320,9 @@ class ReportHelper
         );
 
 
-
-
+        /** @var $t ComponentEnabledModel */
         foreach ($mutations as $t) {
-            $key = is_null($t->$type) ? 0 : $t->$type->id;
+            $key = $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->id : 0;
             if (isset($data[$key])) {
                 $data[$key]['transactions'][] = $t;
                 $data[$key]['component']['sum'] += $t->amount;
@@ -321,7 +330,7 @@ class ReportHelper
                 $data[$key] = [
                     'component'    => [
                         'id'   => $key,
-                        'name' => is_null($t->$type) ? '(no ' . $type . ')' : $t->$type->name,
+                        'name' => $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->name : '(no '.$type->type.')',
                         'sum'  => $t->amount
                     ],
                     'transactions' => [$t]
@@ -331,7 +340,7 @@ class ReportHelper
         // collect sums:
         uasort($data, 'ReportHelper::sortExpenses');
 
-        Cache::forever($cacheKey,$data);
+        Cache::forever($cacheKey, $data);
         return $data;
     }
 

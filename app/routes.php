@@ -174,7 +174,7 @@ Route::get('/home/reports/period/{year}',['uses' => 'ReportController@year', 'as
 Route::get('/home/reports/period/{year}/{month}',['uses' => 'ReportController@month', 'as' => 'monthreport']);
 
 Route::get('/home/reports/period/{year}/{month}/chart',['uses' => 'ReportController@monthAccounts', 'as' => 'monthreportchart']);
-Route::get('/home/reports/period/{year}/{month}/pie/{type}',['uses' => 'ReportController@monthPieChart', 'as' => 'monthreportpie']);
+Route::get('/home/reports/period/{year}/{month}/pie/{typename}',['uses' => 'ReportController@monthPieChart', 'as' => 'monthreportpie']);
 Route::get('/home/reports/period/{year}/chart',['uses' => 'ReportController@yearAccounts', 'as' => 'yearreportchart']);
 
 Route::get('/home/reports/compare/{year}/{otheryear}',['uses' => 'ReportController@compareYear', 'as' => 'compareyear']);

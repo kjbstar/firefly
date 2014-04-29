@@ -66,10 +66,12 @@ class ReportController extends BaseController
         $predicted = ReportHelper::predicted($date);
         $incomes = ReportHelper::incomes($date, 'month');
 
+
+
         $expenses = [
-            'category'    => ReportHelper::expensesGrouped($date, 'month', 'category'),
-            'budget'      => ReportHelper::expensesGrouped($date, 'month', 'budget'),
-            'beneficiary' => ReportHelper::expensesGrouped($date, 'month', 'beneficiary'),
+            'category'    => ReportHelper::expensesGrouped($date, 'month', Type::whereType('category')->first()),
+            'budget'      => ReportHelper::expensesGrouped($date, 'month', Type::whereType('budget')->first()),
+            'beneficiary' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('beneficiary')->first()),
         ];
 
         return View::make('reports.month')->with('date', $date)->with('title', $title)->with('summary', $summary)->with(
@@ -89,7 +91,8 @@ class ReportController extends BaseController
         $date = Toolkit::parseDate($year, $month);
         $array = ['beneficiary', 'budget', 'category'];
         if (in_array($type, $array)) {
-            $data = ReportHelper::expensesGrouped($date, 'month', $type);
+            $typeObject = Type::whereType($type)->first();
+            $data = ReportHelper::expensesGrouped($date, 'month', $typeObject);
         } else {
             App::abort(404);
         }
