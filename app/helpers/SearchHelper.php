@@ -80,11 +80,12 @@ class SearchHelper
      */
     private static function _searchComponents($type, $searchQuery)
     {
+        $type = Type::whereType($type)->first();
         $result = [
             'count'  => 0,
             'result' => null
         ];
-        $query = Auth::user()->components()->where('type', $type)->where('name', 'LIKE', $searchQuery);
+        $query = Auth::user()->components()->where('type_id', $type->id)->where('name', 'LIKE', $searchQuery);
         $result['count'] = $query->count();
         if ($result['count'] <= 20) {
             $result['result'] = $query->get();

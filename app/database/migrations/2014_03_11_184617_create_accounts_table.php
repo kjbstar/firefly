@@ -21,7 +21,7 @@ class CreateAccountsTable extends Migration {
             $table->decimal('openingbalance', 10, 2);
             $table->date('openingbalancedate');
             $table->decimal('currentbalance', 10, 2);
-            $table->boolean('hidden')->default(false);
+            $table->boolean('inactive')->default(false);
             $table->boolean('shared')->default(false);
 
             $table->foreign('user_id')

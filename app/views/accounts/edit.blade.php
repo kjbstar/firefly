@@ -64,16 +64,16 @@
         <!-- Opening balance date -->
         <!-- ignore in transactions (default is zero) -->
         <div class="form-group">
-            <label for="inputHidden" class="col-sm-4 control-label">Hidden
+            <label for="inputInactive" class="col-sm-4 control-label">Inactive
                 <small>(optional)</small>
             </label>
             <div class="col-sm-8">
                 <div class="checkbox">
                     <label>
-                        @if($prefilled['hidden'] == true)
-                        <input checked="checked" name="hidden" value="1" type="checkbox">
+                        @if($prefilled['inactive'] == true)
+                        <input checked="checked" name="inactive" value="1" type="checkbox">
                         @else
-                        <input name="hidden" value="1" type="checkbox">
+                        <input name="inactive" value="1" type="checkbox">
                         @endif
                         Hides the account from most screens.
                     </label>

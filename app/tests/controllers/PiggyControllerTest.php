@@ -383,7 +383,7 @@ class PiggyControllerTest extends TestCase
         $this->assertEquals('Piggy banks', $view['title']);
 
         // match number of accounts:
-        $count = DB::table('accounts')->where('hidden', 0)->count();
+        $count = DB::table('accounts')->where('inactive', 0)->count();
         $this->assertCount($count, $view['accounts']);
 
     }

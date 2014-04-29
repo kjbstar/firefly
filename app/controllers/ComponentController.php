@@ -13,76 +13,45 @@ class ComponentController extends BaseController
 {
 
     /**
-     * Shows the index of the component.
+     * Show the index.
      *
-     * @return View
+     * @param Type $type
+     *
+     * @return \Illuminate\View\View
      */
     public function index(Type $type)
     {
-        $components = Auth::user()->components()->whereNull('parent_component_id')->with('childrencomponents')->where(
-            'type_id', $type->id
-        )->get();
-        $result = [];
-        $parents = []; // used in for multisort.
-        foreach ($components as $obj) {
-            $parents[] = $obj->name;
-
-            $current = [
-                'id'       => $obj->id,
-                'name'     => $obj->name,
-                'hasIcon'  => $obj->hasIcon(),
-                'iconTag'  => $obj->iconTag(),
-                'children' => []
-            ];
-
-            // used in for multisort.
-            $names = [];
-            foreach ($obj->childrencomponents as $c) {
-
-                $names[] = $c->name;
-                $child = [
-                    'id'      => $c->id,
-                    'name'    => $c->name,
-                    'hasIcon' => $c->hasIcon(),
-                    'iconTag' => $c->iconTag(),
-                ];
-                // add to array:
-                $current['children'][] = $child;
-            }
-            array_multisort($names, SORT_NATURAL, $current['children']);
-
-            $result[] = $current;
-        }
-
-        array_multisort($parents, SORT_STRING, $result);
-
+        $components = ComponentHelper::indexList($type);
         return View::make('components.index')->with('title', 'All ' . Str::plural($type->type))->with(
-            'components', $result
+            'components', $components
         )->with('type', $type);
     }
 
     /**
-     * Shows all transactions without component of type X.
+     * Show a list of transactions without this type of component.
      *
-     * @param int $year  The year
-     * @param int $month the month
+     * @param Type $type
+     * @param null $year
+     * @param null $month
      *
-     * @return View
+     * @return \Illuminate\View\View
      */
     public function noComponent(Type $type, $year = null, $month = null)
     {
         $date = Toolkit::parseDate($year, $month);
-
         $list = ComponentHelper::transactionsWithoutComponent($type, $date);
 
-        return View::make('components.empty')->with('title', 'Transactions without a ' . $type->type)->with('mutations', $list)
-            ->with('date', $date)->with('type',$type);
+        return View::make('components.empty')->with('title', 'Transactions without a ' . $type->type)->with(
+            'mutations', $list
+        )->with('date', $date)->with('type', $type);
     }
 
     /**
-     * Add a new component.
+     * Add a new component
      *
-     * @return View
+     * @param Type $type
+     *
+     * @return \Illuminate\View\View
      */
     public function add(Type $type)
     {
@@ -92,6 +61,7 @@ class ComponentController extends BaseController
         } else {
             $prefilled = ComponentHelper::prefilledFromOldInput();
         }
+
         $parents = ComponentHelper::getParentList($type);
 
         return View::make('components.add')->with('title', 'Add new ' . $type->type)->with('parents', $parents)->with(
@@ -100,48 +70,53 @@ class ComponentController extends BaseController
     }
 
     /**
-     * Process adding of new component.
+     * Process add of new component.
      *
-     * @return Redirect
+     * @param Type $type
+     *
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function postAdd(Type $type)
     {
-
-
+        // get data
         $parentID = intval(Input::get('parent_component_id')) > 0 ? intval(Input::get('parent_component_id')) : null;
-        /** @noinspection PhpUndefinedFieldInspection */
         $data = [
             'name'                => Input::get('name'),
             'parent_component_id' => $parentID,
-            'user_id'             => Auth::user()->id,
             'reporting'           => Input::get('reporting') == '1' ? 1 : 0,
         ];
-
-
+        // create the new component
         $component = new Component($data);
+        /** @noinspection PhpParamsInspection */
+        $component->user()->associate(Auth::user());
         $component->type()->associate($type);
+
+        // validate it:
         $validator = Validator::make($component->toArray(), Component::$rules);
+
         // validation fails!
         if ($validator->fails()) {
-            Log::error('Could not save component: ' . print_r($validator->messages()->all(), true));
             Session::flash('error', 'Could not save the new ' . $type->type);
             return Redirect::route('add' . OBJ)->withErrors($validator)->withInput();
-        } else {
-            $result = $component->save();
-            // it fails again!
-            if (!$result) {
-                Log::error('Could not save component, trigger failure!');
-                Session::flash('error', 'Could not save the new ' . $type->type . '. Is the name unique?');
-                return Redirect::route('addcomponent', $type->id)->withErrors($validator)->withInput();
-
-            }
-            Session::flash('success', 'The new ' . $type->type . ' has been saved.');
-            return Redirect::to(Session::get('previous'));
         }
+        // try to save it:
+        $result = $component->save();
+
+
+        // it fails again!
+        if (!$result) {
+            Session::flash('error', 'Could not save the new ' . $type->type . '. Is the name unique?');
+            return Redirect::route('addcomponent', $type->id)->withErrors($validator)->withInput();
+
+        }
+
+        // success!
+        Session::flash('success', 'The new ' . $type->type . ' has been saved.');
+        return Redirect::to(Session::get('previous'));
     }
 
     /**
-     * Edit an component.
+     * Edit a component.
      *
      * @param Component $component The component
      *
@@ -155,6 +130,7 @@ class ComponentController extends BaseController
         } else {
             $prefilled = ComponentHelper::prefilledFromOldInput($component);
         }
+
         $parents = ComponentHelper::getParentList($component->type, $component);
         return View::make('components.edit')->with('component', $component)->with('parents', $parents)->with(
             'title', 'Edit ' . $component->type->type . ' "' . $component->name . '"'
@@ -162,7 +138,7 @@ class ComponentController extends BaseController
     }
 
     /**
-     * Edit an component.
+     * Edit a component.
      *
      * @param Component $component The component.
      *
@@ -170,43 +146,38 @@ class ComponentController extends BaseController
      */
     public function postEdit(Component $component)
     {
-        if (Input::hasFile('icon')) {
-            $icon = Input::file('icon');
-            $mime = $icon->getMimeType();
-            if ($mime == 'image/png') {
-                // continue:
-                $path = $icon->getRealPath();
-                $size = getimagesize($path);
-                if ($size[0] == 16 && $size[1] == 16) {
-                    // continue again!
-                    $destinationPath = Component::getDestinationPath();
-                    $fileName = $component->id . '.png';
-                    $icon->move($destinationPath, $fileName);
-                }
-            }
-        }
+        // save icon (move to helper)
+        ComponentHelper::saveIcon($component);
 
+        // update component
         $component->parent_component_id
             = intval(Input::get('parent_component_id')) > 0 ? intval(Input::get('parent_component_id')) : null;
         $component->name = Input::get('name');
         $component->reporting = Input::get('reporting') == '1' ? 1 : 0;
+
+        // validate it:
         $validator = Validator::make($component->toArray(), Component::$rules);
+
         // it fails!
         if ($validator->fails()) {
             Session::flash('error', 'Could not save the ' . $component->type->type . '.');
             return Redirect::route('editcomponent', $component->id)->withErrors($validator)->withInput();
-        } else {
-            $result = $component->save();
-            // it fails again!
-            if (!$result) {
-                Session::flash('error', 'Could not save the ' . $component->type->type . '. Is the name unique?');
-                return Redirect::route('editcomponent', $component->id)->withInput()->withErrors($validator);
-            }
-            Session::flash('success', 'The ' . $component->type->type . ' has been updated.');
-            return Redirect::to(Session::get('previous'));
-
-
         }
+
+        // try to save it
+        $result = $component->save();
+
+        // it fails again!
+        if (!$result) {
+            Session::flash('error', 'Could not save the ' . $component->type->type . '. Is the name unique?');
+            return Redirect::route('editcomponent', $component->id)->withInput()->withErrors($validator);
+        }
+
+        // return!
+        Session::flash('success', 'The ' . $component->type->type . ' has been updated.');
+        return Redirect::to(Session::get('previous'));
+
+
     }
 
     /**
@@ -249,7 +220,7 @@ class ComponentController extends BaseController
      */
     public function overview(Component $component)
     {
-        $parent = is_null($component->parent_component_id) ? null : $component->parentComponent()->first();
+        $parent = $component->parentComponent;
         $months = ComponentHelper::months($component);
         $title = 'Overview for ' . $component->type->type . ' "' . $component->name . '"';
 
@@ -270,13 +241,16 @@ class ComponentController extends BaseController
         $date = Toolkit::parseDate($year, $month);
         $mutations = ComponentHelper::mutations($component, $date);
         $title = 'Overview for ' . $component->type->type . ' "' . $component->name . '" in ' . $date->format('F Y');
+
         return View::make('components.overview-by-month')->with('component', $component)->with('title', $title)->with(
             'mutations', $mutations
         )->with('date', $date);
     }
 
     /**
-     * Generate a typeahead compatible component list.
+     * Returns a typeahead list.
+     *
+     * @param Type $type
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -297,18 +271,23 @@ class ComponentController extends BaseController
         return Response::json($return);
     }
 
+    /**
+     * Render icon for component.
+     *
+     * @param Component $component
+     */
     public function renderIcon(Component $component)
     {
         if (!$component->hasIcon()) {
             App::abort(404);
         } else {
-            $im = imagecreatefrompng($component->iconFileLocation());
-            imageAlphaBlending($im, true);
-            imageSaveAlpha($im, true);
+            $image = imagecreatefrompng($component->iconFileLocation());
+            imageAlphaBlending($image, true);
+            imageSaveAlpha($image, true);
 
             header('Content-Type: image/png');
-            imagepng($im);
-            imagedestroy($im);
+            imagepng($image);
+            imagedestroy($image);
             exit();
         }
 

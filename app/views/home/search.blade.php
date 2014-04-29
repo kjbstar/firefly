@@ -46,33 +46,7 @@
         </p>
         @endif
         @if($counts['transactions'] > 0 && isset($results['transactions']))
-        <table class="table table-condensed table-striped table-bordered">
-            @foreach($results['transactions'] as $t)
-            <tr>
-                <td>{{$t->date->format('d-m-Y')}}</td>
-                <td>
-
-                    @if($t->beneficiary && $t->beneficiary->hasIcon())
-                    {{$t->beneficiary->iconTag()}}
-                    @endif
-
-                    @if($t->category && $t->category->hasIcon())
-                    {{$t->category->iconTag()}}
-                    @endif
-
-
-                    @if($t->budget && $t->budget->hasIcon())
-                    {{$t->budget->iconTag()}}
-                    @endif
-
-                    <a href="{{URL::Route('edittransaction',[$t->id])}}">{{{$t->description}}}</a>
-
-                </td>
-                <td>{{mf($t->amount,true)}}</td>
-            </tr>
-            @endforeach
-
-        </table>
+            @include('list.mutations-small',['mutations' => $results['transactions']])
         @endif
     </div>
     <div class="col-lg-6 col-md-6">
@@ -89,15 +63,7 @@
         </p>
         @endif
         @if($counts['transfers'] > 0 && isset($results['transfers']))
-        <table class="table table-condensed table-bordered">
-            @foreach($results['transfers'] as $t)
-            <tr>
-                <td>{{$t->date->format('d-m-Y')}}</td>
-                <td><a href="{{URL::Route('edittransfer',[$t->id])}}">{{{$t->description}}}</a></td>
-                <td>{{mf($t->amount,true)}}</td>
-            </tr>
-            @endforeach
-        </table>
+            @include('list.mutations-small',['mutations' => $results['transfers']])
         @endif
     </div>
 </div>
@@ -121,7 +87,7 @@
             @foreach($results['beneficiaries'] as $b)
             <tr>
                 <td>{{$b->iconTag()}}</td>
-                <td><a href="{{URL::Route($b->type.'overview',$b->id)}}">{{{$b->name}}}</a>
+                <td><a href="{{URL::Route('componentoverview',$b->id)}}">{{{$b->name}}}</a>
                 </td>
             </tr>
             @endforeach
@@ -147,7 +113,7 @@
             @foreach($results['categories'] as $b)
             <tr>
                 <td>{{$b->iconTag()}}</td>
-                <td><a href="{{URL::Route($b->type.'overview',$b->id)}}">{{{$b->name}}}</a>
+                <td><a href="{{URL::Route('componentoverview',$b->id)}}">{{{$b->name}}}</a>
                 </td>
             </tr>
             @endforeach
@@ -175,7 +141,7 @@
             @foreach($results['budgets'] as $b)
             <tr>
                 <td>{{$b->iconTag()}}</td>
-                <td><a href="{{URL::Route($b->type.'overview',$b->id)}}">{{{$b->name}}}</a>
+                <td><a href="{{URL::Route('componentoverview',$b->id)}}">{{{$b->name}}}</a>
                 </td>
             </tr>
             @endforeach

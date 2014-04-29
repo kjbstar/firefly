@@ -12,7 +12,7 @@ class TestSeedAccounts extends Seeder
             Account::create(
                 ['user_id'            => $user->id, 'name' => 'TestAccount #' . ($i+1),
                  'openingbalance'     => $balance, 'openingbalancedate' => '2012-01-01',
-                 'currentbalance'     => $balance, 'hidden' => 0]
+                 'currentbalance'     => $balance, 'inactive' => 0]
             );
 
         }
@@ -23,7 +23,7 @@ class TestSeedAccounts extends Seeder
                 'openingbalance' => 1000,
                 'currentbalance' => 1000,
                 'openingbalancedate' => date('Y').'-01-01',
-                'hidden' => 0,
+                'inactive' => 0,
                 'shared' => 1
             ]
         );

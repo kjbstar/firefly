@@ -16,12 +16,12 @@
                 <th>&nbsp;</th>
             </tr>
             @foreach($accounts as $a)
-            @if($a->hidden == 1)
+            @if($a->inactive == 1)
             <tr class="warning">
             @else
             <tr>
             @endif
-                @if($a->hidden == 1)
+                @if($a->inactive == 1)
                 <td>
                     {{{$a->name}}}
                     @if(intval($a->shared) == 1)

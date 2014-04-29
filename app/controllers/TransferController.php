@@ -18,7 +18,7 @@ class TransferController extends BaseController
      */
     public function showIndex()
     {
-        $transfers = Auth::user()->transfers()->with(['accountto','accountfrom'])->orderBy('date', 'DESC')
+        $transfers = Auth::user()->transfers()->with(['accountto', 'accountfrom'])->orderBy('date', 'DESC')
             ->orderBy('id', 'DESC')->paginate(50);
 
         return View::make('transfers.index')->with('title', 'All transfers')
@@ -63,17 +63,20 @@ class TransferController extends BaseController
             return Redirect::route('addtransfer')->withInput();
         }
 
-        $transfer = new Transfer();
-        $transfer->description = Input::get('description');
-        $transfer->amount = floatval(Input::get('amount'));
-        $transfer->date = Input::get('date');
+        $data = [
+            'description'     => Input::get('description'),
+            'amount'          => floatval(Input::get('amount')),
+            'date'            => Input::get('date'),
+            'ignoreallowance' => intval(Input::get('ignoreallowance'))
+        ];
+
+        $transfer = new Transfer($data);
         $transfer->accountto()->associate($accountTo);
         $transfer->accountfrom()->associate($accountFrom);
 
 
         /** @noinspection PhpParamsInspection */
         $transfer->user()->associate(Auth::user());
-        $transfer->ignoreallowance = intval(Input::get('ignoreallowance'));
 
 
         $validator = Validator::make($transfer->toArray(), Transfer::$rules);
@@ -92,19 +95,7 @@ class TransferController extends BaseController
 
         // now we can finally add the components:
         // save all components (if any):
-        foreach (Type::allTypes() as $type) {
-            // split and get second part of Input:
-            $input = Input::get($type->type);
-            $parts = explode('/', $input);
-            $name = isset($parts[1]) ? $parts[1] : $parts[0];
-
-            $component = Component::firstOrCreate(
-                ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
-            );
-            if (!is_null($component->id)) {
-                $transfer->components()->attach($component);
-            }
-        }
+        $transfer->saveComponentsFromInput();
 
         Session::flash('success', 'The transfer has been created.');
 
@@ -183,32 +174,7 @@ class TransferController extends BaseController
             // @codeCoverageIgnoreEnd
 
             // now add or update the components from the input:
-            foreach (Type::allTypes() as $type) {
-                // split and get second part of Input:
-                $input = Input::get($type->type);
-                $parts = explode('/', $input);
-                $name = isset($parts[1]) ? $parts[1] : $parts[0];
-
-                $component = Component::firstOrCreate(
-                    ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
-                );
-                // if component is null, detach whatever component is on that spot, if any
-                if(is_null($component->id) && $transfer->hasComponentOfType($type)) {
-                    $transfer->components()->detach($transfer->getComponentOfType($type));
-                }
-
-                // detach component of this type if different from new component.
-                if (!is_null($component->id) && $transfer->hasComponentOfType($type)
-                    && $transfer->getComponentOfType($type)->id != $component->id
-                ) {
-                    $transfer->components()->detach($transfer->getComponentOfType($type));
-                }
-                else
-                    if (!is_null($component->id) && !$transfer->hasComponentOfType($type)) {
-                        $transfer->components()->attach($transfer);
-                    }
-
-            }
+            $transfer->saveComponentsFromInput();
             Cache::userFlush();
             Session::flash('success', 'The transfer has been saved.');
 

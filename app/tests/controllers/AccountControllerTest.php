@@ -100,7 +100,7 @@ class AccountControllerTest extends TestCase
             'name'               => 'New Test Account',
             'openingbalance'     => $this->_openingbalance,
             'openingbalancedate' => date('Y-m-d'),
-            'hidden'             => 0,
+            'inactive'             => 0,
             'shared'             => 0
         ];
 
@@ -164,7 +164,7 @@ class AccountControllerTest extends TestCase
             'openingbalance'     => rand(20, 2000),
             'openingbalancedate' => $this->_date,
             'shared'             => 1,
-            'hidden'             => 1
+            'inactive'             => 1
         ];
 
         // fire the update!
@@ -183,7 +183,7 @@ class AccountControllerTest extends TestCase
         $this->assertEquals($updated->openingbalancedate, $data['openingbalancedate']);
         $this->assertEquals($updated->openingbalance, $data['openingbalance']);
         $this->assertEquals($updated->shared, $data['shared']);
-        $this->assertEquals($updated->hidden, $data['hidden']);
+        $this->assertEquals($updated->inactive, $data['inactive']);
         $this->assertRedirectedToAction('HomeController@showIndex');
 
     }
@@ -206,7 +206,7 @@ class AccountControllerTest extends TestCase
         // match account object.
         $this->assertEquals(Crypt::decrypt($account->name), $view['account']->name);
         $this->assertEquals($account->openingbalance, $view['account']->openingbalance);
-        $this->assertEquals($account->hidden, $view['account']->hidden);
+        $this->assertEquals($account->inactive, $view['account']->inactive);
 
         // check title:
         $this->assertEquals('Delete account "' . Crypt::decrypt($account->name) . '"', $view['title']);
@@ -232,7 +232,7 @@ class AccountControllerTest extends TestCase
                 'created_at'         => date('Y-m-d H:i:s'),
                 'updated_at'         => date('Y-m-d H:i:s'),
                 'openingbalancedate' => date('Y') . '-01-01',
-                'hidden'             => 0,
+                'inactive'             => 0,
                 'shared'             => 1
             ]
         );
@@ -421,7 +421,7 @@ class AccountControllerTest extends TestCase
             'name'               => null,
             'openingbalance'     => null,
             'openingbalancedate' => null,
-            'hidden'             => null,
+            'inactive'             => null,
             'shared'             => null
         ];
 
@@ -456,7 +456,7 @@ class AccountControllerTest extends TestCase
             'name'               => Crypt::decrypt($account->name),
             'openingbalance'     => 100,
             'openingbalancedate' => date('Y-m-d'),
-            'hidden'             => 0,
+            'inactive'             => 0,
             'shared'             => 0
         ];
 
@@ -531,7 +531,7 @@ class AccountControllerTest extends TestCase
             'openingbalance'     => null,
             'openingbalancedate' => null,
             'shared'             => null,
-            'hidden'             => null
+            'inactive'             => null
         ];
 
         // fire the update!
@@ -565,7 +565,7 @@ class AccountControllerTest extends TestCase
             'openingbalance'     => rand(20, 2000),
             'openingbalancedate' => $this->_date,
             'shared'             => 1,
-            'hidden'             => 1
+            'inactive'             => 1
         ];
 
         // fire the update!

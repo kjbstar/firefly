@@ -7,6 +7,54 @@ use Carbon\Carbon as Carbon;
 class ComponentHelper
 {
 
+    public static function indexList(Type $type)
+    {
+        $components = Auth::user()->components()->whereNull('parent_component_id')->with('childrencomponents')->where(
+            'type_id', $type->id
+        )->orderBy('name')->get();
+        $result = [];
+        foreach ($components as $obj) {
+            $current = [
+                'id'       => $obj->id,
+                'name'     => $obj->name,
+                'hasIcon'  => $obj->hasIcon(),
+                'iconTag'  => $obj->iconTag(),
+                'children' => []
+            ];
+            foreach ($obj->childrencomponents as $c) {
+                $child = [
+                    'id'      => $c->id,
+                    'name'    => $c->name,
+                    'hasIcon' => $c->hasIcon(),
+                    'iconTag' => $c->iconTag(),
+                ];
+                // add to array:
+                $current['children'][] = $child;
+            }
+            $result[] = $current;
+        }
+        return $result;
+    }
+
+    public static function saveIcon(Component $component)
+    {
+        if (Input::hasFile('icon')) {
+            $icon = Input::file('icon');
+            $mime = $icon->getMimeType();
+            if ($mime == 'image/png') {
+                // continue:
+                $path = $icon->getRealPath();
+                $size = getimagesize($path);
+                if ($size[0] == 16 && $size[1] == 16) {
+                    // continue again!
+                    $destinationPath = Component::getDestinationPath();
+                    $fileName = $component->id . '.png';
+                    $icon->move($destinationPath, $fileName);
+                }
+            }
+        }
+    }
+
 
     /**
      * Generate an array containing all months starting one

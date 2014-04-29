@@ -170,7 +170,7 @@ class ReportController extends BaseController
         $current = clone $start;
 
         // all relevant accounts!
-        $accounts = Auth::user()->accounts()->notHidden()->notShared()->where(
+        $accounts = Auth::user()->accounts()->notInactive()->notShared()->where(
             'openingbalancedate', '<', $end->format('Y-m-d')
         )->get();
 
@@ -229,7 +229,7 @@ class ReportController extends BaseController
         $current = clone $start;
 
         // all relevant accounts!
-        $accounts = Auth::user()->accounts()->notHidden()->notShared()->where(
+        $accounts = Auth::user()->accounts()->notInactive()->notShared()->where(
             'openingbalancedate', '<', $end->format('Y-m-d')
         )->get();
 

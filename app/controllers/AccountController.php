@@ -21,26 +21,13 @@ class AccountController extends BaseController
     public function showIndex()
     {
         // get the accounts:
-        $accounts = Auth::user()->accounts()->get();
-        // get their id's:
-        $ids = [];
-        foreach ($accounts as $account) {
-            $ids[] = $account->id;
-        }
+        $accounts = Auth::user()->accounts()->orderBy('inactive')->orderBy('name')->get();
+
         // get balances:
         $date = new Carbon;
-        $raw = Balancemodifier::beforeDate($date)->whereIn('account_id', $ids)->groupBy('account_id')->get(
-            ['account_id', DB::Raw('SUM(`balance`) as aggregate')]
-        );
         $balances = [];
-        foreach ($raw as $entry) {
-            /** @noinspection PhpUndefinedFieldInspection */
-            $balances[$entry->account_id] = floatval($entry->aggregate);
-        }
-        foreach($accounts as $account) {
-            if(!isset($balances[$account->id])) {
-                $balances[$account->id] = floatval($account->balanceOnDate($date));
-            }
+        foreach ($accounts as $account) {
+            $balances[$account->id] = floatval($account->balanceOnDate($date));
         }
         return View::make('accounts.index')->with('accounts', $accounts)->with('balances', $balances)->with(
             'title', 'All accounts'
@@ -77,12 +64,13 @@ class AccountController extends BaseController
             'openingbalance'     => floatval(Input::get('openingbalance')),
             'currentbalance'     => floatval(Input::get('openingbalance')),
             'openingbalancedate' => Input::get('openingbalancedate'),
-            'hidden'             => Input::get('hidden') == '1' ? 1 : 0,
-            'shared'             => Input::get('shared') == '1' ? 1 : 0,
-            'user_id'            => Auth::user()->id
+            'inactive'             => Input::get('inactive') == '1' ? 1 : 0,
+            'shared'             => Input::get('shared') == '1' ? 1 : 0
         ];
         // create the new account:
         $account = new Account($data);
+        /** @noinspection PhpParamsInspection */
+        $account->user()->associate(Auth::user());
 
         // validate it:
         $validator = Validator::make($account->toArray(), Account::$rules);
@@ -120,9 +108,8 @@ class AccountController extends BaseController
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
-        }
-        $prefilled = AccountHelper::prefilledFromAccount($account);
-        if (Input::old()) {
+            $prefilled = AccountHelper::prefilledFromAccount($account);
+        } else {
             $prefilled = AccountHelper::prefilledFromOldInput();
         }
         return View::make('accounts.edit')->with('title', 'Edit account "' . $account->name . '"')->with(
@@ -143,7 +130,7 @@ class AccountController extends BaseController
         $account->name = Input::get('name');
         $account->openingbalance = floatval(Input::get('openingbalance'));
         $account->openingbalancedate = Input::get('openingbalancedate');
-        $account->hidden = Input::get('hidden') == '1' ? 1 : 0;
+        $account->inactive = Input::get('inactive') == '1' ? 1 : 0;
         $account->shared = Input::get('shared') == '1' ? 1 : 0;
 
         // validate it:
@@ -330,8 +317,10 @@ class AccountController extends BaseController
                 /** @noinspection PhpUndefinedVariableInspection */
                 $below -= $prediction['most'];
 
+                /** @var $alt1 int */
                 $alt1 -= $prediction['prediction_alt1'];
 
+                /** @var $alt2 int */
                 $alt2 -= $prediction['prediction_alt2'];
 
                 /** @noinspection PhpUndefinedVariableInspection */

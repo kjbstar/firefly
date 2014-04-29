@@ -13,7 +13,7 @@
             <small>{{$m->date->format('M jS')}}</small>
         </td>
         <td>
-            <a href="{{URL::Route('edittransaction',$m->id)}}" title="Edit {{{$m->description}}}">
+            <a href="{{URL::Route('edit'.strtolower(get_class($m)),$m->id)}}" title="Edit {{{$m->description}}}">
                 {{{$m->description}}}
             </a>
         </td>

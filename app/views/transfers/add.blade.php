@@ -152,6 +152,19 @@
 @section('scripts')
 <script src="js/typeahead.min.js"></script>
 <script src="js/transfers.js"></script>
+<script type="text/javascript">
+    $( document ).ready(function() {
+
+        @foreach(Type::allTypes() as $type)
+        $('input[name="{{$type->type}}"]').typeahead({
+            name: '{{$type->type}}_{{Auth::user()->id}}',
+            prefetch: 'home/type/{{$type->id}}/typeahead',
+            limit: 10
+        });
+            @endforeach
+
+    });
+</script>
 @stop
 @section('styles')
 <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">

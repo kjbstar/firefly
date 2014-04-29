@@ -12,9 +12,6 @@ require_once(app_path() . '/helpers/PiggybankHelper.php');
 class PiggyController extends BaseController
 {
 
-    public static $pigWidth = 63;
-    public static $pigHeight = 50;
-
     /**
      * Index for piggies.
      *
@@ -24,7 +21,6 @@ class PiggyController extends BaseController
     {
         $piggyAccount = Setting::getSetting('piggyAccount');
         if (intval($piggyAccount->value) == 0) {
-            Log::error('Found no piggy account');
             return Redirect::route('piggyselect');
         }
         // get piggy banks:
@@ -39,17 +35,13 @@ class PiggyController extends BaseController
             $totalTarget += floatval($pig->target);
             $pctFilled = $pig->pctFilled();
             $pctLeft = 100 - $pctFilled;
-            // heigth of animation
-            $step = $this::$pigHeight / 100;
             // calculate the height we need:
-            $drawHeight = $pctLeft * $step;
             $pig->pctFilled = $pctFilled;
             $pig->pctLeft = $pctLeft;
-            $pig->drawHeight = $drawHeight;
         }
 
 
-        return View::make('piggy.index')->with('pigWidth', $this::$pigWidth)->with('pigHeight', $this::$pigHeight)
+        return View::make('piggy.index')
             ->with('title', 'Piggy banks')->with('piggies', $piggies)->with('balance', $balance)->with(
                 'totalTarget', $totalTarget
             );
@@ -90,34 +82,36 @@ class PiggyController extends BaseController
             return Redirect::route('piggyselect');
         }
 
-        $piggy = new Piggybank;
+        $max = Auth::user()->piggybanks()->max('order');
+
+        $data = [
+            'name'   => Input::get('name'),
+            'amount' => 0,
+            'target' => floatval(Input::get('target')),
+            'max'    => $max
+        ];
+
+        $piggy = new Piggybank($data);
         /** @noinspection PhpParamsInspection */
         $piggy->user()->associate(Auth::user());
-        $piggy->name = Input::get('name');
-        $piggy->amount = 0;
-        $piggy->target = floatval(Input::get('target'));
-
-        // always add piggy to the end of the line:
-        $max = Auth::user()->piggybanks()->max('order');
-        $piggy->order = ($max + 1);
-
 
         $validator = Validator::make($piggy->toArray(), Piggybank::$rules);
         // failed!
         if ($validator->fails()) {
             Session::flash('error', 'Could not add piggy');
-            Log::error('Piggy errors: ' . print_r($validator->messages()->all(), true));
             return Redirect::route('addpiggybank')->withErrors($validator)->withInput();
         }
+        // save
         $result = $piggy->save();
+
         // failed again!
         if (!$result) {
-            Log::error('Trigger error on piggy.');
             Session::flash('error', 'Could not add piggy');
             return Redirect::route('addpiggybank')->withErrors($validator)->withInput();
         }
-        Session::flash('success', 'Piggy bank created');
 
+
+        Session::flash('success', 'Piggy bank created');
         return Redirect::to(Session::get('previous'));
     }
 
@@ -171,7 +165,7 @@ class PiggyController extends BaseController
     public function selectAccount()
     {
 
-        $accounts = Auth::user()->accounts()->notHidden()->get();
+        $accounts = Auth::user()->accounts()->notInactive()->get();
         $accountList = [];
         foreach ($accounts as $account) {
             $accountList[$account->id] = $account->name;

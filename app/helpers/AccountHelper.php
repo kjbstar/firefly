@@ -16,7 +16,7 @@ class AccountHelper
     public static function accountsAsSelectList()
     {
         $accounts = [];
-        foreach (Auth::user()->accounts()->notHidden()->get() as $a) {
+        foreach (Auth::user()->accounts()->notInactive()->get() as $a) {
             $accounts[$a->id] = $a->name;
         }
 
@@ -32,7 +32,8 @@ class AccountHelper
     {
         $end = new Carbon;
         $end->firstOfMonth();
-        $start = Toolkit::getEarliestEvent();
+        $start = $account->openingbalancedate;
+        $start->firstOfMonth();
         $list = [];
         while ($end >= $start) {
             $url = URL::Route(
@@ -125,7 +126,7 @@ class AccountHelper
             'name'               => '',
             'openingbalance'     => '',
             'openingbalancedate' => date('Y-m-d'),
-            'hidden'             => false,
+            'inactive'             => false,
             'shared'             => false
         ];
     }
@@ -139,7 +140,7 @@ class AccountHelper
             'name'               => Input::old('name'),
             'openingbalance'     => Input::old('openingbalance'),
             'openingbalancedate' => Input::old('openingbalancedate'),
-            'hidden'             => intval(Input::old('hidden')) == 1 ? true : false,
+            'inactive'             => intval(Input::old('inactive')) == 1 ? true : false,
             'shared'             => intval(Input::old('shared')) == 1 ? true : false
         ];
     }
@@ -155,7 +156,7 @@ class AccountHelper
             'name'               => $account->name,
             'openingbalance'     => $account->openingbalance,
             'openingbalancedate' => $account->openingbalancedate->format('Y-m-d'),
-            'hidden'             => $account->hidden == 1 ? true : false,
+            'inactive'             => $account->inactive == 1 ? true : false,
             'shared'             => $account->shared == 1 ? true : false,
 
         ];

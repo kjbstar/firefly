@@ -86,7 +86,7 @@ class HomeControllerTest extends TestCase
         $this->assertEquals('Home', $view['title']);
 
         // check the list of accounts
-        $accounts = DB::table('accounts')->whereUserId($this->_user->id)->where('hidden', 0)->count();
+        $accounts = DB::table('accounts')->whereUserId($this->_user->id)->where('inactive', 0)->count();
         $this->assertCount($accounts, $view['accounts']);
 
         // check (and calculate?) the allowance
@@ -140,7 +140,7 @@ class HomeControllerTest extends TestCase
         $this->assertEquals('Home', $view['title']);
 
         // check the list of accounts
-        $accounts = DB::table('accounts')->whereUserId($this->_user->id)->where('hidden', 0)->count();
+        $accounts = DB::table('accounts')->whereUserId($this->_user->id)->where('inactive', 0)->count();
         $this->assertCount($accounts, $view['accounts']);
 
         // check (and calculate?) the allowance

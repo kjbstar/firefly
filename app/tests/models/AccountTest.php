@@ -161,9 +161,9 @@ class AccountTest extends TestCase
 
     /**
      * @covers Account::scopeNotHidden
-     * @todo   Implement testScopeNotHidden().
+     * @todo   Implement testScopeNotInactive().
      */
-    public function testScopeNotHidden()
+    public function testScopeNotInactive()
     {
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(

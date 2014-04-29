@@ -31,14 +31,15 @@ class HomeController extends BaseController
     }
 
     /**
-     * Show the homepage. Can be for another month.
+     * Show the homepage. Can be for another month or account.
      *
-     * @param int $year  The year
-     * @param int $month The month
+     * @param null    $year
+     * @param null    $month
+     * @param Account $fpAccount
      *
-     * @return View
+     * @return \Illuminate\View\View
      */
-    public function showHome($year = null, $month = null,Account $fpAccount = null)
+    public function showHome($year = null, $month = null, Account $fpAccount = null)
     {
         $today = Toolkit::parseDate($year, $month, new Carbon);
         $actual = new Carbon;
@@ -56,16 +57,16 @@ class HomeController extends BaseController
          * as well, signifying the fact that an allowance can be set for each
          * one.
          */
-        if(is_null($fpAccount)) {
+        if (is_null($fpAccount)) {
             $fpAccount = Toolkit::getFrontpageAccount();
         }
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
-        $allowance = HomeHelper::getAllowance($today,$fpAccount);
-        $predictables = HomeHelper::getPredictables($today,$fpAccount);
-        $budgets = HomeHelper::budgetOverview($today,$fpAccount);
-        $transactions = HomeHelper::transactions($today,$fpAccount);
-        $transfers = HomeHelper::transfers($today,$fpAccount);
+        $allowance = HomeHelper::getAllowance($today, $fpAccount);
+        $predictables = HomeHelper::getPredictables($today, $fpAccount);
+        $budgets = HomeHelper::budgetOverview($today, $fpAccount);
+        $transactions = HomeHelper::transactions($today, $fpAccount);
+        $transfers = HomeHelper::transfers($today, $fpAccount);
 
         $history = HomeHelper::history();
 
@@ -75,7 +76,6 @@ class HomeController extends BaseController
         )->with('allowance', $allowance)->with('transactions', $transactions)->with('fpAccount', $fpAccount)->with(
                 'budgets', $budgets
             )->with('predictables', $predictables)->with('transfers', $transfers);
-        return;
     }
 
     /**
@@ -92,9 +92,9 @@ class HomeController extends BaseController
         $input = [
             'balance'     => floatval(Input::get('balance')),
             'pessimistic' => floatval(Input::get('pessimistic')),
-            'optimistic' => floatval(Input::get('optimistic')),
-            'alt1' => floatval(Input::get('alt1')),
-            'alt2' => floatval(Input::get('alt2')),
+            'optimistic'  => floatval(Input::get('optimistic')),
+            'alt1'        => floatval(Input::get('alt1')),
+            'alt2'        => floatval(Input::get('alt2')),
 
         ];
 

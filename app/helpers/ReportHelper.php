@@ -96,7 +96,7 @@ class ReportHelper
         // get the net worth:
         $nwEnd = 0;
         $nwStart = 0;
-        foreach (Auth::user()->accounts()->notHidden()->notShared()->get() as $account) {
+        foreach (Auth::user()->accounts()->notInactive()->notShared()->get() as $account) {
             $nwEnd += $account->balanceOnDate($end);
             $nwStart += $account->balanceOnDate($start);
         }
@@ -214,7 +214,7 @@ class ReportHelper
     {
         $cacheKey = 'reportincomes' . $date->format('Ymd') . $period;
         if (Cache::has($cacheKey)) {
-//            return Cache::get($cacheKey);
+            return Cache::get($cacheKey);
         }
         switch ($period) {
             case 'month':
@@ -291,7 +291,7 @@ class ReportHelper
     {
         $cacheKey = 'reportexpensesGrouped' . $date->format('Ymd') . $period . $type;
         if (Cache::has($cacheKey)) {
-            //return Cache::get($cacheKey);
+            return Cache::get($cacheKey);
         }
         $data = [];
         // get the transfers with this $type and $date

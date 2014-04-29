@@ -93,19 +93,7 @@ class TransactionController extends BaseController
 
         // now we can finally add the components:
         // save all components (if any):
-        foreach (Type::allTypes() as $type) {
-            // split and get second part of Input:
-            $input = Input::get($type->type);
-            $parts = explode('/', $input);
-            $name = isset($parts[1]) ? $parts[1] : $parts[0];
-
-            $component = Component::firstOrCreate(
-                ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
-            );
-            if (!is_null($component->id)) {
-                $transaction->components()->attach($component);
-            }
-        }
+        $transaction->saveComponentsFromInput();
 
         Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
 
@@ -177,32 +165,7 @@ class TransactionController extends BaseController
             // @codeCoverageIgnoreEnd
 
             // now add or update the components from the input:
-            foreach (Type::allTypes() as $type) {
-                // split and get second part of Input:
-                $input = Input::get($type->type);
-                $parts = explode('/', $input);
-                $name = isset($parts[1]) ? $parts[1] : $parts[0];
-
-                $component = Component::firstOrCreate(
-                    ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
-                );
-                // if component is null, detach whatever component is on that spot, if any
-                if(is_null($component->id) && $transaction->hasComponentOfType($type)) {
-                    $transaction->components()->detach($transaction->getComponentOfType($type));
-                }
-
-                // detach component of this type if different from new component.
-                if (!is_null($component->id) && $transaction->hasComponentOfType($type)
-                    && $transaction->getComponentOfType($type)->id != $component->id
-                ) {
-                    $transaction->components()->detach($transaction->getComponentOfType($type));
-                }
-                else
-                if (!is_null($component->id) && !$transaction->hasComponentOfType($type)) {
-                    $transaction->components()->attach($component);
-                }
-
-            }
+            $transaction->saveComponentsFromInput();
             Cache::userFlush();
             Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
             Session::flash('success', 'The transaction has been saved.');

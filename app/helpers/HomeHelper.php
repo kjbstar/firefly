@@ -24,7 +24,7 @@ class HomeHelper
         if(Cache::has($key)) {
             return Cache::get($key);
         }
-        $query = Auth::user()->accounts()->notHidden()->get();
+        $query = Auth::user()->accounts()->notInactive()->get();
         $accounts = [];
 
         foreach ($query as $account) {
@@ -54,7 +54,7 @@ class HomeHelper
     {
         $key = 'budgetOverview' . $date->format('Ymd') . $account->id;
         if (Cache::has($key)) {
-//            return Cache::get($key);
+            return Cache::get($key);
         }
 
         $budgetType = Type::where('type','budget')->first();
@@ -127,85 +127,6 @@ class HomeHelper
         $result[0]['expense'] = floatval($transactions);
 
 
-//        $key = 'budgetOverview'.$date->format('Ymd').$account->id;
-//        if(Cache::has($key)) {
-//            return Cache::get($key);
-//        }
-//        $budgets = [];
-//        $transactions = $account->transactions()->expenses()->inMonth($date)->beforeDate($date)->get();
-//        foreach ($transactions as $transaction) {
-//            // get the budget
-//
-//
-//
-////            if ($t->type->type == 'budget') {
-////                // basic budget info:
-////                $id = $t->budget->id;
-////                if (isset($budgets[$id])) {
-////                    // only add information
-////                    $budgets[$id]['spent'] += ($t->amount * -1);
-////                } else {
-////                    // create new one:
-////                    $budgets[$id] = ['name'  => $t->budget->name,
-////                                     'spent' => ($t->amount * -1)];
-////                    // limit:
-////                    $limit = $t->budget->limits()->inMonth($date)->first();
-////                    if ($limit) {
-////                        $budgets[$id]['limit'] = $limit->amount;
-////                    }
-////
-////                }
-////
-////            }
-//        }
-//
-//        // Add transfers to shared accounts as expenses:
-//        $transfers = $account->transfersfrom()->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
-//        ->leftJoin('accounts','accounts.id','=','transfers.accountto_id')->
-//            where('accounts.shared',1)
-//            ->beforeDate($date)->get(['transfers.*']);
-//        foreach ($transfers as $t) {
-//            // get the budget
-//            if (!is_null($t->budget)) {
-//                // basic budget info:
-//                $id = $t->budget->id;
-//                if (isset($budgets[$id])) {
-//                    // only add information
-//                    $budgets[$id]['spent'] += $t->amount;
-//                } else {
-//                    // create new one:
-//                    $budgets[$id] = ['name'  => $t->budget->name,
-//                                     'spent' => $t->amount];
-//                    // limit:
-//                    $limit = $t->budget->limits()->inMonth($date)->first();
-//                    if ($limit) {
-//                        $budgets[$id]['limit'] = $limit->amount;
-//                    }
-//
-//                }
-//
-//            }
-//        }
-//
-//
-//        // loop budgets for percentages:
-//        foreach ($budgets as $id => $budget) {
-//            Log::debug('Spent for budget ' . $budget['name'] . ': ' . mf($budget['spent']));
-//            if (isset($budget['limit'])
-//                && $budget['limit'] < $budget['spent']
-//            ) {
-//                // overspent:
-//                $budgets[$id]['pct'] = ceil(($budget['limit'] / $budget['spent']) * 100);
-//
-//            } elseif (isset($budget['limit'])
-//                && $budget['limit'] >= $budget['spent']
-//            ) {
-//                $budgets[$id]['pct'] = ceil(($budget['spent'] / $budget['limit']) * 100);
-//
-//            }
-//        }
-//
-//        // let's do some percentages:
         Cache::forever($key,$result);
         return $result;
 
@@ -298,7 +219,7 @@ class HomeHelper
      */
     public static function transactions(Carbon $date,Account $account)
     {
-        return $account->transactions()->remember(20)->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+        return $account->transactions()->rememberForever()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
             ->get();
     }
 
@@ -309,8 +230,8 @@ class HomeHelper
      */
     public static function transfers(Carbon $date,Account $account)
     {
-        $from = $account->transfersfrom()->remember(20)->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
-        $to = $account->transfersto()->take(5)->remember(20)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
+        $from = $account->transfersfrom()->rememberForever()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
+        $to = $account->transfersto()->take(5)->rememberForever()->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
         $result = $from->merge($to);
         return $result;
     }
