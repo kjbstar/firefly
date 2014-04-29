@@ -10,7 +10,7 @@
         <p>
         {{$transactions->links()}}
         </p>
-        @include('list.transactions')
+        @include('list.mutations-large',['mutations' => $transactions])
         {{$transactions->links()}}
         <p>
             <a href="{{URL::Route('addtransaction')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>

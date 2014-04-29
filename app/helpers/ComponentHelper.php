@@ -24,12 +24,14 @@ class ComponentHelper
         $list = [];
         while ($end > $start) {
             $query = $component->transactions()->inMonth($end);
+            // also transfers!
+            $transfers = $component->transfers()->inMonth($end);
             $url = URL::Route('componentoverviewmonth', [$component->id, $end->format('Y'), $end->format('m')]);
             $entry = [
                 'title' => $end->format('F Y'),
                 'url'   => $url,
                 'sum'   => $query->sum('amount'),
-                'count' => $query->count(),
+                'count' => $query->count() + $transfers->count(),
                 'month' => $end->format('m'),
                 'year'  => $end->format('Y'),
                 'limit' => null
@@ -99,7 +101,7 @@ class ComponentHelper
                 $query->select('transactions.id')->from('transactions')->leftJoin(
                     'component_transaction', 'component_transaction.transaction_id', '=', 'transactions.id'
                 )->leftJoin('components', 'components.id', '=', 'component_transaction.component_id')->where(
-                        'components.type', $type
+                        'components.type_id', $type->id
                     );
             }
         )->orderBy('date', 'DESC');

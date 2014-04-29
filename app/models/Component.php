@@ -1,35 +1,25 @@
 <?php
 
 /**
- * Class Component
+ * Component
  *
- * @property integer                                                      $id
- * @property \Carbon\Carbon                                               $created_at
- * @property \Carbon\Carbon                                               $updated_at
- * @property \Carbon\Carbon                                               $deleted_at
- * @property integer                                                      $parent_component_id
- * @property string                                                       $type
- * @property string                                                       $name
- * @property integer                                                      $user_id
- * @property-read \Component                                              $parentComponent
- * @property-read \Illuminate\Database\Eloquent\Collection|\Component[]   $childrenComponents
- * @property-read \Illuminate\Database\Eloquent\Collection|\Limit[]       $limits
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $user_id
+ * @property integer $type_id
+ * @property integer $parent_component_id
+ * @property string $name
+ * @property boolean $reporting
+ * @property-read \Component $parentComponent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $childrenComponents
+ * @property-read \Type $type
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Limit[] $limits
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @property-read \User                                                   $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfers
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
- * @property boolean                                                      $reporting
- * @method static Component reporting()
- * @method static \Illuminate\Database\Query\Builder|\Component whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Component whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Component whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Component whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|\Component whereParentComponentId($value)
- * @method static \Illuminate\Database\Query\Builder|\Component whereType($value)
- * @method static \Illuminate\Database\Query\Builder|\Component whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\Component whereReporting($value)
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]    $transfers
- * @property integer                                                      $type_id
- * @method static \Illuminate\Database\Query\Builder|\Component whereTypeId($value)
+ * @property-read \User $user
+ * @method static \Component reporting()
  */
 class Component extends Eloquent
 {
@@ -234,6 +224,9 @@ class Component extends Eloquent
         if ($this->hasIcon()) {
             return '<img src="' . URL::Route('componenticon', $this->id) . '" alt="' . htmlentities($this->name)
             . '" title="' . htmlentities($this->name) . '" />';
+        } else {
+            $img = $this->type->getIcon();
+            return '<img src="'.$img.'" alt="'.htmlentities($this->name).'" title="'.htmlentities($this->name).'" />';
         }
         return '';
     }

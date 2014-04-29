@@ -2,23 +2,17 @@
 use Carbon\Carbon as Carbon;
 
 /**
- * Class Balancemodifier
+ * Balancemodifier
  *
  * @property integer $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property integer $account_id
- * @property string $date
+ * @property \Carbon\Carbon $date
  * @property float $balance
  * @property-read \Account $account
- * @method static Balancemodifier onDay($date)
- * @method static Balancemodifier beforeDay($date)
- * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereAccountId($value)
- * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereDate($value)
- * @method static \Illuminate\Database\Query\Builder|\Balancemodifier whereBalance($value)
+ * @method static \Balancemodifier onDay($date)
+ * @method static \Balancemodifier beforeDate($date)
  */
 class Balancemodifier extends Eloquent
 {
@@ -66,7 +60,7 @@ class Balancemodifier extends Eloquent
      *
      * @return mixed
      */
-    public function scopeBeforeDay($query, Carbon $date)
+    public function scopeBeforeDate($query, Carbon $date)
     {
         return $query->where(
             'date', '<', $date->format('Y-m-d')

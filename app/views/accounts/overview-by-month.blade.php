@@ -23,7 +23,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h4>Transactions & transfers</h4>
-        @include('list.mutations')
+        @include('list.mutations-large')
     </div>
 </div>
 

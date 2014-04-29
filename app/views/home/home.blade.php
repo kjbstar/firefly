@@ -1,8 +1,6 @@
 @extends('layouts.default')
 @section('breadcrumbs', Breadcrumbs::render('home'))
 @section('content')
-
-
 <!-- TOP BAR -->
 <div class="row">
     <div class="col-lg-12 col-md-12">
@@ -70,106 +68,27 @@
     <!-- ALL BUDGETS IN COLLAPSE. -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         <h4>Budgets</h4>
-        <table class="table">
-        @foreach($budgets as $id => $budget)
-        <tr>
-            <th><a href="{{URL::Route('componentoverview',$id)}}" title="Overview for {{{$budget['name']}}}">{{{$budget['name']}}}</a></th>
-        </tr>
-        <tr>
-            <td>
-                @if(isset($budget['limit']) && $budget['limit'] < $budget['spent'])
-                <!-- overspent bar -->
-                <div class="progress">
-                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{$budget['pct']}}%;">{{mf($budget['spent'])}}</div>
-                    <div class="progress-bar progress-bar-danger" role="progressbar" style="width: {{100-$budget['pct']}}%;"></div>
-                </div>
-                @elseif(isset($budget['limit']) && $budget['limit'] >= $budget['spent'])
-                <!-- normal bar -->
-                <div class="progress">
-                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{$budget['pct']}}%;">{{mf($budget['spent'])}}</div>
-
-                </div>
-                @elseif(!isset($budget['limit']))
-                <!-- full blue bar -->
-                <div class="progress">
-                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%;">{{mf($budget['spent'])}}</div>
-                </div>
-                @endif
-            </td>
-         </tr>
-        @endforeach
-        </table>
+        @include('list.budgets-small')
 
     </div>
     <!-- TRANSACTIONS -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         <h4>Transactions</h4>
-        <table class="table table-striped table-condensed">
-            @foreach($transactions as $t)
-            <tr>
-                <td>{{$t->date->format('j-M')}}</td>
-                <td>
-                    @foreach($t->components as $c)
-                    @if($c->hasIcon())
-                        {{$c->iconTag()}}
-                    @endif
-                    @endforeach
-                    <a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit {{{$t->description}}}">{{{$t->description}}}</a></td>
-                <td>{{mf($t->amount,true)}}</td>
-            </tr>
-            @endforeach
-        </table>
+        @include('list.mutations-small',['mutations' => $transactions])
     </div>
 </div>
 <div class="row">
     <!-- TRANSFERS -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         <h4>Transfers</h4>
-        <table class="table table-condensed table-striped">
-            @foreach($transfers as $t)
-            <tr>
-                <td>{{$t->date->format('j-M')}}</td>
-                <td><a href="{{URL::Route('edittransfer',$t->id)}}" title="Edit {{{$t->description}}}">{{{$t->description}}}</a></td>
-                <td>
-                    <a href="{{URL::Route('accountoverview',$t->accountfrom->id)}}" title="Overview for {{{$t->accountfrom->name}}}">{{{$t->accountfrom->name}}}</a> &rarr;
-                    <a href="{{URL::Route('accountoverview',$t->accountto->id)}}" title="Overview for {{{$t->accountto->name}}}">{{{$t->accountto->name}}}</a>
-                </td>
-                <td>
-                    @if($t->accountfrom->shared == 1)
-                    <img src="i/money_add.png" />
-                    @endif
-                    @if($t->accountto->shared == 1)
-                    <img src="i/money_delete.png" />
-                    @endif
-                </td>
-                <td>{{mf($t->amount,true)}}</td>
-            </tr>
-            @endforeach
-        </table>
+        @include('list.mutations-small',['mutations' => $transfers])
 
     </div>
     <!-- PREDICTABES -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         @if(count($predictables) > 0)
         <h4>Predictables</h4>
-        <table class="table table-condensed table-striped">
-            <?php $sum=0; ?>
-            @foreach($predictables as $p)
-            <?php $sum += $p->amount; ?>
-            <tr>
-                <td><a href="{{URL::Route('predictableoverview',$p->id)}}">{{{$p->description}}}</a></td>
-                <td><a href="{{URL::Route('accountoverview',$p->account_id)}}">{{{$p->account->name}}}</a></td>
-                <td>{{mf($p->amount,true)}}</td>
-                <td>{{$p->date->format('jS')}}</td>
-                <td><a href="{{URL::Route('addtransaction',$p->id)}}" class="btn btn-default btn-xs" title="Add transaction from predictable"><span class="glyphicon glyphicon-plus-sign"></span></a></td>
-            </tr>
-            @endforeach
-            <tr>
-                <td>Sum</td>
-                <td><strong>{{mf($sum,true)}}</strong></td>
-                <td></td>
-            </tr>
-        </table>
+        @include('list.predictables-small')
         @endif
     </div>
 </div>

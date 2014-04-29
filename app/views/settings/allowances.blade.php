@@ -6,8 +6,7 @@
     <div class="col-lg-8 col-md-12 col-sm-12">
         <h2>Budgeting with allowances</h2>
         <p>
-            Although you can give all your <a href="{{URL::Route('beneficiaries')}}">beneficiaries</a>,
-            <a href="{{URL::Route('budgets')}}">budgets</a> and <a href="{{URL::Route('categories')}}">categories</a>
+            Although you can give all your components
             an individual limit (each month too!) you might be like me and simply want to set a "limit" on how
             much you can spend each month.
         </p>

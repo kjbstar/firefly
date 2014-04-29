@@ -2,28 +2,19 @@
 use Carbon\Carbon as Carbon;
 
 /**
- * Class Setting
+ * Setting
  *
- * @property integer        $id
+ * @property integer $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property integer        $user_id
- * @property string         $type
- * @property string         $name
- * @property string         $date
- * @property string         $value
- * @property-read \User     $user
- * @method static \Illuminate\Database\Query\Builder|\Setting whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Setting whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Setting whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Setting whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|\Setting whereType($value)
- * @method static \Illuminate\Database\Query\Builder|\Setting whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\Setting whereDate($value)
- * @method static \Illuminate\Database\Query\Builder|\Setting whereValue($value)
+ * @property integer $user_id
  * @property integer $account_id
+ * @property string $type
+ * @property string $name
+ * @property \Carbon\Carbon $date
+ * @property string $value
  * @property-read \Account $account
- * @method static \Illuminate\Database\Query\Builder|\Setting whereAccountId($value)
+ * @property-read \User $user
  */
 class Setting extends Eloquent
 {

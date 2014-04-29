@@ -148,6 +148,22 @@ Breadcrumbs::register(
         );
     }
 );
+Breadcrumbs::register(
+    'empty' , function ($breadcrumbs,$type, $date) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push(
+            'Transactions without a ' . $type->type, route('empty',$type->id)
+        );
+        if (!is_null($date)) {
+            $breadcrumbs->push(
+                $date->format('F Y'), route(
+                    'empty',
+                    [$type->id, $date->format('Y'), $date->format('m')]
+                )
+            );
+        }
+    }
+);
 
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),

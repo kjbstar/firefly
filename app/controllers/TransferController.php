@@ -18,7 +18,7 @@ class TransferController extends BaseController
      */
     public function showIndex()
     {
-        $transfers = Auth::user()->transfers()->orderBy('date', 'DESC')
+        $transfers = Auth::user()->transfers()->with(['accountto','accountfrom'])->orderBy('date', 'DESC')
             ->orderBy('id', 'DESC')->paginate(50);
 
         return View::make('transfers.index')->with('title', 'All transfers')
@@ -52,48 +52,63 @@ class TransferController extends BaseController
      */
     public function postAdd()
     {
-        /** @noinspection PhpUndefinedFieldInspection */
-        $data = ['description'     => Input::get('description'),
-                 'amount'          => floatval(Input::get('amount')),
-                 'accountfrom_id'  => intval(Input::get('accountfrom_id')),
-                 'accountto_id'    => intval(Input::get('accountto_id')),
-                 'date'            => Input::get('date'),
-                 'user_id'         => Auth::user()->id,
-                 'ignoreallowance' => intval(Input::get('ignoreallowance'))
-        ];
-        $transfer = new Transfer($data);
+        $accountFrom = Auth::user()->accounts()->find(intval(Input::get('accountfrom_id')));
+        $accountTo = Auth::user()->accounts()->find(intval(Input::get('accountto_id')));
+        if (is_null($accountFrom)) {
+            Session::flash('error', 'Invalid account (from) selected.');
+            return Redirect::route('addtransfer')->withInput();
+        }
+        if (is_null($accountTo)) {
+            Session::flash('error', 'Invalid account (to) selected.');
+            return Redirect::route('addtransfer')->withInput();
+        }
 
-        // explode every object at the / and see if there is one.
-        // more than one? return to Transaction:
-        $beneficiary = ComponentHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
-        $category = ComponentHelper::saveComponentFromText('category', Input::get('category'));
-        $budget = ComponentHelper::saveComponentFromText('budget', Input::get('budget'));
+        $transfer = new Transfer();
+        $transfer->description = Input::get('description');
+        $transfer->amount = floatval(Input::get('amount'));
+        $transfer->date = Input::get('date');
+        $transfer->accountto()->associate($accountTo);
+        $transfer->accountfrom()->associate($accountFrom);
+
+
+        /** @noinspection PhpParamsInspection */
+        $transfer->user()->associate(Auth::user());
+        $transfer->ignoreallowance = intval(Input::get('ignoreallowance'));
 
 
         $validator = Validator::make($transfer->toArray(), Transfer::$rules);
         if ($validator->fails()) {
-            Session::flash('error', 'Could not add transfer.');
+            Session::flash('error', 'Could not save transfer.');
             return Redirect::route('addtransfer')->withInput()->withErrors($validator);
-        } else {
-            $result = $transfer->save();
-
-            // this can't actually fail.
-
-            // @codeCoverageIgnoreStart
-            if (!$result) {
-                Session::flash('error', 'Could not add transfer.');
-                return Redirect::route('addtransfer')->withInput()->withErrors($validator);
-            }
-            // @codeCoverageIgnoreEnd
-            // attach the beneficiary, if it is set:
-            $transfer->attachComponent($beneficiary);
-            $transfer->attachComponent($budget);
-            $transfer->attachComponent($category);
-
-            Session::flash('success', 'The transfer has been created.');
-
-            return Redirect::to(Session::get('previous'));
         }
+
+        $result = $transfer->save();
+        // @codeCoverageIgnoreStart
+        if (!$result) {
+            Session::flash('error', 'Could not save transfer.');
+            return Redirect::route('addtransfer')->withInput()->withErrors($validator);
+        }
+        // @codeCoverageIgnoreEnd
+
+        // now we can finally add the components:
+        // save all components (if any):
+        foreach (Type::allTypes() as $type) {
+            // split and get second part of Input:
+            $input = Input::get($type->type);
+            $parts = explode('/', $input);
+            $name = isset($parts[1]) ? $parts[1] : $parts[0];
+
+            $component = Component::firstOrCreate(
+                ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
+            );
+            if (!is_null($component->id)) {
+                $transfer->components()->attach($component);
+            }
+        }
+
+        Session::flash('success', 'The transfer has been created.');
+
+        return Redirect::to(Session::get('previous'));
     }
 
     /**
@@ -127,53 +142,75 @@ class TransferController extends BaseController
      */
     public function postEdit(Transfer $transfer)
     {
-        $fromAccount = Auth::user()->accounts()->find(
-            intval(Input::get('accountfrom_id'))
-        );
-        $toAccount = Auth::user()->accounts()->find(
-            intval(Input::get('accountto_id'))
-        );
+        // update the transaction:
+        $accountFrom = Auth::user()->accounts()->find(intval(Input::get('accountfrom_id')));
+        $accountTo = Auth::user()->accounts()->find(intval(Input::get('accountto_id')));
+        if (is_null($accountFrom)) {
+            Session::flash('error', 'Invalid account (from) selected.');
+            return Redirect::route('addtransfer')->withInput();
+        }
+        if (is_null($accountTo)) {
+            Session::flash('error', 'Invalid account (to) selected.');
+            return Redirect::route('addtransfer')->withInput();
+        }
 
         $transfer->description = Input::get('description');
         $transfer->amount = floatval(Input::get('amount'));
-        $transfer->ignoreallowance = intval(Input::get('ignoreallowance'));
         $transfer->date = Input::get('date');
-        if ($fromAccount) {
-            $transfer->accountfrom()->associate($fromAccount);
-        }
-        if ($toAccount) {
-            $transfer->accountto()->associate($toAccount);
-        }
+        $transfer->accountto()->associate($accountTo);
+        $transfer->accountfrom()->associate($accountFrom);
+        $transfer->ignoreallowance = is_null(Input::get('ignoreallowance')) ? 0 : 1;
 
-        // explode every object at the / and see if there is one.
-        // more than one? return to Transaction:
-        $beneficiary = ComponentHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
-        $category = ComponentHelper::saveComponentFromText('category', Input::get('category'));
-        $budget = ComponentHelper::saveComponentFromText('budget', Input::get('budget'));
-
+        // validate and save:
         $validator = Validator::make(
             $transfer->toArray(), Transfer::$rules
         );
         if ($validator->fails()) {
-            Session::flash('error', 'Could not edit transfer.');
-            return Redirect::route('edittransfer', $transfer->id)->withInput()->withErrors($validator);
+            Session::flash('error', 'The transfer could not be saved.');
+            Log::debug('These rules failed: ' . print_r($validator->messages()->all(), true));
+            return Redirect::route('edittransfer', $transfer->id)
+                ->withInput()->withErrors($validator);
         } else {
+            // try another save.
             $result = $transfer->save();
+            // @codeCoverageIgnoreStart
             if (!$result) {
-                Session::flash('error', 'Could not edit transfer.');
-                return Redirect::route('edittransfer', $transfer->id)->withInput()->withErrors($validator);
-            } else {
-
-
-                // detach all components first:
-                $transfer->components()->sync([]);
-                // attach the beneficiary, if it is set:
-                $transfer->attachComponent($beneficiary);
-                $transfer->attachComponent($budget);
-                $transfer->attachComponent($category);
+                Session::flash('error', 'The transfer could not be saved.');
+                Log::debug('These rules failed: ' . print_r($validator->messages()->all(), true));
+                return Redirect::route('edittransfer', $transfer->id)
+                    ->withInput()->withErrors($validator);
             }
+            // @codeCoverageIgnoreEnd
 
-            Session::flash('success', 'The transfer has been edited.');
+            // now add or update the components from the input:
+            foreach (Type::allTypes() as $type) {
+                // split and get second part of Input:
+                $input = Input::get($type->type);
+                $parts = explode('/', $input);
+                $name = isset($parts[1]) ? $parts[1] : $parts[0];
+
+                $component = Component::firstOrCreate(
+                    ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
+                );
+                // if component is null, detach whatever component is on that spot, if any
+                if(is_null($component->id) && $transfer->hasComponentOfType($type)) {
+                    $transfer->components()->detach($transfer->getComponentOfType($type));
+                }
+
+                // detach component of this type if different from new component.
+                if (!is_null($component->id) && $transfer->hasComponentOfType($type)
+                    && $transfer->getComponentOfType($type)->id != $component->id
+                ) {
+                    $transfer->components()->detach($transfer->getComponentOfType($type));
+                }
+                else
+                    if (!is_null($component->id) && !$transfer->hasComponentOfType($type)) {
+                        $transfer->components()->attach($transfer);
+                    }
+
+            }
+            Cache::userFlush();
+            Session::flash('success', 'The transfer has been saved.');
 
             return Redirect::to(Session::get('previous'));
         }

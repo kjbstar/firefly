@@ -19,7 +19,7 @@ class TransactionController extends BaseController
      */
     public function showIndex()
     {
-        $transactions = Auth::user()->transactions()->orderBy('date', 'DESC')->orderBy('id', 'DESC')->paginate(25);
+        $transactions = Auth::user()->transactions()->orderBy('date', 'DESC')->with(['account','components','predictable'])->orderBy('id', 'DESC')->paginate(25);
         return View::make('transactions.index')->with('title', 'All transactions')->with('transactions', $transactions);
     }
 
@@ -77,9 +77,6 @@ class TransactionController extends BaseController
         $transaction->mark = intval(Input::get('mark'));
 
 
-
-
-
         $validator = Validator::make($transaction->toArray(), Transaction::$rules);
         if ($validator->fails()) {
             Session::flash('error', 'Could not save transaction.');
@@ -96,16 +93,16 @@ class TransactionController extends BaseController
 
         // now we can finally add the components:
         // save all components (if any):
-        foreach (Type::get() as $type) {
+        foreach (Type::allTypes() as $type) {
             // split and get second part of Input:
             $input = Input::get($type->type);
-            $parts = explode('/',$input);
+            $parts = explode('/', $input);
             $name = isset($parts[1]) ? $parts[1] : $parts[0];
 
             $component = Component::firstOrCreate(
                 ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
             );
-            if(!is_null($component->id)) {
+            if (!is_null($component->id)) {
                 $transaction->components()->attach($component);
             }
         }
@@ -158,12 +155,6 @@ class TransactionController extends BaseController
         $transaction->ignoreallowance = is_null(Input::get('ignoreallowance')) ? 0 : 1;
         $transaction->mark = is_null(Input::get('mark')) ? 0 : 1;
 
-        // explode every object at the / and see if there is one.
-        // more than one? return to Transaction:
-        $beneficiary = ComponentHelper::saveComponentFromText('beneficiary', Input::get('beneficiary'));
-        $category = ComponentHelper::saveComponentFromText('category', Input::get('category'));
-        $budget = ComponentHelper::saveComponentFromText('budget', Input::get('budget'));
-
         // validate and save:
         $validator = Validator::make(
             $transaction->toArray(), Transaction::$rules
@@ -174,13 +165,7 @@ class TransactionController extends BaseController
             return Redirect::route('edittransaction', $transaction->id)
                 ->withInput()->withErrors($validator);
         } else {
-            // detach all components first:
-            $transaction->components()->sync([]);
-            // attach the beneficiary, if it is set:
-            $transaction->attachComponent($beneficiary);
-            $transaction->attachComponent($budget);
-            $transaction->attachComponent($category);
-
+            // try another save.
             $result = $transaction->save();
             // @codeCoverageIgnoreStart
             if (!$result) {
@@ -190,6 +175,35 @@ class TransactionController extends BaseController
                     ->withInput()->withErrors($validator);
             }
             // @codeCoverageIgnoreEnd
+
+            // now add or update the components from the input:
+            foreach (Type::allTypes() as $type) {
+                // split and get second part of Input:
+                $input = Input::get($type->type);
+                $parts = explode('/', $input);
+                $name = isset($parts[1]) ? $parts[1] : $parts[0];
+
+                $component = Component::firstOrCreate(
+                    ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
+                );
+                // if component is null, detach whatever component is on that spot, if any
+                if(is_null($component->id) && $transaction->hasComponentOfType($type)) {
+                    $transaction->components()->detach($transaction->getComponentOfType($type));
+                }
+
+                // detach component of this type if different from new component.
+                if (!is_null($component->id) && $transaction->hasComponentOfType($type)
+                    && $transaction->getComponentOfType($type)->id != $component->id
+                ) {
+                    $transaction->components()->detach($transaction->getComponentOfType($type));
+                }
+                else
+                if (!is_null($component->id) && !$transaction->hasComponentOfType($type)) {
+                    $transaction->components()->attach($component);
+                }
+
+            }
+            Cache::userFlush();
             Queue::push('PredictableQueue@processTransaction', ['transaction_id' => $transaction->id]);
             Session::flash('success', 'The transaction has been saved.');
 

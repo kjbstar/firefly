@@ -77,9 +77,10 @@ class SettingsController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
-        Cache::userFlush();
         $defaultAllowance = Setting::getSetting('defaultAllowance');
         $defaultAllowance->value = floatval($defaultAllowance->value);
+
+
 
         // specific allowances:
         $allowances = Auth::user()->settings()->orderBy('date', 'ASC')->where('name', 'specificAllowance')->get();
@@ -176,10 +177,11 @@ class SettingsController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
+        $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('settings.edit-allowance')->with(
             'setting', $setting
-        );
+        )->with('accounts',$accounts);
     }
 
     /**

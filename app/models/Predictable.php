@@ -1,38 +1,26 @@
 <?php
+use Carbon\Carbon as Carbon;
 
 /**
- * An Eloquent Model: 'Predictable'
+ * Predictable
  *
  * @property integer                                                      $id
  * @property \Carbon\Carbon                                               $created_at
- * @property-read \User                                                   $user
- * @property-read \Illuminate\Database\Eloquent\Collection|\Component[]   $components
  * @property \Carbon\Carbon                                               $updated_at
  * @property integer                                                      $user_id
  * @property string                                                       $description
  * @property float                                                        $amount
  * @property integer                                                      $dom
  * @property integer                                                      $pct
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @property-read mixed                                                   $beneficiary
- * @property-read mixed                                                   $category
- * @property-read mixed                                                   $budget
  * @property boolean                                                      $inactive
- * @method static Predictable active()
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereDescription($value)
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereAmount($value)
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereDom($value)
- * @method static \Illuminate\Database\Query\Builder|\Predictable wherePct($value)
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereInactive($value)
  * @property integer                                                      $account_id
+ * @property-read \User                                                   $user
  * @property-read \Account                                                $account
- * @method static \Illuminate\Database\Query\Builder|\Predictable whereAccountId($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[]   $components
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
+ * @method static \Predictable active()
  */
-class Predictable extends Eloquent
+class Predictable extends ComponentEnabledModel
 {
     public static $rules
         = ['description' => 'required|between:1,500',
@@ -72,86 +60,6 @@ class Predictable extends Eloquent
         return $query->where('inactive', 0);
     }
 
-    /**
-     * Get the beneficiary.
-     *
-     * @return Component|null
-     */
-    public function getBeneficiaryAttribute()
-    {
-
-        $key = $this->id.'-predictable-beneficiary';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type == 'beneficiary') {
-                Cache::forever($key,$component);
-                return $component;
-            }
-        }
-
-        return null;
-
-    }
-
-    /**
-     * Get the category
-     *
-     * @return Component|null
-     */
-    public function getCategoryAttribute()
-    {
-        $key = $this->id . '-predictable-category';
-        if (Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type == 'category') {
-                Cache::forever($key, $component);
-                return $component;
-            }
-        }
-
-        return null;
-
-    }
-
-    /**
-     * Get the budget
-     *
-     * @return Component|null
-     */
-    public function getBudgetAttribute()
-    {
-        $key = $this->id . '-predictable-budget';
-        if (Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type == 'budget') {
-                Cache::forever($key, $component);
-                return $component;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * To get the account from attribute, we use this
-     * caching function.
-     * @return mixed
-     */
-    public function getAccountAttribute() {
-        $key = $this->id.'-predictable-account';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        $var = $this->account()->first();
-        Cache::forever($key,$var);
-        return $var;
-    }
 
     /**
      * Get all components belonging to this predictable.
@@ -181,5 +89,22 @@ class Predictable extends Eloquent
     public function getDates()
     {
         return ['created_at', 'updated_at'];
+    }
+
+    public function minimumAmount()
+    {
+        $pct = (100 - $this->pct) / 100;
+        return $this->amount * $pct;
+    }
+
+    public function maximumAmount()
+    {
+        $pct = (100 + $this->pct) / 100;
+        return $this->amount * $pct;
+    }
+
+    public function dayOfMonth() {
+        $date = new Carbon($this->dom.'-01-2012');
+        return $date->format('jS');
     }
 }

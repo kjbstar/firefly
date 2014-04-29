@@ -52,85 +52,162 @@ class HomeHelper
      */
     public static function budgetOverview(Carbon $date,Account $account)
     {
-        $key = 'budgetOverview'.$date->format('Ymd').$account->id;
-        if(Cache::has($key)) {
-            return Cache::get($key);
+        $key = 'budgetOverview' . $date->format('Ymd') . $account->id;
+        if (Cache::has($key)) {
+//            return Cache::get($key);
         }
-        $budgets = [];
-        $transactions = $account->transactions()->expenses()->inMonth($date)
-            ->beforeDate($date)->get();
-        foreach ($transactions as $t) {
-            // get the budget
-            if ($t->budget) {
-                // basic budget info:
-                $id = $t->budget->id;
-                if (isset($budgets[$id])) {
-                    // only add information
-                    $budgets[$id]['spent'] += ($t->amount * -1);
+
+        $budgetType = Type::where('type','budget')->first();
+        $budgets = Auth::user()->components()->orderBy('parent_component_id','DESC')->where('type_id',$budgetType->id)->get();
+        $result = [];
+        /** @var $budget Budget */
+        foreach($budgets as $budget) {
+            $id = $budget->id;
+            $current = [
+                'name' => $budget->name,
+                'parentName' => $budget->parentComponent()->first() ? $budget->parentComponent->name : null,
+                'limit' => 0,
+                'overspent' => false,
+                'pct' => 100,
+                'iconTag' => $budget->iconTag()
+            ];
+
+            // find transactions in this month:
+            $transactions = $budget->transactions()->where('account_id',$account->id)->inMonth($date)->sum('amount');
+            $current['expense'] = floatval($transactions);
+
+            // transactions count as expense when they go TO a shared account:
+            $transfers = $budget->transfers()->leftJoin('accounts','accounts.id','=','transfers.accountto_id')->
+                where('accounts.shared',1)->where('transfers.accountfrom_id',$account->id)->inMonth($date)->sum('amount');
+            $current['expense'] += floatval($transfers) * -1;
+
+            // has budget a limit in this month?
+            $limit = $budget->limits()->inMonth($date)->first();
+            if(!is_null($limit)) {
+                $current['limit'] = floatval($limit->amount);
+                // overspent?
+                if($current['expense'] * -1 > $current['limit']) {
+                    $current['overspent'] = true;
+                    // calculate bar percentage:
+                    $current['pct'] = round(($current['limit'] / $current['expense'])*-100);
                 } else {
-                    // create new one:
-                    $budgets[$id] = ['name'  => $t->budget->name,
-                                     'spent' => ($t->amount * -1)];
-                    // limit:
-                    $limit = $t->budget->limits()->inMonth($date)->first();
-                    if ($limit) {
-                        $budgets[$id]['limit'] = $limit->amount;
-                    }
-
+                    $current['overspent'] = false;
+                    // calculate bar percentage:
+                    $current['pct'] = round(($current['expense'] / $current['limit'])*-100);
                 }
-
+            }
+            if($current['expense'] != 0 || $current['limit'] != 0) {
+                $result[$id] = $current;
             }
         }
-
-        // Add transfers to shared accounts as expenses:
-        $transfers = $account->transfersfrom()->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
-        ->leftJoin('accounts','accounts.id','=','transfers.accountto_id')->
-            where('accounts.shared',1)
-            ->beforeDate($date)->get(['transfers.*']);
-        foreach ($transfers as $t) {
-            // get the budget
-            if (!is_null($t->budget)) {
-                // basic budget info:
-                $id = $t->budget->id;
-                if (isset($budgets[$id])) {
-                    // only add information
-                    $budgets[$id]['spent'] += $t->amount;
-                } else {
-                    // create new one:
-                    $budgets[$id] = ['name'  => $t->budget->name,
-                                     'spent' => $t->amount];
-                    // limit:
-                    $limit = $t->budget->limits()->inMonth($date)->first();
-                    if ($limit) {
-                        $budgets[$id]['limit'] = $limit->amount;
-                    }
-
-                }
-
-            }
-        }
+        // now do the same for transactions + transfers without a budget!
+        $result[0] = [
+            'name' => '(no budget)',
+            'limit' => 0,
+            'overspent' => false,
+            'pct' => 100,
+            'iconTag' => ''
+        ];
+        /**
+         * select * from transactions
+        where id not in (
+        select transaction_id from component_transaction
+        left join components ON components.id = component_transaction.component_id
+        where components.type_id=3
+        )
+         */
+        $transactions = Auth::user()->transactions()->whereNotIn('id',function($query) use ($date) {
+                $query->select('transaction_id')->from('component_transaction')
+                    ->leftJoin('components','components.id','=','component_transaction.component_id')
+                    ->leftJoin('transactions','transactions.id','=','component_transaction.transaction_id')
+                    ->where('transactions.amount','<',0)
+                    ->where(DB::Raw('DATE_FORMAT(transactions.date,"%m-%Y")'),'=',$date->format('m-Y'))
+                    ->where('components.type_id',3);
+            })->inMonth($date)->expenses()->sum('amount');
+        $result[0]['expense'] = floatval($transactions);
 
 
-        // loop budgets for percentages:
-        foreach ($budgets as $id => $budget) {
-            Log::debug('Spent for budget ' . $budget['name'] . ': ' . mf($budget['spent']));
-            if (isset($budget['limit'])
-                && $budget['limit'] < $budget['spent']
-            ) {
-                // overspent:
-                $budgets[$id]['pct'] = ceil(($budget['limit'] / $budget['spent']) * 100);
-
-            } elseif (isset($budget['limit'])
-                && $budget['limit'] >= $budget['spent']
-            ) {
-                $budgets[$id]['pct'] = ceil(($budget['spent'] / $budget['limit']) * 100);
-
-            }
-        }
-
-        // let's do some percentages:
-        Cache::forever($key,$budgets);
-        return $budgets;
+//        $key = 'budgetOverview'.$date->format('Ymd').$account->id;
+//        if(Cache::has($key)) {
+//            return Cache::get($key);
+//        }
+//        $budgets = [];
+//        $transactions = $account->transactions()->expenses()->inMonth($date)->beforeDate($date)->get();
+//        foreach ($transactions as $transaction) {
+//            // get the budget
+//
+//
+//
+////            if ($t->type->type == 'budget') {
+////                // basic budget info:
+////                $id = $t->budget->id;
+////                if (isset($budgets[$id])) {
+////                    // only add information
+////                    $budgets[$id]['spent'] += ($t->amount * -1);
+////                } else {
+////                    // create new one:
+////                    $budgets[$id] = ['name'  => $t->budget->name,
+////                                     'spent' => ($t->amount * -1)];
+////                    // limit:
+////                    $limit = $t->budget->limits()->inMonth($date)->first();
+////                    if ($limit) {
+////                        $budgets[$id]['limit'] = $limit->amount;
+////                    }
+////
+////                }
+////
+////            }
+//        }
+//
+//        // Add transfers to shared accounts as expenses:
+//        $transfers = $account->transfersfrom()->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+//        ->leftJoin('accounts','accounts.id','=','transfers.accountto_id')->
+//            where('accounts.shared',1)
+//            ->beforeDate($date)->get(['transfers.*']);
+//        foreach ($transfers as $t) {
+//            // get the budget
+//            if (!is_null($t->budget)) {
+//                // basic budget info:
+//                $id = $t->budget->id;
+//                if (isset($budgets[$id])) {
+//                    // only add information
+//                    $budgets[$id]['spent'] += $t->amount;
+//                } else {
+//                    // create new one:
+//                    $budgets[$id] = ['name'  => $t->budget->name,
+//                                     'spent' => $t->amount];
+//                    // limit:
+//                    $limit = $t->budget->limits()->inMonth($date)->first();
+//                    if ($limit) {
+//                        $budgets[$id]['limit'] = $limit->amount;
+//                    }
+//
+//                }
+//
+//            }
+//        }
+//
+//
+//        // loop budgets for percentages:
+//        foreach ($budgets as $id => $budget) {
+//            Log::debug('Spent for budget ' . $budget['name'] . ': ' . mf($budget['spent']));
+//            if (isset($budget['limit'])
+//                && $budget['limit'] < $budget['spent']
+//            ) {
+//                // overspent:
+//                $budgets[$id]['pct'] = ceil(($budget['limit'] / $budget['spent']) * 100);
+//
+//            } elseif (isset($budget['limit'])
+//                && $budget['limit'] >= $budget['spent']
+//            ) {
+//                $budgets[$id]['pct'] = ceil(($budget['spent'] / $budget['limit']) * 100);
+//
+//            }
+//        }
+//
+//        // let's do some percentages:
+        Cache::forever($key,$result);
+        return $result;
 
     }
 

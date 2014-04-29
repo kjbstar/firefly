@@ -10,7 +10,7 @@
                 Add transfer</a>
         </p>
         {{$transfers->links()}}
-        @include('list.transfers')
+        @include('list.mutations-large',['mutations' => $transfers])
         {{$transfers->links()}}
         <p>
             <a href="{{URL::Route('addtransfer')}}" class="btn

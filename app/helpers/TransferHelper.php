@@ -11,17 +11,20 @@ class TransferHelper
      */
     public static function emptyPrefilledAray()
     {
-        return [
+        $data = [
             'description'     => '',
             'amount'          => '',
             'date'            => date('Y-m-d'),
             'accountfrom_id'  => null,
             'accountto_id'    => null,
-            'beneficiary'     => '',
-            'category'        => '',
-            'budget'          => '',
             'ignoreallowance' => false
         ];
+        foreach (Type::allTypes() as $type) {
+            $data[$type->type] = '';
+        }
+
+        return $data;
+
     }
 
     /**
@@ -29,7 +32,7 @@ class TransferHelper
      */
     public static function prefilledFromOldInput()
     {
-        return [
+        $data = [
             'description'     => Input::old('description'),
             'amount'          => floatval(Input::old('amount')),
             'date'            => Input::old('date'),
@@ -40,6 +43,10 @@ class TransferHelper
             'budget'          => Input::old('budget'),
             'ignoreallowance' => intval(Input::old('ignoreallowance')) == 1 ? true : false,
         ];
+        foreach (Type::allTypes() as $type) {
+            $data[$type->type] = Input::old($type->type);
+        }
+        return $data;
     }
 
     /**
@@ -49,17 +56,20 @@ class TransferHelper
      */
     public static function prefilledFromTransfer(Transfer $transfer)
     {
-        return [
-            'description'    => $transfer->description,
-            'amount'         => floatval($transfer->amount),
-            'date'           => $transfer->date->format('Y-m-d'),
-            'accountfrom_id' => $transfer->accountfrom_id,
-            'accountto_id'   => $transfer->accountfrom_id,
-            'beneficiary'    => !is_null($transfer->beneficiary) ? $transfer->beneficiary->name : null,
-            'category'       => !is_null($transfer->category) ? $transfer->category->name : null,
-            'budget'         => !is_null($transfer->budget) ? $transfer->budget->name : null,
-            'ignoreallowance'  => intval($transfer->ignoreallowance) == 1 ? true : false,
+        $data = [
+            'description'     => $transfer->description,
+            'amount'          => floatval($transfer->amount),
+            'date'            => $transfer->date->format('Y-m-d'),
+            'accountfrom_id'  => $transfer->accountfrom_id,
+            'accountto_id'    => $transfer->accountfrom_id,
+            'beneficiary'     => !is_null($transfer->beneficiary) ? $transfer->beneficiary->name : null,
+            'budget'          => !is_null($transfer->budget) ? $transfer->budget->name : null,
+            'ignoreallowance' => intval($transfer->ignoreallowance) == 1 ? true : false,
         ];
+        foreach (Type::allTypes() as $type) {
+            $data[$type->type] = $transfer->hasComponentOfType($type) ? $transfer->getComponentOfType($type)->name : '';
+        }
+        return $data;
     }
 
 } 

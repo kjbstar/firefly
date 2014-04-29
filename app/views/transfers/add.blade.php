@@ -108,32 +108,16 @@
             to be properly grouped.
         </p>
 
-        <!-- beneficiary (can be created) -->
+        <!-- all component types in a loop! -->
+        @foreach(Type::allTypes() as $type)
         <div class="form-group">
-            <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
+            <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
             <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['beneficiary']}}}"
-                       name="beneficiary" class="form-control" id="inputBeneficiary" autocomplete="off" />
+                <input type="text" value="{{{$prefilled[$type->type]}}}"
+                       name="{{$type->type}}" class="form-control" id="input{{$type->type}}" autocomplete="off" />
             </div>
         </div>
-
-        <!-- category (can be created) -->
-        <div class="form-group">
-            <label for="inputCategory" class="col-sm-3 control-label">Category</label>
-            <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['category']}}}"
-                       name="category" class="form-control" id="inputCategory" autocomplete="off" />
-            </div>
-        </div>
-
-        <!-- budget (can be created) -->
-        <div class="form-group">
-            <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
-            <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['budget']}}}"
-                       name="budget" class="form-control" id="inputBudget" autocomplete="off" />
-            </div>
-        </div>
+        @endforeach
 
         <!-- ignore in allowance (default is zero) -->
         <div class="form-group">

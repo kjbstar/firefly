@@ -15,6 +15,7 @@ class PageController extends BaseController
      */
     public function flush()
     {
+        Cache::flush();
         Cache::userFlush();
         return Redirect::to('/');
     }

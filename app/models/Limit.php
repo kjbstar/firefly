@@ -2,23 +2,16 @@
 use Carbon\Carbon as Carbon;
 
 /**
- * Class Limit
+ * Limit
  *
  * @property integer $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon $deleted_at
  * @property integer $component_id
  * @property float $amount
- * @property string $date
+ * @property \Carbon\Carbon $date
  * @property-read \Component $component
- * @method static Limit inMonth($date)
- * @method static \Illuminate\Database\Query\Builder|\Limit whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Limit whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Limit whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Limit whereComponentId($value)
- * @method static \Illuminate\Database\Query\Builder|\Limit whereAmount($value)
- * @method static \Illuminate\Database\Query\Builder|\Limit whereDate($value)
+ * @method static \Limit inMonth($date)
  */
 class Limit extends Eloquent
 {

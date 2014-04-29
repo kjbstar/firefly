@@ -4,15 +4,11 @@
 /**
  * Type
  *
- * @property integer $id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property string $type
+ * @property integer                                                    $id
+ * @property \Carbon\Carbon                                             $created_at
+ * @property \Carbon\Carbon                                             $updated_at
+ * @property string                                                     $type
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
- * @method static \Illuminate\Database\Query\Builder|\Type whereId($value) 
- * @method static \Illuminate\Database\Query\Builder|\Type whereCreatedAt($value) 
- * @method static \Illuminate\Database\Query\Builder|\Type whereUpdatedAt($value) 
- * @method static \Illuminate\Database\Query\Builder|\Type whereType($value) 
  */
 class Type extends Eloquent
 {
@@ -27,4 +23,35 @@ class Type extends Eloquent
     {
         return $this->hasMany('Component');
     }
+
+    public function getIcon()
+    {
+        switch ($this->type) {
+            case 'beneficiary':
+                return 'i/user_gray.png';
+                break;
+            case 'category':
+                return 'i/tag_blue.png';
+                break;
+            case 'budget':
+                return 'i/money.png';
+                break;
+            case 'payer':
+                return 'i/user_go.png';
+                break;
+        }
+        return 'i/error.png';
+    }
+
+    public static function allTypes()
+    {
+        if (Cache::has('types')) {
+            return Cache::get('types');
+        } else {
+            $types = Type::orderBy('type')->get();
+            Cache::forever('types', $types);
+            return $types;
+        }
+    }
+
 } 

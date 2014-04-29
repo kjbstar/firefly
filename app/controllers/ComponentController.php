@@ -69,14 +69,14 @@ class ComponentController extends BaseController
      *
      * @return View
      */
-    public function showEmpty($year = null, $month = null)
+    public function noComponent(Type $type, $year = null, $month = null)
     {
         $date = Toolkit::parseDate($year, $month);
 
-        $list = ComponentHelper::transactionsWithoutComponent(OBJ, $date);
+        $list = ComponentHelper::transactionsWithoutComponent($type, $date);
 
-        return View::make('components.empty')->with('title', 'Transactions without a ' . OBJ)->with('mutations', $list)
-            ->with('date', $date);
+        return View::make('components.empty')->with('title', 'Transactions without a ' . $type->type)->with('mutations', $list)
+            ->with('date', $date)->with('type',$type);
     }
 
     /**

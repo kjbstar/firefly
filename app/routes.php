@@ -113,6 +113,7 @@ $objects = ['beneficiary', 'budget', 'category'];
  */
 Route::get('/home/type/{type}/typeahead',['uses' => 'ComponentController@typeahead']);
 Route::get('/home/component/{type}/index',['uses' => 'ComponentController@index','as' => 'components']);
+Route::get('/home/component/{type}/empty/{year?}/{month?}',['uses' => 'ComponentController@noComponent','as' => 'empty']);
 Route::get('/home/component/{type}/add',['uses' => 'ComponentController@add','as' => 'addcomponent']);
 Route::get('/home/component/{component}/overview',['uses' => 'ComponentController@overview','as' => 'componentoverview']);
 Route::get('/home/component/{component}/overview/{year}/{month}',['uses' => 'ComponentController@overviewByMonth','as' => 'componentoverviewmonth']);
@@ -129,6 +130,9 @@ Route::get('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@a
 Route::get('/limit/edit/{limit}', ['uses' => 'LimitController@edit','as'   => 'editcomponentlimit']);
 Route::get('/limit/delete/{limit}',['uses' => 'LimitController@delete','as'   => 'deletecomponentlimit']);
 
+Route::post('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@postAdd','before'   => 'csrf']);
+Route::post('/limit/edit/{limit}', ['uses' => 'LimitController@postEdit','before'   => 'csrf']);
+Route::post('/limit/delete/{limit}',['uses' => 'LimitController@postDelete','before'   => 'csrf']);
 
 /**
  * PIGGY BANK CONTROLLER

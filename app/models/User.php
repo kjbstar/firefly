@@ -5,37 +5,26 @@ use Illuminate\Auth\UserInterface;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
- * Class User
+ * User
  *
- * @property integer                                                      $id
- * @property \Carbon\Carbon                                               $created_at
- * @property \Carbon\Carbon                                               $updated_at
- * @property \Carbon\Carbon                                               $deleted_at
- * @property string                                                       $email
- * @property string                                                       $password
- * @property string                                                       $activation
- * @property string                                                       $reset
- * @property-read \Illuminate\Database\Eloquent\Collection|\Account[]     $accounts
- * @property-read \Illuminate\Database\Eloquent\Collection|\Piggybank[]   $piggybanks
- * @property-read \Illuminate\Database\Eloquent\Collection|\Setting[]     $settings
- * @property-read \Illuminate\Database\Eloquent\Collection|\Component[]   $components
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]    $transfers
- * @property string                                                       $username
- * @property string                                                       $origin
- * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
- * @method static \Illuminate\Database\Query\Builder|\User whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\User whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\User whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\User whereDeletedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\User whereUsername($value)
- * @method static \Illuminate\Database\Query\Builder|\User whereOrigin($value)
- * @method static \Illuminate\Database\Query\Builder|\User whereEmail($value)
- * @method static \Illuminate\Database\Query\Builder|\User wherePassword($value)
- * @method static \Illuminate\Database\Query\Builder|\User whereActivation($value)
- * @method static \Illuminate\Database\Query\Builder|\User whereReset($value)
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property string $deleted_at
+ * @property string $username
+ * @property string $origin
+ * @property string $email
+ * @property string $password
+ * @property string $activation
  * @property string $remember_token
- * @method static \Illuminate\Database\Query\Builder|\User whereRememberToken($value)
+ * @property string $reset
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Account[] $accounts
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Piggybank[] $piggybanks
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Setting[] $settings
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfers
  */
 class User extends Eloquent implements UserInterface, RemindableInterface
 {

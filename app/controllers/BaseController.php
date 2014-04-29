@@ -17,4 +17,14 @@ class BaseController extends Controller
             $this->layout = View::make($this->layout);
         }
     }
+
+    public function __construct() {
+        if(Cache::has('types')) {
+            View::share('types', Cache::get('types'));
+        } else {
+            $types = Type::orderBy('type')->get();
+            Cache::forever('types',$types);
+            View::share('types', $types);
+        }
+    }
 }

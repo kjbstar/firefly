@@ -2,42 +2,32 @@
 
 use Carbon\Carbon as Carbon;
 
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/AccountHelper.php');
-
 /**
- * Class Account
+ * Account
  *
- * @property integer                                                          $id
- * @property integer                                                          $user_id
- * @property \Carbon\Carbon                                                   $created_at
- * @property \Carbon\Carbon                                                   $updated_at
- * @property string                                                           $name
- * @property float                                                            $openingbalance
- * @property Carbon                                                           $openingbalancedate
- * @property float                                                            $currentbalance
- * @property boolean                                                          $hidden
- * @property-read \User                                                       $user
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]        $transfersto
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]        $transfersfrom
- * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[]     $transactions
- * @method static Account notHidden()
- * @property boolean                                                          $shared
- * @method static \Illuminate\Database\Query\Builder|\Account whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereOpeningbalance($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereOpeningbalancedate($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereCurrentbalance($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereHidden($value)
- * @method static \Illuminate\Database\Query\Builder|\Account whereShared($value)
- * @method static \Account shared()
+ * @noinspection PhpIncludeInspection
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $user_id
+ * @property string $name
+ * @property float $openingbalance
+ * @property \Carbon\Carbon $openingbalancedate
+ * @property float $currentbalance
+ * @property boolean $hidden
+ * @property boolean $shared
+ * @property-read \User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersto
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersfrom
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
+ * @method static \Account notHidden()
+ * @method static \Account shared()
  * @method static \Account notShared()
  */
+require_once(app_path() . '/helpers/AccountHelper.php');
+
 class Account extends Eloquent
 {
 

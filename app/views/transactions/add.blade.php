@@ -93,7 +93,7 @@
         <h4>Optional fields</h4>
 
         <!-- all component types in a loop! -->
-        @foreach(Type::get() as $type)
+        @foreach(Type::allTypes() as $type)
         <div class="form-group">
             <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
             <div class="col-sm-9">
@@ -176,7 +176,7 @@
     <script type="text/javascript">
         $( document ).ready(function() {
 
-            @foreach(Type::get() as $type)
+            @foreach(Type::allTypes() as $type)
             $('input[name="{{$type->type}}"]').typeahead({
                 name: '{{$type->type}}_{{Auth::user()->id}}',
                 prefetch: 'home/type/{{$type->id}}/typeahead',
@@ -185,22 +185,6 @@
             @endforeach
 
         });
-//            $('input[name="beneficiary"]').typeahead({
-//            name: 'beneficiary',
-//            prefetch: 'home/beneficiary/typeahead',
-//            limit: 10
-//        });
-//        $('input[name="category"]').typeahead({
-//            name: 'category',
-//            prefetch: 'home/category/typeahead',
-//            limit: 10
-//        });
-//
-//        $('input[name="budget"]').typeahead({
-//            name: 'budget',
-//            prefetch: 'home/budget/typeahead',
-//            limit: 10
-//        });
     </script>
 @stop
 @section('styles')

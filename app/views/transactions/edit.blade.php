@@ -87,32 +87,17 @@
     <div class="col-lg-6 col-md-6">
         <h4>Optional fields</h4>
 
-        <!-- beneficiary (can be created) --> 
+        <!-- all component types in a loop! -->
+        @foreach(Type::allTypes() as $type)
         <div class="form-group">
-            <label for="inputBeneficiary" class="col-sm-3 control-label">Beneficiary</label>
+            <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
             <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['beneficiary']}}}" name="beneficiary" class="form-control"
-                       id="inputBeneficiary" autocomplete="off" />
+                <input type="text" value="{{{$prefilled[$type->type]}}}"
+                       name="{{$type->type}}" class="form-control" id="input{{$type->type}}" autocomplete="off" />
             </div>
         </div>
-        
-        <!-- categorys (can be created) --> 
-        <div class="form-group">
-            <label for="inputCategory" class="col-sm-3 control-label">Category</label>
-            <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['category']}}}" name="category" class="form-control"
-                       id="inputCategory" autocomplete="off" />
-            </div>
-        </div>
+        @endforeach
 
-        <!-- budget (can be created) --> 
-        <div class="form-group">
-            <label for="inputBudget" class="col-sm-3 control-label">Budget</label>
-            <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled['budget']}}}" name="budget" class="form-control"
-                       id="inputBudget" autocomplete="off" />
-            </div>
-        </div>
 
         <!-- ignore in predictions (default is zero) -->
         <div class="form-group">
@@ -184,6 +169,19 @@
 @section('scripts')
 <script src="js/typeahead.min.js"></script>
 <script src="js/transactions.js"></script>
+<script type="text/javascript">
+    $( document ).ready(function() {
+
+        @foreach(Type::allTypes() as $type)
+        $('input[name="{{$type->type}}"]').typeahead({
+            name: '{{$type->type}}_{{Auth::user()->id}}',
+            prefetch: 'home/type/{{$type->id}}/typeahead',
+            limit: 10
+        });
+            @endforeach
+
+    });
+</script>
 @stop
 @section('styles')
 <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">

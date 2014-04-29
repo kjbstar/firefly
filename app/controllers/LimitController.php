@@ -19,14 +19,14 @@ class LimitController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function addLimit(Component $component, $year, $month)
+    public function add(Component $component, $year, $month)
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
         $date = Toolkit::parseDate($year, $month);
 
-        return View::make('meta-limit.add')->with('object', $component)->with('date', $date);
+        return View::make('meta-limit.add')->with('component', $component)->with('date', $date);
     }
 
     /**
@@ -38,7 +38,7 @@ class LimitController extends BaseController
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-    public function postAddLimit(Component $component, $year, $month)
+    public function postAdd(Component $component, $year, $month)
     {
         $date = Toolkit::parseDate($year, $month);
         $limit = new Limit(
@@ -75,14 +75,14 @@ class LimitController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function editLimit(Limit $limit)
+    public function edit(Limit $limit)
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
-        $object = Auth::user()->components()->find($limit->component_id);
+        $component = Auth::user()->components()->find($limit->component_id);
 
-        return View::make('meta-limit.edit')->with('object', $object)->with('limit', $limit);
+        return View::make('meta-limit.edit')->with('component', $component)->with('limit', $limit);
     }
 
     /**
@@ -92,16 +92,16 @@ class LimitController extends BaseController
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-    public function postEditLimit(Limit $limit)
+    public function postEdit(Limit $limit)
     {
-        $object = Auth::user()->components()->find($limit->component_id);
+        $component = Auth::user()->components()->find($limit->component_id);
         $limit->amount = floatval(Input::get('amount'));
 
         $validator = Validator::make($limit->toArray(), Limit::$rules);
         if ($validator->fails()) {
             Session::flash('error', 'Could not edit ' . OBJ . 'limit.');
 
-            return Redirect::route(OBJ . 'overview', [$object->id]);
+            return Redirect::route(OBJ . 'overview', [$component->id]);
         } else {
             Session::flash('success', 'Limit edited!');
             $limit->save();
@@ -117,14 +117,14 @@ class LimitController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function deleteLimit(Limit $limit)
+    public function delete(Limit $limit)
     {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
-        $object = Auth::user()->components()->find($limit->component_id);
+        $component = Auth::user()->components()->find($limit->component_id);
 
-        return View::make('meta-limit.delete')->with('object', $object)->with('date', $limit->date);
+        return View::make('meta-limit.delete')->with('component', $component)->with('date', $limit->date);
     }
 
     /**
@@ -134,7 +134,7 @@ class LimitController extends BaseController
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-    public function postDeleteLimit(Limit $limit)
+    public function postDelete(Limit $limit)
     {
         $limit->delete();
         Session::flash('success', 'Limit removed.');

@@ -15,7 +15,7 @@
         <table class="table table-bordered table-striped">
             <tr>
                 <th>Month</th>
-                <th>Total transactions</th>
+                <th>Total transactions / transfers</th>
                 <th colspan="2">Limit</th>
                 <th>Total amount</th>
             </tr>
@@ -32,7 +32,7 @@
                     </div>
                 </td>
                 @else
-                    <td colspan="2"><a data-toggle="modal" href="{{URL::Route('addcomponentlimit',[$component->id,$m['year'],$m['month']])}}" data-target="#LimitModal" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></a></td>
+                    <td colspan="2"><a data-toggle="modal" href="{{URL::Route('addcomponentlimit',[$component->id,$m['year'],$m['month']])}}" data-target="#PopupModal" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></a></td>
                 @endif
                 @if(isset($m['limit']) && ($m['sum']*-1) > $m['limit'])
                     <td class="danger">{{mf($m['sum'],false,true)}}</td>

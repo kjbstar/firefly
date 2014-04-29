@@ -75,6 +75,23 @@
             <input type="hidden" name="pct" value="{{$prefilled['pct']}}" id="inputLeeway" />
         </div>
 
+        <!-- Account -->
+        <div class="form-group
+             @if($errors->has('account_id'))
+             has-error
+             @endif
+             ">
+            <label for="inputAccount" class="col-sm-3 control-label">Account</label>
+            <div class="col-sm-9">
+                {{Form::select('account_id',$accounts,$prefilled['account_id'],
+                ['class' => 'form-control'])}}
+                @if($errors->has('account_id'))
+                <span class="text-danger">{{$errors->first('account_id')
+                    }}</span><br />
+                @endif
+            </div>
+        </div>
+
         <!-- the day of month -->
         <div class="form-group
              @if($errors->has('dom'))
@@ -96,31 +113,16 @@
     <div class="col-lg-6">
         <h4>Optional fields</h4>
 
-        <!-- beneficiary (can be created) --> 
+        <!-- all component types in a loop! -->
+        @foreach(Type::allTypes() as $type)
         <div class="form-group">
-            <label for="inputBeneficiary" class="col-sm-3 control-label">Required beneficiary</label>
+            <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
             <div class="col-sm-9">
-                {{Form::select('beneficiary_id',$components['beneficiary'],$prefilled['beneficiary'],['class' => 'form-control'])}}
+                <input type="text" value="{{{$prefilled[$type->type]}}}"
+                       name="{{$type->type}}" class="form-control" id="input{{$type->type}}" autocomplete="off" />
             </div>
         </div>
-        
-        <!-- category (can be created) -->
-        <div class="form-group">
-            <label for="inputCategory" class="col-sm-3 control-label">Required category</label>
-            <div class="col-sm-9">
-                {{Form::select('category_id',$components['category'],$prefilled['category'],['class' => 'form-control'])}}
-
-            </div>
-        </div>
-
-        <!-- budget (can be created) --> 
-        <div class="form-group">
-            <label for="inputBudget" class="col-sm-3 control-label">Required budget</label>
-            <div class="col-sm-9">
-                {{Form::select('budget_id',$components['budget'],$prefilled['budget'],['class' => 'form-control'])}}
-            </div>
-        </div>
-
+        @endforeach
         <!-- inactive predictable (default is zero) -->
         <div class="form-group">
             <label for="inputInactive" class="col-sm-3 control-label">Inactive</label>
@@ -158,6 +160,17 @@
 <script src="jqueryui/js/jquery-ui-1.10.4.custom.min.js"></script>
 <script type="text/javascript">
     var pct = 10; // TODO does not prop over failed commits.
+    $( document ).ready(function() {
+
+        @foreach(Type::allTypes() as $type)
+        $('input[name="{{$type->type}}"]').typeahead({
+            name: '{{$type->type}}_{{Auth::user()->id}}',
+            prefetch: 'home/type/{{$type->id}}/typeahead',
+            limit: 10
+        });
+            @endforeach
+
+    });
 </script>
 <script src="js/predictables.js"></script>
 @stop

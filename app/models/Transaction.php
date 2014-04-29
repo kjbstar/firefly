@@ -2,55 +2,36 @@
 
 use Carbon\Carbon as Carbon;
 
+
 /**
- * Class Transaction
+ * Transaction
  *
- * @property integer                                                    $id
- * @property integer                                                    $user_id
- * @property integer                                                    $account_id
- * @property \Carbon\Carbon                                             $created_at
- * @property \Carbon\Carbon                                             $updated_at
- * @property string                                                     $description
- * @property float                                                      $amount
- * @property string                                                     $date
- * @property boolean                                                    $ignoreprediction
- * @property boolean                                                    $ignoreallowance
- * @property boolean                                                    $mark
- * @property-read mixed                                                 $beneficiary
- * @property-read mixed                                                 $category
- * @property-read mixed                                                 $budget
- * @property-read \Account                                              $account
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $user_id
+ * @property integer $account_id
+ * @property integer $predictable_id
+ * @property string $description
+ * @property float $amount
+ * @property \Carbon\Carbon $date
+ * @property boolean $ignoreprediction
+ * @property boolean $ignoreallowance
+ * @property boolean $mark
+ * @property-read \Account $account
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
- * @property-read \User                                                 $user
- * @method static Transaction inMonth($date)
- * @method static Transaction onDay($date)
- * @method static Transaction onDayOfMonth($date)
- * @method static Transaction betweenDates($start, $end)
- * @method static Transaction expenses()
- * @method static Transaction hasComponentType($component)
- * @method static Transaction hasComponent($component)
- * @method static Transaction withLimitInMonth($date)
- * @method static Transaction inYear($date)
- * @method static Transaction afterDate($date)
- * @method static Transaction incomes()
- * @property integer                                                    $predictable_id
- * @property-read \Predictable                                          $predictable
- * @method static Transaction beforeDate($date)
- * @method static Transaction fromAccount($account)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereAccountId($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction wherePredictableId($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereDescription($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereAmount($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereDate($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereIgnoreprediction($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereIgnoreallowance($value)
- * @method static \Illuminate\Database\Query\Builder|\Transaction whereMark($value)
+ * @property-read \User $user
+ * @property-read \Predictable $predictable
+ * @method static \Transaction inMonth($date)
+ * @method static \Transaction inYear($date)
+ * @method static \Transaction onDay($date)
+ * @method static \Transaction betweenDates($start, $end)
+ * @method static \Transaction expenses()
+ * @method static \Transaction afterDate($date)
+ * @method static \Transaction beforeDate($date)
+ * @method static \Transaction incomes()
  */
-class Transaction extends Eloquent
+class Transaction extends ComponentEnabledModel
 {
 
     public static $rules
@@ -66,87 +47,6 @@ class Transaction extends Eloquent
         ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable = ['user_id', 'date', 'description', 'amount', 'ignoreprediction', 'ignoreallowance', 'mark'];
-    protected $appends = ['beneficiary', 'category', 'budget'];
-
-    /**
-     * Get the beneficiary.
-     *
-     * @return Component|null
-     */
-    public function getBeneficiaryAttribute()
-    {
-        $key = $this->id.'-transaction-beneficiary';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type->type == 'beneficiary') {
-                Cache::forever($key,$component);
-                return $component;
-            }
-        }
-
-        return null;
-
-    }
-
-    /**
-     * Get the category
-     *
-     * @return Component|null
-     */
-    public function getCategoryAttribute()
-    {
-        $key = $this->id.'-transaction-category';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type->type == 'category') {
-                Cache::forever($key,$component);
-                return $component;
-            }
-        }
-
-        return null;
-
-    }
-
-    /**
-     * Get the budget
-     *
-     * @return Component|null
-     */
-    public function getBudgetAttribute()
-    {
-        $key = $this->id.'-transaction-budget';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type->type == 'budget') {
-                Cache::forever($key,$component);
-                return $component;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * To get the account from attribute, we use this
-     * caching function.
-     * @return mixed
-     */
-    public function getAccountAttribute() {
-        $key = $this->id.'-transaction-account';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        $var = $this->account()->first();
-        Cache::forever($key,$var);
-        return $var;
-    }
 
     /**
      * Which account does this transaction belong to?
@@ -156,19 +56,6 @@ class Transaction extends Eloquent
     public function account()
     {
         return $this->belongsTo('Account');
-    }
-
-    /**
-     * Add the component to the transaction.
-     *
-     * @param Component $component
-     */
-    public function attachComponent(Component $component = null)
-    {
-        if (is_null($component)) {
-            return;
-        }
-        $this->components()->attach($component->id);
     }
 
     /**

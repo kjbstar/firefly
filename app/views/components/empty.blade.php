@@ -1,9 +1,9 @@
 @extends('layouts.default')
-@section('breadcrumbs', Breadcrumbs::render('empty'.OBJ,$date))
+@section('breadcrumbs', Breadcrumbs::render('empty',$type,$date))
 @section('content')
 <div class="row">
     <div class="col-lg-12">
-        <h2>Transactions without a {{OBJ}}
+        <h2>Transactions without a {{$type->type}}
 
         @if(!is_null($date))
         in {{$date->format('F Y')}}

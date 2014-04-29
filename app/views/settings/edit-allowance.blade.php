@@ -6,11 +6,17 @@
             <h4 class="modal-title" id="myModalLabel">Edit allowance
                 for {{$setting->date->format('F Y')}}</h4>
         </div>
-        {{Form::open(['class' => 'form-inline','role' => 'form'])}}
+        {{Form::open(['class' => 'form-horizontal','role' => 'form'])}}
         <div class="modal-body">
             <p>
                 Edit the allowance for {{$setting->date->format('F Y')}}.
             </p>
+            <div class="form-group">
+                <label for="inputAccount" class="col-sm-3 control-label">Account</label>
+                <div class="col-sm-9">
+                    {{Form::select('account_id',$accounts,$setting->account_id,['class' => 'form-control'])}}
+                </div>
+            </div>
 
             <div class="form-group">
                 <label class="col-sm-3

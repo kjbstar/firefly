@@ -20,7 +20,7 @@ class TransactionHelper
             'ignoreallowance'  => 0,
             'mark'             => 0
         ];
-        foreach (Type::get() as $type) {
+        foreach (Type::allTypes() as $type) {
             $data[$type->type] = '';
         }
         return $data;
@@ -44,9 +44,9 @@ class TransactionHelper
             'ignoreallowance'  => 0,
             'mark'             => 0
         ];
-        foreach (Type::get() as $type) {
+        foreach (Type::allTypes() as $type) {
             $t = $type->type;
-            $data[$t] = is_null($predictable->$t) ? '' : $predictable->$t->name;
+            $data[$t] = $predictable->hasComponentOfType($type) ? $predictable->getComponentOfType($type)->name : '';
         }
         return $data;
     }
@@ -67,12 +67,9 @@ class TransactionHelper
             'ignoreallowance'  => intval($transaction->ignoreallowance) == 1 ? true : false,
             'mark'             => intval($transaction->mark) == 1 ? true : false,
         ];
-//        'beneficiary'      => is_null($transaction->beneficiary) ? '' : $transaction->beneficiary->name,
-//            'category'         => is_null($transaction->category) ? '' : $transaction->category->name,
-//            'budget'           => is_null($transaction->budget) ? '' : $transaction->budget->name,
-        foreach (Type::get() as $type) {
+        foreach (Type::allTypes() as $type) {
             $t = $type->type;
-            $data[$t] = is_null($transaction->$t) ? '' : $transaction->$t->name;
+            $data[$t] = $transaction->hasComponentOfType($type) ? $transaction->getComponentOfType($type)->name : '';
         }
         return $data;
 
@@ -83,18 +80,19 @@ class TransactionHelper
      */
     public static function prefilledFromOldInput()
     {
-        return ['description'      => Input::old('description'),
-                'amount'           => floatval(Input::old('amount')),
-                'date'             => Input::old('date'),
-                'account_id'       => intval(Input::old('account_id')),
-                'beneficiary'      => intval(Input::old('beneficiary_id')),
-                'category'         => intval(Input::old('category_id')),
-                'budget'           => intval(Input::old('budget_id')),
-                'ignoreprediction' => intval(Input::old('ignoreprediction')) == 1 ? true : false,
-                'ignoreallowance'  => intval(Input::old('ignoreallowance')) == 1 ? true : false,
-                'mark'             => intval(Input::old('mark')) == 1 ? true : false
-
+        $data = ['description'      => Input::old('description'),
+                 'amount'           => floatval(Input::old('amount')),
+                 'date'             => Input::old('date'),
+                 'account_id'       => intval(Input::old('account_id')),
+                 'ignoreprediction' => intval(Input::old('ignoreprediction')) == 1 ? true : false,
+                 'ignoreallowance'  => intval(Input::old('ignoreallowance')) == 1 ? true : false,
+                 'mark'             => intval(Input::old('mark')) == 1 ? true : false
         ];
+        foreach (Type::allTypes() as $type) {
+            $t = $type->type;
+            $data[$t] = Input::old($t);
+        }
+        return $data;
     }
 
 }

@@ -3,41 +3,28 @@
 use Carbon\Carbon as Carbon;
 
 /**
- * Class Transfer
+ * Transfer
  *
- * @property integer                                                    $id
- * @property \Carbon\Carbon                                             $created_at
- * @property \Carbon\Carbon                                             $updated_at
- * @property integer                                                    $user_id
- * @property integer                                                    $accountfrom_id
- * @property integer                                                    $accountto_id
- * @property string                                                     $description
- * @property float                                                      $amount
- * @property string                                                     $date
- * @property-read \Account                                              $accountfrom
- * @property-read \Account                                              $accountto
- * @property-read \User                                                 $user
- * @method static Transfer inMonth($date)
- * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
- * @property-read mixed                                                 $beneficiary
- * @property-read mixed                                                 $category
- * @property-read mixed                                                 $budget
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereAccountfromId($value)
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereAccounttoId($value)
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereDescription($value)
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereAmount($value)
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereDate($value)
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $user_id
+ * @property integer $accountfrom_id
+ * @property integer $accountto_id
+ * @property string $description
+ * @property float $amount
+ * @property \Carbon\Carbon $date
  * @property boolean $ignoreallowance
- * @method static \Illuminate\Database\Query\Builder|\Transfer whereIgnoreallowance($value)
+ * @property-read \Account $accountfrom
+ * @property-read \Account $accountto
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
+ * @property-read \User $user
+ * @method static \Transfer inMonth($date)
  * @method static \Transfer inYear($date)
+ * @method static \Transfer afterDate($date)
  * @method static \Transfer beforeDate($date)
- * @method static \Transfer afterDate($date) 
  */
-class Transfer extends Eloquent
+class Transfer extends ComponentEnabledModel
 {
 
     public static $rules
@@ -52,9 +39,8 @@ class Transfer extends Eloquent
         ];
     protected $fillable
         = ['date', 'amount', 'description', 'accountfrom_id', 'accountto_id',
-           'user_id','ignoreallowance'];
+           'user_id', 'ignoreallowance'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
-    protected $appends = ['beneficiary', 'category', 'budget'];
 
     /**
      * Which account did the transfer come from?
@@ -66,34 +52,6 @@ class Transfer extends Eloquent
         return $this->belongsTo('Account', 'accountfrom_id');
     }
 
-    /**
-     * To get the account from attribute, we use this
-     * caching function.
-     * @return mixed
-     */
-    public function getAccountfromAttribute() {
-        $key = $this->id.'-transfer-accountfrom';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        $var = $this->accountfrom()->first();
-        Cache::forever($key,$var);
-        return $var;
-    }
-
-    /**
-     * And the other way around.
-     * @return mixed
-     */
-    public function getAccounttoAttribute() {
-        $key = $this->id . '-transfer-accountto';
-        if (Cache::has($key)) {
-            return Cache::get($key);
-        }
-        $var = $this->accountto()->first();
-        Cache::forever($key, $var);
-        return $var;
-    }
 
     /**
      * What account is the transfer going to?
@@ -113,70 +71,6 @@ class Transfer extends Eloquent
     public function components()
     {
         return $this->belongsToMany('Component');
-    }
-
-    /**
-     * Get the beneficiary.
-     *
-     * @return Component|null
-     */
-    public function getBeneficiaryAttribute()
-    {
-        $key = $this->id.'-transfer-beneficiary';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type->type == 'beneficiary') {
-                Cache::forever($key,$component);
-                return $component;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the category
-     *
-     * @return Component|null
-     */
-    public function getCategoryAttribute()
-    {
-        $key = $this->id.'-transfer-category';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type->type == 'category') {
-                Cache::forever($key,$component);
-                return $component;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the budget
-     *
-     * @return Component|null
-     */
-    public function getBudgetAttribute()
-    {
-
-        $key = $this->id.'-transfer-budget';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        foreach ($this->components as $component) {
-            if ($component->type->type == 'budget') {
-                Cache::forever($key,$component);
-                return $component;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -217,19 +111,6 @@ class Transfer extends Eloquent
         );
     }
 
-
-    /**
-     * Add the component to the transaction.
-     *
-     * @param Component $component
-     */
-    public function attachComponent(Component $component = null)
-    {
-        if (is_null($component)) {
-            return;
-        }
-        $this->components()->attach($component->id);
-    }
 
     /**
      * @param        $query

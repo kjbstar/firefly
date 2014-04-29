@@ -7,16 +7,16 @@
     "packages": [
         {
             "name": "barryvdh/laravel-ide-helper",
-            "version": "v1.9.1",
+            "version": "v1.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-ide-helper.git",
-                "reference": "16f77638f159c75a93da97dd48904707618483a3"
+                "reference": "f77f5ae7700936751d39268ec92fbe0a0050981b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/16f77638f159c75a93da97dd48904707618483a3",
-                "reference": "16f77638f159c75a93da97dd48904707618483a3",
+                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/f77f5ae7700936751d39268ec92fbe0a0050981b",
+                "reference": "f77f5ae7700936751d39268ec92fbe0a0050981b",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,7 @@
                 "phpstorm",
                 "sublime"
             ],
-            "time": "2014-03-20 15:20:31"
+            "time": "2014-04-25 11:47:00"
         },
         {
             "name": "classpreloader/classpreloader",
@@ -1461,12 +1461,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "2481186310da18bd30e49cb8d5a27c91520db1d1"
+                "reference": "f0565e24d9ac4c34f855d8ee4dc314545c7c4fd9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/2481186310da18bd30e49cb8d5a27c91520db1d1",
-                "reference": "2481186310da18bd30e49cb8d5a27c91520db1d1",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/f0565e24d9ac4c34f855d8ee4dc314545c7c4fd9",
+                "reference": "f0565e24d9ac4c34f855d8ee4dc314545c7c4fd9",
                 "shasum": ""
             },
             "require": {
@@ -1518,7 +1518,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-04-27 07:23:54"
+            "time": "2014-04-27 16:15:10"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3067,12 +3067,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpKernel.git",
-                "reference": "0e4410de0f39603d4c44b75fe399470e7de89dc4"
+                "reference": "10c0abfa5bdfba5a099ad4b7ab03750f40397467"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/HttpKernel/zipball/0e4410de0f39603d4c44b75fe399470e7de89dc4",
-                "reference": "0e4410de0f39603d4c44b75fe399470e7de89dc4",
+                "url": "https://api.github.com/repos/symfony/HttpKernel/zipball/10c0abfa5bdfba5a099ad4b7ab03750f40397467",
+                "reference": "10c0abfa5bdfba5a099ad4b7ab03750f40397467",
                 "shasum": ""
             },
             "require": {
@@ -3131,7 +3131,7 @@
             ],
             "description": "Symfony HttpKernel Component",
             "homepage": "http://symfony.com",
-            "time": "2014-04-27 13:39:18"
+            "time": "2014-04-27 18:41:56"
         },
         {
             "name": "symfony/process",

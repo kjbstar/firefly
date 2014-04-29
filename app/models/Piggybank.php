@@ -1,25 +1,17 @@
 <?php
 
 /**
- * An Eloquent Model: 'Piggybank'
+ * Piggybank
  *
- * @property integer        $id
+ * @property integer $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property integer        $user_id
- * @property string         $name
- * @property float          $amount
- * @property float          $target
- * @property-read \User     $user
- * @method static \Illuminate\Database\Query\Builder|\Piggybank whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\Piggybank whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Piggybank whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\Piggybank whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|\Piggybank whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\Piggybank whereAmount($value)
- * @method static \Illuminate\Database\Query\Builder|\Piggybank whereTarget($value)
+ * @property integer $user_id
+ * @property string $name
+ * @property float $amount
+ * @property float $target
  * @property boolean $order
- * @method static \Illuminate\Database\Query\Builder|\Piggybank whereOrder($value)
+ * @property-read \User $user
  */
 class Piggybank extends Eloquent
 {

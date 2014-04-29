@@ -25,29 +25,7 @@
       @yield('content')
       <div style="height:80px;"></div>
 
-      <div class="modal fade" id="PopupModal" tabindex="-1" role="dialog"  aria-hidden="true">
-
-      </div><!-- /.modal -->
-
-        <!-- Modal -->
-        <div class="modal fade" id="LimitModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="myModalLabeXl">Modal title</h4>
-                    </div>
-                    <div class="modal-body">
-                        Bla
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
-
+      <div class="modal fade" id="PopupModal" tabindex="-1" role="dialog"  aria-hidden="true"></div><!-- /.modal -->
 
     </div>
       <script src="js/jquery-1.10.2.min.js"></script>

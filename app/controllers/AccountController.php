@@ -29,13 +29,18 @@ class AccountController extends BaseController
         }
         // get balances:
         $date = new Carbon;
-        $raw = Balancemodifier::where('date', '<=', $date->format('Y-m-d'))->whereIn('account_id', $ids)->groupBy(
-            'account_id'
-        )->get(['account_id', DB::Raw('SUM(`balance`) as aggregate')]);
+        $raw = Balancemodifier::beforeDate($date)->whereIn('account_id', $ids)->groupBy('account_id')->get(
+            ['account_id', DB::Raw('SUM(`balance`) as aggregate')]
+        );
         $balances = [];
         foreach ($raw as $entry) {
             /** @noinspection PhpUndefinedFieldInspection */
             $balances[$entry->account_id] = floatval($entry->aggregate);
+        }
+        foreach($accounts as $account) {
+            if(!isset($balances[$account->id])) {
+                $balances[$account->id] = floatval($account->balanceOnDate($date));
+            }
         }
         return View::make('accounts.index')->with('accounts', $accounts)->with('balances', $balances)->with(
             'title', 'All accounts'
@@ -99,7 +104,8 @@ class AccountController extends BaseController
         }
 
         // success!
-        Session::flash('success', 'The changes has been saved.');
+        Cache::userFlush();
+        Session::flash('success', 'The new account has been created.');
         return Redirect::to(Session::get('previous'));
     }
 
@@ -121,8 +127,7 @@ class AccountController extends BaseController
         }
         return View::make('accounts.edit')->with('title', 'Edit account "' . $account->name . '"')->with(
             'account', $account
-        )
-            ->with('prefilled', $prefilled);
+        )->with('prefilled', $prefilled);
     }
 
     /**
@@ -160,6 +165,7 @@ class AccountController extends BaseController
 
         }
         // success!
+        Cache::userFlush();
         Session::flash('success', 'The account has been updated.');
         return Redirect::to(Session::get('previous'));
 
@@ -180,7 +186,7 @@ class AccountController extends BaseController
         }
 
         return View::make('accounts.delete')->with('account', $account)->with(
-            'title', 'Delete account "' . $account->name.'"'
+            'title', 'Delete account "' . $account->name . '"'
         );
     }
 
@@ -333,7 +339,7 @@ class AccountController extends BaseController
             }
             // get the marked transactions:
             $annotation = isset($marked[$current->format('Y-m-d')]) ? $marked[$current->format('Y-m-d')] : null;
-            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain,$above,$alt2,$alt1,$below);
+            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $alt2, $alt1, $below);
             $date->addDay();
         }
 

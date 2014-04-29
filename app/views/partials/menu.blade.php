@@ -1,5 +1,5 @@
 <?php
-$types = Type::get();
+$types = Type::allTypes();
 ?>
 
 <nav class="navbar navbar-default" role="navigation">
