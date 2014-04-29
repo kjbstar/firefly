@@ -81,6 +81,15 @@ class ReportController extends BaseController
             );
     }
 
+    /**
+     * Pie chart for month.
+     *
+     * @param $year
+     * @param $month
+     * @param $type
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function monthPieChart($year, $month, $type)
     {
         $key = 'reportmonthPieChart'.$year.$month.$type;
@@ -90,6 +99,7 @@ class ReportController extends BaseController
         // get data:
         $date = Toolkit::parseDate($year, $month);
         $array = ['beneficiary', 'budget', 'category'];
+        $data = [];
         if (in_array($type, $array)) {
             $typeObject = Type::whereType($type)->first();
             $data = ReportHelper::expensesGrouped($date, 'month', $typeObject);
@@ -113,9 +123,9 @@ class ReportController extends BaseController
         }
 
         $chart->generate();
-        $data = $chart->getData();
-        Cache::forever($key,$data);
-        return Response::json($data);
+        $chartData = $chart->getData();
+        Cache::forever($key,$chartData);
+        return Response::json($chartData);
 
     }
 
@@ -262,8 +272,12 @@ class ReportController extends BaseController
     }
 
     /**
+     * Compare two years.
+     *
      * @param $yearOne
      * @param $yearTwo
+     *
+     * @return \Illuminate\View\View
      */
     public function compareYear($yearOne,$yearTwo) {
         $dateOne = new Carbon($yearOne.'-01-01');

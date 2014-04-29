@@ -100,8 +100,8 @@ $types = Type::allTypes();
         {{Form::open(['action' => 'search', 'class' => 'navbar-form navbar-left','method' => 'get'])}}
         <form class="" role="search">
             <div class="form-group">
-                @if(isset($query))
-                <input type="text" name="query" class="form-control" placeholder="Search" value="{{{$query}}}">
+                @if(isset($search['originalQuery']))
+                <input type="text" name="query" class="form-control" placeholder="Search" value="{{{$search['originalQuery']}}}">
                 @else
                 <input type="text" name="query" class="form-control" placeholder="Search">
                 @endif

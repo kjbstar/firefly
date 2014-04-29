@@ -11,8 +11,8 @@ use Carbon\Carbon as Carbon;
  * @property \Carbon\Carbon $date
  * @property float $balance
  * @property-read \Account $account
- * @method static \Balancemodifier onDay($date)
- * @method static \Balancemodifier beforeDate($date)
+ * @method static \Balancemodifier onDay($date) 
+ * @method static \Balancemodifier beforeDate($date) 
  */
 class Balancemodifier extends Eloquent
 {

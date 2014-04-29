@@ -316,9 +316,9 @@ class PiggyController extends BaseController
 
     public function dropPiggy()
     {
-        $id = intval(Input::get('id'));
+        $piggyId = intval(Input::get('id'));
         $position = intval(Input::get('position'));
-        $pig = Auth::user()->piggybanks()->find($id);
+        $pig = Auth::user()->piggybanks()->find($piggyId);
         $pig->order = $position;
         $pig->save();
     }

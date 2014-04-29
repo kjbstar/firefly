@@ -1,75 +1,53 @@
 <?php
+
 use Carbon\Carbon as Carbon;
+
 /** @noinspection PhpIncludeInspection */
 require_once(app_path() . '/helpers/SearchHelper.php');
 
+/**
+ * Class SearchController
+ */
 class SearchController extends BaseController
 {
 
-    private $_cacheEnabled = true;
+    private $cacheEnabled = true;
+
+    /**
+     * Search
+     *
+     * @return \Illuminate\View\View
+     */
     public function search()
     {
-        // grab query:
-        $query = Input::get('query');
-        $originalQuery = $query;
-        // explode query:
-        $parts = explode(' ', $query);
-        $terms = [];
-
         // special search things:
-        $specials = [
-            'afterDate'  => false,
-            'beforeDate' => false,
-        ];
-        foreach ($parts as $part) {
-            if (!(strpos($part, ':') === false)) {
-                // special search item!
-                $specialParts = explode(':', $part);
-                switch ($specialParts[0]) {
-                    case 'after':
-                        $specials['afterDate'] = new Carbon($specialParts[1]);
-                        break;
-                    case 'before':
-                        $specials['beforeDate'] = new Carbon($specialParts[1]);
-                        break;
-                }
-            } else {
-                $terms[] = $part;
-            }
-        }
+        $search = SearchHelper::parseQuery();
 
-        $query = join(' ', $terms);
-        $sql = '%' . str_replace(' ', '%', $query) . '%';
-        $md5 = md5($sql . print_r($specials,true));
-        // have searched for this before:
-        if (
-            Cache::has('search-time-' . $md5)
-            && Cache::has('search-results-' . $md5)
-            && Cache::has('search-counts-' . $md5)
-            && $this->_cacheEnabled
+        // check cache:
+        $key = 'search-' . $search['md5'];
+
+        if (Cache::has($key) && $this->cacheEnabled
         ) {
-            $results = Cache::get('search-results-' . $md5);
-            $counts = Cache::get('search-counts-' . $md5);
-            $time = Cache::get('search-time-' . $md5);
+            $result = Cache::get($key);
         } else {
-            Cache::forever('search-time-' . $md5, new Carbon);
-            $time = null;
-            $results = [];
-            $counts = [];
+            $result = [
+                'time'    => new Carbon,
+                'result' => [],
+                'count'  => [],
+            ];
 
             // search for these models:
-            $models = ['transactions','transfers','accounts','beneficiaries','budgets','categories'];
-            foreach($models as $model) {
-                $methodName = 'search'.ucfirst($model);
-                $result = SearchHelper::$methodName($sql,$specials);
-                $results[$model] = $result['result'];
-                $counts[$model] = $result['count'];
+            $models = ['transactions', 'transfers', 'accounts', 'beneficiaries', 'budgets', 'categories'];
+            foreach ($models as $model) {
+                $methodName = 'search' . ucfirst($model);
+                $current = SearchHelper::$methodName($search);
+                $result['result'][$model] = $current['result'];
+                $result['count'][$model] = $current['count'];
             }
-            Cache::forever('search-results-' . $md5, $results);
-            Cache::forever('search-counts-' . $md5, $counts);
+            Cache::forever($key, $result);
+            unset($result['time']);
         }
 
-        return View::make('home.search')->with('query', $originalQuery)->with('queryText',$query)->with('results', $results)->with('counts', $counts)
-            ->with('time', $time)->with('specials',$specials);
+        return View::make('home.search')->with('search', $search)->with('result',$result);
     }
 }

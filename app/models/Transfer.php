@@ -2,6 +2,7 @@
 
 use Carbon\Carbon as Carbon;
 
+
 /**
  * Transfer
  *
@@ -19,17 +20,17 @@ use Carbon\Carbon as Carbon;
  * @property-read \Account $accountto
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
  * @property-read \User $user
- * @method static \Transfer inMonth($date)
- * @method static \Transfer inYear($date)
- * @method static \Transfer afterDate($date)
- * @method static \Transfer beforeDate($date)
+ * @method static \Transfer inMonth($date) 
+ * @method static \Transfer inYear($date) 
+ * @method static \Transfer afterDate($date) 
+ * @method static \Transfer beforeDate($date) 
  */
 class Transfer extends ComponentEnabledModel
 {
 
     public static $rules
         = ['user_id'         => 'required|exists:users,id',
-           'description'     => 'required|between:1,500',
+           'description'     => 'required|between:1,255',
            'date'            => 'required|before:2038-01-01|after:1980-01-01',
            'amount'          => 'required|numeric|between:0.01,65536',
            'accountfrom_id'  => 'required|integer|exists:accounts,id|different:accountto_id',

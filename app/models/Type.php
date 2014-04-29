@@ -1,13 +1,12 @@
 <?php
 
-
 /**
  * Type
  *
- * @property integer                                                    $id
- * @property \Carbon\Carbon                                             $created_at
- * @property \Carbon\Carbon                                             $updated_at
- * @property string                                                     $type
+ * @property integer $id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property string $type
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
  */
 class Type extends Eloquent

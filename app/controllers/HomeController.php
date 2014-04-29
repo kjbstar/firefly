@@ -66,10 +66,10 @@ class HomeController extends BaseController
         $predictables = HomeHelper::getPredictables($today, $fpAccount);
         $budgets = HomeHelper::budgetOverview($today, $fpAccount);
         $transactions = HomeHelper::transactions($today, $fpAccount);
+
         $transfers = HomeHelper::transfers($today, $fpAccount);
 
         $history = HomeHelper::history();
-
 
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(
             'history', $history

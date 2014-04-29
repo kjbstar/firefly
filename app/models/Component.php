@@ -19,16 +19,15 @@
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfers
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
  * @property-read \User $user
- * @method static \Component reporting()
+ * @method static \Component reporting() 
  */
 class Component extends Eloquent
 {
     public static $rules
-        = ['name'                => 'required|between:1,500',
+        = ['name'                => 'required|between:1,60',
            'user_id'             => 'required|exists:users,id',
            'reporting'           => 'numeric|between:0,1',
            'parent_component_id' => 'exists:components,id',
-           'mime'                => 'between:0,50'
         ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable

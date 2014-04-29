@@ -38,9 +38,6 @@ class TransferHelper
             'date'            => Input::old('date'),
             'accountfrom_id'  => intval(Input::old('accountfrom_id')),
             'accountto_id'    => intval(Input::old('accountto_id')),
-            'beneficiary'     => Input::old('beneficiary'),
-            'category'        => Input::old('category'),
-            'budget'          => Input::old('budget'),
             'ignoreallowance' => intval(Input::old('ignoreallowance')) == 1 ? true : false,
         ];
         foreach (Type::allTypes() as $type) {
@@ -62,8 +59,6 @@ class TransferHelper
             'date'            => $transfer->date->format('Y-m-d'),
             'accountfrom_id'  => $transfer->accountfrom_id,
             'accountto_id'    => $transfer->accountfrom_id,
-            'beneficiary'     => !is_null($transfer->beneficiary) ? $transfer->beneficiary->name : null,
-            'budget'          => !is_null($transfer->budget) ? $transfer->budget->name : null,
             'ignoreallowance' => intval($transfer->ignoreallowance) == 1 ? true : false,
         ];
         foreach (Type::allTypes() as $type) {

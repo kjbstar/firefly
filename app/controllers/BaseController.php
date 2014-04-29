@@ -36,6 +36,9 @@ class BaseController extends Controller
         }
     }
 
+    /**
+     * Get types.
+     */
     public function __construct() {
         if(Cache::has('types')) {
             View::share('types', Cache::get('types'));

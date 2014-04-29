@@ -1,6 +1,10 @@
 <?php
 
 
+/**
+ * ComponentEnabledModel
+ *
+ */
 class ComponentEnabledModel extends Eloquent
 {
     public function hasComponentOfType(Type $type)

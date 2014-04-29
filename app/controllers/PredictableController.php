@@ -74,7 +74,7 @@ class PredictableController extends BaseController
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function postAdd(Transaction $transaction = null)
+    public function postAdd()
     {
         $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
         if (is_null($account)) {
@@ -117,6 +117,7 @@ class PredictableController extends BaseController
             $parts = explode('/', $input);
             $name = isset($parts[1]) ? $parts[1] : $parts[0];
 
+            /** @noinspection PhpUndefinedFieldInspection */
             $component = Component::firstOrCreate(
                 ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
             );
@@ -204,6 +205,7 @@ class PredictableController extends BaseController
                 $parts = explode('/', $input);
                 $name = isset($parts[1]) ? $parts[1] : $parts[0];
 
+                /** @noinspection PhpUndefinedFieldInspection */
                 $component = Component::firstOrCreate(
                     ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
                 );

@@ -1,20 +1,56 @@
 <?php
-
+use Carbon\Carbon as Carbon;
 
 class SearchHelper
 {
-    public static function searchTransactions($searchQuery, $specials)
+    public static function parseQuery()
     {
-        $query = Auth::user()->transactions()->where('description', 'LIKE', $searchQuery);
+        $data = [
+            'originalQuery' => Input::get('query'),
+            'specials' => [
+                'afterDate'  => false,
+                'beforeDate' => false,
+            ],
+            'queryParts' => [],
+            'query' => ''
+        ];
+        // explode:
+        $parts = explode(' ', Input::get('query'));
+
+        foreach ($parts as $part) {
+            if (!(strpos($part, ':') === false)) {
+                // special search item!
+                $specialParts = explode(':', $part);
+                switch ($specialParts[0]) {
+                    case 'after':
+                        $data['specials']['afterDate'] = new Carbon($specialParts[1]);
+                        break;
+                    case 'before':
+                        $data['specials']['beforeDate'] = new Carbon($specialParts[1]);
+                        break;
+                }
+            } else {
+                $data['queryParts'][] = $part;
+            }
+        }
+        $data['query'] = '%'.join('%',$data['queryParts']).'%';
+        $data['queryText'] = join(' ',$data['queryParts']);
+        $data['md5'] = md5(print_r($data,true));
+        return $data;
+    }
+
+    public static function searchTransactions($search)
+    {
+        $query = Auth::user()->transactions()->where('description', 'LIKE', $search['query']);
         $result = [
             'count'  => 0,
             'result' => null
         ];
-        if ($specials['afterDate']) {
-            $query->afterDate($specials['afterDate']);
+        if ($search['specials']['afterDate']) {
+            $query->afterDate($search['specials']['afterDate']);
         }
-        if ($specials['beforeDate']) {
-            $query->beforeDate($specials['afterDate']);
+        if ($search['specials']['beforeDate']) {
+            $query->beforeDate($search['specials']['afterDate']);
         }
         $result['count'] = $query->count();
         if ($result['count'] <= 20) {
@@ -23,18 +59,18 @@ class SearchHelper
         return $result;
     }
 
-    public static function searchTransfers($searchQuery, $specials)
+    public static function searchTransfers($search)
     {
-        $query = Auth::user()->transfers()->where('description', 'LIKE', $searchQuery);
+        $query = Auth::user()->transfers()->where('description', 'LIKE', $search['query']);
         $result = [
             'count'  => 0,
             'result' => null
         ];
-        if ($specials['afterDate']) {
-            $query->afterDate($specials['afterDate']);
+        if ($search['specials']['afterDate']) {
+            $query->afterDate($search['specials']['afterDate']);
         }
-        if ($specials['beforeDate']) {
-            $query->beforeDate($specials['afterDate']);
+        if ($search['specials']['beforeDate']) {
+            $query->beforeDate($search['specials']['afterDate']);
         }
         $result['count'] = $query->count();
         if ($result['count'] <= 20) {
@@ -43,13 +79,13 @@ class SearchHelper
         return $result;
     }
 
-    public static function searchAccounts($searchQuery, $specials)
+    public static function searchAccounts($search)
     {
         $result = [
             'count'  => 0,
             'result' => null
         ];
-        $query = Auth::user()->accounts()->where('name', 'LIKE', $searchQuery);
+        $query = Auth::user()->accounts()->where('name', 'LIKE', $search['query']);
         $result['count'] = $query->count();
         if ($result['count'] <= 20) {
             $result['result'] = $query->get();
@@ -57,19 +93,19 @@ class SearchHelper
         return $result;
     }
 
-    public static function searchBeneficiaries($searchQuery, $specials)
+    public static function searchBeneficiaries($search)
     {
-        return self::_searchComponents('beneficiary', $searchQuery);
+        return self::_searchComponents('beneficiary', $search['query']);
     }
 
-    public static function searchCategories($searchQuery, $specials)
+    public static function searchCategories($search)
     {
-        return self::_searchComponents('category', $searchQuery);
+        return self::_searchComponents('category', $search['query']);
     }
 
-    public static function searchBudgets($searchQuery, $specials)
+    public static function searchBudgets($search)
     {
-        return self::_searchComponents('budget', $searchQuery);
+        return self::_searchComponents('budget', $search['query']);
     }
 
     /**
@@ -78,14 +114,14 @@ class SearchHelper
      *
      * @return array
      */
-    private static function _searchComponents($type, $searchQuery)
+    private static function _searchComponents($type, $search)
     {
         $type = Type::whereType($type)->first();
         $result = [
             'count'  => 0,
             'result' => null
         ];
-        $query = Auth::user()->components()->where('type_id', $type->id)->where('name', 'LIKE', $searchQuery);
+        $query = Auth::user()->components()->where('type_id', $type->id)->where('name', 'LIKE', $search);
         $result['count'] = $query->count();
         if ($result['count'] <= 20) {
             $result['result'] = $query->get();
@@ -93,13 +129,4 @@ class SearchHelper
         return $result;
 
     }
-
-    ////                $plur = Str::plural($component);
-//                $q = Auth::user()->components()->where('type', $component)->where('name', 'LIKE', $sql);
-//                $counts[$plur] = $q->count();
-//                if ($counts[$plur] <= 20) {
-//                    $results[$plur] = $q->get();
-//                }
-//                unset($q);
-
-} 
+}

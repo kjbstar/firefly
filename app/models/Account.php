@@ -2,10 +2,11 @@
 
 use Carbon\Carbon as Carbon;
 
+require_once(app_path() . '/helpers/AccountHelper.php');
+
 /**
  * Account
  *
- * @noinspection PhpIncludeInspection
  * @property integer $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
@@ -14,7 +15,7 @@ use Carbon\Carbon as Carbon;
  * @property float $openingbalance
  * @property \Carbon\Carbon $openingbalancedate
  * @property float $currentbalance
- * @property boolean $hidden
+ * @property boolean $inactive
  * @property boolean $shared
  * @property-read \User $user
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersto
@@ -22,12 +23,10 @@ use Carbon\Carbon as Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersfrom
  * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @method static \Account notHidden()
- * @method static \Account shared()
- * @method static \Account notShared()
+ * @method static \Account notInactive() 
+ * @method static \Account shared() 
+ * @method static \Account notShared() 
  */
-require_once(app_path() . '/helpers/AccountHelper.php');
-
 class Account extends Eloquent
 {
 
@@ -35,7 +34,7 @@ class Account extends Eloquent
         = ['name'               => 'required|between:1,40',
            'openingbalance'     => 'required|numeric',
            'openingbalancedate' => 'required|date|after:1950-01-01',
-           'inactive'             => 'required|between:0,1',
+           'inactive'           => 'required|between:0,1',
            'shared'             => 'required|between:0,1',
            'user_id'            => 'required|exists:users,id',];
     protected $guarded = ['id', 'created_at', 'updated_at'];
@@ -97,7 +96,7 @@ class Account extends Eloquent
             $cacheTime = 10;
         }
         /** @noinspection PhpUndefinedFieldInspection */
-        $key = $date->format('Y-m-d'). $this->id . '-balanceOndate';
+        $key = $date->format('Y-m-d') . $this->id . '-balanceOndate';
 
         if (cache::has($key)) {
             // @codeCoverageIgnoreStart
@@ -278,7 +277,6 @@ class Account extends Eloquent
         $data['prediction']['prediction'] = array_sum([$data['prediction']['most'] + $data['prediction']['least']]) / 2;
         $data['prediction']['prediction_alt1'] = $influences > 0 ? $sum / $influences : $sum;
         $data['prediction']['prediction_alt2'] = count($days) > 0 ? $sum / count($days) : $sum;
-
 
 
         // in order to spice up the charts, we add two intermediate lines called

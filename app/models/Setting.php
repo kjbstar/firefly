@@ -1,6 +1,7 @@
 <?php
 use Carbon\Carbon as Carbon;
 
+
 /**
  * Setting
  *
@@ -20,7 +21,7 @@ class Setting extends Eloquent
 {
     public static $rules
         = [
-            'name'       => 'required|between:1,500',
+            'name'       => 'required|between:1,50',
             'user_id'    => 'required|exists:users,id',
             'type'       => 'in:date,float,string,int',
             'value'      => 'required',
