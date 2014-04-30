@@ -16,7 +16,7 @@ class CreateCacheKeys extends Migration {
 		{
 			$table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->string('description', 255);
+            $table->string('key', 255);
 
             $table->foreign('user_id')
                 ->references('id')->on('users')
