@@ -18,11 +18,9 @@ class CreatePiggies extends Migration {
 			$table->timestamps();
             $table->integer('user_id')->unsigned();
             $table->string('name', 500);
-            $table->integer('order')->unsigned();
             $table->decimal('amount', 10, 2);
             $table->decimal('target', 10, 2)->nullable();
-
-
+            $table->integer('order')->unsigned();
 
             $table->foreign('user_id')
                 ->references('id')->on('users')
