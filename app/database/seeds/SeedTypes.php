@@ -4,19 +4,20 @@ class SeedTypes extends Seeder
 {
     public function run()
     {
-        Type::create(
+        Eloquent::unguard();
+        \Type::create(
             [
-                'beneficiary'
+                'type' => 'beneficiary'
             ]
         );
-        Type::create(
+        \Type::create(
             [
-                'category'
+                'type' => 'category'
             ]
         );
-        Type::create(
+        \Type::create(
             [
-                'budget'
+                'type' => 'budget'
             ]
         );
     }
