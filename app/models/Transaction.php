@@ -22,14 +22,14 @@ use Carbon\Carbon as Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
  * @property-read \User $user
  * @property-read \Predictable $predictable
- * @method static \Transaction inMonth($date) 
- * @method static \Transaction inYear($date) 
- * @method static \Transaction onDay($date) 
- * @method static \Transaction betweenDates($start, $end) 
- * @method static \Transaction expenses() 
- * @method static \Transaction afterDate($date) 
- * @method static \Transaction beforeDate($date) 
- * @method static \Transaction incomes() 
+ * @method static \Transaction inMonth($date)
+ * @method static \Transaction inYear($date)
+ * @method static \Transaction onDay($date)
+ * @method static \Transaction betweenDates($start, $end)
+ * @method static \Transaction expenses()
+ * @method static \Transaction afterDate($date)
+ * @method static \Transaction beforeDate($date)
+ * @method static \Transaction incomes()
  */
 class Transaction extends ComponentEnabledModel
 {

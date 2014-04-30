@@ -18,7 +18,7 @@ use Carbon\Carbon as Carbon;
  * @property-read \Account $account
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @method static \Predictable active() 
+ * @method static \Predictable active()
  */
 class Predictable extends ComponentEnabledModel
 {

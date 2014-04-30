@@ -107,7 +107,7 @@ return [
         'Illuminate\View\ViewServiceProvider',
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Grumpydictator\Gchart\GchartServiceProvider',
-        'Profiler\ProfilerServiceProvider',
+        'Barryvdh\Debugbar\ServiceProvider',
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
         'DaveJamesMiller\Breadcrumbs\ServiceProvider',
     ],

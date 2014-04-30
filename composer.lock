@@ -3,8 +3,55 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "2177e73d930aca7c88523324ade39842",
+    "hash": "2b404535f3a8c86007e9f54b993f7c14",
     "packages": [
+        {
+            "name": "barryvdh/laravel-debugbar",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/barryvdh/laravel-debugbar.git",
+                "reference": "9c0c6de939141f43efdf9c3beed22db50e2a4248"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/barryvdh/laravel-debugbar/zipball/9c0c6de939141f43efdf9c3beed22db50e2a4248",
+                "reference": "9c0c6de939141f43efdf9c3beed22db50e2a4248",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/filesystem": "~4.0",
+                "illuminate/support": "~4.0",
+                "maximebf/debugbar": "1.9.x",
+                "php": ">=5.3.0",
+                "symfony/finder": "~2.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Barryvdh\\Debugbar": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Barry vd. Heuvel",
+                    "email": "barryvdh@gmail.com"
+                }
+            ],
+            "description": "PHP Debugbar integration for Laravel",
+            "keywords": [
+                "debug",
+                "debugbar",
+                "laravel",
+                "profiler",
+                "webprofiler"
+            ],
+            "time": "2014-04-08 08:47:14"
+        },
         {
             "name": "barryvdh/laravel-ide-helper",
             "version": "v1.9.2",
@@ -1021,27 +1068,35 @@
             "time": "2014-04-29 23:26:59"
         },
         {
-            "name": "loic-sharma/profiler",
-            "version": "v1.1.2",
+            "name": "maximebf/debugbar",
+            "version": "1.9.14",
             "source": {
                 "type": "git",
-                "url": "https://github.com/loic-sharma/profiler.git",
-                "reference": "6db72a07c39c4b83d70fd6432cfb952e0eac61fc"
+                "url": "https://github.com/maximebf/php-debugbar.git",
+                "reference": "ab02c692d2bdad1009639f6ba319576af590620c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/loic-sharma/profiler/zipball/6db72a07c39c4b83d70fd6432cfb952e0eac61fc",
-                "reference": "6db72a07c39c4b83d70fd6432cfb952e0eac61fc",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/ab02c692d2bdad1009639f6ba319576af590620c",
+                "reference": "ab02c692d2bdad1009639f6ba319576af590620c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0",
-                "psr/log": "1.0.*"
+                "psr/log": "~1.0"
+            },
+            "require-dev": {
+                "php": ">=5.3.0"
+            },
+            "suggest": {
+                "kriswallsmith/assetic": "The best way to manage assets",
+                "monolog/monolog": "Log using Monolog",
+                "predis/predis": "Redis storage"
             },
             "type": "library",
             "autoload": {
                 "psr-0": {
-                    "Profiler": "src/"
+                    "DebugBar": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1050,16 +1105,17 @@
             ],
             "authors": [
                 {
-                    "name": "Loic Sharma"
+                    "name": "Maxime Bouroumeau-Fuseau",
+                    "email": "maxime.bouroumeau@gmail.com",
+                    "homepage": "http://maximebf.com"
                 }
             ],
-            "description": "A PHP 5.3 profiler based off of Laravel 3's Anbu.",
+            "description": "Debug bar in the browser for php application",
+            "homepage": "https://github.com/maximebf/php-debugbar",
             "keywords": [
-                "anbu",
-                "laravel",
-                "profiler"
+                "debug"
             ],
-            "time": "2013-06-17 17:00:15"
+            "time": "2014-04-25 16:30:40"
         },
         {
             "name": "monolog/monolog",
@@ -1277,12 +1333,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pdepend/pdepend.git",
-                "reference": "268f01c9ea0259bdbc87fe7fce0ebe6d5246ae52"
+                "reference": "0008154ed57e39c25185a78df2615823f7ce2b58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/268f01c9ea0259bdbc87fe7fce0ebe6d5246ae52",
-                "reference": "268f01c9ea0259bdbc87fe7fce0ebe6d5246ae52",
+                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/0008154ed57e39c25185a78df2615823f7ce2b58",
+                "reference": "0008154ed57e39c25185a78df2615823f7ce2b58",
                 "shasum": ""
             },
             "require": {
@@ -1313,7 +1369,7 @@
                 "BSD-3-Clause"
             ],
             "description": "Official version of pdepend to be handled with Composer",
-            "time": "2014-04-28 19:29:31"
+            "time": "2014-04-30 09:18:08"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -1494,12 +1550,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "f0565e24d9ac4c34f855d8ee4dc314545c7c4fd9"
+                "reference": "a995604307026ed8693ffba8848765532030371b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/f0565e24d9ac4c34f855d8ee4dc314545c7c4fd9",
-                "reference": "f0565e24d9ac4c34f855d8ee4dc314545c7c4fd9",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/a995604307026ed8693ffba8848765532030371b",
+                "reference": "a995604307026ed8693ffba8848765532030371b",
                 "shasum": ""
             },
             "require": {
@@ -1551,7 +1607,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-04-27 16:15:10"
+            "time": "2014-04-30 08:57:33"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3475,6 +3531,7 @@
     ],
     "minimum-stability": "dev",
     "stability-flags": {
+        "barryvdh/laravel-debugbar": 20,
         "grumpydictator/gchart": 20
     },
     "platform": [

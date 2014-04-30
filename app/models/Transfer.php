@@ -20,10 +20,10 @@ use Carbon\Carbon as Carbon;
  * @property-read \Account $accountto
  * @property-read \Illuminate\Database\Eloquent\Collection|\Component[] $components
  * @property-read \User $user
- * @method static \Transfer inMonth($date) 
- * @method static \Transfer inYear($date) 
- * @method static \Transfer afterDate($date) 
- * @method static \Transfer beforeDate($date) 
+ * @method static \Transfer inMonth($date)
+ * @method static \Transfer inYear($date)
+ * @method static \Transfer afterDate($date)
+ * @method static \Transfer beforeDate($date)
  */
 class Transfer extends ComponentEnabledModel
 {

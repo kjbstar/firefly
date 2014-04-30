@@ -23,9 +23,9 @@ require_once(app_path() . '/helpers/AccountHelper.php');
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersfrom
  * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
- * @method static \Account notInactive() 
- * @method static \Account shared() 
- * @method static \Account notShared() 
+ * @method static \Account notInactive()
+ * @method static \Account shared()
+ * @method static \Account notShared()
  */
 class Account extends Eloquent
 {

@@ -19,7 +19,7 @@
  * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfers
  * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
  * @property-read \User $user
- * @method static \Component reporting() 
+ * @method static \Component reporting()
  */
 class Component extends Eloquent
 {
