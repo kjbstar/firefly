@@ -200,7 +200,7 @@ Route::post('/home/transfer/add/{account?}',['uses' => 'TransferController@postA
  * USER CONTROLLER:
  */
 Route::get('/login', ['uses' => 'UserController@login', 'as' => 'login']);
-Route::get('/logout', 'UserController@logout');
+Route::get('/logout', ['uses' => 'UserController@logout','as' => 'logout']);
 Route::get('/reset', ['uses' => 'UserController@reset', 'as' => 'reset']);
 Route::get('/register', ['uses' => 'UserController@register', 'as' => 'register']);
 Route::get('/activate/{code}', ['uses' => 'UserController@activate','as' => 'activate']);
@@ -209,8 +209,10 @@ Route::post('/reset', ['uses' => 'UserController@postReset', 'before' => 'csrf']
 Route::post('/login', ['uses' => 'UserController@postLogin', 'before' => 'csrf']);
 Route::post('/register', ['uses' => 'UserController@postRegister', 'before' => 'csrf']);
 
+/**
+ * Profile controller:
+ */
+Route::get('/home/profile', ['uses' => 'ProfileController@index','as' => 'profile']);
+Route::get('/home/profile/password', ['uses' => 'ProfileController@changePassword','as' => 'change-password']);
 
-Route::get('/test',function() {
-       //return     dd( Route::getRoutes() );
-
-    });
+Route::post('/home/profile/password', ['uses' => 'ProfileController@postChangePassword','before' => 'csrf']);

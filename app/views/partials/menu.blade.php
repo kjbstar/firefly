@@ -98,7 +98,6 @@ $types = Type::allTypes();
 
         </ul>
         {{Form::open(['action' => 'search', 'class' => 'navbar-form navbar-left','method' => 'get'])}}
-        <form class="" role="search">
             <div class="form-group">
                 @if(isset($search['originalQuery']))
                 <input type="text" name="query" class="form-control" placeholder="Search" value="{{{$search['originalQuery']}}}">
@@ -108,9 +107,14 @@ $types = Type::allTypes();
             </div>
             <button type="submit" class="btn btn-default">Submit</button>
         </form>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="/logout">Logout {{{Auth::user()->username}}}</a></li>
-          </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{{Auth::user()->username}}} <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{URL::Route('change-password')}}">Change password</a></li>
+                    <li><a href="{{URL::Route('logout')}}">Logout</a></li>
+                </ul>
+                </li>
+            </ul>
         </div><!-- /.navbar-collapse -->
       </nav>
 <p>

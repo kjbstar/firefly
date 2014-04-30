@@ -165,6 +165,22 @@ Breadcrumbs::register(
     }
 );
 
+// profile:
+Breadcrumbs::register(
+    'profile', function ($breadcrumbs) {
+        $breadcrumbs->parent('home');
+        $breadcrumbs->push('Profile', route('profile'));
+    }
+);
+
+Breadcrumbs::register(
+    'change-password', function ($breadcrumbs) {
+        $breadcrumbs->parent('profile');
+        $breadcrumbs->push('Change your password', route('change-password'));
+    }
+);
+
+
 // add, edit, delete
 // Transfer, Transaction, Account, beneficiary (fake), budget (fake),
 //category (fake)

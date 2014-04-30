@@ -164,8 +164,10 @@ class UserController extends BaseController
         }
 
         return View::make('user.sentpw')->with('title', 'Reset!');
+    }
 
-
+    public function changePassword() {
+        return 1;
     }
 
 }
