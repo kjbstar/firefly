@@ -4,8 +4,6 @@ class SeedTypes extends Seeder
 {
     public function run()
     {
-        $user = User::first();
-
         Type::create(
             [
                 'beneficiary'
