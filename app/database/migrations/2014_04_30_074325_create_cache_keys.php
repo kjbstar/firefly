@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAccountsTable extends Migration {
+class CreateCacheKeys extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,22 +12,16 @@ class CreateAccountsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('accounts', function(Blueprint $table)
+		Schema::create('cachekeys', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->timestamps();
             $table->integer('user_id')->unsigned();
-            $table->string('name', 40);
-            $table->decimal('openingbalance', 10, 2);
-            $table->date('openingbalancedate');
-            $table->decimal('currentbalance', 10, 2);
-            $table->boolean('inactive')->default(false);
-            $table->boolean('shared')->default(false);
+            $table->string('description', 255);
 
             $table->foreign('user_id')
                 ->references('id')->on('users')
                 ->onDelete('cascade');
-        });
+		});
 	}
 
 	/**
@@ -37,7 +31,7 @@ class CreateAccountsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('accounts');
+		Schema::drop('cachekeys');
 	}
 
 }
