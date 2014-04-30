@@ -65,11 +65,11 @@
                 <th rowspan="2">Total diff</th>
             </tr>
             <tr>
-                <th>Expense</th>
                 <th>Income</th>
+                <th>Expense</th>
                 <th>Difference</th>
-                <th>Expense</th>
                 <th>Income</th>
+                <th>Expense</th>
                 <th>Difference</th>
 
             </tr>
