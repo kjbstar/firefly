@@ -2,9 +2,6 @@
 
 use Carbon\Carbon as Carbon;
 
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/SearchHelper.php');
-
 /**
  * Class SearchController
  */

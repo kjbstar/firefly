@@ -1,10 +1,5 @@
 <?php
 
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/AccountHelper.php');
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/TransferHelper.php');
-
 /**
  * Class TransferController
  */

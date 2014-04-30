@@ -1,11 +1,4 @@
 <?php
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/AccountHelper.php');
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/TransactionHelper.php');
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/ComponentHelper.php');
-
 /**
  * Class TransactionController
  */

@@ -1,11 +1,4 @@
 <?php
-// @codeCoverageIgnoreStart
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/HomeHelper.php');
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/Toolkit.php');
-// @codeCoverageIgnoreEnd
-
 use Carbon\Carbon as Carbon;
 
 /**

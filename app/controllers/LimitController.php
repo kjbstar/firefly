@@ -1,9 +1,4 @@
 <?php
-// @codeCoverageIgnoreStart
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/Toolkit.php');
-// @codeCoverageIgnoreEnd
-
 /**
  * Class LimitController
  */

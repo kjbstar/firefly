@@ -1,13 +1,6 @@
 <?php
 use Carbon\Carbon as Carbon;
 
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/Toolkit.php');
-
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/AccountHelper.php');
-
-
 /**
  * Class SettingsController
  */

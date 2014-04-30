@@ -1,10 +1,4 @@
 <?php
-// @codeCoverageIgnoreStart
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/AccountHelper.php');
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/Toolkit.php');
-// @codeCoverageIgnoreEnd
 use Carbon\Carbon as Carbon;
 
 /**

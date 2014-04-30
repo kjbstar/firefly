@@ -1,11 +1,5 @@
 <?php
 
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/PredictableHelper.php');
-
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/AccountHelper.php');
-
 /**
  * Class PredictableController
  */

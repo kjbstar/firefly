@@ -1,10 +1,4 @@
 <?php
-
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/Toolkit.php');
-/** @noinspection PhpIncludeInspection */
-include_once(app_path() . '/helpers/ReportHelper.php');
-
 use Carbon\Carbon as Carbon;
 
 /**

@@ -1,11 +1,6 @@
 <?php
 use Carbon\Carbon as Carbon;
 
-// @codeCoverageIgnoreStart
-/** @noinspection PhpIncludeInspection */
-require_once(app_path() . '/helpers/PiggybankHelper.php');
-// @codeCoverageIgnoreEnd
-
 /**
  * Class PiggyController
  */
