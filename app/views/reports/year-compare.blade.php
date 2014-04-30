@@ -75,11 +75,13 @@
             </tr>
             @foreach($months as $month => $data)
             <tr>
-                <td>{{$month}}</td>
-                <td>{{mf($data[$yearOne]['in'],true)}}</td>
+                <td>{{$month}}
+
+                </td>
+                <td><a href="{{$data[$yearOne]['url']}}">{{mf($data[$yearOne]['in'],true)}}</a></td>
                 <td>{{mf($data[$yearOne]['out'],true)}}</td>
                 <td>{{mf($data[$yearOne]['in']+$data[$yearOne]['out'],true)}}</td>
-                <td>{{mf($data[$yearTwo]['in'],true)}}</td>
+                <td><a href="{{$data[$yearTwo]['url']}}">{{mf($data[$yearTwo]['in'],true)}}</a></td>
                 <td>{{mf($data[$yearTwo]['out'],true)}}</td>
                 <td>{{mf($data[$yearTwo]['in']+$data[$yearTwo]['out'],true)}}</td>
                 <td>

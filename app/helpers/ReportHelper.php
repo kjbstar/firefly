@@ -194,13 +194,33 @@ class ReportHelper
 
         while ($current <= $end) {
 
-            $out = Auth::user()->transactions()->inMonth($current)->expenses()->sum('amount');
-            $in = Auth::user()->transactions()->inMonth($current)->incomes()->sum('amount');
+            $totalOut = Auth::user()->transactions()->inMonth($current)->expenses()->
+                leftJoin('accounts','accounts.id','=','transactions.account_id')
+                ->where('accounts.shared',0)
+                ->sum('amount');
+            $totalIn = Auth::user()->transactions()->inMonth($current)->incomes()->
+                leftJoin('accounts','accounts.id','=','transactions.account_id')
+                ->where('accounts.shared',0)
+                ->sum('amount');
+
+            // transfers TO a shared account are counted as an expense:
+            $transfersOut = Auth::user()->transfers()
+                ->leftJoin('accounts','accounts.id','=','transfers.accountto_id')
+                ->where('accounts.shared',1)
+                ->inMonth($current)
+                ->sum('amount');
+
+            // transfers FROM a shared account are counted as income:
+            $transfersIn = Auth::user()->transfers()
+                ->leftJoin('accounts','accounts.id','=','transfers.accountfrom_id')
+                ->where('accounts.shared',1)
+                ->inMonth($current)
+                ->sum('amount');
 
             $list[] = [
                 'date' => $current->format('F Y'),
-                'in'   => $in,
-                'out'  => $out,
+                'in'   => ($totalIn + $transfersIn),
+                'out'  => ($totalOut - $transfersOut),
                 'url'  => URL::Route('monthreport', [$current->format('Y'), $current->format('m')])
             ];
 
@@ -329,9 +349,10 @@ class ReportHelper
             } else {
                 $data[$key] = [
                     'component'    => [
-                        'id'   => $key,
-                        'name' => $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->name : '(no '.$type->type.')',
-                        'sum'  => $t->amount,
+                        'id'      => $key,
+                        'name'    => $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->name
+                                : '(no ' . $type->type . ')',
+                        'sum'     => $t->amount,
                         'hasIcon' => $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->hasIcon() : false,
                         'iconTag' => $t->hasComponentOfType($type) ? $t->getComponentOfType($type)->iconTag() : '',
                     ],
