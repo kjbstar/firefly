@@ -2,8 +2,6 @@
 
 use Carbon\Carbon as Carbon;
 
-require_once(app_path() . '/helpers/AccountHelper.php');
-
 /**
  * Account
  *
