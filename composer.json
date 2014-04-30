@@ -11,7 +11,8 @@
         "barryvdh/laravel-ide-helper": "1.*",
         "davejamesmiller/laravel-breadcrumbs": "2.*",
         "phpunit/phpunit": "4.*",
-        "phpunit/php-invoker": "1.*"
+        "phpunit/php-invoker": "1.*",
+        "grumpydictator/gchart": "dev-master"
 
     },
     "autoload": {

@@ -20,7 +20,7 @@ $types = Type::allTypes();
         </div>
     <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav">
-            @if(Route::getCurrentRoute()->getName() == 'home')
+            @if(Route::getCurrentRoute()->getName() == 'home' && !is_null($fpAccount))
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{{$fpAccount->name}}} <b class="caret"></b></a>
             <ul class="dropdown-menu">
@@ -113,3 +113,7 @@ $types = Type::allTypes();
           </ul>
         </div><!-- /.navbar-collapse -->
       </nav>
+<p>
+
+
+</p>

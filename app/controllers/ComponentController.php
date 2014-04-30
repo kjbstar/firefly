@@ -189,13 +189,13 @@ class ComponentController extends BaseController
      */
     public function delete(Component $component)
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+
+        $transactions = $component->transactions()->count();
+        $transfers = $component->transfers()->count();
 
         return View::make('components.delete')->with('component', $component)->with(
             'title', 'Delete ' . $component->type->type . ' "' . $component->name . '"'
-        );
+        )->with('transactions', $transactions)->with('transfers', $transfers);
     }
 
     /**
@@ -208,9 +208,9 @@ class ComponentController extends BaseController
     public function postDelete(Component $component)
     {
         $component->delete();
-        Session::flash('success', $component->type->type . ' deleted.');
+        Session::flash('success', ucfirst($component->type->type) . ' deleted.');
 
-        return Redirect::to(Session::get('previous'));
+        return Redirect::route('components',$component->type->id);
     }
 
     /**

@@ -59,10 +59,19 @@
     <div class="col-lg-12">
         <table class="table table-bordered table-striped">
             <tr>
-                <th>Month</th>
+                <th rowspan="2">Month</th>
                 <th colspan="3">{{$yearOne}}</th>
                 <th colspan="3">{{$yearTwo}}</th>
-                <th>Diff</th>
+                <th rowspan="2">Total diff</th>
+            </tr>
+            <tr>
+                <th>Expense</th>
+                <th>Income</th>
+                <th>Difference</th>
+                <th>Expense</th>
+                <th>Income</th>
+                <th>Difference</th>
+
             </tr>
             @foreach($months as $month => $data)
             <tr>

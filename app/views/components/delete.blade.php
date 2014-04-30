@@ -7,7 +7,10 @@
     {{Form::open()}}
     <p>
         Are you sure you want to delete {{$component->type->type}} "{{{$component->name}}}"?
-        Transactions related to this {{$component->type->type}} will lose this connection.
+        @if($transactions > 0 || $transfers > 0)
+        There are {{$transactions}} transaction(s) and {{$transfers}} transfer(s) related to this {{$component->type->type}}
+        that will lose this connection.
+        @endif
     </p>
     <div class="form-group">
       <button type="submit" class="btn btn-danger">Delete

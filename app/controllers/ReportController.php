@@ -67,10 +67,9 @@ class ReportController extends BaseController
         $incomes = ReportHelper::incomes($date, 'month');
 
 
-
         $expenses = [
-            'category'    => ReportHelper::expensesGrouped($date, 'month', Type::whereType('category')->first()),
-            'budget'      => ReportHelper::expensesGrouped($date, 'month', Type::whereType('budget')->first()),
+            'category' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('category')->first()),
+            'budget' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('budget')->first()),
             'beneficiary' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('beneficiary')->first()),
         ];
 
@@ -92,8 +91,8 @@ class ReportController extends BaseController
      */
     public function monthPieChart($year, $month, $type)
     {
-        $key = 'reportmonthPieChart'.$year.$month.$type;
-        if(Cache::has($key)) {
+        $key = 'reportmonthPieChart' . $year . $month . $type;
+        if (Cache::has($key)) {
             return Response::json(Cache::get($key));
         }
         // get data:
@@ -124,7 +123,7 @@ class ReportController extends BaseController
 
         $chart->generate();
         $chartData = $chart->getData();
-        Cache::forever($key,$chartData);
+        Cache::forever($key, $chartData);
         return Response::json($chartData);
 
     }
@@ -148,9 +147,7 @@ class ReportController extends BaseController
 
         return View::make('reports.year')->with('date', $date)->with('title', $title)->with('summary', $summary)->with(
             'biggest', $biggest
-        )->with(
-                'incomes', $incomes
-            )->with('months', $months);
+        )->with('incomes', $incomes)->with('months', $months);
 
     }
 
@@ -279,36 +276,36 @@ class ReportController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function compareYear($yearOne,$yearTwo) {
-        $dateOne = new Carbon($yearOne.'-01-01');
-        $dateTwo = new Carbon($yearTwo.'-01-01');
-        $title = 'Comparing '.$dateOne->format('Y').' with '.$dateTwo->format('Y');
+    public function compareYear($yearOne, $yearTwo)
+    {
+        $dateOne = new Carbon($yearOne . '-01-01');
+        $dateTwo = new Carbon($yearTwo . '-01-01');
+        $title = 'Comparing ' . $dateOne->format('Y') . ' with ' . $dateTwo->format('Y');
 
         // income expenses for both years.
-        $summary = ReportHelper::summaryCompared($dateOne,$dateTwo);
+        $summary = ReportHelper::summaryCompared($dateOne, $dateTwo);
 
         // monthly list for both years.
-        $months = ReportHelper::monthsCompared($dateOne,$dateTwo);
+        $months = ReportHelper::monthsCompared($dateOne, $dateTwo);
         $monthsFormatted = [];
-        foreach($months[$yearOne] as $month) {
-            $monthName = substr($month['date'],0,-5);
+        foreach ($months[$yearOne] as $month) {
+            $monthName = substr($month['date'], 0, -5);
             $monthsFormatted[$monthName][$yearOne] = $month;
         }
 
-        foreach($months[$yearTwo] as $month) {
-            $monthName = substr($month['date'],0,-5);
+        foreach ($months[$yearTwo] as $month) {
+            $monthName = substr($month['date'], 0, -5);
             $monthsFormatted[$monthName][$yearTwo] = $month;
         }
 
         return View::make('reports.year-compare')
-            ->with('dateOne',$dateOne)
-            ->with('dateTwo',$dateTwo)
-            ->with('title',$title)
-            ->with('summary',$summary)
-            ->with('yearOne',$dateOne->format('Y'))
-            ->with('yearTwo',$dateTwo->format('Y'))
-            ->with('months',$monthsFormatted)
-            ;
+            ->with('dateOne', $dateOne)
+            ->with('dateTwo', $dateTwo)
+            ->with('title', $title)
+            ->with('summary', $summary)
+            ->with('yearOne', $dateOne->format('Y'))
+            ->with('yearTwo', $dateTwo->format('Y'))
+            ->with('months', $monthsFormatted);
     }
 
 

@@ -14,6 +14,7 @@ class TransferTrigger
      *
      * @return bool|null
      */
+    // TODO add validations from below.
     public function createTransfer(Transfer $transfer)
     {
         $accountFrom = $transfer->accountfrom()->first();

@@ -181,7 +181,11 @@
                             @foreach($row['transactions'] as $t)
                             <tr>
                                 <td>{{$t->date->format('jS')}}</td>
+                                @if(get_class($t) == 'Transfer')
+                                <td><a href="{{URL::Route('edittransfer',$t->id)}}" title="Edit transfer '{{{$t->description}}}'">{{{$t->description}}}</a></td>
+                                @else
                                 <td><a href="{{URL::Route('edittransaction',$t->id)}}" title="Edit transaction '{{{$t->description}}}'">{{{$t->description}}}</a></td>
+                                @endif
                                 <td>{{mf($t->amount,true)}}</td>
                             </tr>
                             @endforeach

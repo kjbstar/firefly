@@ -19,7 +19,10 @@ class TransactionController extends BaseController
      */
     public function showIndex()
     {
-        $transactions = Auth::user()->transactions()->orderBy('date', 'DESC')->with(['account','components','predictable'])->orderBy('id', 'DESC')->paginate(25);
+        $transactions = Auth::user()->transactions()->orderBy('date', 'DESC')->with(
+            ['account', 'components', 'predictable']
+        )->orderBy('id', 'DESC')->paginate(25);
+
         return View::make('transactions.index')->with('title', 'All transactions')->with('transactions', $transactions);
     }
 
@@ -43,12 +46,11 @@ class TransactionController extends BaseController
             $prefilled = TransactionHelper::prefilledFromPredictable($predictable);
         }
 
-
         $accounts = AccountHelper::accountsAsSelectList();
 
-        return View::make('transactions.add')->with(
-            'title', 'Add a transaction'
-        )->with('accounts', $accounts)->with('prefilled', $prefilled);
+        return View::make('transactions.add')->with('title', 'Add a transaction')->with('accounts', $accounts)->with(
+            'prefilled', $prefilled
+        );
     }
 
     /**
@@ -68,13 +70,14 @@ class TransactionController extends BaseController
         $transaction->description = Input::get('description');
         $transaction->amount = floatval(Input::get('amount'));
         $transaction->date = Input::get('date');
+        $transaction->ignoreprediction = intval(Input::get('ignoreprediction'));
+        $transaction->ignoreallowance = intval(Input::get('ignoreallowance'));
+        $transaction->mark = intval(Input::get('mark'));
+
         $transaction->account()->associate($account);
 
         /** @noinspection PhpParamsInspection */
         $transaction->user()->associate(Auth::user());
-        $transaction->ignoreprediction = intval(Input::get('ignoreprediction'));
-        $transaction->ignoreallowance = intval(Input::get('ignoreallowance'));
-        $transaction->mark = intval(Input::get('mark'));
 
 
         $validator = Validator::make($transaction->toArray(), Transaction::$rules);
@@ -144,23 +147,18 @@ class TransactionController extends BaseController
         $transaction->mark = is_null(Input::get('mark')) ? 0 : 1;
 
         // validate and save:
-        $validator = Validator::make(
-            $transaction->toArray(), Transaction::$rules
-        );
+        $validator = Validator::make($transaction->toArray(), Transaction::$rules);
+
         if ($validator->fails()) {
             Session::flash('error', 'The transaction could not be saved.');
-            Log::debug('These rules failed: ' . print_r($validator->messages()->all(), true));
-            return Redirect::route('edittransaction', $transaction->id)
-                ->withInput()->withErrors($validator);
+            return Redirect::route('edittransaction', $transaction->id)->withInput()->withErrors($validator);
         } else {
             // try another save.
             $result = $transaction->save();
             // @codeCoverageIgnoreStart
             if (!$result) {
                 Session::flash('error', 'The transaction could not be saved.');
-                Log::debug('These rules failed: ' . print_r($validator->messages()->all(), true));
-                return Redirect::route('edittransaction', $transaction->id)
-                    ->withInput()->withErrors($validator);
+                return Redirect::route('edittransaction', $transaction->id)->withInput()->withErrors($validator);
             }
             // @codeCoverageIgnoreEnd
 
@@ -187,9 +185,9 @@ class TransactionController extends BaseController
             Session::put('previous', URL::previous());
         }
 
-        return View::make('transactions.delete')->with(
-            'transaction', $transaction
-        )->with('title', 'Delete transaction ' . $transaction->description);
+        return View::make('transactions.delete')->with('transaction', $transaction)->with(
+            'title', 'Delete transaction ' . $transaction->description
+        );
     }
 
     /**

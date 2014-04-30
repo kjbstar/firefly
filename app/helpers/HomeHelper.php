@@ -20,8 +20,8 @@ class HomeHelper
      */
     public static function homeAccountList(Carbon $date)
     {
-        $key = 'homeAccountList'.$date->format('Ymd');
-        if(Cache::has($key)) {
+        $key = 'homeAccountList' . $date->format('Ymd');
+        if (Cache::has($key)) {
             return Cache::get($key);
         }
         $query = Auth::user()->accounts()->notInactive()->get();
@@ -29,7 +29,7 @@ class HomeHelper
 
         foreach ($query as $account) {
             $url = URL::Route('accountoverviewmonth', [$account->id, $date->format('Y'), $date->format('m')]);
-            $homeURL = URL::Route('home',[$date->format('Y'), $date->format('m'),$account->id]);
+            $homeURL = URL::Route('home', [$date->format('Y'), $date->format('m'), $account->id]);
             $accounts[] = [
                 'name'    => $account->name,
                 'id'      => $account->id,
@@ -41,7 +41,7 @@ class HomeHelper
         }
 
         unset($query);
-        Cache::forever($key,$accounts);
+        Cache::forever($key, $accounts);
         return $accounts;
     }
 
@@ -50,84 +50,92 @@ class HomeHelper
      *
      * @return array
      */
-    public static function budgetOverview(Carbon $date,Account $account)
+    public static function budgetOverview(Carbon $date, Account $account = null)
     {
+        if (is_null($account)) {
+            return [];
+        }
         $key = 'budgetOverview' . $date->format('Ymd') . $account->id;
         if (Cache::has($key)) {
             return Cache::get($key);
         }
 
-        $budgetType = Type::where('type','budget')->first();
-        $budgets = Auth::user()->components()->orderBy('parent_component_id','DESC')->where('type_id',$budgetType->id)->get();
+        $budgetType = Type::where('type', 'budget')->first();
+        $budgets = Auth::user()->components()->orderBy('parent_component_id', 'DESC')->where('type_id', $budgetType->id)
+            ->get();
         $result = [];
         /** @var $budget Budget */
-        foreach($budgets as $budget) {
+        foreach ($budgets as $budget) {
             $id = $budget->id;
             $current = [
-                'name' => $budget->name,
+                'name'       => $budget->name,
                 'parentName' => $budget->parentComponent()->first() ? $budget->parentComponent->name : null,
-                'limit' => 0,
-                'overspent' => false,
-                'pct' => 100,
-                'iconTag' => $budget->iconTag()
+                'limit'      => 0,
+                'overspent'  => false,
+                'pct'        => 100,
+                'iconTag'    => $budget->iconTag()
             ];
 
             // find transactions in this month:
-            $transactions = $budget->transactions()->where('account_id',$account->id)->inMonth($date)->sum('amount');
+            $transactions = $budget->transactions()->where('account_id', $account->id)->inMonth($date)->sum('amount');
             $current['expense'] = floatval($transactions);
 
             // transactions count as expense when they go TO a shared account:
-            $transfers = $budget->transfers()->leftJoin('accounts','accounts.id','=','transfers.accountto_id')->
-                where('accounts.shared',1)->where('transfers.accountfrom_id',$account->id)->inMonth($date)->sum('amount');
+            $transfers = $budget->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')
+                ->where('accounts.shared', 1)->where('transfers.accountfrom_id', $account->id)->inMonth($date)->sum(
+                    'amount'
+                );
             $current['expense'] += floatval($transfers) * -1;
 
             // has budget a limit in this month?
             $limit = $budget->limits()->inMonth($date)->first();
-            if(!is_null($limit)) {
+            if (!is_null($limit)) {
                 $current['limit'] = floatval($limit->amount);
                 // overspent?
-                if($current['expense'] * -1 > $current['limit']) {
+                if ($current['expense'] * -1 > $current['limit']) {
                     $current['overspent'] = true;
                     // calculate bar percentage:
-                    $current['pct'] = round(($current['limit'] / $current['expense'])*-100);
+                    $current['pct'] = round(($current['limit'] / $current['expense']) * -100);
                 } else {
                     $current['overspent'] = false;
                     // calculate bar percentage:
-                    $current['pct'] = round(($current['expense'] / $current['limit'])*-100);
+                    $current['pct'] = round(($current['expense'] / $current['limit']) * -100);
                 }
             }
-            if($current['expense'] != 0 || $current['limit'] != 0) {
+            if ($current['expense'] != 0 || $current['limit'] != 0) {
                 $result[$id] = $current;
             }
         }
         // now do the same for transactions + transfers without a budget!
         $result[0] = [
-            'name' => '(no budget)',
-            'limit' => 0,
+            'name'      => '(no budget)',
+            'limit'     => 0,
             'overspent' => false,
-            'pct' => 100,
-            'iconTag' => ''
+            'pct'       => 100,
+            'iconTag'   => ''
         ];
         /**
          * select * from transactions
-        where id not in (
-        select transaction_id from component_transaction
-        left join components ON components.id = component_transaction.component_id
-        where components.type_id=3
-        )
+         * where id not in (
+         * select transaction_id from component_transaction
+         * left join components ON components.id = component_transaction.component_id
+         * where components.type_id=3
+         * )
          */
-        $transactions = Auth::user()->transactions()->whereNotIn('id',function($query) use ($date) {
+        $transactions = Auth::user()->transactions()->whereNotIn(
+            'id', function ($query) use ($date) {
                 $query->select('transaction_id')->from('component_transaction')
-                    ->leftJoin('components','components.id','=','component_transaction.component_id')
-                    ->leftJoin('transactions','transactions.id','=','component_transaction.transaction_id')
-                    ->where('transactions.amount','<',0)
-                    ->where(DB::Raw('DATE_FORMAT(transactions.date,"%m-%Y")'),'=',$date->format('m-Y'))
-                    ->where('components.type_id',3);
-            })->inMonth($date)->expenses()->sum('amount');
+                    ->leftJoin('components', 'components.id', '=', 'component_transaction.component_id')
+                    ->leftJoin('transactions', 'transactions.id', '=', 'component_transaction.transaction_id')
+                    ->where('transactions.amount', '<', 0)
+                    ->where(DB::Raw('DATE_FORMAT(transactions.date,"%m-%Y")'), '=', $date->format('m-Y'))
+                    ->where('components.type_id', 3);
+            }
+        )->inMonth($date)->expenses()->sum('amount');
         $result[0]['expense'] = floatval($transactions);
 
 
-        Cache::forever($key,$result);
+        Cache::forever($key, $result);
         return $result;
 
     }
@@ -137,29 +145,37 @@ class HomeHelper
      *
      * @return array
      */
-    public static function getAllowance(Carbon $date,Account $account)
+    public static function getAllowance(Carbon $date, Account $account = null)
     {
-        $key = 'getAllowance'.$date->format('Ymd').$account->id;
-        if(Cache::has($key)) {
+
+        // make the default array:
+        // days = number of days left, used as a percentage:
+        $allowance = [
+            'amount' => 0,
+            'over'   => false,
+            'spent'  => 0,
+            'days'   => round((intval($date->format('d')) / intval($date->format('t'))) * 100)
+        ];
+        if (is_null($account)) {
+            return null;
+        }
+
+        $key = 'getAllowance' . $date->format('Ymd') . $account->id;
+        if (Cache::has($key)) {
             return Cache::get($key);
         }
+
+
         // get the allowance (setting) for this month, OR specific month.
         // and grab the value:
         $defaultAllowance = Setting::getSetting('defaultAllowance');
         $specificAllowance = Auth::user()->settings()->where('name', 'specificAllowance')->where(
             'date', $date->format('Y-m') . '-01'
-        )->where('account_id',$account->id)->first();
+        )->where('account_id', $account->id)->first();
         $amount = !is_null($specificAllowance) ? $specificAllowance->value : $defaultAllowance->value;
         unset($specificAllowance, $defaultAllowance);
 
-        // make the default array:
-        // days = number of days left, used as a percentage:
-        $allowance = [
-            'amount' => $amount,
-            'over'   => false,
-            'spent'  => 0,
-            'days'   => round((intval($date->format('d')) / intval($date->format('t'))) * 100)
-        ];
+        $allowance['amount'] = $amount;
 
         // start with the allowance thing,
         // if relevant:
@@ -173,7 +189,7 @@ class HomeHelper
             $spentOnShared = floatval(
                 Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')->where(
                     'accounts.shared', 1
-                )->where('accountto_id',$account->id)->inMonth($date)->where('ignoreallowance',0)->sum('amount')
+                )->where('accountto_id', $account->id)->inMonth($date)->where('ignoreallowance', 0)->sum('amount')
             );
 
             // save it as the spent amount:
@@ -184,7 +200,7 @@ class HomeHelper
             }
             $allowance['pct'] = round(($spent / $amount) * 100);
         }
-        Cache::forever($key,$allowance);
+        Cache::forever($key, $allowance);
         return $allowance;
     }
 
@@ -193,10 +209,13 @@ class HomeHelper
      *
      * @return array
      */
-    public static function getPredictables(Carbon $date,Account $account)
+    public static function getPredictables(Carbon $date, Account $account = null)
     {
-        $key = 'getPredictables'.$date->format('Ymd').$account->id;
-        if(Cache::has($key)) {
+        if (is_null($account)) {
+            return [];
+        }
+        $key = 'getPredictables' . $date->format('Ymd') . $account->id;
+        if (Cache::has($key)) {
             return Cache::get($key);
         }
         $predictables = $account->predictables()->active()->orderBy('dom', 'ASC')->get();
@@ -208,7 +227,7 @@ class HomeHelper
                 $list[] = $p;
             }
         }
-        Cache::forever($key,$list);
+        Cache::forever($key, $list);
         return $list;
     }
 
@@ -217,9 +236,13 @@ class HomeHelper
      *
      * @return mixed
      */
-    public static function transactions(Carbon $date,Account $account)
+    public static function transactions(Carbon $date, Account $account = null)
     {
-        return $account->transactions()->rememberForever()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)
+        if (is_null($account)) {
+            return [];
+        }
+        return $account->transactions()->rememberForever()->with('account')->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')
+            ->inMonth($date)
             ->get();
     }
 
@@ -228,10 +251,17 @@ class HomeHelper
      *
      * @return mixed
      */
-    public static function transfers(Carbon $date,Account $account)
+    public static function transfers(Carbon $date, Account $account = null)
     {
-        $from = $account->transfersfrom()->rememberForever()->take(5)->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
-        $to = $account->transfersto()->take(5)->rememberForever()->orderBy('date', 'DESC')->orderBy('id', 'DESC')->inMonth($date)->get();
+        if (is_null($account)) {
+            return [];
+        }
+        $from = $account->transfersfrom()->rememberForever()->with(['accountto', 'accountfrom'])->take(5)->orderBy(
+            'date', 'DESC'
+        )->orderBy('id', 'DESC')->inMonth($date)->get();
+        $to = $account->transfersto()->take(5)->rememberForever()->with(['accountto', 'accountfrom'])->orderBy(
+            'date', 'DESC'
+        )->orderBy('id', 'DESC')->inMonth($date)->get();
         $result = $from->merge($to);
         return $result;
     }

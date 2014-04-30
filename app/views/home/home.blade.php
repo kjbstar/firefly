@@ -14,6 +14,7 @@
     </div>
 </div>
 
+
 <!-- MAIN ACCOUNT CHART -->
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
@@ -67,22 +68,27 @@
 <div class="row">
     <!-- ALL BUDGETS IN COLLAPSE. -->
     <div class="col-lg-6 col-md-12 col-sm-12">
-        <h4>Budgets</h4>
-        @include('list.budgets-small')
+        @if($fpAccount)
+            <h4>Budgets</h4>
+            @include('list.budgets-small')
+        @endif
 
     </div>
     <!-- TRANSACTIONS -->
     <div class="col-lg-6 col-md-12 col-sm-12">
-        <h4>Transactions</h4>
-        @include('list.mutations-small',['mutations' => $transactions])
+        @if($fpAccount)
+            <h4>Transactions</h4>
+            @include('list.mutations-small',['mutations' => $transactions])
+        @endif
     </div>
 </div>
 <div class="row">
     <!-- TRANSFERS -->
     <div class="col-lg-6 col-md-12 col-sm-12">
-        <h4>Transfers</h4>
-        @include('list.mutations-small',['mutations' => $transfers])
-
+        @if($fpAccount)
+            <h4>Transfers</h4>
+            @include('list.mutations-small',['mutations' => $transfers])
+        @endif
     </div>
     <!-- PREDICTABES -->
     <div class="col-lg-6 col-md-12 col-sm-12">
@@ -113,6 +119,7 @@
     var month = {{$today->format('n')}};
     var year = {{$today->format('Y')}};
     var fpAccount = {{$fpAccount ? $fpAccount->id : 0}};
+    var addAccountURL = '{{URL::Route('addaccount')}}';
 
 </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>

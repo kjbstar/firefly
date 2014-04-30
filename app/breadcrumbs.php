@@ -125,7 +125,7 @@ Breadcrumbs::register(
     'componentoverview', function ($breadcrumbs, Component $component) {
         $breadcrumbs->parent('components', $component->type);
         $breadcrumbs->push(
-            ucfirst($component->type->type) . ' overview', route('componentoverview', $component->id)
+            'Overview for '.$component->type->type.' "'  .ucfirst($component->name) . '"', route('componentoverview', $component->id)
         );
     }
 );
@@ -134,7 +134,7 @@ Breadcrumbs::register(
     'componentoverviewmonth', function ($breadcrumbs, Component $component, Carbon $date) {
         $breadcrumbs->parent('componentoverview', $component);
         $breadcrumbs->push(
-            $component->type->type . ' overview for ' . $date->format('F Y'),
+            $date->format('F Y'),
             route('componentoverview', [$component->id, $date->format('Y'), $date->format('m')])
         );
     }

@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "30de813a068aef68ac49596424741fec",
+    "hash": "2177e73d930aca7c88523324ade39842",
     "packages": [
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -539,12 +539,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "62e530073cba7c479b48c1d517565adfa6ba9d51"
+                "reference": "d2f081de8384f7b1a2031efd82fe7256bbb6d465"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/62e530073cba7c479b48c1d517565adfa6ba9d51",
-                "reference": "62e530073cba7c479b48c1d517565adfa6ba9d51",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/d2f081de8384f7b1a2031efd82fe7256bbb6d465",
+                "reference": "d2f081de8384f7b1a2031efd82fe7256bbb6d465",
                 "shasum": ""
             },
             "require": {
@@ -602,7 +602,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2014-04-25 21:40:27"
+            "time": "2014-04-29 22:45:42"
         },
         {
             "name": "doctrine/inflector",
@@ -785,6 +785,39 @@
             "time": "2013-12-04 14:19:30"
         },
         {
+            "name": "grumpydictator/gchart",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/JC5/gchart.git",
+                "reference": "be5d3fce9ca8e836378891afb09340f2c429d26a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/JC5/gchart/zipball/be5d3fce9ca8e836378891afb09340f2c429d26a",
+                "reference": "be5d3fce9ca8e836378891afb09340f2c429d26a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "4.x",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Grumpydictator\\Gchart": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "James Cole",
+                    "email": "TheGrumpyDictator@gmail.com"
+                }
+            ],
+            "time": "2014-04-30 07:16:23"
+        },
+        {
             "name": "ircmaxell/password-compat",
             "version": "1.0.x-dev",
             "source": {
@@ -877,12 +910,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "2210d5d1d07debd2e9b0e67077b7088918ef904f"
+                "reference": "dde53a39385435649ab42626d21cde9a4c1e85fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/2210d5d1d07debd2e9b0e67077b7088918ef904f",
-                "reference": "2210d5d1d07debd2e9b0e67077b7088918ef904f",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/dde53a39385435649ab42626d21cde9a4c1e85fd",
+                "reference": "dde53a39385435649ab42626d21cde9a4c1e85fd",
                 "shasum": ""
             },
             "require": {
@@ -985,7 +1018,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2014-04-26 14:27:01"
+            "time": "2014-04-29 23:26:59"
         },
         {
             "name": "loic-sharma/profiler",
@@ -1364,12 +1397,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "60a9631219ff799e96b2b529db6a796d58f8ce77"
+                "reference": "431e3a04c73c72b516b6b11bd23d93c36115f01d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/60a9631219ff799e96b2b529db6a796d58f8ce77",
-                "reference": "60a9631219ff799e96b2b529db6a796d58f8ce77",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/431e3a04c73c72b516b6b11bd23d93c36115f01d",
+                "reference": "431e3a04c73c72b516b6b11bd23d93c36115f01d",
                 "shasum": ""
             },
             "require": {
@@ -1453,7 +1486,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2014-04-23 22:41:16"
+            "time": "2014-04-29 14:32:49"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1755,12 +1788,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "38ccc18e40d093aed238ddab7450fa842876d7f1"
+                "reference": "318c3f3e0112c7502595b66b7463f2a149803edb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/38ccc18e40d093aed238ddab7450fa842876d7f1",
-                "reference": "38ccc18e40d093aed238ddab7450fa842876d7f1",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/318c3f3e0112c7502595b66b7463f2a149803edb",
+                "reference": "318c3f3e0112c7502595b66b7463f2a149803edb",
                 "shasum": ""
             },
             "require": {
@@ -1821,7 +1854,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-04-27 14:32:28"
+            "time": "2014-04-30 07:01:45"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1976,12 +2009,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/comparator.git",
-                "reference": "e4f1b2e03bf3af65b7b3e8f437a4255657df577d"
+                "reference": "7043b47ba5990b6b12ee32625934d7a9be3a8ab2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/e4f1b2e03bf3af65b7b3e8f437a4255657df577d",
-                "reference": "e4f1b2e03bf3af65b7b3e8f437a4255657df577d",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/7043b47ba5990b6b12ee32625934d7a9be3a8ab2",
+                "reference": "7043b47ba5990b6b12ee32625934d7a9be3a8ab2",
                 "shasum": ""
             },
             "require": {
@@ -2033,7 +2066,7 @@
                 "compare",
                 "equality"
             ],
-            "time": "2014-04-27 07:18:17"
+            "time": "2014-04-30 06:50:25"
         },
         {
             "name": "sebastian/diff",
@@ -2685,12 +2718,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Debug.git",
-                "reference": "3e375dc7089abe46b9ea54d0b347169b8751ce98"
+                "reference": "6e721ae2cd7bde0f8dfa9c3186808a6c4140469c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Debug/zipball/3e375dc7089abe46b9ea54d0b347169b8751ce98",
-                "reference": "3e375dc7089abe46b9ea54d0b347169b8751ce98",
+                "url": "https://api.github.com/repos/symfony/Debug/zipball/6e721ae2cd7bde0f8dfa9c3186808a6c4140469c",
+                "reference": "6e721ae2cd7bde0f8dfa9c3186808a6c4140469c",
                 "shasum": ""
             },
             "require": {
@@ -2733,7 +2766,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "http://symfony.com",
-            "time": "2014-04-28 17:43:58"
+            "time": "2014-04-30 06:22:28"
         },
         {
             "name": "symfony/dependency-injection",
@@ -2856,12 +2889,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/EventDispatcher.git",
-                "reference": "133627e57441b50128807702bea0d395129809ad"
+                "reference": "cb62ec8dd05893fc8e4f0e6e21e326e1fc731fe8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/133627e57441b50128807702bea0d395129809ad",
-                "reference": "133627e57441b50128807702bea0d395129809ad",
+                "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/cb62ec8dd05893fc8e4f0e6e21e326e1fc731fe8",
+                "reference": "cb62ec8dd05893fc8e4f0e6e21e326e1fc731fe8",
                 "shasum": ""
             },
             "require": {
@@ -2869,6 +2902,7 @@
             },
             "require-dev": {
                 "psr/log": "~1.0",
+                "symfony/config": "~2.0",
                 "symfony/dependency-injection": "~2.0",
                 "symfony/stopwatch": "~2.2"
             },
@@ -2905,7 +2939,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "http://symfony.com",
-            "time": "2014-04-16 10:36:21"
+            "time": "2014-04-29 10:13:57"
         },
         {
             "name": "symfony/filesystem",
@@ -3440,9 +3474,9 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "grumpydictator/gchart": 20
+    },
     "platform": [
 
     ],

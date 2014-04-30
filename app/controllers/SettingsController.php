@@ -36,7 +36,6 @@ class SettingsController extends BaseController
             $accountList[$a->id] = $a->name;
         }
 
-
         return View::make('settings.index')->with('title', 'Settings')->with('predictionStart', $predictionStart)->with(
             'accountList', $accountList
         )->with('frontpageAccount', $frontpageAccount);
@@ -81,9 +80,10 @@ class SettingsController extends BaseController
         $defaultAllowance->value = floatval($defaultAllowance->value);
 
 
-
         // specific allowances:
-        $allowances = Auth::user()->settings()->orderBy('date', 'ASC')->where('name', 'specificAllowance')->get();
+        $allowances = Auth::user()->settings()->with('account')->orderBy('date', 'ASC')->where(
+            'name', 'specificAllowance'
+        )->get();
 
         return View::make('settings.allowances')->with('defaultAllowance', $defaultAllowance)->with(
             'allowances', $allowances
@@ -121,7 +121,7 @@ class SettingsController extends BaseController
 
         $accounts = AccountHelper::accountsAsSelectList();
 
-        return View::make('settings.add-allowance')->with('title', 'Add a new allowance')->with('accounts',$accounts);
+        return View::make('settings.add-allowance')->with('title', 'Add a new allowance')->with('accounts', $accounts);
     }
 
     /**
@@ -135,28 +135,30 @@ class SettingsController extends BaseController
         $amount = floatval(Input::get('amount'));
 
         $setting = new Setting;
-        /** @noinspection PhpParamsInspection */
-        $setting->user()->associate(Auth::user());
+
+
         $setting->date = $date;
         $setting->value = $amount;
         $setting->type = 'float';
         $setting->name = 'specificAllowance';
-        if(!is_null(Input::get('account_id'))) {
-            $setting->account_id = intval(Input::get('account_id'));
+        /** @noinspection PhpParamsInspection */
+        $setting->user()->associate(Auth::user());
+        if (!is_null(Input::get('account_id'))) {
+            $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
+            if (is_null($account)) {
+                Session::flash('error', 'Invalid account selected.');
+                return Redirect::to(Session::get('previous'));
+            }
+            $setting->account()->associate($account);
         }
+
         // validate
         $validator = Validator::make($setting->toArray(), Setting::$rules);
         if ($validator->fails() || $amount == 0) {
-            Session::flash(
-                'error', $validator->messages()->all()
-            );
-
-
+            Session::flash('error', $validator->messages()->all());
             return Redirect::to(Session::get('previous'));
         } else {
-            Session::flash(
-                'success', 'Allowance saved!'
-            );
+            Session::flash('success', 'Allowance saved!');
             $setting->save();
         }
 
@@ -179,9 +181,7 @@ class SettingsController extends BaseController
         }
         $accounts = AccountHelper::accountsAsSelectList();
 
-        return View::make('settings.edit-allowance')->with(
-            'setting', $setting
-        )->with('accounts',$accounts);
+        return View::make('settings.edit-allowance')->with('setting', $setting)->with('accounts', $accounts);
     }
 
     /**
@@ -196,16 +196,10 @@ class SettingsController extends BaseController
         $setting->value = floatval(Input::get('value'));
         $validator = Validator::make($setting->toArray(), Setting::$rules);
         if ($validator->fails() || floatval(Input::get('value')) == 0) {
-            Session::flash(
-                'error', 'Because of an error,
-            the allowance could not be added.'
-            );
+            Session::flash('error', 'Because of an error, the allowance could not be added.');
         } else {
             $setting->save();
-            Session::flash(
-                'success', 'Allowance for ' . $setting->date->format('F Y') . ' has been
-            saved.'
-            );
+            Session::flash('success', 'Allowance for ' . $setting->date->format('F Y') . ' has been saved.');
         }
 
         return Redirect::to(Session::get('previous'));
@@ -239,10 +233,7 @@ class SettingsController extends BaseController
     public function postDeleteAllowance(Setting $setting)
     {
         $setting->delete();
-        Session::flash(
-            'success', $setting->date->format('F Y') . ' no longer
-        has a specific allowance'
-        );
+        Session::flash('success', $setting->date->format('F Y') . ' no longerhas a specific allowance');
 
         return Redirect::to(Session::get('previous'));
     }

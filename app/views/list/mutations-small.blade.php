@@ -18,7 +18,12 @@
             </a>
         </td>
         <td>
-            {{mf($m->amount,true)}}
+            @if(get_class($m) == 'Transfer')
+            <span title="{{{$m->accountfrom->name}}} &rarr; {{{$m->accountto->name}}}">{{mf($m->amount,true)}}</span>
+            @else
+            <span title="{{{$m->account->name}}}">{{mf($m->amount,true)}}</span>
+            @endif
+
         </td>
     </tr>
     @endforeach
