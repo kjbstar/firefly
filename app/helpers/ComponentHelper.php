@@ -67,6 +67,7 @@ class ComponentHelper
     public static function months(Component $component)
     {
         $end = new Carbon;
+        $end->startOfMonth();
         $end->addMonth();
         $start = Toolkit::getEarliestEvent();
         $list = [];
