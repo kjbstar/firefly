@@ -46,7 +46,7 @@ class CreateTransfers extends Migration {
 	 */
 	public function down()
 	{
-        Schema::drop('transfer_component');
+        Schema::drop('component_transfer');
 		Schema::drop('transfers');
 	}
 
