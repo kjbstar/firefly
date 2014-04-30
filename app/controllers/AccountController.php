@@ -18,7 +18,7 @@ class AccountController extends BaseController
      *
      * @return View
      */
-    public function showIndex()
+    public function index()
     {
         // get the accounts:
         $accounts = Auth::user()->accounts()->orderBy('inactive')->orderBy('name')->get();
@@ -199,7 +199,7 @@ class AccountController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function showOverview(Account $account)
+    public function overview(Account $account)
     {
         $months = AccountHelper::months($account);
         $title = 'Overview for account "' . $account->name . '"';
@@ -215,7 +215,7 @@ class AccountController extends BaseController
      *
      * @return mixed
      */
-    public function showOverviewChart(Account $account)
+    public function overviewChart(Account $account)
     {
         $months = AccountHelper::months($account);
         $chart = App::make('gchart');
@@ -245,7 +245,7 @@ class AccountController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function showOverviewByMonth(Account $account, $year, $month)
+    public function overviewByMonth(Account $account, $year, $month)
     {
         $date = Toolkit::parseDate($year, $month);
         $mutations = AccountHelper::mutations($account, $date);
@@ -265,7 +265,7 @@ class AccountController extends BaseController
      *
      * @return mixed
      */
-    public function showOverviewChartByMonth(Account $account, $year, $month)
+    public function overviewChartByMonth(Account $account, $year, $month)
     {
         $date = Toolkit::parseDate($year, $month);
         $date->startOfMonth();

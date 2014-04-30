@@ -16,7 +16,7 @@ class TransferController extends BaseController
      *
      * @return View
      */
-    public function showIndex()
+    public function index()
     {
         $transfers = Auth::user()->transfers()->with(['accountto', 'accountfrom'])->orderBy('date', 'DESC')->orderBy(
             'id', 'DESC'

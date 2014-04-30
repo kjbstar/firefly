@@ -38,17 +38,17 @@ Route::pattern('othermonth', '[0-9]+');
 /*
  * ACCOUNT CONTROLLER
  *  */
-Route::get('/home/account',['uses' => 'AccountController@showIndex', 'as' => 'accounts']);
+Route::get('/home/account',['uses' => 'AccountController@index', 'as' => 'accounts']);
 Route::get('/home/account/add',['uses' => 'AccountController@add', 'as' => 'addaccount']);
 Route::get('/home/account/{account}/edit',['uses' => 'AccountController@edit', 'as' => 'editaccount']);
 Route::get('/home/account/{account}/delete',['uses' => 'AccountController@delete', 'as' => 'deleteaccount']);
 
-Route::get('/home/account/{account}/overview/chart/{year}/{month}',['uses' => 'AccountController@showOverviewChartByMonth']);
+Route::get('/home/account/{account}/overview/chart/{year}/{month}',['uses' => 'AccountController@overviewChartByMonth']);
 
-Route::get('/home/account/{account}/overview/{year}/{month}',['uses' => 'AccountController@showOverviewByMonth', 'as' => 'accountoverviewmonth']);
-Route::get('/home/account/{account}/overview',['uses' => 'AccountController@showOverview', 'as' => 'accountoverview']);
+Route::get('/home/account/{account}/overview/{year}/{month}',['uses' => 'AccountController@overviewByMonth', 'as' => 'accountoverviewmonth']);
+Route::get('/home/account/{account}/overview',['uses' => 'AccountController@overview', 'as' => 'accountoverview']);
 
-Route::get('/home/account/{account}/overview/chart',['uses' => 'AccountController@showOverviewChart']);
+Route::get('/home/account/{account}/overview/chart',['uses' => 'AccountController@overviewChart']);
 
 Route::post('/home/account/add',['uses' => 'AccountController@postAdd', 'before' => 'csrf']);
 Route::post('/home/account/{account}/edit',['uses' => 'AccountController@postEdit', 'before' => 'csrf']);
@@ -57,8 +57,8 @@ Route::post('/home/account/{account}/delete',['uses' => 'AccountController@postD
 /**
  * HOMECONTROLLER
  */
-Route::get('/', ['uses' => 'HomeController@showIndex', 'as' => 'index']);
-Route::get('/home/{year?}/{month?}/{account?}',['uses' => 'HomeController@showHome', 'as' => 'home']);
+Route::get('/', ['uses' => 'HomeController@index', 'as' => 'index']);
+Route::get('/home/{year?}/{month?}/{account?}',['uses' => 'HomeController@home', 'as' => 'home']);
 Route::get('/home/predict/{year}/{month}/{day}',['uses' => 'HomeController@predict', 'as' => 'predictDay']);
 Route::get('/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']);
 Route::get('/home/flush', ['uses' => 'PageController@flush', 'as' => 'flush']);
@@ -73,41 +73,6 @@ Route::get('/home/moveComponents',['uses' => 'PageController@moveComponents','as
 $objects = ['beneficiary', 'budget', 'category'];
 
 
-//foreach ($objects as $o) {
-//
-//    /**
-//     * ALL POST META ROUTES:
-//     */
-//    Route::group(
-//        ['before' => 'meta|csrf', 'prefix' => 'home/' . $o], function () {
-//            Route::post('/{component}/edit', ['uses' => 'ComponentController@postEdit']);
-//            Route::post('/{component}/delete', ['uses' => 'ComponentController@postDelete']);
-//            Route::post('/add', ['uses' => 'ComponentController@postAdd']);
-//            Route::post('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@postAddLimit']);
-//            Route::post('/limit/edit/{limit}',['uses' => 'LimitController@postEditLimit']);
-//            Route::post('/limit/delete/{limit}',['uses' => 'LimitController@postDeleteLimit']);
-//        }
-//    );
-//    /**
-//     * ALL GET META ROUTES
-//     */
-//    Route::group(
-//        ['before' => 'meta', 'prefix' => 'home/' . $o], function () use ($o) {
-//            Route::get('',['uses' => 'ComponentController@showIndex', 'as' => Str::plural($o)]);
-//            Route::get('/add', ['uses' => 'ComponentController@add', 'as' => 'add' . $o]);
-//            Route::get('/empty/{year?}/{month?}',['uses' => 'ComponentController@showEmpty', 'as' => 'empty' . $o]);
-//            Route::get('/typeahead', ['uses' => 'ComponentController@typeahead']);
-//            Route::get('/{component}/edit',['uses' => 'ComponentController@edit', 'as' => 'edit' . $o]);
-//            Route::get('/{component}/delete',['uses' => 'ComponentController@delete', 'as' => 'delete' . $o]);
-//            Route::get('/{component}/overview/chart/{year?}/{month?}',['uses' => 'ComponentController@showOverviewChart','as'   => $o . 'overviewchart']);
-//            Route::get('/{component}/overview/{year}/{month}',['uses' => 'ComponentController@showOverviewByMonth','as'   => $o . 'overviewmonth']);
-//            Route::get('/{component}/overview',['uses' => 'ComponentController@showOverview','as'   => $o . 'overview']);
-//            Route::get('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@addLimit','as'   => 'add' . $o . 'limit']);
-//            Route::get('/limit/edit/{limit}', ['uses' => 'LimitController@editLimit','as'   => 'edit' . $o . 'limit']);
-//            Route::get('/limit/delete/{limit}',['uses' => 'LimitController@deleteLimit','as'   => 'delete' . $o . 'limit']);
-//        }
-//    );
-//}
 /**
  * URL for components:
  */
@@ -211,7 +176,7 @@ Route::post('/home/settings', ['uses' => 'SettingsController@postIndex']);
 /**
  * TRANSACTION CONTROLLER
  */
-Route::get('/home/transaction',['uses' => 'TransactionController@showIndex', 'as' => 'transactions']);
+Route::get('/home/transaction',['uses' => 'TransactionController@index', 'as' => 'transactions']);
 Route::get('/home/transaction/{transaction}/edit',['uses' => 'TransactionController@edit', 'as' => 'edittransaction']);
 Route::get('/home/transaction/{transaction}/delete',['uses' => 'TransactionController@delete', 'as' => 'deletetransaction']);
 Route::get('/home/transaction/add/{predictable?}',['uses' => 'TransactionController@add', 'as' => 'addtransaction']);
@@ -223,7 +188,7 @@ Route::post('/home/transaction/add/{predictable?}',['uses' => 'TransactionContro
 /**
  * TRANSFER CONTROLLER
  */
-Route::get('/home/transfer',['uses' => 'TransferController@showIndex', 'as' => 'transfers']);
+Route::get('/home/transfer',['uses' => 'TransferController@index', 'as' => 'transfers']);
 Route::get('/home/transfer/{transfer}/edit',['uses' => 'TransferController@edit', 'as' => 'edittransfer']);
 Route::get('/home/transfer/{transfer}/delete',['uses' => 'TransferController@delete', 'as' => 'deletetransfer']);
 Route::get('/home/transfer/add',['uses' => 'TransferController@add', 'as' => 'addtransfer']);

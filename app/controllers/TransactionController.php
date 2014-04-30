@@ -17,7 +17,7 @@ class TransactionController extends BaseController
      *
      * @return View
      */
-    public function showIndex()
+    public function index()
     {
         $transactions = Auth::user()->transactions()->orderBy('date', 'DESC')->with(
             ['account', 'components', 'predictable']

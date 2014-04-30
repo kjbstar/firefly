@@ -20,7 +20,7 @@ class HomeController extends BaseController
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function showIndex()
+    public function index()
     {
 
         if (Auth::check()) {
@@ -39,7 +39,7 @@ class HomeController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function showHome($year = null, $month = null, Account $fpAccount = null)
+    public function home($year = null, $month = null, Account $fpAccount = null)
     {
         $today = Toolkit::parseDate($year, $month, new Carbon);
         $actual = new Carbon;
