@@ -5,14 +5,9 @@
     "require": {
         "laravel/framework": "4.1.*",
         "barryvdh/laravel-debugbar": "dev-master",
-        "phpmd/phpmd": "1.4.*",
-        "squizlabs/php_codesniffer": "1.*",
         "barryvdh/laravel-ide-helper": "1.*",
         "davejamesmiller/laravel-breadcrumbs": "2.*",
-        "phpunit/phpunit": "4.*",
-        "phpunit/php-invoker": "1.*",
         "grumpydictator/gchart": "dev-master"
-
     },
     "autoload": {
         "classmap": [
