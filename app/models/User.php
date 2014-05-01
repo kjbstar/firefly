@@ -158,12 +158,17 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     {
         $data['url'] = URL::Route('activate', $this->activation);
         $email = $this->email;
+        try {
         Mail::send(
             ['email.register.html', 'email.register.text'], $data,
             function ($message) use ($email) {
                 $message->to($email, $email)->subject('Welcome to Firefly!');
             }
         );
+        } catch(Swift_TransportException $e) {
+            Session::flash('error','There was an error sending the registration email. Please check the logs.');
+            return false;
+        }
 
         return true;
     }

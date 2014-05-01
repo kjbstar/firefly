@@ -105,10 +105,14 @@ class UserController extends BaseController
                 'warning', 'Invalid e-mail address.'
             )->with('title', 'Register');
         } else {
-            $user->sendRegistrationMail();
+            $result = $user->sendRegistrationMail();
             $user->save();
+            if($result) {
 
             return View::make('user.registered')->with('title', 'Registered!');
+            } else {
+                return View::make('error.500');
+            }
         }
     }
 
