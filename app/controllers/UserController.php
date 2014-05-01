@@ -30,9 +30,7 @@ class UserController extends BaseController
         ) {
             return Redirect::to('/home');
         } else {
-            return View::make('user.login')->with(
-                'warning', 'Incorrect login details'
-            );
+            return View::make('user.login')->with('warning', 'Incorrect login details');
         }
     }
 
@@ -55,13 +53,17 @@ class UserController extends BaseController
      */
     public function register()
     {
-        return View::make('user.register')->with('title', 'Register');
+        if(Config::get('firefly.allowRegistration')) {
+            return View::make('user.register')->with('title', 'Register');
+        } else {
+            return View::make('error.general')->with('message','Sorry, this instance does not allow registration.');
+        }
     }
 
     /**
      * Activates a new user
      *
-     * @param string $code The code he is given.
+     * @param string $code The code given.
      *
      * @return View
      */
@@ -92,6 +94,9 @@ class UserController extends BaseController
      */
     public function postRegister()
     {
+        if(!Config::get('firefly.allowRegistration')) {
+            return View::make('error.general')->with('message','Sorry, this instance does not allow registration.');
+        }
         $data = ['email'      => Input::get('email'),
                  'username'   => Input::get('email'),
                  'activation' => Str::random(64), 'password' => Str::random(60),
@@ -169,9 +174,4 @@ class UserController extends BaseController
 
         return View::make('user.sentpw')->with('title', 'Reset!');
     }
-
-    public function changePassword() {
-        return 1;
-    }
-
 }

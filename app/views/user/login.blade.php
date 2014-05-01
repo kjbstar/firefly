@@ -18,7 +18,9 @@
 <button type="submit" class="btn btn-primary">Sign in</button>
 {{Form::close()}}
 <ul style="margin-top:40px;">
-    <li><a href="{{URL::route('register')}}">... or register</a></li>
+    @if(Config::get('firefly.allowRegistration'))
+        <li><a href="{{URL::route('register')}}">... or register</a></li>
+    @endif
     <li><a href="{{URL::route('reset')}}">... or reset your password</a></li>
 </ul>
     </div>
