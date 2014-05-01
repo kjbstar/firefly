@@ -32,7 +32,7 @@
             </div>
         </div>
 
-
+        @if(!is_null($frontpageAccount))
         <div class="panel panel-info">
             <div class="panel-heading">
                 <h3 class="panel-title">Frontpage account</h3>
@@ -44,6 +44,7 @@
                 {{Form::select('frontpageAccount',$accountList,$frontpageAccount->id,['class' => 'form-control',])}}
                 </div>
             </div>
+        @endif
 
             {{Form::submit('Submit',['class' => 'btn btn-info'])}}
         {{Form::close()}}
