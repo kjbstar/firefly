@@ -91,6 +91,13 @@
     </div>
     <div class="col-lg-6">
         <h4>Optional fields</h4>
+        @if(Type::count() > 0)
+        <p class="text-info">
+            Use the suggestions given in the {{Type::count()}} field(s) below,
+            or add something new by simply typing it in. You can find your new entries
+            under the relevant "Lists"-menu item in the top menu bar.
+        </p>
+        @endif
         @include('partials.types')
         <!-- ignore in transactions (default is zero) -->
         <div class="form-group">
