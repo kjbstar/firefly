@@ -39,7 +39,8 @@
             </div>
             <div class="panel-body">
                 <p>
-                    The chart on the frontpage can contain any account you wish.
+                    The frontpage used to be capable of showing just one account. It has a small drop down
+                    now, but still defaults to this account:
                 </p>
                 {{Form::select('frontpageAccount',$accountList,$frontpageAccount->id,['class' => 'form-control',])}}
                 </div>
