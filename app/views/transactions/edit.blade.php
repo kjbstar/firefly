@@ -86,18 +86,7 @@
     </div>
     <div class="col-lg-6 col-md-6">
         <h4>Optional fields</h4>
-
-        <!-- all component types in a loop! -->
-        @foreach(Type::allTypes() as $type)
-        <div class="form-group">
-            <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
-            <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled[$type->type]}}}"
-                       name="{{$type->type}}" class="form-control" id="input{{$type->type}}" autocomplete="off" />
-            </div>
-        </div>
-        @endforeach
-
+        @include('partials.types')
 
         <!-- ignore in predictions (default is zero) -->
         <div class="form-group">

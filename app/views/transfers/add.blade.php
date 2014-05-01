@@ -107,17 +107,7 @@
             reports as being an expense. As such, they will need this optional information
             to be properly grouped.
         </p>
-
-        <!-- all component types in a loop! -->
-        @foreach(Type::allTypes() as $type)
-        <div class="form-group">
-            <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
-            <div class="col-sm-9">
-                <input type="text" value="{{{$prefilled[$type->type]}}}"
-                       name="{{$type->type}}" class="form-control" id="input{{$type->type}}" autocomplete="off" />
-            </div>
-        </div>
-        @endforeach
+        @include('partials.types')
 
         <!-- ignore in allowance (default is zero) -->
         <div class="form-group">
