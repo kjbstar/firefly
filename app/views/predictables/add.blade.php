@@ -56,23 +56,20 @@
 
         <!-- LEEWAY -->
         <div class="form-group
-             @if($errors->has('date'))
+             @if($errors->has('pct'))
              has-error
              @endif
              ">
             <label for="inputLeeway" class="col-sm-3 control-label">Leeway</label>
             <div class="col-sm-3">
                 <div id="lowAmount" style="text-align:right;"></div>
-
             </div>
             <div class="col-sm-3">
-                <div id="slider"></div>
-
+                <input type="range" id="inputLeeway" min="0" max="100" step="1" value="{{{$prefilled['pct']}}}" name="pct" />
             </div>
             <div class="col-sm-3">
                 <div id="highAmount"></div>
             </div>
-            <input type="hidden" name="pct" value="{{$prefilled['pct']}}" id="inputLeeway" />
         </div>
 
         <!-- Account -->
@@ -159,7 +156,6 @@
 <script src="js/typeahead.min.js"></script>
 <script src="jqueryui/js/jquery-ui-1.10.4.custom.min.js"></script>
 <script type="text/javascript">
-    var pct = 10; // TODO does not prop over failed commits.
     $( document ).ready(function() {
 
         @foreach(Type::allTypes() as $type)
@@ -175,7 +171,4 @@
 <script src="js/predictables.js"></script>
 @stop
 @section('styles')
-<link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">
-<link href="jqueryui/css/ui-lightness/jquery-ui-1.10.4.custom.css" rel="stylesheet" media="screen">
-<link href="css/transactions.css" rel="stylesheet" media="screen">
 @stop

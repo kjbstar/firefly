@@ -44,7 +44,6 @@ class PredictableController extends BaseController
     {
 
         if (Input::old()) {
-
             $prefilled = PredictableHelper::prefilledFromOldInput();
         } else {
             Session::put('previous', URL::previous());
@@ -81,11 +80,11 @@ class PredictableController extends BaseController
         $predictable->amount = floatval(Input::get('amount'));
         $predictable->pct = intval(Input::get('pct'));
         $predictable->dom = intval(Input::get('dom'));
-        $predictable->account()->associate($account);
+        $predictable->inactive = intval(Input::get('inactive'));
 
         /** @noinspection PhpParamsInspection */
         $predictable->user()->associate(Auth::user());
-        $predictable->inactive = intval(Input::get('inactive'));
+        $predictable->account()->associate($account);
 
 
         $validator = Validator::make($predictable->toArray(), Predictable::$rules);
@@ -105,20 +104,7 @@ class PredictableController extends BaseController
 
         // now we can finally add the components:
         // save all components (if any):
-        foreach (Type::allTypes() as $type) {
-            // split and get second part of Input:
-            $input = Input::get($type->type);
-            $parts = explode('/', $input);
-            $name = isset($parts[1]) ? $parts[1] : $parts[0];
-
-            /** @noinspection PhpUndefinedFieldInspection */
-            $component = Component::firstOrCreate(
-                ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
-            );
-            if (!is_null($component->id)) {
-                $predictable->components()->attach($component);
-            }
-        }
+        $predictable->saveComponentsFromInput();
 
         Queue::push('PredictableQueue@scanAll', ['predictable_id' => $predictable->id]);
 
@@ -140,7 +126,7 @@ class PredictableController extends BaseController
             Session::put('previous', URL::previous());
             $prefilled = PredictableHelper::prefilledFromPredictable($predictable);
         } else {
-            $prefilled = TransactionHelper::prefilledFromOldInput();
+            $prefilled = PredictableHelper::prefilledFromOldInput();
         }
         $accounts = AccountHelper::accountsAsSelectList();
 
@@ -165,69 +151,46 @@ class PredictableController extends BaseController
             return Redirect::route('addpredictable')->withInput();
         }
 
-        // update the transaction:
+        // update the predictable:
         $predictable->description = Input::get('description');
         $predictable->amount = floatval(Input::get('amount'));
         $predictable->dom = intval(Input::get('dom'));
         $predictable->inactive = is_null(Input::get('inactive')) ? 0 : 1;
         $predictable->account_id = intval(Input::get('account_id'));
+        $predictable->pct = intval(Input::get('pct'));
+
 
         // validate and save:
         $validator = Validator::make(
             $predictable->toArray(), Predictable::$rules
         );
+
         if ($validator->fails()) {
             Session::flash('error', 'The predictable could not be saved.');
-            Log::debug('These rules failed: ' . print_r($predictable->messages()->all(), true));
             return Redirect::route('editpredictable', $predictable->id)
                 ->withInput()->withErrors($validator);
-        } else {
-            // try another save.
-            $result = $predictable->save();
-            // @codeCoverageIgnoreStart
-            if (!$result) {
-                Session::flash('error', 'The predictable could not be saved.');
-                return Redirect::route('editpredictable', $predictable->id)
-                    ->withInput()->withErrors($validator);
-            }
-            // @codeCoverageIgnoreEnd
-
-            // now add or update the components from the input:
-            foreach (Type::allTypes() as $type) {
-                // split and get second part of Input:
-                $input = Input::get($type->type);
-                $parts = explode('/', $input);
-                $name = isset($parts[1]) ? $parts[1] : $parts[0];
-
-                /** @noinspection PhpUndefinedFieldInspection */
-                $component = Component::firstOrCreate(
-                    ['name' => $name, 'type_id' => $type->id, 'user_id' => Auth::user()->id]
-                );
-                // if component is null, detach whatever component is on that spot, if any
-                if (is_null($component->id) && $predictable->hasComponentOfType($type)) {
-                    $predictable->components()->detach($predictable->getComponentOfType($type));
-                }
-
-                // detach component of this type if different from new component.
-                if (!is_null($component->id) && $predictable->hasComponentOfType($type)
-                    && $predictable->getComponentOfType($type)->id != $component->id
-                ) {
-                    $predictable->components()->detach($predictable->getComponentOfType($type));
-                } else {
-                    if (!is_null($component->id) && !$predictable->hasComponentOfType($type)) {
-                        $predictable->components()->attach($component);
-                    }
-                }
-
-            }
-            Cache::userFlush();
-            Queue::push('PredictableQueue@scan', ['predictable_id' => $predictable->id]);
-            Session::flash('success', 'The predictable has been saved.');
-
-            return Redirect::to(Session::get('previous'));
-
-
         }
+
+        // try another save.
+        $result = $predictable->save();
+        // @codeCoverageIgnoreStart
+        if (!$result) {
+            Session::flash('error', 'The predictable could not be saved.');
+            return Redirect::route('editpredictable', $predictable->id)->withInput()->withErrors($validator);
+        }
+        // @codeCoverageIgnoreEnd
+
+        // now add or update the components from the input:
+        $predictable->saveComponentsFromInput();
+
+        Cache::userFlush();
+
+        Queue::push('PredictableQueue@scan', ['predictable_id' => $predictable->id]);
+        Session::flash('success', 'The predictable has been saved.');
+
+        return Redirect::to(Session::get('previous'));
+
+
     }
 
     /**
@@ -237,17 +200,15 @@ class PredictableController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public
-    function delete(
-        Predictable $predictable
-    ) {
+    public function delete(Predictable $predictable)
+    {
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
 
-        return View::make('predictables.delete')->with(
-            'predictable', $predictable
-        )->with('title', 'Delete predictable ' . $predictable->description);
+        return View::make('predictables.delete')->with('predictable', $predictable)->with(
+            'title', 'Delete predictable ' . $predictable->description
+        );
     }
 
     /**
@@ -257,10 +218,8 @@ class PredictableController extends BaseController
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public
-    function postDelete(
-        Predictable $predictable
-    ) {
+    public function postDelete(Predictable $predictable)
+    {
         $predictable->delete();
         Session::flash('success', 'Predictable deleted.');
 
@@ -272,14 +231,10 @@ class PredictableController extends BaseController
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public
-    function rescan(
-        Predictable $predictable
-    ) {
+    public function rescan(Predictable $predictable)
+    {
         Queue::push('PredictableQueue@scan', ['predictable_id' => $predictable->id]);
-        Session::flash(
-            'success', 'Rescan was queued.'
-        );
+        Session::flash('success', 'Rescan was queued.');
 
         return Redirect::route('predictableoverview', $predictable->id);
     }
@@ -289,14 +244,10 @@ class PredictableController extends BaseController
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public
-    function rescanAll(
-        Predictable $predictable
-    ) {
+    public function rescanAll(Predictable $predictable)
+    {
         Queue::push('PredictableQueue@scanAll', ['predictable_id' => $predictable->id]);
-        Session::flash(
-            'success', 'Rescan was queued.'
-        );
+        Session::flash('success', 'Rescan was queued.');
 
         return Redirect::route('predictableoverview', $predictable->id);
     }
