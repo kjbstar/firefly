@@ -30,40 +30,6 @@ class PostInstallCommand extends Command
         parent::__construct();
     }
 
-    private function createUser()
-    {
-        // ask for details:
-        $username = $this->ask('What is your preferred user name?');
-        $this->comment('Your email address is only used for password reset things.');
-        $email = $this->ask('What is your email address?');
-
-
-        // create user:
-        $user = new \User([
-            'username' => $username,
-            'origin'   => '',
-            'password' => '',
-            'email'    => $email,
-        ]);
-
-        // validate it:
-        $validator = Validator::make($user->toArray(),User::$rules);
-        if($validator->fails()) {
-            $this->error($validator->messages()->first());
-            return false;
-        }
-
-
-        try {
-            $user->save();
-        } catch (QueryException $e) {
-            $this->comment($e->getMessage());
-            $this->error('A database exception was caught. Please try again.');
-            return false;
-        }
-        return $user;
-    }
-
     /**
      * Execute the console command.
      *
@@ -71,16 +37,26 @@ class PostInstallCommand extends Command
      */
     public function fire()
     {
-        $user = false;
-        while ($user === false) {
-            $user = $this->createUser();
-        }
         // set a password:
         $password = Str::random(12);
-        $user->password = Hash::make($password);
-        $user->save();
+        $username = 'admin';
+
+        $user = new User([
+            'username' => $username,
+            'password' => Hash::make($password),
+            'email' => 'empty@local',
+            'origin' => '',
+        ]);
+        try {
+            $user->save();
+        } catch(QueryException $e) {
+            $this->error('The user "'.$username.'" already exists. Its password has been reset. Sorry about that.');
+            $user = User::whereUsername($username)->first();
+            $user->password = Hash::make($password);
+            $user->save();
+        }
         echo "\n";
-        $this->info('You can login using your new username ' . $user->username . ' and password '.$password);
+        $this->info('You can login using username ' . $user->username . ' and password '.$password);
     }
 
     /**
