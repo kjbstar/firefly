@@ -62,8 +62,8 @@ class ReportController extends BaseController
 
 
         $expenses = [
-            'category' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('category')->first()),
-            'budget' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('budget')->first()),
+            'category'    => ReportHelper::expensesGrouped($date, 'month', Type::whereType('category')->first()),
+            'budget'      => ReportHelper::expensesGrouped($date, 'month', Type::whereType('budget')->first()),
             'beneficiary' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('beneficiary')->first()),
         ];
 
@@ -253,7 +253,7 @@ class ReportController extends BaseController
                 }
             }
             $chart->addRowArray($row);
-            $current->addMonth();
+            $current->addDay();
         }
 
         $chart->generate();
