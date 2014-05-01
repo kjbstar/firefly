@@ -12,11 +12,6 @@ $('#PopupModal').on('hidden.bs.modal', function () {
     $(this).removeData();
 })
 
-// bla bla select thing.
-$(document).ready(function () {
-    $('#pop').popover();
-});
-
 function updateSelectedAccount() {
     fpAccount = $('#accountChartSelector').val();
     drawAccountChart();

@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-
+    <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">
     <link href="css/site.css" rel="stylesheet" media="screen">
     @yield('styles')
     
@@ -28,7 +28,7 @@
       <div class="modal fade" id="PopupModal" tabindex="-1" role="dialog"  aria-hidden="true"></div><!-- /.modal -->
 
     </div>
-      <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
       <script src="bootstrap/js/bootstrap.min.js"></script>
       @yield('scripts')
 

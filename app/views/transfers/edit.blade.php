@@ -141,7 +141,6 @@
 @stop
 @section('scripts')
 <script src="js/typeahead.min.js"></script>
-<script src="js/transfers.js"></script>
 <script type="text/javascript">
     $( document ).ready(function() {
 
@@ -157,6 +156,4 @@
 </script>
 @stop
 @section('styles')
-<link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">
-<link href="css/transactions.css" rel="stylesheet" media="screen">
 @stop

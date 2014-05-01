@@ -9,8 +9,6 @@ $(function () {
                     // send to server:
                     var URL = '/home/piggy/drop';
                     $.post(URL, {id: ID, position: position});
-                    console.log(ID);
-                    console.log(position);
                     position++;
                 });
 
