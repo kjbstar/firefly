@@ -27,7 +27,8 @@
         "post-install-cmd": [
             "php artisan optimize",
             "php artisan migrate",
-            "php artisan db:seed"
+            "php artisan db:seed",
+            "php artisan firefly:install"
 
 ],
         "pre-update-cmd": [
