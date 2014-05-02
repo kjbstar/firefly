@@ -234,7 +234,7 @@ class ReportHelper
     {
         $cacheKey = 'reportincomes' . $date->format('Ymd') . $period;
         if (Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
+            //return Cache::get($cacheKey);
         }
         switch ($period) {
             case 'month':
@@ -247,6 +247,8 @@ class ReportHelper
         $beneficiaryType = Type::whereType('beneficiary')->first();
 
         $data = [];
+
+        // transactions that are income are of course, income
         $transactions = Auth::user()->transactions()->incomes()->with(
             ['components' => function ($query) use ($beneficiaryType) {
                     $query->where('type_id', $beneficiaryType->id);
@@ -258,8 +260,17 @@ class ReportHelper
             ->where('accounts.shared', 0)
             ->get();
 
-        /** @var $t Transaction */
-        foreach ($transactions as $t) {
+        // transfers FROM a shared account to you are also income,
+        // since transfers TO shared accounts are expenses.
+        $transfers = Auth::user()->transfers()->$inPeriod($date)
+            ->leftJoin('accounts','accounts.id','=','transfers.accountfrom_id')
+            ->where('accounts.shared',1)->get();
+
+        // join these two and loop them:
+        $set = $transactions->merge($transfers);
+
+        /** @var $t ComponentEnabledModel */
+        foreach ($set as $t) {
             $key = $t->hasComponentOfType($beneficiaryType) ? $t->getComponentOfType($beneficiaryType)->id : 0;
             if (isset($data[$key])) {
                 $data[$key]['transactions'][] = $t;
