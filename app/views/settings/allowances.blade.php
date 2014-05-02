@@ -50,7 +50,7 @@
                 </div>
                 </p>
                 <p>
-                    <input type="submit" class="btn btn-info" />
+                    <input type="submit" name="submit" value="Save default allowance" class="btn btn-info" />
                 </p>
                 {{Form::close()}}
             </div>
