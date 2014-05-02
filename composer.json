@@ -1,13 +1,13 @@
 {
     "name": "grumpydictator/firefly",
-    "description": "Firefly",
+    "description": "A web-application to manage your finances.",
     "license": "MIT",
     "require": {
         "laravel/framework": "4.1.*",
         "barryvdh/laravel-debugbar": "dev-master",
         "barryvdh/laravel-ide-helper": "1.*",
         "davejamesmiller/laravel-breadcrumbs": "2.*",
-        "grumpydictator/gchart": "dev-master"
+        "grumpydictator/gchart": "1.*"
     },
     "autoload": {
         "classmap": [
