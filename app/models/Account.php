@@ -5,22 +5,22 @@ use Carbon\Carbon as Carbon;
 /**
  * Account
  *
- * @property integer $id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property integer $user_id
- * @property string $name
- * @property float $openingbalance
- * @property \Carbon\Carbon $openingbalancedate
- * @property float $currentbalance
- * @property boolean $inactive
- * @property boolean $shared
- * @property-read \User $user
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersto
- * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[] $predictables
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[] $transfersfrom
+ * @property integer                                                          $id
+ * @property \Carbon\Carbon                                                   $created_at
+ * @property \Carbon\Carbon                                                   $updated_at
+ * @property integer                                                          $user_id
+ * @property string                                                           $name
+ * @property float                                                            $openingbalance
+ * @property \Carbon\Carbon                                                   $openingbalancedate
+ * @property float                                                            $currentbalance
+ * @property boolean                                                          $inactive
+ * @property boolean                                                          $shared
+ * @property-read \User                                                       $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]        $transfersto
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[]     $predictables
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]        $transfersfrom
  * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[] $transactions
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[]     $transactions
  * @method static \Account notInactive()
  * @method static \Account shared()
  * @method static \Account notShared()
@@ -84,26 +84,16 @@ class Account extends Eloquent
      */
     public function balanceOnDate(Carbon $date)
     {
+
         if ($date < $this->openingbalancedate) {
             $date = $this->openingbalancedate;
         }
-        $now = new Carbon;
-        if ($now->diffInMonths($date) > 2) {
-            $cacheTime = 20160;
-        } else {
-            $cacheTime = 10;
-        }
-        /** @noinspection PhpUndefinedFieldInspection */
-        $key = $date->format('Y-m-d') . $this->id . '-balanceOndate';
-
-        if (cache::has($key)) {
-            // @codeCoverageIgnoreStart
+        $key = $this->id . $date->format('dmy') . 'balanceOnDate';
+        if (Cache::has($key)) {
             return Cache::get($key);
-            // @codeCoverageIgnoreEnd
         } else {
-
             $r = floatval($this->balancemodifiers()->where('date', '<=', $date->format('Y-m-d'))->sum('balance'));
-            Cache::put($key, $r, $cacheTime);
+            Cache::forever($key, $r);
             return $r;
         }
     }
@@ -140,6 +130,10 @@ class Account extends Eloquent
      */
     public function predictOnDateExpanded(Carbon $date)
     {
+        $key = $this->id.$date->format('ymd').'predictOnDateExpanded';
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
         // data that will be returned:
         $data = [
             'prediction'   => [
@@ -288,6 +282,7 @@ class Account extends Eloquent
             $data['prediction']['prediction']
 
         );
+        Cache::forever($key,$data);
 
         return $data;
 

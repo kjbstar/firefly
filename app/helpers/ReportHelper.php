@@ -234,7 +234,7 @@ class ReportHelper
     {
         $cacheKey = 'reportincomes' . $date->format('Ymd') . $period;
         if (Cache::has($cacheKey)) {
-            //return Cache::get($cacheKey);
+            return Cache::get($cacheKey);
         }
         switch ($period) {
             case 'month':
