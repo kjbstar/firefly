@@ -1,12 +1,16 @@
 <table class="table table-bordered">
     <tr>
-        <th colspan="2">Description</th>
+        <th colspan="3">Description</th>
         <th colspan="2">Amount</th>
         <th>Day of month</th>
         <th>&nbsp;</th>
     </tr>
     @foreach($predictables as $predictable)
+    @if($predictable->inactive)
+    <tr class="warning">
+    @else
     <tr>
+    @endif
         <td>
             @foreach($types as $type)
             @if($predictable->hasComponentOfType($type))
@@ -15,9 +19,16 @@
             @endforeach
         </td>
         <td>
+
             <a href="{{URL::Route('predictableoverview',$predictable->id)}}" title="Overview for {{{$predictable->description}}}">
             {{{$predictable->description}}}
             </a>
+            @if($predictable->inactive)
+                <em>(inactive)</em>
+            @endif
+        </td>
+        <td>
+            {{$predictable->transactions()->count()}}
         </td>
         <td>
             &gt; {{mf($predictable->maximumAmount(),true)}}
