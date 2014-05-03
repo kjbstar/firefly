@@ -2,10 +2,18 @@
 @section('breadcrumbs', Breadcrumbs::render('addpredictable'))
 @section('content')
 <div class="row">
-    <div class="col-lg-12">
+    <div class="col-lg-12 col-md-12">
         <h3>
             Add a new predictable
         </h3>
+        <p class="text-info">
+            So-called "predictables" are expenses (or incomes) that occur exactly once a month. Examples are rent,
+            insurance bills or your job's salary. By creating a "predictable" for such transactions you can
+            group and predict such expenses and not be surprised by them (as I always was).
+        </p>
+        <p class="text-info">
+            Read more about predictables <a href="https://github.com/JC5/firefly/wiki/Predictables">on the wiki page about them</a>.
+        </p>
     </div>
 </div>
 
@@ -16,11 +24,11 @@
         <h4>Mandatory fields</h4>
 
         <!-- description -->
-        <div class="form-group
-             @if($errors->has('description'))
-             has-error
-             @endif
-             ">
+        @if($errors->has('description'))
+            <div class="form-group has-error">
+        @else
+            <div class="form-group">
+        @endif
             <label for="inputDescription" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-9">
                 <input type="text" name="description" class="form-control"
@@ -126,7 +134,6 @@
                 </div>
             </div>
         </div>
-
 
     </div>
 
