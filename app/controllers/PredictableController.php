@@ -12,7 +12,7 @@ class PredictableController extends BaseController
      */
     public function index()
     {
-        $predictables = Auth::user()->predictables()->get();
+        $predictables = Auth::user()->predictables()->orderBy('inactive')->orderBy('description')->get();
 
         return View::make('predictables.index')->with('title', 'All predictables')->with('predictables', $predictables);
 
@@ -223,7 +223,7 @@ class PredictableController extends BaseController
         $predictable->delete();
         Session::flash('success', 'Predictable deleted.');
 
-        return Redirect::to(Session::get('previous'));
+        return Redirect::route('predictables');
     }
 
     /**
@@ -235,20 +235,6 @@ class PredictableController extends BaseController
     {
         Queue::push('PredictableQueue@scan', ['predictable_id' => $predictable->id]);
         Session::flash('success', 'Rescan was queued.');
-
-        return Redirect::route('predictableoverview', $predictable->id);
-    }
-
-    /**
-     * @param Predictable $predictable
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function rescanAll(Predictable $predictable)
-    {
-        Queue::push('PredictableQueue@scanAll', ['predictable_id' => $predictable->id]);
-        Session::flash('success', 'Rescan was queued.');
-
         return Redirect::route('predictableoverview', $predictable->id);
     }
 }
