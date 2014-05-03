@@ -71,7 +71,7 @@ class PredictableQueue
         $query->where(
             function ($query) use ($transaction) {
                 foreach ($transaction->components as $search) {
-                    $query->orWhere('component_transaction.component_id', $search->id);
+                    $query->orWhere('component_predictable.component_id', $search->id);
                 }
             }
         );
@@ -79,12 +79,14 @@ class PredictableQueue
 
         /** @var $predictable Predictable */
         $predictable = $query->get(['predictables.*'])->first();
-        // check amount.
-        if ($transaction->amount >= $predictable->maximumAmount()
-            && $transaction->amount <= $predictable->minimumAmount()
-        ) {
-            $transaction->predictable()->associate($predictable);
-            $transaction->save();
+        if (!is_null($predictable)) {
+            // check amount.
+            if ($transaction->amount >= $predictable->maximumAmount()
+                && $transaction->amount <= $predictable->minimumAmount()
+            ) {
+                $transaction->predictable()->associate($predictable);
+                $transaction->save();
+            }
         }
         $job->delete();
     }
