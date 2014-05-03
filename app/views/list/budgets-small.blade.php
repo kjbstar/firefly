@@ -1,8 +1,9 @@
 <table class="table table-bordered">
-
+<?php $sum=0;$limit=0;$left=0;?>
 @foreach($budgets as $id => $budget)
+    <?php $sum+=$budget['expense'];$limit+=$budget['limit'];$left+=($budget['limit']+$budget['expense']);?>
     <tr>
-        <td>
+        <td colspan="2">
             {{$budget['iconTag']}}
             <small style="font-weight: normal">{{{$budget['parentName'] or ''}}}</small>
             @if($id != 0)
@@ -20,7 +21,7 @@
     </tr>
     @if($budget['expense'] != 0)
     <tr>
-        <td colspan="3">
+        <td colspan="4">
             <!-- OVERSPENT BUDGETS: -->
             @if($budget['overspent'])
             <div class="progress">
@@ -31,7 +32,14 @@
             @if($budget['limit'])
                 <!-- NOT OVERSPENT BUT HAS LIMIT -->
                 <div class="progress">
-                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{$budget['pct']}}%;">{{mf($budget['expense']*-1)}}</div>
+                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{$budget['pct']}}%;">
+                        @if($budget['pct'] > 40)
+                        {{mf($budget['expense']*-1)}}
+                        @endif
+                    </div>
+                    @if($budget['pct'] <= 40)
+                    <small style="color:#555;">&nbsp;{{mf($budget['expense']*-1)}}</small>
+                    @endif
                 </div>
             @else
                 <!-- NOT OVERSPENT BUT ALSO NO LIMIT -->
@@ -64,4 +72,10 @@
     </tr>
     @endif
     @endforeach
+    <tr>
+        <td><em>Sums</em></td>
+        <td>{{mf($sum*-1,false)}}</td>
+        <td>{{mf($limit,true)}}</td>
+        <td>{{mf($left,true)}}</td>
+    </tr>
 </table>
