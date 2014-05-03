@@ -39,7 +39,7 @@ class TransactionHelper
             'description'      => $predictable->description,
             'amount'           => $predictable->amount,
             'date'             => date('Y-m-') . $dayOfMonth,
-            'account_id'       => null,
+            'account_id'       => $predictable->account_id,
             'ignoreprediction' => 0,
             'ignoreallowance'  => 0,
             'mark'             => 0

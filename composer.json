@@ -2,12 +2,15 @@
     "name": "grumpydictator/firefly",
     "description": "A web-application to manage your finances.",
     "license": "MIT",
+    "php": ">=5.4.0",
     "require": {
         "laravel/framework": "4.1.*",
-        "barryvdh/laravel-debugbar": "dev-master",
-        "barryvdh/laravel-ide-helper": "1.*",
         "davejamesmiller/laravel-breadcrumbs": "2.*",
-        "grumpydictator/gchart": "1.*"
+        "grumpydictator/gchart": "dev-master"
+    },
+    "require-dev": {
+        "barryvdh/laravel-debugbar": "dev-master",
+        "barryvdh/laravel-ide-helper": "1.*"
     },
     "autoload": {
         "classmap": [
@@ -54,5 +57,5 @@
     "config": {
         "preferred-install": "dist"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }

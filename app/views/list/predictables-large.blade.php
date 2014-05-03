@@ -1,6 +1,7 @@
 <table class="table table-bordered">
     <tr>
-        <th colspan="3">Description</th>
+        <th colspan="2">Description</th>
+        <th>#</th>
         <th colspan="2">Amount</th>
         <th>Day of month</th>
         <th>&nbsp;</th>
@@ -28,7 +29,7 @@
             @endif
         </td>
         <td>
-            {{$predictable->transactions()->count()}}
+            <span title="Transactions found so far">{{$predictable->transactions()->count()}}</span>
         </td>
         <td>
             &gt; {{mf($predictable->maximumAmount(),true)}}
