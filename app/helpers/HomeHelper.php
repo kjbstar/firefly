@@ -122,7 +122,7 @@ class HomeHelper
          * where components.type_id=3
          * )
          */
-        $transactions = Auth::user()->transactions()->whereNotIn(
+        $transactions = Auth::user()->transactions()->where('account_id',$account->id)->whereNotIn(
             'id', function ($query) use ($date) {
                 $query->select('transaction_id')->from('component_transaction')
                     ->leftJoin('components', 'components.id', '=', 'component_transaction.component_id')
