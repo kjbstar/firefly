@@ -8,42 +8,6 @@ class PredictableHelper
     /**
      * @return array
      */
-    public static function componentList()
-    {
-        $list = ['beneficiary' => [0 => '(none)'], 'budget' => [0 => '(none)'],
-                 'category'    => [0 => '(none)']];
-        $components = Auth::user()->components()->get();
-        foreach ($components as $component) {
-            $t = $component->type;
-            $id = $component->id;
-            $name = $component->name;
-
-            // is a parent:
-            if ($component->childrenComponents()->count() > 0) {
-                $list[$t][$name] = isset($list[$t][$name]) ? $list[$t][$name]
-                    : [];
-
-            }
-
-            // is a child:
-            if (!is_null($component->parent_component_id)) {
-                $parentName = $component->parentComponent()->first()->name;
-                $list[$t][$parentName][$id] = $name;
-            }
-            // neither:
-            if (is_null($component->parent_component_id)
-                && $component->childrenComponents()->count() == 0
-            ) {
-                $list[$t][$id] = $name;
-            }
-        }
-
-        return $list;
-    }
-
-    /**
-     * @return array
-     */
     public static function emptyPrefilledAray()
     {
         $data = [
@@ -114,13 +78,11 @@ class PredictableHelper
             'dom'         => intval($predictable->dom),
             'pct'         => intval($predictable->pct),
             'inactive'    => intval($predictable->inactive) == 1 ? true : false,
-            'beneficiary' => is_null($predictable->beneficiary) ? 0 : $predictable->beneficiary->id,
-            'category'    => is_null($predictable->category) ? 0 : $predictable->category->id,
-            'budget'      => is_null($predictable->budget) ? 0 : $predictable->budget->id,
             'account_id'  => $predictable->account_id
         ];
         foreach (Type::allTypes() as $type) {
-            $data[$type->type] = $predictable->hasComponentOfType($type) ? $predictable->getComponentOfType($type)->name : '';
+            $data[$type->type] = $predictable->hasComponentOfType($type) ? $predictable->getComponentOfType($type)->name
+                : '';
         }
         return $data;
     }
