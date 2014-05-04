@@ -30,6 +30,37 @@ class PostInstallCommand extends Command
         parent::__construct();
     }
 
+
+    private function _checkFoldersWriteable() {
+        $folders = [
+            'app/storage/cache',
+            'app/storage/components',
+            'app/storage/logs',
+            'app/storage/meta',
+            'app/storage/sessions',
+            'app/storage/views',
+        ];
+        $error = false;
+        foreach($folders as $folder) {
+            if(!is_writable($folder)) {
+                $error = true;
+                $this->error('Folder '.$folder.' is not writeable.');
+            }
+        }
+        return $error;
+
+    }
+
+    private function _checkDBConnection() {
+        try {
+            DB::select('SELECT 1;');
+        } catch(PDOException $e) {
+            $this->error('No database connection: ' . $e->getMessage());
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Execute the console command.
      *
@@ -37,6 +68,19 @@ class PostInstallCommand extends Command
      */
     public function fire()
     {
+        $error = false;
+
+        // folders writeable?
+        $error = $this->_checkFoldersWriteable();
+
+        // database connection?
+        $error = $error || $this->_checkDBConnection();
+
+        if($error) {
+            $this->comment('Please fix the errors listed above first. Then run this command again.');
+            return;
+        }
+
         // set a password:
         $password = Str::random(12);
         $username = 'admin';
@@ -55,8 +99,9 @@ class PostInstallCommand extends Command
             $user->password = Hash::make($password);
             $user->save();
         }
-        echo "\n";
+        $this->info("\n\n");
         $this->info('You can login using username ' . $user->username . ' and password '.$password);
+        $this->info("\n\n");
     }
 
     /**
