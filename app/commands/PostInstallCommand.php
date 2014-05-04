@@ -81,6 +81,10 @@ class PostInstallCommand extends Command
             return;
         }
 
+        // run migration and db:seed
+        $this->call('migrate');
+        $this->call('db:seed');
+
         // set a password:
         $password = Str::random(12);
         $username = 'admin';
