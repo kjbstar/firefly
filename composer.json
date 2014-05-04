@@ -29,15 +29,9 @@
     "scripts": {
         "post-install-cmd": [
             "php artisan optimize",
-            "chmod 777 app/storage/cache",
-            "chmod 777 app/storage/components",
-            "chmod 777 app/storage/logs",
-            "chmod 777 app/storage/meta",
-            "chmod 777 app/storage/sessions",
-            "chmod 777 app/storage/views",
             "php artisan migrate",
             "php artisan db:seed",
-            "php artisan firefly:install"
+            "php artisan firefly:create-project"
 
 ],
         "pre-update-cmd": [
@@ -51,8 +45,7 @@
 
         ],
         "post-create-project-cmd": [
-            "php artisan key:generate",
-            "php artisan firefly:create-project"
+            "php artisan key:generate"
         ]
     },
     "config": {
