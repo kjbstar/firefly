@@ -12,3 +12,4 @@
 */
 
 Artisan::add(new PostInstallCommand);
+Artisan::add(new PostCreateProjectCommand);
