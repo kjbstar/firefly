@@ -12,9 +12,9 @@ $types = Type::allTypes();
           </button>
           <a class="navbar-brand" href="{{URL::Route('home')}}">Firefly //
               @if(isset($today))
-              {{$today->format('F Y')}}
+                {{$today->format('F Y')}}
               @else
-              {{date('F Y')}}
+                {{date('F Y')}}
               @endif
           </a>
         </div>
@@ -36,73 +36,43 @@ $types = Type::allTypes();
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add
                     <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                    <li><a href="{{URL::Route('addaccount')}}"><span
-                                class="glyphicon glyphicon-plus"></span> Add
-                            account
-                        </a></li>
+                    <li><a href="{{URL::Route('addaccount')}}"><span class="glyphicon glyphicon-plus"></span> Add account</a></li>
                     @if(count($types) > 0)
-                    <li class="divider"></li>
+                        <li class="divider"></li>
+                        @foreach($types as $type)
+                            <li><a href="{{URL::Route('addcomponent',$type->id)}}"><span class="glyphicon glyphicon-plus"></span>Add {{$type->type}}</a></li>
+                        @endforeach
+                        <li class="divider"></li>
                     @endif
-                    @foreach($types as $type)
-                    <li><a href="{{URL::Route('addcomponent',$type->id)}}"><span
-                                class="glyphicon glyphicon-plus"></span>
-                            Add {{$type->type}}</a></li>
-                    @endforeach
-                    @if(count($types) > 0)
-                    <li class="divider"></li>
-                    @endif
-                    <li><a href="{{URL::Route('addtransaction')}}"><span
-                                class="glyphicon glyphicon-plus"></span>
-                            Add transaction</a></li>
-                    <li><a href="{{URL::Route('addtransfer')}}"><span
-                                class="glyphicon glyphicon-plus"></span> Add
-                            transfer
-                        </a></li>
+                    <li><a href="{{URL::Route('addtransaction')}}"><span class="glyphicon glyphicon-plus"></span> Add transaction</a></li>
+                    <li><a href="{{URL::Route('addtransfer')}}"><span class="glyphicon glyphicon-plus"></span> Add transfer</a></li>
                     </ul>
                     </li>
-
               <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Lists <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="{{URL::Route('accounts')}}"><span class="glyphicon
-              glyphicon-list"></span> Accounts</a></li>
-                @if(count($types) > 0)
-                <li class="divider"></li>
-                @endif
-                @foreach($types as $type)
-                <li><a href="{{URL::Route('components',$type->id)}}"><span class="glyphicon
-              glyphicon-list"></span> {{ucfirst(Str::plural($type->type))}}</a></li>
-                @endforeach
-                @if(count($types) > 0)
-                <li class="divider"></li>
-                @endif
-                <li><a href="{{URL::Route('transactions')}}"><span class="glyphicon
-              glyphicon-list"></span> Transactions</a></li>
-              <li><a href="{{URL::Route('transfers')}}"><span class="glyphicon
-              glyphicon-list"></span> Transfers</a></li>
-            </ul>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle"
-                   data-toggle="dropdown">More <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="{{URL::Route('settings')}}"><span
-                                class="glyphicon glyphicon-cog"></span>
-                            Settings</a></li>
-                    <li><a href="{{URL::Route('allowances')}}"><span
-                                class="glyphicon glyphicon-euro"></span>
-                            Allowances</a></li>
-                    <li><a href="{{URL::Route('predictables')}}"><span class="glyphicon
-              glyphicon-repeat"></span> Predictables</a></li>
-                    <li><a href="{{URL::Route('reports')}}"><span
-                                class="glyphicon glyphicon-book"></span>
-                            Reports</a></li>
-                    <li><a href="{{URL::Route('piggy')}}"><span
-                                class="glyphicon glyphicon-time"></span>
-                            Piggy banks</a></li>
-
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Lists <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{{URL::Route('accounts')}}"><span class="glyphicon glyphicon-list"></span> Accounts</a></li>
+                    @if(count($types) > 0)
+                        <li class="divider"></li>
+                        @foreach($types as $type)
+                            <li><a href="{{URL::Route('components',$type->id)}}"><span class="glyphicon glyphicon-list"></span> {{ucfirst(Str::plural($type->type))}}</a></li>
+                        @endforeach
+                        <li class="divider"></li>
+                    @endif
+                    <li><a href="{{URL::Route('transactions')}}"><span class="glyphicon glyphicon-list"></span> Transactions</a></li>
+                    <li><a href="{{URL::Route('transfers')}}"><span class="glyphicon glyphicon-list"></span> Transfers</a></li>
                 </ul>
-                </li>
-
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{URL::Route('settings')}}"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                    <li><a href="{{URL::Route('allowances')}}"><span class="glyphicon glyphicon-euro"></span> Allowances</a></li>
+                    <li><a href="{{URL::Route('predictables')}}"><span class="glyphicon glyphicon-repeat"></span> Predictables</a></li>
+                    <li><a href="{{URL::Route('reports')}}"><span class="glyphicon glyphicon-book"></span> Reports</a></li>
+                    <li><a href="{{URL::Route('piggy')}}"><span class="glyphicon glyphicon-time"></span> Piggy banks</a></li>
+                </ul>
+            </li>
         </ul>
         {{Form::open(['action' => 'search', 'class' => 'navbar-form navbar-left','method' => 'get'])}}
             <div class="form-group">
