@@ -88,8 +88,7 @@
              ">
             <label for="inputAccount" class="col-sm-3 control-label">Account</label>
             <div class="col-sm-9">
-                {{Form::select('account_id',$accounts,$prefilled['account_id'],
-                ['class' => 'form-control'])}}
+                {{Form::select('account_id',$accounts,$prefilled['account_id'],['class' => 'form-control'])}}
                 @if($errors->has('account_id'))
                 <span class="text-danger">{{$errors->first('account_id')
                     }}</span><br />
