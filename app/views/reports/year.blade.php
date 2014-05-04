@@ -119,6 +119,37 @@
 <div class="row">
     <div class="col-lg-6 col-md-6 col-sm-12">
         <h4>Shared accounts</h4>
+
+        @if(count($sharedAccounts) > 0)
+        <table class="table table-bordered">
+            <tr>
+                <th>Month</th>
+                <th>Start of month</th>
+                <th>End of month</th>
+                <th>Contributions</th>
+            </tr>
+            @foreach($sharedAccounts as $entry)
+
+            @if(count($entry['data']) > 0)
+            <tr>
+                <td>{{$entry['date']->format('F Y')}}</td>
+                <!-- the first one, currently dont support more. -->
+                <td>{{mf($entry['data'][0]['account']->startOfMonth,true)}}</td>
+                <td>{{mf($entry['data'][0]['account']->endOfMonth,true)}}</td>
+                <td>
+                    @if(count($entry['data'][0]['contributions']) > 0)
+                    @foreach($entry['data'][0]['contributions'] as $c)
+                        <a href="{{URL::Route('componentoverview',$c->getComponentOfType($entry['data'][0]['payer'])->id)}}" title="Contribution by {{$c->getComponentOfType($entry['data'][0]['payer'])->name}}">{{$c->pct}}%</a>
+                    @endforeach
+                    @endif
+                </td>
+            </tr>
+            @endif
+            @endforeach
+
+        </table>
+        @endif
+
         <p>
             A list of all shared accounts, they're change in this monts
             (+/-) and your share of adding money to it.

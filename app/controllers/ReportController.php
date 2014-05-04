@@ -144,10 +144,11 @@ class ReportController extends BaseController
         $biggest = ReportHelper::biggestExpenses($date, 'year');
         $incomes = ReportHelper::incomes($date, 'year');
         $months = ReportHelper::months($date);
+        $sharedAccounts = ReportHelper::sharedAccountsByMonth($date);
 
         return View::make('reports.year')->with('date', $date)->with('title', $title)->with('summary', $summary)->with(
             'biggest', $biggest
-        )->with('incomes', $incomes)->with('months', $months);
+        )->with('incomes', $incomes)->with('months', $months)->with('sharedAccounts',$sharedAccounts);
 
     }
 

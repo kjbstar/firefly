@@ -367,6 +367,24 @@ class ReportHelper
         return ($sumA < $sumB) ? -1 : 1;
     }
 
+    public static function sharedAccountsByMonth(Carbon $date) {
+        $date->startOfYear();
+        $end = clone $date;
+        $end->endOfYear();
+        $data = [];
+
+        $current = clone $end;
+        while($current >= $date) {
+            $data[] = [
+                'date' => clone $current,
+                'data' => self::sharedAccounts($current)
+            ];
+
+            $current->subMonth();
+        }
+        return $data;
+    }
+
     /**
      * Something something shared accounts.
      */
