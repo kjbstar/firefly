@@ -11,7 +11,24 @@ class ProfileController extends BaseController
      */
     public function index()
     {
-        return 'Hi there!';
+        // some statistics:
+        $stats = [];
+        $stats['totalIn'] = floatval(Auth::user()->transactions()->incomes()->sum('amount'));
+        $stats['totalOut'] = floatval(Auth::user()->transactions()->expenses()->sum('amount'));
+        $stats['countIn'] = Auth::user()->transactions()->incomes()->count();
+        $stats['countOut'] = Auth::user()->transactions()->expenses()->count();
+
+        $stats['avgIn'] = $stats['totalIn'] / $stats['countIn'];
+        $stats['avgOut'] = $stats['totalOut'] / $stats['countOut'];
+
+        $stats['transferred'] = floatval(Auth::user()->transfers()->sum('amount'));
+        $stats['transfers'] = Auth::user()->transfers()->count();
+        $stats['types'] = [];
+        foreach (Type::allTypes() as $type) {
+            $stats['types'][Str::plural($type->type)] = Auth::user()->components()->whereTypeId($type->id)->count();
+        }
+
+        return View::make('profile.index')->with('title', 'Profile')->with('stats', $stats);
     }
 
     /**
@@ -21,7 +38,7 @@ class ProfileController extends BaseController
      */
     public function changePassword()
     {
-        return View::make('profile.change-password');
+        return View::make('profile.change-password')->with('title', 'Change password');
     }
 
     public function postChangePassword()
@@ -45,7 +62,46 @@ class ProfileController extends BaseController
         Auth::user()->save();
 
         Session::flash('success', 'Your password has been changed.');
-        return Redirect::route('home');
+        return Redirect::route('profile');
+    }
+
+    public function changeUsername()
+    {
+        return View::make('profile.change-username')->with('title', 'Change username');
+    }
+
+    public function postChangeUsername()
+    {
+        $count = User::whereUsername(Input::get('username'))->where('id', '!=', Auth::user()->id)->count();
+        if($count > 0) {
+            Session::flash('error', 'Could not change to this username.');
+            return View::make('profile.change-username');
+        }
+        // is not changed?
+        if(Auth::user()->username == Input::get('username')) {
+            Session::flash('error', 'Have to change it buddy.');
+            return View::make('profile.change-username');
+        }
+
+        // set!
+        $user = Auth::user();
+        $user->username = Input::get('username');
+
+        $rules = [
+            'username' => User::$rules['username']
+        ];
+
+        // validate:
+        $validator = Validator::make($user->toArray(),$rules);
+        if($validator->fails()) {
+            Session::flash('error', $validator->messages()->first());
+            return View::make('profile.change-username');
+        }
+
+        // save!
+        $user->save();
+        Session::flash('success', 'Username changed!');
+        return Redirect::route('profile');
     }
 
 

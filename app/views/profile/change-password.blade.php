@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
     <div class="col-lg-6 col-md-6 col-sm-12">
-        <h3>Change your password</h3>
+        <h2>Change your password</h2>
         <p>
             To change your password, fill in this extremely obvious form.
         </p>

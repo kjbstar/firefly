@@ -214,5 +214,7 @@ Route::post('/register', ['uses' => 'UserController@postRegister', 'before' => '
  */
 Route::get('/home/profile', ['uses' => 'ProfileController@index','as' => 'profile']);
 Route::get('/home/profile/password', ['uses' => 'ProfileController@changePassword','as' => 'change-password']);
+Route::get('/home/profile/username', ['uses' => 'ProfileController@changeUsername','as' => 'change-username']);
 
 Route::post('/home/profile/password', ['uses' => 'ProfileController@postChangePassword','before' => 'csrf']);
+Route::post('/home/profile/username', ['uses' => 'ProfileController@postChangeUsername','before' => 'csrf']);
