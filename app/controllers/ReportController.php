@@ -60,18 +60,22 @@ class ReportController extends BaseController
         $predicted = ReportHelper::predicted($date);
         $incomes = ReportHelper::incomes($date, 'month');
 
+        // something something shared accounts.
+
+        $sharedAccounts = ReportHelper::sharedAccounts($date);
+
 
         $expenses = [
-            'category'    => ReportHelper::expensesGrouped($date, 'month', Type::whereType('category')->first()),
-            'budget'      => ReportHelper::expensesGrouped($date, 'month', Type::whereType('budget')->first()),
-            'beneficiary' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('beneficiary')->first()),
+            'category'    => ReportHelper::expensesGrouped($date, 'month', Type::whereType('category')->rememberForever()->first()),
+            'budget'      => ReportHelper::expensesGrouped($date, 'month', Type::whereType('budget')->rememberForever()->first()),
+            'beneficiary' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('beneficiary')->rememberForever()->first()),
         ];
 
         return View::make('reports.month')->with('date', $date)->with('title', $title)->with('summary', $summary)->with(
             'biggest', $biggest
         )->with('predicted', $predicted)->with('expenses', $expenses)->with(
                 'incomes', $incomes
-            );
+            )->with('sharedAccounts', $sharedAccounts);
     }
 
     /**
@@ -89,6 +93,7 @@ class ReportController extends BaseController
         if (Cache::has($key)) {
             return Response::json(Cache::get($key));
         }
+
         // get data:
         $date = Toolkit::parseDate($year, $month);
         $array = ['beneficiary', 'budget', 'category'];
@@ -99,6 +104,7 @@ class ReportController extends BaseController
         } else {
             App::abort(404);
         }
+
 
         // generate chart:
         $chart = App::make('gchart');

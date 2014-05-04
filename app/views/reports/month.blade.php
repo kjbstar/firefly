@@ -306,16 +306,61 @@
 <div class="row">
     <div class="col-lg-6 col-md-6 col-sm-12">
         <h4>Shared accounts</h4>
+        @if(count($sharedAccounts) > 0)
+        <table class="table table-striped table-bordered table-condensed">
+            <tr>
+                <th>Account</th>
+                <th>Start of {{$date->format('F Y')}}</th>
+                <th>End of {{$date->format('F Y')}}</th>
+                <th>Diff</th>
+            </tr>
+            @foreach($sharedAccounts as $entry)
+            <tr>
+                <td><a href="{{URL::Route('accountoverviewmonth',[$entry['account']->id,$date->format('Y'),$date->format('m')])}}">{{{$entry['account']->name}}}</a></td>
+                <td>{{mf($entry['account']->startOfMonth,true)}}</td>
+                <td>{{mf($entry['account']->endOfMonth,true)}}</td>
+                <td>{{mf($entry['account']->endOfMonth-$entry['account']->startOfMonth,true)}}</td>
+            </tr>
+            @endforeach
+        </table>
+        @else
         <p>
-            A list of all shared accounts, they're change in this monts
-            (+/-) and your share of adding money to it.
+            <em>Nothing here</em>
         </p>
+        @endif
     </div>
     <div class="col-lg-6 col-md-6 col-sm-12">
+        @if(count($sharedAccounts) > 0)
+            <h4>Contributions</h4>
+            @foreach($sharedAccounts as $account)
+                <h5>{{{$entry['account']->name}}}</h5>
+                @if(count($entry['contributions']) > 0)
+                <table class="table table-condensed table-bordered">
+                @foreach($entry['contributions'] as $mutation)
+                <tr>
+                    <td>
+                        <a href="{{URL::Route('componentoverviewmonth',[$mutation->getComponentOfType($entry['payer'])->id,$date->format('Y'),$date->format('m')])}}">
+                        {{{$mutation->getComponentOfType($entry['payer'])->name}}}
+                        </a>
+                    </td>
+                    <td>{{mf($mutation->amount,true)}}</td>
+                    <td>{{$mutation->pct}}%</td>
+                </tr>
+                @endforeach
+                    <tr>
+                        <td style="text-align-right;"><em>Sum</em></td>
+                        <td colspan="2">{{mf($entry['contributionsSum'],true)}}</td>
+                    </tr>
+                </table>
+            @else
+                <em>Nothing here</em>
+            @endif
+            @endforeach
+        @else
         <p>
-            Transfers made on the shared account, grouped by
-            budget?
+            <em>Nothing here</em>
         </p>
+        @endif
     </div>
 </div>
 

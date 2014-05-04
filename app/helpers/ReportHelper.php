@@ -194,26 +194,28 @@ class ReportHelper
 
         while ($current <= $end) {
 
-            $totalOut = Auth::user()->transactions()->inMonth($current)->expenses()->
-                leftJoin('accounts','accounts.id','=','transactions.account_id')
-                ->where('accounts.shared',0)
+            $totalOut = Auth::user()->transactions()->inMonth($current)->expenses()->leftJoin(
+                'accounts', 'accounts.id', '=', 'transactions.account_id'
+            )
+                ->where('accounts.shared', 0)
                 ->sum('amount');
-            $totalIn = Auth::user()->transactions()->inMonth($current)->incomes()->
-                leftJoin('accounts','accounts.id','=','transactions.account_id')
-                ->where('accounts.shared',0)
+            $totalIn = Auth::user()->transactions()->inMonth($current)->incomes()->leftJoin(
+                'accounts', 'accounts.id', '=', 'transactions.account_id'
+            )
+                ->where('accounts.shared', 0)
                 ->sum('amount');
 
             // transfers TO a shared account are counted as an expense:
             $transfersOut = Auth::user()->transfers()
-                ->leftJoin('accounts','accounts.id','=','transfers.accountto_id')
-                ->where('accounts.shared',1)
+                ->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')
+                ->where('accounts.shared', 1)
                 ->inMonth($current)
                 ->sum('amount');
 
             // transfers FROM a shared account are counted as income:
             $transfersIn = Auth::user()->transfers()
-                ->leftJoin('accounts','accounts.id','=','transfers.accountfrom_id')
-                ->where('accounts.shared',1)
+                ->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountfrom_id')
+                ->where('accounts.shared', 1)
                 ->inMonth($current)
                 ->sum('amount');
 
@@ -263,8 +265,8 @@ class ReportHelper
         // transfers FROM a shared account to you are also income,
         // since transfers TO shared accounts are expenses.
         $transfers = Auth::user()->transfers()->$inPeriod($date)
-            ->leftJoin('accounts','accounts.id','=','transfers.accountfrom_id')
-            ->where('accounts.shared',1)->get();
+            ->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountfrom_id')
+            ->where('accounts.shared', 1)->get();
 
         // join these two and loop them:
         $set = $transactions->merge($transfers);
@@ -290,34 +292,6 @@ class ReportHelper
         return $data;
     }
 
-    public static function categories(Carbon $date)
-    {
-        $data = [];
-        $transactions = Auth::user()->transactions()->whereNull('predictable_id')->expenses()->with(
-            ['components' => function ($query) {
-                    $query->where('type', 'category');
-                }]
-        )->inMonth($date)->get();
-
-        foreach ($transactions as $t) {
-            $key = $t->category->id;
-            if (isset($data[$key])) {
-                $data[$key]['transactions'][] = $t;
-                $data[$key]['category']['sum'] += $t->amount;
-            } else {
-                $data[$key] = [
-                    'category'     => [
-                        'id'   => $key,
-                        'name' => $t->category->name,
-                        'sum'  => $t->amount
-                    ],
-                    'transactions' => [$t]
-                ];
-            }
-        }
-        return $data;
-    }
-
     public static function expensesGrouped($date, $period, Type $type)
     {
         $cacheKey = 'reportexpensesGrouped' . $date->format('Ymd') . $period . $type;
@@ -326,12 +300,17 @@ class ReportHelper
         }
         $data = [];
         // get the transfers with this $type and $date
+        // exclude transactions from a shared account,
+        // since I want to ignore them.
         $transactions = Auth::user()->transactions()->expenses()->with(
             ['components' => function ($query) use ($type) {
                     $query->where('type_id', $type->id);
                 }]
-        )->inMonth($date)->get();
-
+        )
+            ->inMonth($date)
+            ->leftJoin('accounts', 'accounts.id', '=', 'transactions.account_id')
+            ->where('accounts.shared', 0)
+            ->get(['transactions.*']);
         // get the transfers TO a shared account
         // with this $type and $date.
         $transfers = Auth::user()->transfers()->with(
@@ -386,5 +365,63 @@ class ReportHelper
             return 0;
         }
         return ($sumA < $sumB) ? -1 : 1;
+    }
+
+    /**
+     * Something something shared accounts.
+     */
+    public static function sharedAccounts(Carbon $date)
+    {
+        $cacheKey = 'sharedAccounts' . $date->format('Ymd');
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+        $date->startOfMonth();
+        $eom = clone $date;
+        $eom->endOfMonth();
+        // get the shared accounts:
+        $list = Auth::user()->accounts()
+            ->where('openingbalancedate', '<=', $eom->format('Y-m-d'))
+            ->shared()
+            ->get();
+        $payer = Type::whereType('payer')->rememberForever()->first();
+        $result = [];
+        foreach ($list as $account) {
+
+            if ($payer) {
+                // transactions into shared account with a payer
+                $sTr = $account->transactions()->incomes()->whereHas(
+                    'components', function ($q) use ($payer) {
+                        $q->whereTypeId($payer->id);
+                    }
+                )->inMonth($date)->get();
+                $sTransf = $account->transfersto()->whereHas(
+                    'components', function ($q) use ($payer) {
+                        $q->whereTypeId($payer->id);
+                    }
+                )->inMonth($date)->get();
+                $set = $sTransf->merge($sTr);
+                $sum = $set->sum('amount');
+
+                foreach ($set as $entry) {
+                    $entry->pct = round(($entry->amount / $sum) * 100);
+                }
+            } else {
+                $set = [];
+                $sum = 0;
+            }
+            // balance for startOfMonth
+            $account->startOfMonth = $account->balanceOnDate($date);
+            $account->endOfMonth = $account->balanceOnDate($eom);
+
+            $result[] = [
+                'account'          => $account,
+                'contributions'    => $set,
+                'contributionsSum' => $sum,
+                'payer'            => $payer
+            ];
+        }
+        Cache::forever($cacheKey,$result);
+        return $result;
     }
 }
