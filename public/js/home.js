@@ -8,10 +8,6 @@ function drawCharts() {
     drawAccountChart();
 }
 
-$('#PopupModal').on('hidden.bs.modal', function () {
-    $(this).removeData();
-})
-
 function updateSelectedAccount() {
     fpAccount = $('#accountChartSelector').val();
     drawAccountChart();
