@@ -9,7 +9,18 @@
       <div class="modal-body">
         <p>
         By adding a limit to a {{$component->type->type}} you trigger an alert when it's amount is reached this month.
+            If you select a specific account, the limit will only be applied to transactions on that account. Otherwise
+            any transaction will count towards the limit.
         </p>
+          <div class="form-group">
+              <label for="inputAccount" class="col-sm-3
+            control-label">Account</label>
+              <div class="col-sm-9">
+                  {{Form::select('account_id',$accounts,0,['class' => 'form-control'])}}
+              </div>
+          </div>
+
+
         <div class="form-group">
             <label for="inputAmount" class="col-sm-3
             control-label">Amount</label>

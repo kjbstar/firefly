@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class LimitController
  */
@@ -20,8 +21,12 @@ class LimitController extends BaseController
             Session::put('previous', URL::previous());
         }
         $date = Toolkit::parseDate($year, $month);
+        $accounts = AccountHelper::accountsAsSelectList();
+        array_unshift_assoc($accounts, 0, '(no account)');
 
-        return View::make('meta-limit.add')->with('component', $component)->with('date', $date);
+        return View::make('meta-limit.add')->with('component', $component)->with('date', $date)->with(
+            'accounts', $accounts
+        );
     }
 
     /**
@@ -35,12 +40,21 @@ class LimitController extends BaseController
      */
     public function postAdd(Component $component, $year, $month)
     {
+        $account = null;
+        if (intval(Input::get('account_id')) != 0) {
+            $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
+            if (is_null($account)) {
+                Session::flash('error', 'Invalid account selected.');
+                return Redirect::route('addtransaction')->withInput();
+            }
+        }
+
         $date = Toolkit::parseDate($year, $month);
         $limit = new Limit(
             [
                 'component_id' => $component->id,
                 'date'         => $date,
-                'amount'       => floatval(Input::get('amount'))
+                'amount'       => floatval(Input::get('amount')),
             ]
         );
 
@@ -48,16 +62,19 @@ class LimitController extends BaseController
 
         // it fails!
         if ($validator->fails()) {
-            Session::flash('error', 'Could not add ' . OBJ . ' limit.');
+            Session::flash('error', 'Could not add limit.');
             return Redirect::route(OBJ . 'overview', [$component->id]);
+        }
+        if (!is_null($account)) {
+            $limit->account()->associate($account);
         }
         // save
         $result = $limit->save();
 
         // failed again!
         if (!$result) {
-            Session::flash('error', 'Could not add ' . OBJ . ' limit.');
-            return Redirect::route(OBJ . 'overview', [$component->id]);
+            Session::flash('error', 'Could not add limit (trigger error).');
+            return Redirect::route('componentoverview', [$component->id]);
         }
 
         Session::flash('success', 'Limit saved!');
@@ -77,9 +94,14 @@ class LimitController extends BaseController
         if (!Input::old()) {
             Session::put('previous', URL::previous());
         }
+        $accounts = AccountHelper::accountsAsSelectList();
+        array_unshift_assoc($accounts, 0, '(no account)');
+
         $component = Auth::user()->components()->find($limit->component_id);
 
-        return View::make('meta-limit.edit')->with('component', $component)->with('limit', $limit);
+        return View::make('meta-limit.edit')->with('accounts', $accounts)->with('component', $component)->with(
+            'limit', $limit
+        );
     }
 
     /**
@@ -93,6 +115,19 @@ class LimitController extends BaseController
     {
         $component = Auth::user()->components()->find($limit->component_id);
         $limit->amount = floatval(Input::get('amount'));
+
+        $account = null;
+        if (intval(Input::get('account_id')) != 0) {
+            $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
+            if (is_null($account)) {
+                Session::flash('error', 'Invalid account selected.');
+                return Redirect::route('addtransaction')->withInput();
+            }
+        }
+        if (!is_null($account)) {
+            $limit->account()->associate($account);
+        }
+
 
         $validator = Validator::make($limit->toArray(), Limit::$rules);
         if ($validator->fails()) {
@@ -120,7 +155,9 @@ class LimitController extends BaseController
         }
         $component = Auth::user()->components()->find($limit->component_id);
 
-        return View::make('meta-limit.delete')->with('component', $component)->with('date', $limit->date);
+        return View::make('meta-limit.delete')->with('component', $component)->with('limit', $limit)->with(
+            'date', $limit->date
+        );
     }
 
     /**

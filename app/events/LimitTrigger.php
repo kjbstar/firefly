@@ -14,7 +14,7 @@ class LimitTrigger
      */
     public function createLimit(Limit $limit)
     {
-        $count = Limit::whereComponentId($limit->component_id)->whereDate($limit->date)->count();
+        $count = Limit::whereComponentId($limit->component_id)->whereAccountId($limit->account_id)->whereDate($limit->date)->count();
         return $count == 0;
 
 

@@ -88,7 +88,15 @@ class HomeHelper
             $current['expense'] += floatval($transfers) * -1;
 
             // has budget a limit in this month?
-            $limit = $budget->limits()->inMonth($date)->first();
+            $limit = $budget->limits()->inMonth($date)->where(
+                function($query) use ($account) {
+                $query->orWhereNull('account_id');
+                    if(!is_null($account)) {
+                    $query->orWhere('account_id',$account->id);
+                    }
+                }
+            )->orderBy('account_id','DESC')->first();
+
             if (!is_null($limit)) {
                 $current['limit'] = floatval($limit->amount);
                 // overspent?

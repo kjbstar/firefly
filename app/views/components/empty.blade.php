@@ -9,7 +9,7 @@
         in {{$date->format('F Y')}}
         @endif
         </h2>
-        @include('list.mutations')
+        @include('list.mutations-large')
     </div>
 </div>
 @stop

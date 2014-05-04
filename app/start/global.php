@@ -83,6 +83,15 @@ App::down(
 | definitions instead of putting them all in the main routes file.
 |
 */
+
+function array_unshift_assoc(&$arr, $key, $val)
+{
+    $arr = array_reverse($arr, true);
+    $arr[$key] = $val;
+    $arr = array_reverse($arr, true);
+    return $arr;
+}
+
 if (!function_exists('mf')) {
     function mf($n, $coloured = false, $list = false)
     {

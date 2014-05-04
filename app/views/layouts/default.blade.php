@@ -33,6 +33,7 @@
     <script src="js/yepnope.1.5.4-min.js"></script>
     <script src="js/modernizr.custom.21599.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/site.js"></script>
       @yield('scripts')
 
   </body>

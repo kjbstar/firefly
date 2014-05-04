@@ -77,20 +77,14 @@ class ComponentHelper
             $transfers = $component->transfers()->inMonth($end);
             $url = URL::Route('componentoverviewmonth', [$component->id, $end->format('Y'), $end->format('m')]);
             $entry = [
-                'title' => $end->format('F Y'),
-                'url'   => $url,
-                'sum'   => $query->sum('amount'),
-                'count' => $query->count() + $transfers->count(),
-                'month' => $end->format('m'),
-                'year'  => $end->format('Y'),
-                'limit' => null
+                'title'  => $end->format('F Y'),
+                'url'    => $url,
+                'sum'    => $query->sum('amount'),
+                'count'  => $query->count() + $transfers->count(),
+                'month'  => $end->format('m'),
+                'year'   => $end->format('Y'),
+                'limits' => $component->limits()->with('account')->inMonth($end)->get()
             ];
-            $limit = $component->limits()->inMonth($end)->first();
-            if ($limit) {
-                $entry['limit'] = $limit->amount;
-                $entry['limit-id'] = $limit->id;
-            }
-
             $end->subMonth();
             $list[] = $entry;
         }
