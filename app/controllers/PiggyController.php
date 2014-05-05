@@ -83,7 +83,7 @@ class PiggyController extends BaseController
             'name'   => Input::get('name'),
             'amount' => 0,
             'target' => floatval(Input::get('target')),
-            'max'    => $max
+            'order'    => $max
         ];
 
         $piggy = new Piggybank($data);
