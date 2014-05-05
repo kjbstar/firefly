@@ -115,9 +115,9 @@ class Account extends Eloquent
      */
     public function predictOnDate(Carbon $date)
     {
-        $cacheKey = $this->id.'-'.$date->format('dmy').'-predictOnDate';
-        if(Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
+        $cacheKey = $this->id . '-' . $date->format('dmy') . '-predictOnDate';
+        if (Cache::has($cacheKey)) {
+            //return Cache::get($cacheKey);
         }
         // prediction setting:
         $predictionStart = Setting::getSetting('predictionStart')->value->format('Y-m-d');
@@ -127,31 +127,41 @@ class Account extends Eloquent
         $queryText
             = '
         SELECT
-          MAX(`average`) as `min`,
-          MIN(`average`) as `max`,
-          AVG(`average`) as `avg`
+          MAX(`sum`) as `min`,
+          MIN(`sum`) as `max`,
+          AVG(`average`) as `avg`,
+          AVG(`sum`) as `sum_avg`
         FROM (
           SELECT
             DATE_FORMAT(`date`,"%d-%m-%Y") as `day`,
-            AVG(`amount`) as `average`
+            AVG(`amount`) as `average`,
+            SUM(`amount`) as `sum`
           FROM `transactions`
           WHERE `amount` < 0
-          AND   DATE_FORMAT(`date`,"%d") = "'.$dayOfPrediction.'"
+          AND   DATE_FORMAT(`date`,"%d") = "' . $dayOfPrediction . '"
           AND   `ignoreprediction` = 0
-          AND   `account_id` = '.$this->id.'
-          AND   `date` > "'.$predictionStart.'"
+          AND   `account_id` = ' . $this->id . '
+          AND   `date` > "' . $predictionStart . '"
           GROUP BY `day`
           ORDER BY `date`) as `t`;';
 
+        // number of months between $date and start of prediction.
+        $diff = $date->diffInMonths(Setting::getSetting('predictionStart')->value);
         $set = DB::selectOne($queryText);
         $data['most'] = floatval($set->max) * -1;
         $data['least'] = floatval($set->min) * -1;
-        $data['prediction'] = floatval($set->avg) * -1;
+        Log::debug(
+            'Diff in months between ' . $date->format('d-m-Y') . ' and ' . Setting::getSetting(
+                'predictionStart'
+            )->value->format('d-m-Y') . ': ' . $diff
+        );
+        $data['prediction']
+            = $diff != 0 ? (floatval($set->sum_avg) * -1) / $diff : (floatval($set->sum_avg) * -1);
 
         /**
          * The  prediction is done by
          */
-        Cache::forever($cacheKey,$data);
+        Cache::forever($cacheKey, $data);
 
 
         return $data;
@@ -162,13 +172,14 @@ class Account extends Eloquent
      *
      * @param Carbon $date
      */
-    public function predictionInformation(Carbon $date) {
+    public function predictionInformation(Carbon $date)
+    {
         $predictionStart = Setting::getSetting('predictionStart')->value->format('Y-m-d');
         $transactions = Auth::user()->transactions()
-            ->where(DB::Raw('DATE_FORMAT(`date`,"%d")'),'=',$date->format('d'))
-            ->where('date','>',$predictionStart)
-            ->where('ignoreprediction',0)
-            ->where('account_id',$this->id)
+            ->where(DB::Raw('DATE_FORMAT(`date`,"%d")'), '=', $date->format('d'))
+            ->where('date', '>', $predictionStart)
+            ->where('ignoreprediction', 0)
+            ->where('account_id', $this->id)
             ->expenses()
             ->get();
 

@@ -52,7 +52,7 @@ class SettingsController extends BaseController
         $predictionStart->save();
         $frontpageAccount->save();
 
-
+        Cache::userFlush();
         Session::flash('success', 'Settings saved!');
 
         return Redirect::to(Session::get('previous'));

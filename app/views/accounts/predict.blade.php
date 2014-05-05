@@ -13,9 +13,9 @@
 
     </tr>
     <tr>
-        <td>{{mf($prediction['most'],true)}}</td>
-        <td>{{mf($prediction['prediction'],true)}}</td>
         <td>{{mf($prediction['least'],true)}}</td>
+        <td>{{mf($prediction['prediction'],true)}}</td>
+        <td>{{mf($prediction['most'],true)}}</td>
     </tr>
 </table>
 
