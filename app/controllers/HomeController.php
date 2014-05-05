@@ -70,34 +70,4 @@ class HomeController extends BaseController
                 'budgets', $budgets
             )->with('predictables', $predictables)->with('transfers', $transfers);
     }
-
-    /**
-     * TODO: catch no accounts present.
-     *
-     * @param $year
-     * @param $month
-     * @param $day
-     *
-     * @return \Illuminate\View\View
-     */
-    public function predict($year, $month, $day)
-    {
-        $input = [
-            'balance'     => floatval(Input::get('balance')),
-            'pessimistic' => floatval(Input::get('pessimistic')),
-            'optimistic'  => floatval(Input::get('optimistic')),
-            'alt1'        => floatval(Input::get('alt1')),
-            'alt2'        => floatval(Input::get('alt2')),
-
-        ];
-
-
-        $date = new Carbon($year . '-' . $month . '-' . $day);
-        $account = Toolkit::getFrontpageAccount();
-        $prediction = $account->predictOnDateExpanded($date);
-
-        // do a prediction, but "visible":
-        return View::make('home.predict')->with('prediction', $prediction)
-            ->with('date', $date)->with('input', $input);
-    }
 }

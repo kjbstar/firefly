@@ -53,13 +53,14 @@ Route::get('/home/account/{account}/overview/chart',['uses' => 'AccountControlle
 Route::post('/home/account/add',['uses' => 'AccountController@postAdd', 'before' => 'csrf']);
 Route::post('/home/account/{account}/edit',['uses' => 'AccountController@postEdit', 'before' => 'csrf']);
 Route::post('/home/account/{account}/delete',['uses' => 'AccountController@postDelete', 'before' => 'csrf']);
+Route::get('/home/account/{account}/predict/{year}/{month}/{day}',['uses' => 'AccountController@predict', 'as' => 'predictDay']);
 
 /**
  * HOMECONTROLLER
  */
 Route::get('/', ['uses' => 'HomeController@index', 'as' => 'index']);
 Route::get('/home/{year?}/{month?}/{account?}',['uses' => 'HomeController@home', 'as' => 'home']);
-Route::get('/home/predict/{year}/{month}/{day}',['uses' => 'HomeController@predict', 'as' => 'predictDay']);
+
 Route::get('/home/recalc', ['uses' => 'PageController@recalculate', 'as' => 'recalc']);
 Route::get('/home/flush', ['uses' => 'PageController@flush', 'as' => 'flush']);
 Route::get('/home/decrypt', ['uses' => 'PageController@decrypt', 'as' => 'decrypt']);

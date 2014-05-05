@@ -109,195 +109,71 @@ class Account extends Eloquent
     }
 
     /**
-     * Predict what the balance will be on the given date
-     *
-     * The prediction contains the amount we'll expect to be
-     * spent on the given date. It might be 50, so we expect the
-     * spent amount to be 50 for that day.
-     *
-     * The "most" index contains the amount most spent on this day of the
-     *  month ever. Predicting for the 4th day of the month,
-     * you might have once spent 500 euro's that day. This var will
-     * reflect that.
-     *
-     * The "least" contains the amount at the day you spent the least
-     * money. So either 0 or more.
-     *
-     *
-     * @param \Carbon\Carbon $date
-     *
-     * @return float
-     */
-    public function predictOnDateExpanded(Carbon $date)
-    {
-        $key = $this->id.$date->format('ymd').'predictOnDateExpanded';
-        if(Cache::has($key)) {
-            return Cache::get($key);
-        }
-        // data that will be returned:
-        $data = [
-            'prediction'   => [
-                'most'       => 0,
-                'least'      => 0,
-                'prediction' => 0
-            ],
-            'transactions' => [],
-            'predictables' => []
-        ];
-
-        // dates
-        $current = clone $date;
-        $dateDay = intval($date->format('d'));
-        $predictionDate = AccountHelper::getPredictionStart();
-        // we set current to the first day of the month:
-        $current->firstOfMonth();
-        $current->subMonth();
-
-        // between $predictionDate and $date
-        // there are X occurences of the day $date
-        // ex: between 1-jan-2014 and 16-apr-2014 there
-        // is: 16-jan, 16-feb,16-march.
-        // we need those dates.
-        $days = [];
-        while ($current >= $predictionDate) {
-            $daysInMonth = intval($current->format('t'));
-            $year = intval($current->format('Y'));
-            $month = intval($current->format('m'));
-            if ($daysInMonth >= $dateDay) {
-                $current->setDate($year, $month, $dateDay);
-            } else {
-                Log::error('We cannot predict for this exact day. Fallback to day #' . $daysInMonth);
-                $current->setDate($year, $month, $daysInMonth);
-            }
-            $days[] = clone $current;
-            $current->firstOfMonth();
-            $current->subMonth();
-        }
-        $sum = 0;
-
-        // debug loop for debug debug!
-        Log::debug('Predicting on account ' . $this->name . ' for day: ' . $date->format('M jS Y'));
-        foreach ($days as $currentDay) {
-            Log::debug('Source for prediction: ' . $currentDay->format('M jS Y'));
-        }
-        // when a day has zero transactions
-        // it does not influence the average, and vice versa.
-        $influences = 0;
-
-        foreach ($days as $index => $currentDay) {
-            // the query for transactions on this day:
-            $query = $this->transactions()->expenses()->afterDate($predictionDate)->where('ignoreprediction', 0)
-                ->whereNull('predictable_id')->onDay($currentDay);
-            $amount = floatval($query->sum('amount')) * -1;
-            $data['transactions'][$currentDay->format('d-m-Y')] = $query->get();
-
-            // the total amount defines the average later on:
-            $sum += $amount;
-
-            // more than the current 'most expensive day ever'?
-            if ($amount > $data['prediction']['most']) {
-                $data['prediction']['most'] = $amount;
-            }
-            // first entry is 'least' by default (otherwise it would stick at
-            // zero)
-            if ($index == 0) {
-                $data['prediction']['least'] = $amount;
-            }
-            // then re-check the least amount:
-            if (($amount != 0 && $amount < $data['prediction']['least']) || $data['prediction']['least'] == 0) {
-                $data['prediction']['least'] = $amount;
-            }
-            if ($amount > 0) {
-                $influences++;
-            }
-            Log::debug('Amount for ' . $currentDay->format('M jS Y') . ': ' . $amount);
-        }
-        Log::debug(
-            'Final calculation for ' . $date->format('M jS Y') . ' [most/least/sum]: ' . $data['prediction']['most']
-            . '/' . $data['prediction']['least']
-            . '/' . $sum
-        );
-        // now we have the amount for the current day,
-        // and we work on the predictables for this day:
-
-        $predictables = $this->predictables()->active()->where('dom', $dateDay)->get();
-        Log::debug('Found ' . count($predictables) . ' predictable expenses for ' . $date->format('M jS Y'));
-
-        // if there are predictables for this day, it does influence the number of days:
-        if (count($predictables) > 0) {
-            $influences++;
-        }
-
-        $predictableSum = 0;
-        foreach ($predictables as $p) {
-            // predictables that were paid in this month
-            // already are ignored.
-            $ct = $p->transactions()->inMonth($date)->count();
-            if ($ct == 0) {
-                // if they ARE in this month, we use the number to
-                // finetune the $data['prediction'] array
-                $amount = ($p->amount * -1);
-                $sum += $amount;
-                $predictableSum += $amount;
-                // update the least / most if need be:
-                Log::debug(
-                    'Predictable "' . $p->description . '" is expected to add ' . ($p->amount * -1) . ' to the sum of '
-                    . $date->format('M jS Y') . '.'
-                );
-
-                $p->date = new Carbon('2012-01-' . $p->dom);
-                // and we save it:
-                $data['predictables'][] = $p;
-            }
-        }
-        // update most/least sums:
-        if ($predictableSum > $data['prediction']['most']) {
-            $data['prediction']['most'] = $predictableSum;
-            Log::debug(
-                'All ' . count($predictables) . ' predictable(s) for this day add up to an expected expense of '
-                . $predictableSum . '.'
-            );
-        }
-        if ($predictableSum > 0 && $predictableSum < $data['prediction']['least']) {
-            $data['prediction']['least'] = $predictableSum;
-        }
-
-
-        // the actual prediction (three ways of doing it):
-        // TODO switch by setting?
-
-        $data['prediction']['prediction'] = array_sum([$data['prediction']['most'] + $data['prediction']['least']]) / 2;
-        $data['prediction']['prediction_alt1'] = $influences > 0 ? $sum / $influences : $sum;
-        $data['prediction']['prediction_alt2'] = count($days) > 0 ? $sum / count($days) : $sum;
-
-
-        // in order to spice up the charts, we add two intermediate lines called
-        // (how original)
-
-        Log::debug(
-            'Final prediction for ' . $date->format('M jS Y') . '[most/least/sum/avg]' .
-            $data['prediction']['most'] . '/' .
-            $data['prediction']['least'] . '/' .
-            $sum . '/' .
-            $data['prediction']['prediction']
-
-        );
-        Cache::forever($key,$data);
-
-        return $data;
-
-    }
-
-    /**
      * @param Carbon $date
      *
      * @return mixed
      */
     public function predictOnDate(Carbon $date)
     {
-        $data = $this->predictOnDateExpanded($date);
+        $cacheKey = $this->id.'-'.$date->format('dmy').'-predictOnDate';
+        if(Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+        // prediction setting:
+        $predictionStart = Setting::getSetting('predictionStart')->value->format('Y-m-d');
 
-        return $data['prediction'];
+        $dayOfPrediction = $date->format('d');
+
+        $queryText
+            = '
+        SELECT
+          MAX(`average`) as `min`,
+          MIN(`average`) as `max`,
+          AVG(`average`) as `avg`
+        FROM (
+          SELECT
+            DATE_FORMAT(`date`,"%d-%m-%Y") as `day`,
+            AVG(`amount`) as `average`
+          FROM `transactions`
+          WHERE `amount` < 0
+          AND   DATE_FORMAT(`date`,"%d") = "'.$dayOfPrediction.'"
+          AND   `ignoreprediction` = 0
+          AND   `account_id` = '.$this->id.'
+          AND   `date` > "'.$predictionStart.'"
+          GROUP BY `day`
+          ORDER BY `date`) as `t`;';
+
+        $set = DB::selectOne($queryText);
+        $data['most'] = floatval($set->max) * -1;
+        $data['least'] = floatval($set->min) * -1;
+        $data['prediction'] = floatval($set->avg) * -1;
+
+        /**
+         * The  prediction is done by
+         */
+        Cache::forever($cacheKey,$data);
+
+
+        return $data;
+    }
+
+    /**
+     * Return what the prediction for $date is based on.
+     *
+     * @param Carbon $date
+     */
+    public function predictionInformation(Carbon $date) {
+        $predictionStart = Setting::getSetting('predictionStart')->value->format('Y-m-d');
+        $transactions = Auth::user()->transactions()
+            ->where(DB::Raw('DATE_FORMAT(`date`,"%d")'),'=',$date->format('d'))
+            ->where('date','>',$predictionStart)
+            ->where('ignoreprediction',0)
+            ->where('account_id',$this->id)
+            ->expenses()
+            ->get();
+
+        return $transactions;
+
     }
 
     /**

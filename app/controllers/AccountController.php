@@ -58,7 +58,7 @@ class AccountController extends BaseController
             'openingbalance'     => floatval(Input::get('openingbalance')),
             'currentbalance'     => floatval(Input::get('openingbalance')),
             'openingbalancedate' => Input::get('openingbalancedate'),
-            'inactive'             => Input::get('inactive') == '1' ? 1 : 0,
+            'inactive'           => Input::get('inactive') == '1' ? 1 : 0,
             'shared'             => Input::get('shared') == '1' ? 1 : 0
         ];
         // create the new account:
@@ -274,8 +274,6 @@ class AccountController extends BaseController
         $chart->addCertainty(1);
         $chart->addInterval(1);
         $chart->addInterval(1);
-        $chart->addInterval(1);
-        $chart->addInterval(1);
 
         // all annotations:
         $marked = AccountHelper::getMarkedTransactions($account, $date, $end);
@@ -287,8 +285,6 @@ class AccountController extends BaseController
             $balance = $account->balanceOnDate($date);
             $above = $balance;
             $below = $balance;
-            $alt1 = $balance;
-            $alt2 = $balance;
         }
 
 
@@ -300,29 +296,23 @@ class AccountController extends BaseController
                 $balance = $account->balanceOnDate($current);
                 $above = $balance;
                 $below = $balance;
-                $alt1 = $balance;
-                $alt2 = $balance;
             } else {
                 // predict the future:
                 $certain = false;
                 $prediction = $account->predictOnDate($current);
+
                 /** @noinspection PhpUndefinedVariableInspection */
                 $above -= $prediction['least'];
+
                 /** @noinspection PhpUndefinedVariableInspection */
                 $below -= $prediction['most'];
-
-                /** @var $alt1 int */
-                $alt1 -= $prediction['prediction_alt1'];
-
-                /** @var $alt2 int */
-                $alt2 -= $prediction['prediction_alt2'];
 
                 /** @noinspection PhpUndefinedVariableInspection */
                 $balance -= $prediction['prediction'];
             }
             // get the marked transactions:
             $annotation = isset($marked[$current->format('Y-m-d')]) ? $marked[$current->format('Y-m-d')] : null;
-            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $alt2, $alt1, $below);
+            $chart->addRow($current, $balance, $annotation[0], $annotation[1], $certain, $above, $below);
             $date->addDay();
         }
 
@@ -335,7 +325,29 @@ class AccountController extends BaseController
         } else {
             return Response::json($chart->getData());
         }
+    }
 
+    /**
+     * TODO: catch no accounts present.
+     *
+     * @param $year
+     * @param $month
+     * @param $day
+     *
+     * @return \Illuminate\View\View
+     */
+    public function predict(Account $account, $year, $month, $day)
+    {
+        $date = Carbon::createFromDate($year,$month,$day);
+        $basicPrediction = $account->predictOnDate($date);
+        $transactions = $account->predictionInformation($date);
+
+        return View::make('accounts.predict')->with('prediction',$basicPrediction)->with('date',$date)
+
+            ->with('transactions',$transactions);
+
+
+        return 1;
     }
 
 }

@@ -37,22 +37,9 @@ function drawAccountChart() {
                     var selection = chart.getSelection()[0];
                     // build some sort of modal dialog?
                     var date = gdata.getValue(selection.row, 0);
-                    var params = {
-                        balance: gdata.getValue(selection.row, 1),
-                        optimistic: gdata.getValue(selection.row, 5),
-                        alt1: gdata.getValue(selection.row, 6),
-                        alt2: gdata.getValue(selection.row, 7),
-                        pessimistic: gdata.getValue(selection.row, 8)
-
-
-
-                    };
-
-                    var query = $.param(params);
-
 
                     var dateString = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
-                    var URL = '/home/predict/' + dateString + '?' + query;
+                    var URL = '/home/account/'+fpAccount+'/predict/' + dateString;
 
 
                     $('#PopupModal').modal(
