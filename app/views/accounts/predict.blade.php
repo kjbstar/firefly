@@ -13,9 +13,9 @@
 
     </tr>
     <tr>
-        <td>{{mf($prediction['least'],true)}}</td>
-        <td>{{mf($prediction['prediction'],true)}}</td>
-        <td>{{mf($prediction['most'],true)}}</td>
+        <td>{{mf($prediction['least']*-1,true)}}</td>
+        <td>{{mf($prediction['prediction']*-1,true)}}</td>
+        <td>{{mf($prediction['most']*-1,true)}}</td>
     </tr>
 </table>
 
@@ -29,8 +29,8 @@
     @foreach($information as $row)
     <tr>
         <td>{{$row->day->format('jS F')}}</td>
-        <td>{{mf($row->sum_of_day)}}</td>
-        <td>{{mf($row->average_of_day)}}</td>
+        <td>{{mf($row->sum_of_day,true)}}</td>
+        <td>{{mf($row->average_of_day,true)}}</td>
     </tr>
     @endforeach
 </table>

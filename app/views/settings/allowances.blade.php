@@ -42,7 +42,7 @@
                 <p>
                 <div class="input-group">
                     <span class="input-group-addon">&euro;</span>
-                    <input type="amount" name="defaultAllowance"
+                    <input type="number" name="defaultAllowance"
                           class="form-control"
                    value="{{{$defaultAllowance->value > 0 ?
                    $defaultAllowance->value

@@ -110,6 +110,20 @@
 
   </div>
 </div>
+@stop
 
-
+@section('scripts')
+<script type="text/javascript">
+    // fallback for input type date,
+    // which Firefox doesn't support.
+    yepnope({
+        test : Modernizr.inputtypes.date,
+        nope : ['//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js','http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-lightness/jquery-ui.css'],
+        complete: function () {
+            $('input[type=date]').datepicker({
+                dateFormat: 'yy-mm-dd'
+            });
+        }
+    });
+</script>
 @stop
