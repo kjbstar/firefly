@@ -62,7 +62,7 @@ class HomeController extends BaseController
 
         $transfers = HomeHelper::transfers($today, $fpAccount);
 
-        $history = HomeHelper::history();
+        $history = HomeHelper::history($fpAccount);
 
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(
             'history', $history

@@ -277,14 +277,18 @@ class HomeHelper
     /**
      * @return array
      */
-    public static function history()
+    public static function history(Account $account = null)
     {
         $earliest = Toolkit::getEarliestEvent();
         $history = [];
         $now = new Carbon;
         $now->addMonth();
         while ($now > $earliest) {
-            $url = URL::Route('home', [$now->format('Y'), $now->format('n')]);
+            if(!is_null($account)) {
+                $url = URL::Route('home', [$now->format('Y'), $now->format('n'),$account->id]);
+            } else {
+                $url = URL::Route('home', [$now->format('Y'), $now->format('n')]);
+            }
             $history[] = [
                 'url'     => $url,
                 'title'   => $now->format('F Y'),
