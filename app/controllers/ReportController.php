@@ -237,15 +237,25 @@ class ReportController extends BaseController
         $current = clone $start;
 
         // all relevant accounts!
-        $accounts = Auth::user()->accounts()->notInactive()->notShared()->where(
+        $accounts = Auth::user()->accounts()->notShared()->where(
             'openingbalancedate', '<', $end->format('Y-m-d')
         )->get();
 
         // create a chart!
         $chart = App::make('gchart');
         $chart->addColumn('Month', 'date');
-        foreach ($accounts as $account) {
-            $chart->addColumn($account->name, 'number');
+        foreach ($accounts as $index => $account) {
+
+            // sneak in a check if this account was actually active
+            // in this year. If not, simply unset it. I know.
+            $transactions = $account->transactions()->inYear($start)->count();
+            $transfersTo = $account->transfersto()->inYear($start)->count();
+            $transfersFrom = $account->transfersfrom()->inYear($start)->count();
+            if($transactions == 0 && $transfersTo  == 0 && $transfersFrom == 0) {
+                unset($accounts[$index]);
+            } else {
+                $chart->addColumn($account->name, 'number');
+            }
         }
 
 

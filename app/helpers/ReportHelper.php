@@ -260,13 +260,13 @@ class ReportHelper
             )
             ->leftJoin('accounts', 'accounts.id', '=', 'transactions.account_id')
             ->where('accounts.shared', 0)
-            ->get();
+            ->get(['transactions.*']);
 
         // transfers FROM a shared account to you are also income,
         // since transfers TO shared accounts are expenses.
         $transfers = Auth::user()->transfers()->$inPeriod($date)
             ->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountfrom_id')
-            ->where('accounts.shared', 1)->get();
+            ->where('accounts.shared', 1)->get(['transfers.*']);
 
         // join these two and loop them:
         $set = $transactions->merge($transfers);
@@ -367,14 +367,15 @@ class ReportHelper
         return ($sumA < $sumB) ? -1 : 1;
     }
 
-    public static function sharedAccountsByMonth(Carbon $date) {
+    public static function sharedAccountsByMonth(Carbon $date)
+    {
         $date->startOfYear();
         $end = clone $date;
         $end->endOfYear();
         $data = [];
 
         $current = clone $end;
-        while($current >= $date) {
+        while ($current >= $date) {
             $data[] = [
                 'date' => clone $current,
                 'data' => self::sharedAccounts($current)
@@ -439,7 +440,7 @@ class ReportHelper
                 'payer'            => $payer
             ];
         }
-        Cache::forever($cacheKey,$result);
+        Cache::forever($cacheKey, $result);
         return $result;
     }
 }
