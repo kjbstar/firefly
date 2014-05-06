@@ -19,8 +19,21 @@
     </tr>
 </table>
 
-<h5>Based on these transactions</h5>
-    @include('list.mutations-small',['mutations' => $transactions])
+<h5>Based on this information</h5>
+<table class="table table-bordered">
+    <tr>
+        <th>Date</th>
+        <th>Total amount</th>
+        <th>Average amount</th>
+    </tr>
+    @foreach($information as $row)
+    <tr>
+        <td>{{$row->day->format('jS F')}}</td>
+        <td>{{mf($row->sum_of_day)}}</td>
+        <td>{{mf($row->average_of_day)}}</td>
+    </tr>
+    @endforeach
+</table>
 
             </div>
             <div class="modal-footer">

@@ -340,11 +340,11 @@ class AccountController extends BaseController
     {
         $date = Carbon::createFromDate($year,$month,$day);
         $basicPrediction = $account->predictOnDate($date);
-        $transactions = $account->predictionInformation($date);
+        $information = $account->predictionInformation($date);
 
         return View::make('accounts.predict')->with('prediction',$basicPrediction)->with('date',$date)
 
-            ->with('transactions',$transactions);
+            ->with('information',$information);
 
 
         return 1;

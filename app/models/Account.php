@@ -127,15 +127,15 @@ class Account extends Eloquent
         $queryText
             = '
         SELECT
-          MAX(`sum`) as `min`,
-          MIN(`sum`) as `max`,
-          AVG(`average`) as `avg`,
-          AVG(`sum`) as `sum_avg`
+          MAX(`sum_of_day`) as `min`,
+          MIN(`sum_of_day`) as `max`,
+          AVG(`average_of_day`) as `avg`,
+          AVG(`sum_of_day`) as `sum_avg`
         FROM (
           SELECT
             DATE_FORMAT(`date`,"%d-%m-%Y") as `day`,
-            AVG(`amount`) as `average`,
-            SUM(`amount`) as `sum`
+            AVG(`amount`) as `average_of_day`,
+            SUM(`amount`) as `sum_of_day`
           FROM `transactions`
           WHERE `amount` < 0
           AND   DATE_FORMAT(`date`,"%d") = "' . $dayOfPrediction . '"
@@ -158,9 +158,6 @@ class Account extends Eloquent
         $data['prediction']
             = $diff != 0 ? (floatval($set->sum_avg) * -1) / $diff : (floatval($set->sum_avg) * -1);
 
-        /**
-         * The  prediction is done by
-         */
         Cache::forever($cacheKey, $data);
 
 
@@ -174,16 +171,35 @@ class Account extends Eloquent
      */
     public function predictionInformation(Carbon $date)
     {
+        $dayOfPrediction = $date->format('d');
+        /**
+         * SELECT
+         * DATE_FORMAT(`date`,"%d-%m-%Y") as `day`,
+         * AVG(`amount`) as `average_of_day`,
+         * SUM(`amount`) as `sum_of_day`
+         * FROM `transactions`
+         *
+         * GROUP BY `day`
+         * ORDER BY `date`
+         */
         $predictionStart = Setting::getSetting('predictionStart')->value->format('Y-m-d');
-        $transactions = Auth::user()->transactions()
-            ->where(DB::Raw('DATE_FORMAT(`date`,"%d")'), '=', $date->format('d'))
-            ->where('date', '>', $predictionStart)
+        $information = Auth::user()->transactions()
+            ->expenses()
+            ->where(DB::Raw('DATE_FORMAT(`date`,"%d")'), '=', $dayOfPrediction)
             ->where('ignoreprediction', 0)
             ->where('account_id', $this->id)
-            ->expenses()
-            ->get();
-
-        return $transactions;
+            ->where('date', '>', $predictionStart)
+            ->get(
+                [
+                    DB::Raw('DATE_FORMAT(`date`,"%d-%m-%Y") as `day`'),
+                    DB::Raw('AVG(`amount`) as `average_of_day`'),
+                    DB::Raw('SUM(`amount`) as `sum_of_day`')
+                ]
+            );
+        $information->each(function($x) {
+                $x->day = new Carbon($x->day);
+            });
+        return $information;
 
     }
 
