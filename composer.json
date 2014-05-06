@@ -3,6 +3,7 @@
     "description": "A web-application to manage your finances.",
     "license": "MIT",
     "php": ">=5.4.0",
+    "type" => "project",
     "require": {
         "laravel/framework": "4.1.*",
         "davejamesmiller/laravel-breadcrumbs": "2.*",
