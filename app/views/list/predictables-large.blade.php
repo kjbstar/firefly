@@ -4,6 +4,7 @@
         <th>#</th>
         <th colspan="2">Amount</th>
         <th>Day of month</th>
+        <th>Last hit</th>
         <th>&nbsp;</th>
     </tr>
     @foreach($predictables as $predictable)
@@ -39,6 +40,11 @@
         </td>
         <td>
             {{$predictable->dayOfMonth()}}
+        </td>
+        <td>
+            @if($predictable->lastTransaction)
+            {{$predictable->lastTransaction->date->format('jS F Y')}}
+            @endif
         </td>
         <td>
             <div class="btn-group">

@@ -13,6 +13,14 @@ class PredictableController extends BaseController
     public function index()
     {
         $predictables = Auth::user()->predictables()->orderBy('inactive')->orderBy('description')->get();
+        $predictables->each(function($p) {
+                $p->lastTransaction = $p->transactions()->orderBy('date','DESC')->first();
+            });
+        $predictables = $predictables->sortBy(
+            function ($p) {
+                return $p->lastTransaction;
+            }
+        )->reverse();
 
         return View::make('predictables.index')->with('title', 'All predictables')->with('predictables', $predictables);
 
