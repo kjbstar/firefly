@@ -2,8 +2,22 @@
     "name": "grumpydictator/firefly",
     "description": "A web-application to manage your finances.",
     "license": "MIT",
+    "keywords": ["finance","finances","manager","euro","laravel","money","financials","budgets","transactions","transfers","management"],
+    "homepage": "https://github.com/JC5/firefly",
     "php": ">=5.4.0",
     "type": "project",
+    "authors": [{
+        "name": "James Cole",
+        "email": "thegrumpydictator@gmail.com",
+        "homepage": "https://github.com/JC5",
+        "role": "Developer"
+    }],
+    "support": [{
+        "email": "thegrumpydictator@gmail.com",
+        "issues": "https://github.com/JC5/firefly/issues?state=open",
+        "source": "https://github.com/JC5/firefly"
+
+    }],
     "require": {
         "laravel/framework": "4.1.*",
         "davejamesmiller/laravel-breadcrumbs": "2.*",
