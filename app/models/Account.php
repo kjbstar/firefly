@@ -117,7 +117,7 @@ class Account extends Eloquent
     {
         $cacheKey = $this->id . '-' . $date->format('dmy') . '-predictOnDate';
         if (Cache::has($cacheKey)) {
-            //return Cache::get($cacheKey);
+            return Cache::get($cacheKey);
         }
         // prediction setting:
         $predictionStart = Setting::getSetting('predictionStart')->value->format('Y-m-d');
