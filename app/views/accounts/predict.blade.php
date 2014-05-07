@@ -29,7 +29,16 @@
     @foreach($information as $row)
     <tr>
         <td>{{$row->day->format('jS F')}}</td>
-        <td>{{mf($row->sum_of_day,true)}}</td>
+
+        @if($row->sum_of_day == $prediction['least']*-1)
+        <td class="success">
+        @elseif($row->sum_of_day == $prediction['most']*-1)
+        <td class="danger">
+        @else
+        <td>
+        @endif
+
+            {{mf($row->sum_of_day,true)}}</td>
         <td>{{mf($row->average_of_day,true)}}</td>
     </tr>
     @endforeach
