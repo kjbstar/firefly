@@ -40,8 +40,10 @@ class PostCreateProjectCommand extends Command
     public function fire()
     {
         //
-        $this->info('To finish the installation of Firefly, follow these instructions:');
-        $this->info('https://github.com/JC5/firefly/wiki/Installation');
+        $this->info("\n\n");
+        $this->comment('To finish the installation of Firefly, follow these instructions:');
+        $this->comment('https://github.com/JC5/firefly/wiki/Installation');
+        $this->info("\n\n");
     }
 
     /**
