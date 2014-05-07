@@ -92,7 +92,7 @@ class HomeHelper
                 function($query) use ($account) {
                 $query->orWhereNull('account_id');
                     if(!is_null($account)) {
-                    $query->orWhere('account_id',$account->id);
+                        $query->orWhere('account_id',$account->id);
                     }
                 }
             )->orderBy('account_id','DESC')->first();
