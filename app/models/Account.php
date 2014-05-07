@@ -158,6 +158,17 @@ class Account extends Eloquent
         $data['prediction']
             = $diff != 0 ? (floatval($set->sum_avg) * -1) / $diff : (floatval($set->sum_avg) * -1);
 
+        /*
+         * If the optimistic (least) prediction is larger than the normal prediction,
+         * (ie predicting a bigger expense)
+         * we change the optimistic prediction:
+         */
+        Log::debug('Data[least] ('.$data['least'].') vs Data[pred] ('.$data['prediction'].')');
+        if($data['least'] > $data['prediction']) {
+
+            $data['least'] = $data['prediction'];
+        }
+
         Cache::forever($cacheKey, $data);
 
 
