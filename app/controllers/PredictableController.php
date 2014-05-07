@@ -114,7 +114,6 @@ class PredictableController extends BaseController
         // save all components (if any):
         $predictable->saveComponentsFromInput();
 
-        Queue::push('PredictableQueue@scanAll', ['predictable_id' => $predictable->id]);
 
         Session::flash('success', 'The predictable has been created.');
 
