@@ -189,6 +189,7 @@ class Account extends Eloquent
             ->where('ignoreprediction', 0)
             ->where('account_id', $this->id)
             ->where('date', '>', $predictionStart)
+            ->groupBy('day')
             ->get(
                 [
                     DB::Raw('DATE_FORMAT(`date`,"%d-%m-%Y") as `day`'),
