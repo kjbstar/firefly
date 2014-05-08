@@ -24,7 +24,7 @@ class HomeControllerTest extends TestCase
      * @covers HomeController::index()
      */
     public function testIndexLogin() {
-        $user = User::whereUsername('admin');
+        $user = User::whereUsername('admin')->first();
         $this->be($user);
 
         $this->action('GET', 'HomeController@index');
