@@ -199,9 +199,13 @@ class AccountTrigger
         if (is_null(Auth::user())) {
             $user = User::find($account->user_id);
         }
+        if (is_null($user)) {
+            return false;
+        }
         if (is_null($account->id)) {
             $accounts = $user->accounts()->get();
         } else {
+
             $accounts = $user->accounts()->where(
                 'id', '!=', $account->id
             )->get();

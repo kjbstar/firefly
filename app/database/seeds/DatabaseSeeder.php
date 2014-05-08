@@ -11,9 +11,26 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         Eloquent::unguard();
+        $env = App::environment();
+        if ($env == 'local') {
+            exit('LOCAL');
+        }
+
         // create the types
         $this->call('SeedTypes');
 
+
+        if ($env == 'testing' || $env == 'travis') {
+            // seed test data.
+
+            // seed new user
+            $this->call('NewUserSeeder');
+
+            // seed accounts:
+            $this->call('SeedAccounts');
+        } else {
+            // seed anything else
+        }
 
 
     }
