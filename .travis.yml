@@ -8,3 +8,6 @@ install:
 
 before_install:
   - mysql -e 'create database firefly;'
+
+after_script:
+  - php vendor/bin/coveralls
