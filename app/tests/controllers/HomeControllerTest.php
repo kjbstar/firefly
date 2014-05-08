@@ -31,4 +31,21 @@ class HomeControllerTest extends TestCase
         $this->assertRedirectedToRoute('home');
     }
 
+    /**
+     * Run the home page and test some basic information.
+     */
+    public function testHomeBasic() {
+        $user = User::whereUsername('admin')->first();
+        $this->be($user);
+
+        $response = $this->action('GET', 'HomeController@home');
+        $view = $response->original;
+
+        $this->assertResponseOk();
+
+        $this->assertEquals('Home',$view['title']);
+
+
+    }
+
 }
