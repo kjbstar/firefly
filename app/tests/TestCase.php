@@ -1,9 +1,5 @@
 <?php
 
-/**
- * TODO every successful POST should have a 'success' flash.
- * TODO every failed POST should have a 'error' flash.
- */
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
 
@@ -23,16 +19,14 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
     }
 
-    public function testIsTrue() {
+    public function testIsTrue()
+    {
         $this->assertTrue(true);
     }
 
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-//        $test = new self;
-//        $test->setUp();
-//        $test->seed();
     }
 
     protected function tearDown()
@@ -40,7 +34,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
         parent::tearDown();
 
         // workaround for https://github.com/symfony/symfony/issues/2531
-        if (ob_get_length() == 0 ) {
+        if (ob_get_length() == 0) {
             ob_start();
         }
     }

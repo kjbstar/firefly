@@ -83,13 +83,14 @@ App::down(
 | definitions instead of putting them all in the main routes file.
 |
 */
-
-function array_unshift_assoc(&$arr, $key, $val)
-{
-    $arr = array_reverse($arr, true);
-    $arr[$key] = $val;
-    $arr = array_reverse($arr, true);
-    return $arr;
+if (!function_exists('array_unshift_assoc')) {
+    function array_unshift_assoc(&$arr, $key, $val)
+    {
+        $arr = array_reverse($arr, true);
+        $arr[$key] = $val;
+        $arr = array_reverse($arr, true);
+        return $arr;
+    }
 }
 
 if (!function_exists('mf')) {
@@ -125,6 +126,6 @@ Cache::extend(
     'authfilecache', function ($app) {
         $path = $app['config']['cache.path'];
         $files = new Illuminate\Filesystem\Filesystem($app['files'], $path);
-        return new Illuminate\Cache\Repository(new AuthenticatedCacheFileStore($files,$path));
+        return new Illuminate\Cache\Repository(new AuthenticatedCacheFileStore($files, $path));
     }
 );
