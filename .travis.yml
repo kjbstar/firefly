@@ -4,3 +4,7 @@ php:
   - 5.4
 install:
   - composer install
+  - php artisan firefly:install --env=travis
+
+before_script:
+  - mysql -e 'create database firefly;'
