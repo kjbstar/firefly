@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon as Carbon;
+
 class HomeControllerTest extends TestCase
 {
 
@@ -39,6 +41,9 @@ class HomeControllerTest extends TestCase
         $this->assertResponseOk();
 
         $this->assertEquals('Home',$view['title']);
+        // $today should be today's date:
+        $today = new Carbon;
+        $this->assertEquals($today->format('Ymd'),$view['today']->format('Ymd'));
 
 
     }

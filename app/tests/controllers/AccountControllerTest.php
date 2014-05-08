@@ -23,7 +23,21 @@ class AccountControllerTest extends TestCase
      */
     public function testIndex()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $user = User::whereUsername('admin')->first();
+        $this->be($user);
+
+        $response = $this->action('GET', 'AccountController@index');
+        $view = $response->original;
+
+        $this->assertResponseOk();
+
+        $this->assertEquals('All accounts',$view['title']);
+
+        // test the count of the accounts.
+        $count = DB::table('accounts')->where('user_id',$user->id)->count();
+        $this->assertCount($count,$view['accounts']);
+
+
     }
 
     /**
@@ -32,7 +46,18 @@ class AccountControllerTest extends TestCase
      */
     public function testAdd()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $user = User::whereUsername('admin')->first();
+        $this->be($user);
+
+        $response = $this->action('GET', 'AccountController@add');
+        $view = $response->original;
+
+        $this->assertResponseOk();
+        $this->assertSessionHas('previous');
+
+        $this->assertEquals('Add a new account',$view['title']);
+
+
     }
 
     /**
