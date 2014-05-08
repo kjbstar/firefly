@@ -1,4 +1,6 @@
-[![Coverage Status](https://coveralls.io/repos/JC5/firefly/badge.png?branch=master)](https://coveralls.io/r/JC5/firefly?branch=master) [![Build Status](https://travis-ci.org/JC5/firefly.svg?branch=master)](https://travis-ci.org/JC5/firefly)
+[![Build Status](https://travis-ci.org/JC5/firefly.svg?branch=master)](https://travis-ci.org/JC5/firefly) [![Coverage Status](https://coveralls.io/repos/JC5/firefly/badge.png?branch=master)](https://coveralls.io/r/JC5/firefly?branch=master)
+
+[![Latest Stable Version](https://poser.pugx.org/grumpydictator/firefly/v/stable.png)](https://packagist.org/packages/grumpydictator/firefly) [![Total Downloads](https://poser.pugx.org/grumpydictator/firefly/downloads.png)](https://packagist.org/packages/grumpydictator/firefly)
 
 # Firefly
 Firefly is a PHP based money manager. It's built to support my own finances, but
