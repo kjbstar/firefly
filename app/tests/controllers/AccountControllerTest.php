@@ -136,20 +136,76 @@ class AccountControllerTest extends TestCase
 
     /**
      * @covers AccountController::edit
-     * @todo   implement
      */
     public function testEdit()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // find an account to edit:
+        $account = DB::table('accounts')->first();
+        $response = $this->action('GET', 'AccountController@edit', $account->id);
+        $view = $response->original;
+
+        $this->assertResponseOk();
+        $this->assertSessionHas('previous');
+        $this->assertEquals('Edit account "' . $account->name . '"', $view['title']);
+        $this->assertEquals($account->name, $view['account']->name);
+        $this->assertEquals($account->name, $view['prefilled']['name']);
+
+    }
+
+    /**
+     * @covers AccountController::edit
+     */
+    public function testEditWithOldInput()
+    {
+        // find an account to edit:
+        $account = DB::table('accounts')->first();
+
+        $oldData = [
+            'name'               => 'Old input (edited account)',
+            'openingbalance'     => '100',
+            'openingbalancedate' => '2014-01-01'
+        ];
+        $this->session(['_old_input' => $oldData]);
+
+        $response = $this->action('GET', 'AccountController@edit', $account->id);
+        $view = $response->original;
+
+        $this->assertResponseOk();
+        $this->assertEquals('Edit account "' . $account->name . '"', $view['title']);
+        $this->assertEquals($account->name, $view['account']->name);
+        $this->assertEquals($oldData['name'], $view['prefilled']['name']);
+
     }
 
     /**
      * @covers AccountController::postEdit
-     * @todo   implement
      */
     public function testPostEdit()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // find account to edit.
+        $account = DB::table('accounts')->first();
+        $originalName = $account->name;
+
+        $newData = [
+            'name'               => 'New Account Name #' . rand(1000, 9999),
+            'openingbalance'     => $account->openingbalance,
+            'openingbalancedate' => $account->openingbalancedate,
+            'inactive'           => $account->inactive,
+            'shared'             => $account->shared
+        ];
+
+        // this should update the account.
+        $this->call('POST', '/home/account/' . $account->id . '/edit/', $newData);
+
+        $this->assertSessionHas('success');
+        $this->assertResponseStatus(302);
+        $newAccount = DB::table('accounts')->find($account->id);
+
+        // new account name should match
+        $this->assertEquals($newData['name'], $newAccount->name);
+
+        // restore account again:
+        DB::table('accounts')->whereId($account->id)->update(['name' => $originalName]);
     }
 
     /**
