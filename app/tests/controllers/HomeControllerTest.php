@@ -3,11 +3,6 @@
 class HomeControllerTest extends TestCase
 {
 
-    public function testSomethingIsTrue()
-    {
-        $this->assertTrue(true);
-    }
-
     /**
      * Redirect user if not logged in.
      *

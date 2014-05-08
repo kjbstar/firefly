@@ -219,3 +219,8 @@ Route::get('/home/profile/username', ['uses' => 'ProfileController@changeUsernam
 
 Route::post('/home/profile/password', ['uses' => 'ProfileController@postChangePassword','before' => 'csrf']);
 Route::post('/home/profile/username', ['uses' => 'ProfileController@postChangeUsername','before' => 'csrf']);
+
+/**
+ * Clover coverage parser (very simple).
+ */
+Route::get('/clover', ['uses' => 'CloverController@coverage','as' => 'clover']);
