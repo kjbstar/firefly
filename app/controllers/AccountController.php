@@ -140,11 +140,13 @@ class AccountController extends BaseController
         $result = $account->save();
 
         // failed again!
+        // @codeCoverageIgnoreStart
         if (!$result) {
             Session::flash('error', 'Could not save the account. Is the account name unique?');
             return Redirect::route('editaccount', $account->id)->withInput()->withErrors($validator);
-
         }
+        // @codeCoverageIgnoreEnd
+
         // success!
         Cache::userFlush();
         Session::flash('success', 'The account has been updated.');

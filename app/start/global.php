@@ -129,3 +129,9 @@ Cache::extend(
         return new Illuminate\Cache\Repository(new AuthenticatedCacheFileStore($files, $path));
     }
 );
+
+Cache::extend(
+    'userarray', function ($app) {
+        return new Illuminate\Cache\Repository(new UserArrayStore);
+    }
+);
