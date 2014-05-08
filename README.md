@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/JC5/firefly/badge.png?branch=master)](https://coveralls.io/r/JC5/firefly?branch=master) [![Build Status](https://travis-ci.org/JC5/firefly.svg?branch=master)](https://travis-ci.org/JC5/firefly)
+
 # Firefly
 Firefly is a PHP based money manager. It's built to support my own finances, but
 can be used by pretty much anybody.
