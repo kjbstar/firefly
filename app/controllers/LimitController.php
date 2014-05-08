@@ -77,6 +77,8 @@ class LimitController extends BaseController
             return Redirect::route('componentoverview', [$component->id]);
         }
 
+        Cache::userFlush();
+
         Session::flash('success', 'Limit saved!');
         return Redirect::to(Session::get('previous'));
 
@@ -135,6 +137,8 @@ class LimitController extends BaseController
             return Redirect::route(OBJ . 'overview', [$component->id]);
         }
         // save
+
+        Cache::userFlush();
         Session::flash('success', 'Limit edited!');
         $limit->save();
 
@@ -169,6 +173,7 @@ class LimitController extends BaseController
      */
     public function postDelete(Limit $limit)
     {
+        Cache::userFlush();
         $limit->delete();
         Session::flash('success', 'Limit removed.');
 
