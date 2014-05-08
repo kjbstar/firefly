@@ -25,7 +25,8 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "dev-master",
-        "barryvdh/laravel-ide-helper": "1.*"
+        "barryvdh/laravel-ide-helper": "1.*",
+        "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {
         "classmap": [
