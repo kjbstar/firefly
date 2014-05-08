@@ -9,5 +9,7 @@ install:
 before_install:
   - mysql -e 'create database firefly;'
 
+src_dir: .
+
 after_script:
   - php vendor/bin/coveralls
