@@ -425,7 +425,7 @@ class AccountControllerTest extends TestCase
 
         // get a date
         $date = new Carbon;
-        $date->subMonths(3);
+        $date->addMonths(3);
 
         // this should get the overview
         $response = $this->call('GET', '/home/account/' . $account->id . '/overview/chart/' . $date->format('Y/m'));
