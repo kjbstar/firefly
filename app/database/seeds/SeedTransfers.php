@@ -19,7 +19,7 @@ class SeedTransfers extends Seeder {
                 'accountto_id'=> $other->id,
                 'description' => 'Test transfer #1',
                 'amount' => 500,
-                'date' => '2014-01-01',
+                'date' => '2014-01-03',
                 'ignoreallowance' => 0,
             ]
         );
@@ -33,7 +33,7 @@ class SeedTransfers extends Seeder {
                 'accountto_id'=> $account->id,
                 'description' => 'Test transfer #2',
                 'amount' => 500,
-                'date' => '2014-01-01',
+                'date' => '2014-01-04',
                 'ignoreallowance' => 0,
             ]
         );

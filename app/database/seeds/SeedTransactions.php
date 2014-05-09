@@ -18,7 +18,7 @@ class SeedTransactions extends Seeder {
                 'predictable_id' => null,
                 'description' => 'Test transaction',
                 'amount' => 1000,
-                'date' => '2014-01-01',
+                'date' => '2014-01-02',
                 'ignoreprediction' => 0,
                 'ignoreallowance' => 0,
                 'mark' => 0,
