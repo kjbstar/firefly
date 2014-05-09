@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\QueryException as QueryException;
+use \Illuminate\Routing\Controller;
 
 /**
  * Class BaseController

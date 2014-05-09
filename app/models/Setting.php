@@ -1,6 +1,6 @@
 <?php
 use Carbon\Carbon as Carbon;
-
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
  * Setting

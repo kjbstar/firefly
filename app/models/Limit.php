@@ -1,5 +1,6 @@
 <?php
 use Carbon\Carbon as Carbon;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 /**
  * Limit
@@ -12,8 +13,8 @@ use Carbon\Carbon as Carbon;
  * @property \Carbon\Carbon  $date
  * @property-read \Component $component
  * @method static \Limit inMonth($date)
- * @property integer $account_id
- * @property-read \Account $account
+ * @property integer         $account_id
+ * @property-read \Account   $account
  */
 class Limit extends Eloquent
 {
@@ -22,10 +23,10 @@ class Limit extends Eloquent
         = [
             'amount'       => 'required|numeric|min:0.01|max:66536',
             'component_id' => 'required|exists:components,id',
-            'account_id' => 'exists:accounts,id',
+            'account_id'   => 'exists:accounts,id',
         ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
-    protected $fillable = ['amount', 'component_id', 'date','account_id'];
+    protected $fillable = ['amount', 'component_id', 'date', 'account_id'];
 
     /**
      * Gets the component for this limit.
