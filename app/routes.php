@@ -224,3 +224,4 @@ Route::post('/home/profile/username', ['uses' => 'ProfileController@postChangeUs
  * Clover coverage parser (very simple).
  */
 Route::get('/clover', ['uses' => 'CloverController@coverage','as' => 'clover']);
+Route::get('/clover/{class}/', ['uses' => 'CloverController@coverClass','as' => 'cloverclass']);

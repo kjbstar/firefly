@@ -22,7 +22,7 @@
             </tr>
                 @foreach($info as $file => $row)
                 <tr>
-                    <td>{{$file}}</td>
+                    <td><a href="{{URL::Route('cloverclass',$file)}}">{{$file}}</a></td>
                     @if($row['methods'] < 50)
                     <td class="danger">{{$row['methods']}}%</td>
                     @elseif($row['methods'] >= 50 && $row['methods'] < 90)
