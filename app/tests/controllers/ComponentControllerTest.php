@@ -377,7 +377,6 @@ class ComponentControllerTest extends TestCase
 
     /**
      * @covers ComponentController::renderIcon
-     * @expectedException NotFoundHttpException
      */
     public function testRenderIcon()
     {
