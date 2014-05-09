@@ -416,6 +416,34 @@ class AccountControllerTest extends TestCase
     }
 
     /**
+     * @covers AccountController::overviewChartByMonth
+     */
+    public function testOverviewChartByMonthInThePast()
+    {
+        // get an account:
+        $account = Account::first();
+
+        // get a date
+        $date = new Carbon;
+        $date->subMonths(3);
+
+        // this should get the overview
+        $response = $this->call('GET', '/home/account/' . $account->id . '/overview/chart/' . $date->format('Y/m'));
+        $jsonContent = $response->getContent();
+        $json = json_decode($jsonContent);
+
+        $this->assertResponseOk();
+
+        // there should be seven columns
+        $this->assertCount(7,$json->cols);
+
+        // there should be as many rows as days in this month:
+        $this->assertCount(intval($date->format('t')),$json->rows);
+
+
+    }
+
+    /**
      * @covers AccountController::predict
      */
     public function testPredict()
