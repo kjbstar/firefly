@@ -132,7 +132,7 @@ class LimitController extends BaseController
 
         $validator = Validator::make($limit->toArray(), Limit::$rules);
         if ($validator->fails()) {
-            Session::flash('error', 'Could not edit ' . OBJ . 'limit.');
+            Session::flash('error', 'Could not edit ' . $component->type->type . 'limit.');
             return Redirect::route('componentoverview', [$component->id]);
         }
         // save
