@@ -92,13 +92,13 @@ Route::post('/home/component/{component}/edit',['uses' => 'ComponentController@p
 Route::post('/home/component/{type}/add',['uses' => 'ComponentController@postAdd','before' => 'csrf']);
 
 // URLS for LIMITS:
-Route::get('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@add','as'   => 'addcomponentlimit']);
-Route::get('/limit/edit/{limit}', ['uses' => 'LimitController@edit','as'   => 'editcomponentlimit']);
-Route::get('/limit/delete/{limit}',['uses' => 'LimitController@delete','as'   => 'deletecomponentlimit']);
+Route::get('/home/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@add','as'   => 'addcomponentlimit']);
+Route::get('/home/limit/edit/{limit}', ['uses' => 'LimitController@edit','as'   => 'editcomponentlimit']);
+Route::get('/home/limit/delete/{limit}',['uses' => 'LimitController@delete','as'   => 'deletecomponentlimit']);
 
-Route::post('/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@postAdd','before'   => 'csrf']);
-Route::post('/limit/edit/{limit}', ['uses' => 'LimitController@postEdit','before'   => 'csrf']);
-Route::post('/limit/delete/{limit}',['uses' => 'LimitController@postDelete','before'   => 'csrf']);
+Route::post('/home/limit/add/{component}/{year}/{month}',['uses' => 'LimitController@postAdd','before'   => 'csrf']);
+Route::post('/home/limit/edit/{limit}', ['uses' => 'LimitController@postEdit','before'   => 'csrf']);
+Route::post('/home/limit/delete/{limit}',['uses' => 'LimitController@postDelete','before'   => 'csrf']);
 
 /**
  * PIGGY BANK CONTROLLER

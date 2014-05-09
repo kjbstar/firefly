@@ -17,12 +17,11 @@ class LimitController extends BaseController
      */
     public function add(Component $component, $year, $month)
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
         $date = Toolkit::parseDate($year, $month);
         $accounts = AccountHelper::accountsAsSelectList();
         array_unshift_assoc($accounts, 0, '(no account)');
+        Session::put('previous', URL::previous());
+
 
         return View::make('meta-limit.add')->with('component', $component)->with('date', $date)->with(
             'accounts', $accounts
@@ -45,7 +44,7 @@ class LimitController extends BaseController
             $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
             if (is_null($account)) {
                 Session::flash('error', 'Invalid account selected.');
-                return Redirect::route('addtransaction')->withInput();
+                return Redirect::route('componentoverview', [$component->id]);
             }
         }
 
@@ -63,7 +62,7 @@ class LimitController extends BaseController
         // it fails!
         if ($validator->fails()) {
             Session::flash('error', 'Could not add limit.');
-            return Redirect::route(OBJ . 'overview', [$component->id]);
+            return Redirect::route('componentoverview', [$component->id]);
         }
         if (!is_null($account)) {
             $limit->account()->associate($account);
@@ -123,7 +122,7 @@ class LimitController extends BaseController
             $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
             if (is_null($account)) {
                 Session::flash('error', 'Invalid account selected.');
-                return Redirect::route('addtransaction')->withInput();
+                return Redirect::route('componentoverview', [$component->id]);
             }
         }
         if (!is_null($account)) {
@@ -134,7 +133,7 @@ class LimitController extends BaseController
         $validator = Validator::make($limit->toArray(), Limit::$rules);
         if ($validator->fails()) {
             Session::flash('error', 'Could not edit ' . OBJ . 'limit.');
-            return Redirect::route(OBJ . 'overview', [$component->id]);
+            return Redirect::route('componentoverview', [$component->id]);
         }
         // save
 
@@ -154,9 +153,7 @@ class LimitController extends BaseController
      */
     public function delete(Limit $limit)
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
         $component = Auth::user()->components()->find($limit->component_id);
 
         return View::make('meta-limit.delete')->with('component', $component)->with('limit', $limit)->with(
