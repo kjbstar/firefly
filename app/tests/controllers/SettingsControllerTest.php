@@ -4,10 +4,6 @@
  */
 class SettingsControllerTest extends TestCase
 {
-    /**
-     * @var SettingsController
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -15,7 +11,9 @@ class SettingsControllerTest extends TestCase
      */
     public function setUp()
     {
-        $this->object = new SettingsController;
+        parent::setUp();
+        $user = User::where('username', 'admin')->first();
+        $this->be($user);
     }
 
     /**

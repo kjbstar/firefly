@@ -83,7 +83,7 @@ class PiggyController extends BaseController
             'name'   => Input::get('name'),
             'amount' => 0,
             'target' => floatval(Input::get('target')),
-            'order'    => $max
+            'order'  => $max
         ];
 
         $piggy = new Piggybank($data);
@@ -311,6 +311,10 @@ class PiggyController extends BaseController
 
     public function dropPiggy()
     {
+        $piggyAccount = Setting::getSetting('piggyAccount');
+        if (intval($piggyAccount->value) == 0) {
+            return Redirect::route('piggyselect');
+        }
         $piggyId = intval(Input::get('id'));
         $position = intval(Input::get('position'));
         $pig = Auth::user()->piggybanks()->find($piggyId);

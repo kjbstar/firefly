@@ -5,17 +5,14 @@
 class TransactionControllerTest extends TestCase
 {
     /**
-     * @var TransactionController
-     */
-    protected $object;
-
-    /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
     public function setUp()
     {
-        $this->object = new TransactionController;
+        parent::setUp();
+        $user = User::where('username', 'admin')->first();
+        $this->be($user);
     }
 
     /**

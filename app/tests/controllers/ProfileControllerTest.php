@@ -4,10 +4,6 @@
  */
 class ProfileControllerTest extends TestCase
 {
-    /**
-     * @var ProfileController
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -15,7 +11,9 @@ class ProfileControllerTest extends TestCase
      */
     public function setUp()
     {
-        $this->object = new ProfileController;
+        parent::setUp();
+        $user = User::where('username', 'admin')->first();
+        $this->be($user);
     }
 
     /**

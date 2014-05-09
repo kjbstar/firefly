@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             $this->call('SeedComponents');
             $this->call('SeedTransactions');
             $this->call('SeedTransfers');
+            $this->call('SeedPiggybanks');
         } else {
             // seed anything else
         }

@@ -4,10 +4,6 @@
  */
 class UserControllerTest extends TestCase
 {
-    /**
-     * @var UserController
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -15,7 +11,9 @@ class UserControllerTest extends TestCase
      */
     public function setUp()
     {
-        $this->object = new UserController;
+        parent::setUp();
+        $user = User::where('username', 'admin')->first();
+        $this->be($user);
     }
 
     /**
