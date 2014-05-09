@@ -76,7 +76,8 @@ class CloverController extends BaseController
 
             // loop file lines
             foreach ($fileLines as $index => $line) {
-                $isCovered = isset($covered[$index]) ? $covered[$index] : null;
+                $lineNumber = $index + 1;
+                $isCovered = isset($covered[$lineNumber]) ? $covered[$lineNumber] : null;
                 $return[$index] = [
                     'line'    => $line,
                     'covered' => $isCovered

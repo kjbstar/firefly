@@ -21,16 +21,13 @@ class DatabaseSeeder extends Seeder
 
 
         if ($env == 'testing' || $env == 'travis') {
+
             // seed test data.
-
-            // seed new user
             $this->call('NewUserSeeder');
-
-            // seed accounts:
             $this->call('SeedAccounts');
-
-            // seed components:
             $this->call('SeedComponents');
+            $this->call('SeedTransactions');
+            $this->call('SeedTransfers');
         } else {
             // seed anything else
         }
