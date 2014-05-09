@@ -271,12 +271,13 @@ class ComponentController extends BaseController
      *
      * @param Component $component
      */
+    // @codeCoverageIgnoreStart
     public function renderIcon(Component $component)
     {
         if (!$component->hasIcon()) {
             App::abort(404);
         } else {
-            // @codeCoverageIgnoreStart
+
             $image = imagecreatefrompng($component->iconFileLocation());
             imageAlphaBlending($image, true);
             imageSaveAlpha($image, true);
@@ -285,8 +286,8 @@ class ComponentController extends BaseController
             imagepng($image);
             imagedestroy($image);
             exit();
-            // @codeCoverageIgnoreEnd
-        }
 
+        }
     }
+    // @codeCoverageIgnoreEnd
 }

@@ -374,15 +374,4 @@ class ComponentControllerTest extends TestCase
         $this->assertResponseOk();
         $this->assertCount($count,$json);
     }
-
-    /**
-     * @covers ComponentController::renderIcon
-     */
-    public function testRenderIcon()
-    {
-        $component = Component::first();
-        $this->action('GET', 'ComponentController@renderIcon',$component->id);
-
-    }
-
-} 
+}
