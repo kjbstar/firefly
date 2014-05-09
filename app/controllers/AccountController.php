@@ -227,7 +227,7 @@ class AccountController extends BaseController
             return '<pre>' . print_r($chart->getData(), true) . '</pre>';
             // @codeCoverageIgnoreEnd
         } else {
-            return $chart->getData();
+            return Response::json($chart->getData());
         }
     }
 

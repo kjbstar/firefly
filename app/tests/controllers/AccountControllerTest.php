@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon as Carbon;
+
 
 class AccountControllerTest extends TestCase
 {
@@ -304,51 +306,132 @@ class AccountControllerTest extends TestCase
 
         $this->assertSessionHas('success');
         $this->assertResponseStatus(302);
-        $this->assertEquals($count-1, $newCount);
+        $this->assertEquals($count - 1, $newCount);
     }
 
     /**
      * @covers AccountController::overview
-     * @todo   implement
      */
     public function testOverview()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // get an account:
+        $account = Account::first();
+
+        // this should get the overview
+        $response = $this->call('GET', '/home/account/' . $account->id . '/overview/');
+        $view = $response->original;
+
+        // count for $months array should match
+        $start = $account->openingbalancedate;
+        $start->firstOfMonth();
+        $diff = $start->diffInMonths(new Carbon) + 1;
+        $this->assertCount($diff,$view['months']);
+
+        $this->assertResponseOk();
+        $this->assertEquals('Overview for account "' . $account->name . '"', $view['title']);
+
+
     }
 
     /**
      * @covers AccountController::overviewChart
-     * @todo   implement
      */
     public function testOverviewChart()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // get an account:
+        $account = Account::first();
+
+        // this should get the overview
+        $response = $this->call('GET', '/home/account/' . $account->id . '/overview/chart');
+        $jsonContent = $response->getContent();
+        $json = json_decode($jsonContent);
+
+        // count for $months array should match
+        $start = $account->openingbalancedate;
+        $start->firstOfMonth();
+        $diff = $start->diffInMonths(new Carbon) + 1;
+
+        $this->assertResponseOk();
+
+        // there should be two columns
+        $this->assertCount(2,$json->cols);
+
+        // there should be $diff rows:
+        $this->assertCount($diff,$json->rows);
+
     }
 
     /**
      * @covers AccountController::overviewByMonth
-     * @todo   implement
      */
     public function testOverviewByMonth()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+
+        // get an account:
+        $account = Account::first();
+
+        // get a date
+        $date = new Carbon;
+
+        // this should get the overview
+        $response = $this->call('GET', '/home/account/' . $account->id . '/overview/' . $date->format('Y/m'));
+        $view = $response->original;
+
+        // count for $mutations array should match
+        $transfersFrom = Transfer::whereAccountfromId($account->id)->where(DB::Raw('DATE_FORMAT(`date`,"%Y-%m")'),$date->format('Y-m'))->count();
+        $transfersTo = Transfer::whereAccounttoId($account->id)->where(DB::Raw('DATE_FORMAT(`date`,"%Y-%m")'),$date->format('Y-m'))->count();
+        $transactions = Transaction::whereAccountId($account->id)->where(DB::Raw('DATE_FORMAT(`date`,"%Y-%m")'),$date->format('Y-m'))->count();
+        $sum = $transfersFrom + $transfersTo + $transactions;
+        $this->assertCount($sum,$view['mutations']);
+
+        $this->assertResponseOk();
+        $this->assertEquals('Overview for account "' . $account->name . '" in '.$date->format('F Y'), $view['title']);
     }
 
     /**
      * @covers AccountController::overviewChartByMonth
-     * @todo   implement
      */
     public function testOverviewChartByMonth()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // get an account:
+        $account = Account::first();
+
+        // get a date
+        $date = new Carbon;
+
+        // this should get the overview
+        $response = $this->call('GET', '/home/account/' . $account->id . '/overview/chart/' . $date->format('Y/m'));
+        $jsonContent = $response->getContent();
+        $json = json_decode($jsonContent);
+
+        $this->assertResponseOk();
+
+        // there should be seven columns
+        $this->assertCount(7,$json->cols);
+
+        // there should be as many rows as days in this month:
+        $this->assertCount(intval($date->format('t')),$json->rows);
+
+
     }
 
     /**
      * @covers AccountController::predict
-     * @todo   implement
      */
     public function testPredict()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // get an account:
+        $account = Account::first();
+
+        // get a date
+        $date = new Carbon;
+
+        // this should get the overview
+        $response = $this->call('GET', '/home/account/' . $account->id . '/predict/' . $date->format('Y/m/d'));
+        $view = $response->original;
+
+        $this->assertResponseOk();
+
+        $this->assertEquals($date->format('Ymd'),$view['date']->format('Ymd'));
     }
 } 
