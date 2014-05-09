@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class ComponentController
  */
@@ -90,7 +91,7 @@ class ComponentController extends BaseController
         // validation fails!
         if ($validator->fails()) {
             Session::flash('error', 'Could not save the new ' . $type->type);
-            return Redirect::route('add' . OBJ)->withErrors($validator)->withInput();
+            return Redirect::route('addcomponent', $type->id)->withErrors($validator)->withInput();
         }
         // try to save it:
         $result = $component->save();
@@ -182,6 +183,7 @@ class ComponentController extends BaseController
      */
     public function delete(Component $component)
     {
+        Session::put('previous', URL::previous());
 
         $transactions = $component->transactions()->count();
         $transfers = $component->transfers()->count();
@@ -203,7 +205,7 @@ class ComponentController extends BaseController
         $component->delete();
         Session::flash('success', ucfirst($component->type->type) . ' deleted.');
 
-        return Redirect::route('components',$component->type->id);
+        return Redirect::route('components', $component->type->id);
     }
 
     /**
@@ -274,6 +276,7 @@ class ComponentController extends BaseController
         if (!$component->hasIcon()) {
             App::abort(404);
         } else {
+            // @codeCoverageIgnoreStart
             $image = imagecreatefrompng($component->iconFileLocation());
             imageAlphaBlending($image, true);
             imageSaveAlpha($image, true);
@@ -282,6 +285,7 @@ class ComponentController extends BaseController
             imagepng($image);
             imagedestroy($image);
             exit();
+            // @codeCoverageIgnoreEnd
         }
 
     }
