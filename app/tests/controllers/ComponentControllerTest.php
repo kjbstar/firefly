@@ -377,7 +377,7 @@ class ComponentControllerTest extends TestCase
 
     /**
      * @covers ComponentController::renderIcon
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedException NotFoundHttpException
      */
     public function testRenderIcon()
     {
