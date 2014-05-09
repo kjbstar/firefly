@@ -1,7 +1,6 @@
 <?php
 
 use Carbon\Carbon as Carbon;
-
 class ComponentControllerTest extends TestCase
 {
     public function setUp()
@@ -378,7 +377,7 @@ class ComponentControllerTest extends TestCase
 
     /**
      * @covers ComponentController::renderIcon
-     * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function testRenderIcon()
     {
