@@ -209,21 +209,102 @@ class AccountControllerTest extends TestCase
     }
 
     /**
+     * @covers AccountController::postEdit
+     */
+    public function testPostEditFailsValidator()
+    {
+        // find account to edit.
+        $account = DB::table('accounts')->first();
+
+        $newData = [
+            'name' => null,
+        ];
+
+        // this should update the account.
+        $this->call('POST', '/home/account/' . $account->id . '/edit/', $newData);
+
+        $this->assertSessionHas('error');
+        $this->assertResponseStatus(302);
+        $newAccount = DB::table('accounts')->find($account->id);
+
+        // account name should match old name.
+        $this->assertEquals($account->name, $newAccount->name);
+    }
+
+    /**
+     * @covers AccountController::postEdit
+     */
+    public function testPostEditFailsTrigger()
+    {
+        // find account to edit.
+        $account = DB::table('accounts')->first();
+
+        // find another account
+        $otherAccount = DB::table('accounts')->where('id', '!=', $account->id)->first();
+
+        // valid data, but account name is already in use:
+        $newData = [
+            'name'               => $otherAccount->name,
+            'openingbalance'     => $account->openingbalance,
+            'openingbalancedate' => $account->openingbalancedate,
+            'inactive'           => $account->inactive,
+            'shared'             => $account->shared
+        ];
+
+        // this should (try to) update the account.
+        $this->call('POST', '/home/account/' . $account->id . '/edit/', $newData);
+
+        $this->assertSessionHas('error');
+        $this->assertResponseStatus(302);
+        $newAccount = DB::table('accounts')->find($account->id);
+
+        // account name should match old name.
+        $this->assertEquals($account->name, $newAccount->name);
+    }
+
+    /**
      * @covers AccountController::delete
-     * @todo   implement
      */
     public function testDelete()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // find an account to delete:
+        $account = DB::table('accounts')->first();
+        $response = $this->action('GET', 'AccountController@delete', $account->id);
+        $view = $response->original;
+
+        $this->assertResponseOk();
+        $this->assertSessionHas('previous');
+        $this->assertEquals('Delete account "' . $account->name . '"', $view['title']);
+        $this->assertEquals($account->name, $view['account']->name);
     }
 
     /**
      * @covers AccountController::postDelete
-     * @todo   implement
      */
     public function testPostDelete()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        // create account, delete it.
+        $user = User::whereUsername('admin')->first();
+        $toDelete = Account::create(
+            [
+                'user_id'            => $user->id,
+                'name'               => 'To be deleted.',
+                'openingbalance'     => 1000,
+                'openingbalancedate' => '2014-01-01',
+                'currentbalance'     => 1000,
+                'inactive'           => 0,
+                'shared'             => 0
+            ]
+        );
+        $count = Account::count();
+
+        // this should delete the account.
+        $this->call('POST', '/home/account/' . $toDelete->id . '/delete/');
+        $newCount = Account::count();
+
+        $this->assertSessionHas('success');
+        $this->assertResponseStatus(302);
+        $this->assertEquals($count-1, $newCount);
     }
 
     /**
