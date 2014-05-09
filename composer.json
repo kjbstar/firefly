@@ -26,7 +26,8 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "dev-master",
         "barryvdh/laravel-ide-helper": "1.*",
-        "satooshi/php-coveralls": "dev-master"
+        "satooshi/php-coveralls": "dev-master",
+        "phpunit/phpunit-skeleton-generator": "2.0.*@dev"
     },
     "autoload": {
         "classmap": [
