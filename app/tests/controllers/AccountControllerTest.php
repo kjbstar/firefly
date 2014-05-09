@@ -12,13 +12,6 @@ class AccountControllerTest extends TestCase
         $user = User::whereUsername('admin')->first();
         $this->be($user);
     }
-
-    public function testIfTrue()
-    {
-
-        $this->assertTrue(true);
-    }
-
     /**
      * @covers AccountController::index
      * @todo   implement
@@ -47,8 +40,6 @@ class AccountControllerTest extends TestCase
      */
     public function testAdd()
     {
-        $user = User::whereUsername('admin')->first();
-        $this->be($user);
 
         $response = $this->action('GET', 'AccountController@add');
         $view = $response->original;
@@ -64,8 +55,6 @@ class AccountControllerTest extends TestCase
      */
     public function testAddWithOldInput()
     {
-        $user = User::whereUsername('admin')->first();
-        $this->be($user);
 
         $oldData = [
             'name'               => 'Old input (new account)',

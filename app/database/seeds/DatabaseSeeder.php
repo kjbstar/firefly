@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
 
             // seed accounts:
             $this->call('SeedAccounts');
+
+            // seed components:
+            $this->call('SeedComponents');
         } else {
             // seed anything else
         }
