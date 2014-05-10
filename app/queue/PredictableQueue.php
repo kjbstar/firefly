@@ -24,7 +24,12 @@ class PredictableQueue
     public function processPredictable($job, Predictable $predictable)
     {
         // find transactions for this predictable:
-        $query = Auth::user()->transactions()
+        $user = Auth::user();
+        if(is_null($user)) {
+            $user = $predictable->user()->first();
+        }
+
+        $query = $user->transactions()
             ->where('amount', '>=', $predictable->maximumAmount())
             ->where('amount', '<=', $predictable->minimumAmount())
             ->where('description', $predictable->description);

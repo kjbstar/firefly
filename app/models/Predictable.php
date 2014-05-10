@@ -30,7 +30,7 @@ class Predictable extends ComponentEnabledModel
            'inactive'    => 'required|numeric|between:0,1'];
     protected $guarded = ['id', 'created_at', 'updated_at'];
     protected $fillable
-        = ['description', 'inactive', 'user_id', 'dom', 'amount'];
+        = ['description', 'inactive', 'account_id','user_id', 'dom', 'amount'];
 
     /**
      * Return the user this Predictable belongs to.
