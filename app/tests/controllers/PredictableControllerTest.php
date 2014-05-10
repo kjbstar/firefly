@@ -133,6 +133,29 @@ class PredictableControllerTest extends TestCase
     /**
      * @covers PredictableController::postAdd
      */
+    public function testPostAddWrongAccount()
+    {
+        $account = Account::first();
+        $newData = [
+            'a'           => 'b',
+            'account_id'  => -1,
+            'amount'      => 20,
+            'pct'         => 1,
+            'dom'         => 12,
+            'inactive'    => 0,
+            'description' => 'Some new predictable' . rand(1000, 9999),
+        ];
+        $count = Predictable::count();
+        $this->action('POST', 'PredictableController@postAdd', $newData);
+        $newCount = Predictable::count();
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('error');
+        $this->assertEquals($count, $newCount);
+    }
+
+    /**
+     * @covers PredictableController::postAdd
+     */
     public function testPostAddFailValidator()
     {
         $account = Account::first();
@@ -246,6 +269,44 @@ class PredictableControllerTest extends TestCase
         $editData = [
             'description' => null,
             'account_id'  => $account->id,
+            'amount'      => 500,
+            'dom'         => 1,
+            'pct'         => 1,
+            'inactive'    => 0
+        ];
+        $this->call('POST', '/home/predictable/' . $predictable->id . '/edit', $editData);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('error');
+        $count = Predictable::whereDescription($editData['description'])->count();
+        $this->assertEquals(0, $count);
+
+        $predictable->delete();
+
+    }
+
+    /**
+     * @covers PredictableController::postEdit
+     */
+    public function testPostEditWrongAccount()
+    {
+        $user = User::whereUsername('admin')->first();
+        $account = $user->accounts()->first();
+        $new = [
+            'user_id'     => $user->id,
+            'description' => 'To be edited' . rand(1,999),
+            'amount'      => 500,
+            'dom'         => 1,
+            'account_id'  => $account->id,
+            'pct'         => 1,
+            'inactive'    => 0
+        ];
+
+        Predictable::create($new);
+        $predictable = Predictable::whereDescription($new['description'])->first();
+
+        $editData = [
+            'description' => 'To be edited (wrong account)',
+            'account_id'  => -1,
             'amount'      => 500,
             'dom'         => 1,
             'pct'         => 1,
