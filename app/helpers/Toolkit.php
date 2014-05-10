@@ -24,7 +24,7 @@ class Toolkit
             $year = intval($year);
             $month = intval($month);
             if ($year > 2000 && $year <= 3000 && $month >= 1 && $month <= 12) {
-                return new Carbon($year . '-' . $month . '-01');
+                return Carbon::createFromDate($year, $month, 1);
             }
         }
 

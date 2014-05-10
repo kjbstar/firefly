@@ -289,8 +289,8 @@ class ReportController extends BaseController
      */
     public function compareYear($yearOne, $yearTwo)
     {
-        $dateOne = new Carbon($yearOne . '-01-01');
-        $dateTwo = new Carbon($yearTwo . '-01-01');
+        $dateOne = Carbon::createFromDate($yearOne,1,1);
+        $dateTwo = Carbon::createFromDate($yearTwo,1,1);
         $title = 'Comparing ' . $dateOne->format('Y') . ' with ' . $dateTwo->format('Y');
 
         // income expenses for both years.
