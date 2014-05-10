@@ -21,7 +21,7 @@
             {{$m->date->format('M jS Y')}}
         </td>
         <td>
-            <a href="{{URL::Route('edittransaction',$m->id)}}" title="Edit {{{$m->description}}}">
+            <a href="{{URL::Route('edit'.strtolower(get_class($m)),$m->id)}}" title="Edit {{{$m->description}}}">
                 {{{$m->description}}}
             </a>
         </td>
@@ -47,9 +47,10 @@
             <a href="{{URL::Route('accountoverview',$m->account_id)}}" title="Overview for {{{$m->account->name}}}">{{{$m->account->name}}}</a>
             @endif
             @if(get_class($m) == 'Transfer')
-            <a href="{{URL::Route('accountoverview',$m->accountto_id)}}" title="Overview for {{{$m->accountto->name}}}">{{{$m->accountto->name}}}</a>
-            &rarr;
             <a href="{{URL::Route('accountoverview',$m->accountfrom_id)}}" title="Overview for {{{$m->accountfrom->name}}}">{{{$m->accountfrom->name}}}</a>
+            &rarr;
+            <a href="{{URL::Route('accountoverview',$m->accountto_id)}}" title="Overview for {{{$m->accountto->name}}}">{{{$m->accountto->name}}}</a>
+
             @endif
         </td>
         <td>

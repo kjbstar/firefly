@@ -82,8 +82,9 @@ class PostInstallCommand extends Command
         }
 
         // run migration and db:seed
-        $this->call('migrate');
-        $this->call('db:seed');
+        $env = App::environment();
+        $this->call('migrate',['--env' => $env]);
+        $this->call('db:seed',['--env' => $env]);
 
         // set a password:
         $password = Str::random(12);

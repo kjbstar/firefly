@@ -17,12 +17,14 @@ class ProfileControllerTest extends TestCase
         $this->be($user);
     }
 
+
     /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
     protected function tearDown()
     {
+
     }
 
     /**
@@ -56,6 +58,7 @@ class ProfileControllerTest extends TestCase
         $user = User::where('username', 'admin')->first();
         $user->password = Hash::make('supersecret');
         $result = $user->save();
+        $this->be($user);
         $this->assertTrue($result);
         $this->assertTrue(Hash::check('supersecret', $user->getAuthPassword()));
         $newPassword = 'verysecret';
@@ -99,7 +102,7 @@ class ProfileControllerTest extends TestCase
         $data = [
             'current'  => 'supersecret',
             'new'      => $newPassword,
-            'newagain' => $newPassword.'Mismatch'
+            'newagain' => $newPassword . 'Mismatch'
         ];
         $this->call('POST', '/home/profile/password', $data);
         $this->assertResponseStatus(200);
@@ -139,7 +142,7 @@ class ProfileControllerTest extends TestCase
     public function testPostChangeUsername()
     {
         $data = [
-            'username'  => 'admin_again',
+            'username' => 'admin_again',
         ];
         $this->call('POST', '/home/profile/username', $data);
         $this->assertResponseStatus(302);
@@ -150,38 +153,41 @@ class ProfileControllerTest extends TestCase
         $user->username = 'admin';
         $user->save();
     }
+
     /**
      * @covers ProfileController::postChangeUsername
      */
     public function testPostChangeUsernameExistingUser()
     {
         $data = [
-            'username'  => 'existingUser',
+            'username' => 'existingUser',
         ];
         $this->call('POST', '/home/profile/username', $data);
         $this->assertResponseOk();
         $this->assertSessionHas('error');
     }
+
     /**
      * @covers ProfileController::postChangeUsername
      */
     public function testPostChangeUsernameNothingChanged()
     {
         $data = [
-            'username'  => 'admin',
+            'username' => 'admin',
         ];
         $this->call('POST', '/home/profile/username', $data);
         $this->assertResponseOk();
         $this->assertSessionHas('error');
 
     }
+
     /**
      * @covers ProfileController::postChangeUsername
      */
     public function testPostChangeUsernameFailsValidator()
     {
         $data = [
-            'username'  => null,
+            'username' => null,
         ];
         $this->call('POST', '/home/profile/username', $data);
         $this->assertResponseOk();
