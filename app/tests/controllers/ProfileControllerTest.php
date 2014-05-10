@@ -55,7 +55,9 @@ class ProfileControllerTest extends TestCase
     {
         $user = User::where('username', 'admin')->first();
         $user->password = Hash::make('supersecret');
-        $user->save();
+        $result = $user->save();
+        $this->assertTrue($result);
+        $this->assertTrue(Hash::check('supersecret', $user->getAuthPassword()));
         $newPassword = 'verysecret';
         $data = [
             'current'  => 'supersecret',
