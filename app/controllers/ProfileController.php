@@ -18,8 +18,8 @@ class ProfileController extends BaseController
         $stats['countIn'] = Auth::user()->transactions()->incomes()->count();
         $stats['countOut'] = Auth::user()->transactions()->expenses()->count();
 
-        $stats['avgIn'] = $stats['totalIn'] / $stats['countIn'];
-        $stats['avgOut'] = $stats['totalOut'] / $stats['countOut'];
+        $stats['avgIn'] = $stats['countIn'] != 0 ? $stats['totalIn'] / $stats['countIn'] : $stats['totalIn'];
+        $stats['avgOut'] = $stats['countOut'] != 0 ? $stats['totalOut'] / $stats['countOut'] : $stats['totalOut'];
 
         $stats['transferred'] = floatval(Auth::user()->transfers()->sum('amount'));
         $stats['transfers'] = Auth::user()->transfers()->count();

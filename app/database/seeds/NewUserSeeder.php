@@ -21,6 +21,18 @@ class NewUserSeeder extends Seeder
                     'reset'          => null
                 ]
             );
+
+            User::create(
+                [
+                    'username'       => 'existingUser',
+                    'origin'         => '',
+                    'email'          => 'user@local',
+                    'password'       => Hash::make('supersecret'),
+                    'activation'     => null,
+                    'remember_token' => null,
+                    'reset'          => null
+                ]
+            );
         }
 
 
