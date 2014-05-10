@@ -30,9 +30,14 @@ class SearchControllerTest extends TestCase
      */
     public function testSearch()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        // search for a term, make sure the results bla bla match what we expected to find?
+        $query = ['query' => 'Checking'];
+
+        $response = $this->action('GET', 'SearchController@search',$query);
+        $view = $response->original;
+        $this->assertResponseOk();
+        $this->assertEquals('Searching for "'.$query['query'].'"',$view['title']);
+        // find one account:
+        $this->assertEquals(1,$view['result']['count']['accounts']);
     }
 }

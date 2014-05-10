@@ -45,6 +45,6 @@ class SearchController extends BaseController
             unset($result['time']);
         }
 
-        return View::make('home.search')->with('search', $search)->with('result',$result);
+        return View::make('home.search')->with('search', $search)->with('result',$result)->with('title','Searching for "'.$search['originalQuery'].'"');
     }
 }

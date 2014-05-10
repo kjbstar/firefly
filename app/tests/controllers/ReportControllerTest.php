@@ -37,6 +37,7 @@ class ReportControllerTest extends TestCase
         $this->assertResponseOk();
         $this->assertEquals('Reports', $view['title']);
         $this->assertCount(1, $view['years']);
+        // TODO foreach year, count=12?
     }
 
     /**
@@ -71,7 +72,7 @@ class ReportControllerTest extends TestCase
 
         // two columns:
         $this->assertCount(2, $json->cols);
-        // TODO rows as many as we have components with expenses this month
+        // TODO rows as many as we have components with expenses this month?
     }
 
     /**
@@ -113,6 +114,8 @@ class ReportControllerTest extends TestCase
         $json = json_decode($jsonContent);
         $this->assertResponseOk();
 
+        // TODO check if the count is correct for the accounts in the chart.
+
         // days in year
         $count = 365;
         $this->assertCount($count, $json->rows);
@@ -126,6 +129,7 @@ class ReportControllerTest extends TestCase
         $response = $this->action('GET', 'ReportController@compareYear', ['2013', '2014']);
         $view = $response->original;
         $this->assertResponseOk();
+        // TODO check if the processing is correct (monthsCompared)
 
         $this->assertEquals('Comparing 2013 with 2014', $view['title']);
     }
