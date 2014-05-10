@@ -141,8 +141,8 @@ class PiggyControllerTest extends TestCase
         $user = User::whereUsername('admin')->first();
         $existing = Piggybank::first();
         $newData = [
-            'user_id' => $existing->name,
-            'name'    => null,
+            'user_id' => $user->id,
+            'name'    => $existing->name,
             'amount'  => 0,
             'target'  => 1000,
             'order'   => 1
@@ -224,9 +224,9 @@ class PiggyControllerTest extends TestCase
         $account = Account::first();
         $count = Setting::count();
 
-        $this->action('POST', 'PiggyController@postSelectAccount',['account' => $account->id]);
+        $this->action('POST', 'PiggyController@postSelectAccount', ['account' => $account->id]);
         $newCount = Setting::count();
-        $this->assertEquals($count+1,$newCount);
+        $this->assertEquals($count + 1, $newCount);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('piggy');
         $this->assertSessionHas('success');
@@ -238,9 +238,9 @@ class PiggyControllerTest extends TestCase
     public function testPostSelectInvalidAccount()
     {
         $count = Setting::count();
-        $this->action('POST', 'PiggyController@postSelectAccount',['account' => 1000]);
+        $this->action('POST', 'PiggyController@postSelectAccount', ['account' => 1000]);
         $newCount = Setting::count();
-        $this->assertEquals($count,$newCount-1);
+        $this->assertEquals($count, $newCount - 1);
         $this->assertResponseStatus(302);
         $this->assertRedirectedToRoute('piggyselect');
         $this->assertSessionHas('error');
@@ -249,39 +249,152 @@ class PiggyControllerTest extends TestCase
 
     /**
      * @covers PiggyController::edit
-     * @todo   Implement testEdit().
      */
     public function testEdit()
     {
+        $this->createSetting();
         $piggy = Piggybank::first();
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $response = $this->action('GET', 'PiggyController@edit', $piggy->id);
+        $view = $response->original;
+
+        $this->assertEquals('Edit piggy bank "' . $piggy->name . '"', $view['title']);
+        $this->assertEquals($piggy->id, $view['pig']->id);
+    }
+
+    /**
+     * @covers PiggyController::edit
+     */
+    public function testEditWithOldInput()
+    {
+        $this->createSetting();
+        $oldData = [
+            'name' => 'Old piggy name (old input)'
+        ];
+        $this->session(['_old_input' => $oldData]);
+
+        $piggy = Piggybank::first();
+        $response = $this->action('GET', 'PiggyController@edit', $piggy->id);
+        $view = $response->original;
+
+        $this->assertEquals('Edit piggy bank "' . $piggy->name . '"', $view['title']);
+        $this->assertEquals($piggy->id, $view['pig']->id);
+        $this->assertEquals($oldData['name'], $view['prefilled']['name']);
     }
 
     /**
      * @covers PiggyController::postEdit
-     * @todo   Implement testPostEdit().
      */
     public function testPostEdit()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        $this->createSetting();
+        $user = User::where('username', 'admin')->first();
+        $piggy = Piggybank::create(
+            [
+                'user_id' => $user->id,
+                'name'    => 'TO be edited soon.' . rand(1000,9999),
+                'amount'  => 0,
+                'target'  => 1000,
+                'order'   => 1
+            ]
         );
+        $editData = [
+            'name' => 'Edited a piggy bank.' . rand(1000,9999)
+        ];
+        // post!
+        $this->call('POST', '/home/piggy/edit/' . $piggy->id, $editData);
+
+        $this->assertResponseStatus(302);
+        $this->assertRedirectedToRoute('index');
+        $this->assertSessionHas('success');
+
+        $newPiggy = Piggybank::find($piggy->id);
+        $this->assertEquals($editData['name'], $newPiggy->name);
+
+        $newPiggy->delete();
+
+    }
+
+    /**
+     * @covers PiggyController::postEdit
+     */
+    public function testPostEditFailsValidator()
+    {
+        $this->createSetting();
+        $user = User::where('username', 'admin')->first();
+        $piggy = Piggybank::create(
+            [
+                'user_id' => $user->id,
+                'name'    => 'TO be edited soon.' . rand(1000,9999),
+                'amount'  => 0,
+                'target'  => 1000,
+                'order'   => 1
+            ]
+        );
+        $editData = [
+            'name' => null
+        ];
+        // post!
+        $this->call('POST', '/home/piggy/edit/' . $piggy->id, $editData);
+
+        $this->assertResponseStatus(302);
+        $this->assertRedirectedToRoute('editpiggy',$piggy->id);
+        $this->assertSessionHas('error');
+
+        $newPiggy = Piggybank::find($piggy->id);
+        $this->assertEquals($piggy->name, $newPiggy->name);
+
+        $newPiggy->delete();
+
+    }
+
+    /**
+     * @covers PiggyController::postEdit
+     */
+    public function testPostEditFailsTrigger()
+    {
+        $this->createSetting();
+        $user = User::where('username', 'admin')->first();
+        $piggy = Piggybank::create(
+            [
+                'user_id' => $user->id,
+                'name'    => 'TO be edited soon.' . rand(1000,9999),
+                'amount'  => 0,
+                'target'  => 1000,
+                'order'   => 1
+            ]
+        );
+
+        $otherPiggy = Piggybank::where('id','!=',$piggy->id)->first();
+        $editData = [
+            'name' => $otherPiggy->name
+        ];
+        // post!
+        $this->call('POST', '/home/piggy/edit/' . $piggy->id, $editData);
+
+        $this->assertResponseStatus(302);
+        $this->assertRedirectedToRoute('editpiggy',$piggy->id);
+        $this->assertSessionHas('error');
+
+        $newPiggy = Piggybank::find($piggy->id);
+        $this->assertEquals($piggy->name, $newPiggy->name);
+
+        $newPiggy->delete();
+
     }
 
     /**
      * @covers PiggyController::updateAmount
-     * @todo   Implement testUpdateAmount().
      */
     public function testUpdateAmount()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->createSetting();
+        $piggy = Piggybank::first();
+        $response = $this->action('GET', 'PiggyController@updateAmount', $piggy->id);
+        $view = $response->original;
+
+        $this->assertEquals($piggy->id,$view['pig']->id);
+        $this->assertResponseOk();
+        $this->assertSessionHas('previous');
     }
 
     /**
@@ -290,22 +403,42 @@ class PiggyControllerTest extends TestCase
      */
     public function testPostUpdateAmount()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->createSetting();
+        $piggy = Piggybank::first();
+        $editData = [
+            'amount' => 100
+        ];
+        $this->call('POST', '/home/piggy/amount/' . $piggy->id, $editData);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('success');
+        // is piggy updated?
+        $newPiggy = Piggybank::find($piggy->id);
+
+        $this->assertEquals(100,$newPiggy->amount);
+
+        $newPiggy->amount = 0;
+        $newPiggy->save();
     }
 
     /**
      * @covers PiggyController::dropPiggy
-     * @todo   Implement testDropPiggy().
      */
     public function testDropPiggy()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $this->createSetting();
+        $piggy = Piggybank::first();
+
+        $originalOrder = $piggy->order;
+        $order = $piggy->order + 1;
+
+        $this->action('POST', 'PiggyController@dropPiggy', ['id' => $piggy->id,'position' => $order]);
+
+        $this->assertResponseOk();
+        $newPiggy = Piggybank::find($piggy->id);
+        $this->assertEquals($newPiggy->order,$order);
+
+        $newPiggy->order = $originalOrder;
+        $newPiggy->save();
     }
 
     /**

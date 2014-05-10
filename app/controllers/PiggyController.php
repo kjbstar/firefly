@@ -213,7 +213,6 @@ class PiggyController extends BaseController
             $prefilled = PiggybankHelper::prefilledFromPiggybank($pig);
         } else {
             $prefilled = PiggybankHelper::prefilledFromOldInput();
-
         }
 
         return View::make('piggy.edit')->with('pig', $pig)->with('title', 'Edit piggy bank "' . $pig->name . '"')->with(
@@ -251,7 +250,14 @@ class PiggyController extends BaseController
             Session::flash('error', 'Could not edit piggy!');
             return Redirect::route('editpiggy', $pig->id)->withErrors($validator)->withInput();
         }
-        $pig->save();
+        $result = $pig->save();
+
+        // failed again!
+        if (!$result) {
+            Session::flash('error', 'Could not edit piggy');
+            return Redirect::route('editpiggy', $pig->id)->withErrors($validator)->withInput();
+        }
+
         Session::flash('success', 'Piggy bank updated');
 
         return Redirect::to(Session::get('previous'));
@@ -272,9 +278,8 @@ class PiggyController extends BaseController
 
         // calculate the amount of money left to devide:
         $piggies = Auth::user()->piggybanks()->get();
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
+
         // get account:
         $piggyAccount = Setting::getSetting('piggyAccount');
         $account = Auth::user()->accounts()->find($piggyAccount->value);
