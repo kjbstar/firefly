@@ -298,7 +298,8 @@ class PiggyControllerTest extends TestCase
             ]
         );
         $editData = [
-            'name' => 'Edited a piggy bank.' . rand(1000,9999)
+            'name' => 'Edited a piggy bank.' . rand(1000,9999),
+            'target' => 1001
         ];
         // post!
         $this->call('POST', '/home/piggy/edit/' . $piggy->id, $editData);
