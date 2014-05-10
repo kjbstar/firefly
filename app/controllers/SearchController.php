@@ -25,7 +25,9 @@ class SearchController extends BaseController
 
         if (Cache::has($key) && $this->cacheEnabled
         ) {
+            // @codeCoverageIgnoreStart
             $result = Cache::get($key);
+            // @codeCoverageIgnoreEnd
         } else {
             $result = [
                 'time'    => new Carbon,
