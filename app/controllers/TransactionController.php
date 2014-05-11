@@ -131,6 +131,12 @@ class TransactionController extends BaseController
     public function postEdit(Transaction $transaction)
     {
 
+        $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
+        if (is_null($account)) {
+            Session::flash('error', 'Invalid account selected.');
+            return Redirect::route('addtransaction')->withInput();
+        }
+
         // update the transaction:
         $transaction->description = Input::get('description');
         $transaction->amount = floatval(Input::get('amount'));

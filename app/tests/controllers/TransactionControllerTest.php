@@ -131,6 +131,28 @@ class TransactionControllerTest extends TestCase
         $this->assertEquals($count, $newCount);
         $this->assertSessionHas('error');
     }
+    /**
+     * @covers TransactionController::postAdd
+     */
+    public function testPostAddInvalidAccount()
+    {
+        $data = [
+            'a'                => 'b',
+            'date'             => date('Y-m-d'),
+            'amount'           => '-100',
+            'account_id'       => null,
+            'ignoreprediction' => 0,
+            'ignoreallowance'  => 0,
+            'mark'             => 0,
+            'description'      => 'Bla bla',
+        ];
+        $count = Transaction::count();
+        $this->action('POST', 'TransactionController@postAdd', $data);
+        $newCount = Transaction::count();
+        $this->assertResponseStatus(302);
+        $this->assertEquals($count, $newCount);
+        $this->assertSessionHas('error');
+    }
 
     /**
      * @covers TransactionController::postAdd
