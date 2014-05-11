@@ -336,7 +336,7 @@ class TransactionControllerTest extends TestCase
     /**
      * @covers TransactionController::postEdit
      */
-    public function testPostEditFailsTrigger()
+    public function testPostEditInvalidAccount()
     {
         $user = User::where('username', 'admin')->first();
         $account = Account::first();
