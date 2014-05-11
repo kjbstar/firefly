@@ -29,6 +29,9 @@ class SettingsControllerTest extends TestCase
      */
     public function testIndex()
     {
+        foreach(Setting::get() as $s) {
+            $s->delete();
+        }
         $count = Setting::count();
         $response = $this->action('GET', 'SettingsController@index');
         $view = $response->original;
