@@ -32,15 +32,17 @@
     <div class="col-lg-4 col-md-4 col-sm-12">
         <table class="table table-condensed table-bordered">
             @foreach($accounts as $account)
-            <tr>
+            <tr @if($account['name'] == 'TOTAL') style="border-top: solid 2px grey" @endif>
                 @if($account['shared'])
                 <td><a href="{{$account['url']}}">{{{$account['name']}}}</a> <img src="i/group.png" alt="Shared account" /></td>
+                @elseif($account['name'] == 'TOTAL')
+                <td><strong>{{{$account['name']}}}</strong></td>
                 @else
                 <td><a href="{{$account['url']}}">{{{$account['name']}}}</a></td>
                 @endif
                 <td style="text-align:right;">{{mf ($account['current'],true,true)}}</td>
             </tr>
-            @endforeach
+            @endforeach          
         </table>
     </div>
 <!-- ALLOWANCE BAR -->

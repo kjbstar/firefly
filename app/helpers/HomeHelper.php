@@ -26,6 +26,7 @@ class HomeHelper
         }
         $query = Auth::user()->accounts()->notInactive()->get();
         $accounts = [];
+        $total = [];
 
         foreach ($query as $account) {
             $url = URL::Route('accountoverviewmonth', [$account->id, $date->format('Y'), $date->format('m')]);
@@ -38,7 +39,17 @@ class HomeHelper
                 'current' => $account->balanceOnDate($date),
                 'shared'  => $account->shared == 1 ? true : false,
             ];
+            $total[] = $account->balanceOnDate($date);
         }
+
+        $accounts[] = [
+            'name'      =>  'TOTAL',
+            'id'        =>  '0',
+            'url'       =>  '#',
+            'homeurl'   =>  '#',
+            'current'   =>  array_sum($total),
+            'shared'    =>  false,   
+        ];
 
         unset($query);
         Cache::forever($key, $accounts);
