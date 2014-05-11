@@ -144,6 +144,49 @@ class UserControllerTest extends TestCase
     }
 
     /**
+     * @covers UserController::activate
+     */
+    public function testActivateIsLoggedIn()
+    {
+        $user = User::where('username', 'admin')->first();
+        $this->be($user);
+
+        $activation = Str::random(64);
+        $user = User::create(
+            [
+                'username'       => 'tempUser',
+                'origin'         => '',
+                'email'          => 'user@temp',
+                'password'       => Hash::make('supersecret'),
+                'activation'     => $activation,
+                'remember_token' => null,
+                'reset'          => null
+            ]
+        );
+
+        $response = $this->action('GET', 'UserController@activate', $activation);
+        $view = $response->original;
+        $this->assertEquals('You are logged in!', $view['message']);
+        $this->assertResponseOk();
+
+        $updatedUser = User::find($user->id);
+        $this->assertEquals($user->activation, $updatedUser->activation);
+        $updatedUser->forceDelete();
+    }
+
+    /**
+     * @covers UserController::activate
+     */
+    public function testActivateInvalidUser()
+    {
+        $activation = Str::random(64);
+        $response = $this->action('GET', 'UserController@activate', $activation);
+        $view = $response->original;
+        $this->assertEquals('Activated', $view['title']);
+        $this->assertResponseOk();
+    }
+
+    /**
      * @covers UserController::postRegister
      */
     public function testPostRegister()
@@ -157,10 +200,10 @@ class UserControllerTest extends TestCase
         $view = $response->original;
         $newCount = User::count();
         $this->assertResponseOk();
-        $this->assertEquals($count+1,$newCount);
-        $this->assertEquals('Registered!',$view['title']);
+        $this->assertEquals($count + 1, $newCount);
+        $this->assertEquals('Registered!', $view['title']);
 
-        $user = User::where('email',$data['email'])->first();
+        $user = User::where('email', $data['email'])->first();
         $user->forceDelete();
     }
 
@@ -177,9 +220,9 @@ class UserControllerTest extends TestCase
         $count = User::count();
         $response = $this->action('POST', 'UserController@postRegister', $data);
         $view = $response->original;
-        $this->assertEquals('Sorry, this instance does not allow registration.',$view['message']);
+        $this->assertEquals('Sorry, this instance does not allow registration.', $view['message']);
         $newCount = User::count();
-        $this->assertEquals($count,$newCount);
+        $this->assertEquals($count, $newCount);
         Config::set('firefly.allowRegistration', true);
     }
 
@@ -197,10 +240,11 @@ class UserControllerTest extends TestCase
         $view = $response->original;
         $newCount = User::count();
         $this->assertResponseOk();
-        $this->assertEquals($count,$newCount);
-        $this->assertEquals('Invalid e-mail address.',$view['warning']);
-        $this->assertEquals('Register',$view['title']);
+        $this->assertEquals($count, $newCount);
+        $this->assertEquals('Invalid e-mail address.', $view['warning']);
+        $this->assertEquals('Register', $view['title']);
     }
+
     /**
      * @covers UserController::reset
      */
@@ -214,7 +258,6 @@ class UserControllerTest extends TestCase
 
     /**
      * @covers UserController::postReset
-     * @todo   Implement testPostReset().
      */
     public function testPostReset()
     {
@@ -242,6 +285,22 @@ class UserControllerTest extends TestCase
     }
 
     /**
+     * @covers UserController::postReset
+     */
+    public function testPostResetInvalidUser()
+    {
+        $data = [
+            'username' => 'iDoNotExist',
+        ];
+
+        $response = $this->action('POST', 'UserController@postReset', $data);
+        $view = $response->original;
+        $this->assertEquals('Sent!',$view['title']);
+        $this->assertResponseOk();
+
+    }
+
+    /**
      * @covers UserController::resetme
      */
     public function testResetme()
@@ -264,5 +323,18 @@ class UserControllerTest extends TestCase
         $this->assertNull($updatedUser->reset);
 
         $updatedUser->forceDelete();
+    }
+
+    /**
+     * @covers UserController::resetme
+     */
+    public function testResetmeInvalidCode()
+    {
+        $reset = Str::random(64);
+        $response = $this->action('GET', 'UserController@resetme', $reset);
+        $view = $response->original;
+        $this->assertEquals('Reset!',$view['title']);
+        $this->assertResponseOk();
+
     }
 }

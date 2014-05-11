@@ -125,9 +125,9 @@ class ReportControllerTest extends TestCase
     /**
      * @covers ReportController::monthAccounts
      */
-    public function testMonthAccountsPastMonth()
+    public function testMonthAccountsFutureMonth()
     {
-        $date = Carbon::createFromDate(2013, 1, 1);
+        $date = Carbon::createFromDate(2015, 1, 1);
         $response = $this->action('GET', 'ReportController@monthAccounts', [$date->format('Y'), $date->format('m')]);
         $jsonContent = $response->getContent();
         $json = json_decode($jsonContent);

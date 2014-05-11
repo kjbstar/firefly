@@ -113,7 +113,9 @@ class UserController extends BaseController
 
                 return View::make('user.registered')->with('title', 'Registered!');
             } else {
+                // @codeCoverageIgnoreStart
                 return View::make('error.500');
+                // @codeCoverageIgnoreEnd
             }
         }
     }
