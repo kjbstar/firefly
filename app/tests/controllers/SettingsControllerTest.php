@@ -26,14 +26,18 @@ class SettingsControllerTest extends TestCase
 
     /**
      * @covers SettingsController::index
-     * @todo   Implement testIndex().
      */
     public function testIndex()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $count = Setting::count();
+        $response = $this->action('GET', 'SettingsController@index');
+        $view = $response->original;
+        $newCount = Setting::count();
+
+        $this->assertResponseOk();
+        $this->assertEquals('Settings',$view['title']);
+        $this->assertSessionHas('previous');
+        $this->assertEquals($count+2,$newCount);
     }
 
     /**
@@ -42,6 +46,8 @@ class SettingsControllerTest extends TestCase
      */
     public function testPostIndex()
     {
+        // settings should now exist (and be empty / invalid)
+        // update both, see if it sticks.
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(
             'This test has not been implemented yet.'

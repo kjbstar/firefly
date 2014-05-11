@@ -14,9 +14,7 @@ class SettingsController extends BaseController
      */
     public function index()
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
 
         // let's grab the settings that might be available.
         $predictionStart = Toolkit::getPredictionStart();
@@ -24,10 +22,7 @@ class SettingsController extends BaseController
 
         // and the setting that controls which accounts (and
         // subsequent predictions) you want to see on the front page:
-        $accountList = [];
-        foreach (Auth::user()->accounts()->get() as $a) {
-            $accountList[$a->id] = $a->name;
-        }
+        $accountList = AccountHelper::accountsAsSelectList();
 
         return View::make('settings.index')->with('title', 'Settings')->with('predictionStart', $predictionStart)->with(
             'accountList', $accountList

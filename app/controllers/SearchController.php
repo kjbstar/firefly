@@ -27,10 +27,10 @@ class SearchController extends BaseController
         ) {
             // @codeCoverageIgnoreStart
             $result = Cache::get($key);
-            // @codeCoverageIgnoreEnd
         } else {
+            // @codeCoverageIgnoreEnd
             $result = [
-                'time'    => new Carbon,
+                'time'   => new Carbon,
                 'result' => [],
                 'count'  => [],
             ];
@@ -47,6 +47,8 @@ class SearchController extends BaseController
             unset($result['time']);
         }
 
-        return View::make('home.search')->with('search', $search)->with('result',$result)->with('title','Searching for "'.$search['originalQuery'].'"');
+        return View::make('home.search')->with('search', $search)->with('result', $result)->with(
+            'title', 'Searching for "' . $search['originalQuery'] . '"'
+        );
     }
 }
