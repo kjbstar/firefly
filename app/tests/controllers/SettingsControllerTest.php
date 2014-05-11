@@ -45,111 +45,342 @@ class SettingsControllerTest extends TestCase
 
     /**
      * @covers SettingsController::postIndex
-     * @todo   Implement testPostIndex().
+     * @depends testIndex
      */
     public function testPostIndex()
     {
-        // settings should now exist (and be empty / invalid)
-        // update both, see if it sticks.
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $account = Account::first();
+        $data = [
+            'predictionStart' => '2014-01-01',
+            'frontpageAccount' => $account->id
+        ];
+        $this->action('POST', 'SettingsController@index',$data);
+        $this->assertResponseStatus(302);
+
+        $predictionStart = DB::table('settings')->where('name','predictionStart')->first();
+        $this->assertEquals($data['predictionStart'],$predictionStart->value);
+
+        $frontpageAccount = DB::table('settings')->where('name','frontpageAccount')->first();
+        $this->assertEquals($data['frontpageAccount'],$frontpageAccount->value);
     }
 
     /**
      * @covers SettingsController::allowances
-     * @todo   Implement testAllowances().
      */
     public function testAllowances()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $count = DB::table('settings')->where('name','defaultAllowance')->count();
+        $response = $this->action('GET', 'SettingsController@allowances');
+        $view = $response->original;
+        $this->assertResponseOk();
+        $this->assertEquals('Allowances',$view['title']);
+        $this->assertSessionHas('previous');
+        $newCount = DB::table('settings')->where('name','defaultAllowance')->count();
+        if($count == 0) {
+            $this->assertEquals($count+1,$newCount);
+        } else {
+            $this->assertEquals($count,$newCount);
+        }
+        $this->assertEquals(0,$view['defaultAllowance']->value);
     }
 
     /**
      * @covers SettingsController::postAllowances
-     * @todo   Implement testPostAllowances().
+     * @depends testAllowances
      */
     public function testPostAllowances()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $data = [
+            'defaultAllowance' => 1000
+        ];
+        $this->action('POST', 'SettingsController@allowances',$data);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('success');
+
+        $setting = $newCount = DB::table('settings')->where('name','defaultAllowance')->first();
+        $this->assertEquals($data['defaultAllowance'],$setting->value);
     }
 
     /**
      * @covers SettingsController::addAllowance
-     * @todo   Implement testAddAllowance().
      */
     public function testAddAllowance()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $response = $this->action('GET', 'SettingsController@addAllowance');
+        $view = $response->original;
+        $count = DB::table('accounts')->count();
+        $this->assertCount($count,$view['accounts']);
+        $this->assertResponseOk();
+        $this->assertSessionHas('previous');
+        $this->assertEquals('Add a new allowance',$view['title']);
     }
 
     /**
      * @covers SettingsController::postAddAllowance
-     * @todo   Implement testPostAddAllowance().
      */
     public function testPostAddAllowance()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $account = Account::first();
+        $data = [
+            'date' => '2014-02',
+            'amount' => 1250,
+            'account_id' => $account->id
+        ];
+        $count = DB::table('settings')->where('name','specificAllowance')->where('date',$data['date'].'-01')
+            ->where('account_id',$data['account_id'])->count();
+
+        $this->assertEquals(0,$count);
+        $this->action('POST', 'SettingsController@addAllowance',$data);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('success');
+
+        $newCount = DB::table('settings')->where('name','specificAllowance')->where('date',$data['date'].'-01')
+            ->where('account_id',$data['account_id'])->count();
+
+        $this->assertEquals(1,$newCount);
+
+        foreach(Setting::where('name','specificAllowance')->get() as $s) {
+            $s->delete();
+        }
+
+    }
+    /**
+     * @covers SettingsController::postAddAllowance
+     */
+    public function testPostAddAllowanceInvalidAccount()
+    {
+        $data = [
+            'date' => '2014-03',
+            'amount' => 1250,
+            'account_id' => -1
+        ];
+        $this->action('POST', 'SettingsController@addAllowance',$data);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('error');
+
+        $newCount = DB::table('settings')->where('name','specificAllowance')->where('date',$data['date'].'-01')
+            ->where('value',$data['amount'])->count();
+
+        $this->assertEquals(0,$newCount);
+
+        foreach(Setting::where('name','specificAllowance')->get() as $s) {
+            $s->delete();
+        }
+
+    }
+
+    /**
+     * @covers SettingsController::postAddAllowance
+     */
+    public function testPostAddAllowanceFailsValidator()
+    {
+        $account = Account::first();
+        $data = [
+            'date' => '2014-03',
+            'amount' => 0,
+            'account_id' => $account
+        ];
+        $this->action('POST', 'SettingsController@addAllowance',$data);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('error');
+
+        $newCount = DB::table('settings')->where('name','specificAllowance')->where('date',$data['date'].'-01')
+            ->where('value',$data['amount'])->count();
+
+        $this->assertEquals(0,$newCount);
+
+        foreach(Setting::where('name','specificAllowance')->get() as $s) {
+            $s->delete();
+        }
+
     }
 
     /**
      * @covers SettingsController::editAllowance
-     * @todo   Implement testEditAllowance().
      */
     public function testEditAllowance()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        // create specific amount-setting
+        // edit it.
+        $user = User::where('username', 'admin')->first();
+        $account = $user->accounts()->first();
+        $setting = Setting::create(
+            [
+                'user_id' => $user->id,
+                'account_id' => $account->id,
+                'type' => 'float',
+                'name' => 'specificAllowance',
+                'date' => '2013-01-01',
+                'value' => 1200
+            ]
         );
+        $response = $this->call('GET','/home/allowance/'.$setting->id.'/edit');
+        $view = $response->original;
+
+        $this->assertResponseOk();
+        $this->assertSessionHas('previous');
+        $this->assertEquals($setting->id,$view['setting']->id);
+
+        $setting->delete();
     }
 
     /**
      * @covers SettingsController::postEditAllowance
-     * @todo   Implement testPostEditAllowance().
      */
     public function testPostEditAllowance()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        $user = User::where('username', 'admin')->first();
+        $account = $user->accounts()->first();
+        $setting = Setting::create(
+            [
+                'user_id' => $user->id,
+                'account_id' => $account->id,
+                'type' => 'float',
+                'name' => 'specificAllowance',
+                'date' => '2013-01-01',
+                'value' => 1200
+            ]
         );
+
+        // update setting:
+        $data = [
+            'account_id' => $account->id,
+            'value' => 1100,
+        ];
+
+        $this->call('POST','/home/allowance/'.$setting->id.'/edit',$data);
+
+        $setting = Setting::find($setting->id);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('success');
+        $this->assertEquals($data['value'],$setting->value);
+
+        $setting->delete();
+    }
+
+    /**
+     * @covers SettingsController::postEditAllowance
+     */
+    public function testPostEditAllowanceInvalidAccount()
+    {
+        $user = User::where('username', 'admin')->first();
+        $account = $user->accounts()->first();
+        $setting = Setting::create(
+            [
+                'user_id' => $user->id,
+                'account_id' => $account->id,
+                'type' => 'float',
+                'name' => 'specificAllowance',
+                'date' => '2013-01-01',
+                'value' => 1200
+            ]
+        );
+        $oldValue = $setting->value;
+
+        // update setting:
+        $data = [
+            'account_id' => -1,
+            'value' => 1100,
+        ];
+
+        $this->call('POST','/home/allowance/'.$setting->id.'/edit',$data);
+
+        $setting = Setting::find($setting->id);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('error');
+        $this->assertEquals($oldValue,$setting->value);
+
+        $setting->delete();
+    }
+
+    /**
+     * @covers SettingsController::postEditAllowance
+     */
+    public function testPostEditAllowanceFailsValidator()
+    {
+        $user = User::where('username', 'admin')->first();
+        $account = $user->accounts()->first();
+        $setting = Setting::create(
+            [
+                'user_id' => $user->id,
+                'account_id' => $account->id,
+                'type' => 'float',
+                'name' => 'specificAllowance',
+                'date' => '2013-01-01',
+                'value' => 1200
+            ]
+        );
+        $oldValue = $setting->value;
+
+        // update setting:
+        $data = [
+            'account_id' => $account->id,
+            'value' => 0,
+        ];
+
+        $this->call('POST','/home/allowance/'.$setting->id.'/edit',$data);
+
+        $setting = Setting::find($setting->id);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('error');
+        $this->assertEquals($oldValue,$setting->value);
+
+        $setting->delete();
     }
 
     /**
      * @covers SettingsController::deleteAllowance
-     * @todo   Implement testDeleteAllowance().
      */
     public function testDeleteAllowance()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        // create specific amount-setting
+        // edit it.
+        $user = User::where('username', 'admin')->first();
+        $account = $user->accounts()->first();
+        $setting = Setting::create(
+            [
+                'user_id' => $user->id,
+                'account_id' => $account->id,
+                'type' => 'float',
+                'name' => 'specificAllowance',
+                'date' => '2013-01-01',
+                'value' => 1200
+            ]
         );
+        $response = $this->call('GET','/home/allowance/'.$setting->id.'/delete');
+        $view = $response->original;
+
+        $this->assertResponseOk();
+        $this->assertSessionHas('previous');
+        $this->assertEquals($setting->id,$view['setting']->id);
+
+        $setting->delete();
     }
 
     /**
      * @covers SettingsController::postDeleteAllowance
-     * @todo   Implement testPostDeleteAllowance().
      */
     public function testPostDeleteAllowance()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        // create specific amount-setting
+        // edit it.
+        $user = User::where('username', 'admin')->first();
+        $account = $user->accounts()->first();
+        $setting = Setting::create(
+            [
+                'user_id' => $user->id,
+                'account_id' => $account->id,
+                'type' => 'float',
+                'name' => 'specificAllowance',
+                'date' => '2013-01-01',
+                'value' => 1200
+            ]
         );
+        $response = $this->call('POST','/home/allowance/'.$setting->id.'/delete');
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('success');
+        $count = DB::table('settings')->where('id',$setting->id)->count();
+        $this->assertEquals(0,$count);
+
     }
 }

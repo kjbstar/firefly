@@ -61,9 +61,7 @@ class SettingsController extends BaseController
      */
     public function allowances()
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
         $defaultAllowance = Setting::getSetting('defaultAllowance');
         $defaultAllowance->value = floatval($defaultAllowance->value);
 
@@ -103,9 +101,7 @@ class SettingsController extends BaseController
     public function addAllowance()
     {
 
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
 
         $accounts = AccountHelper::accountsAsSelectList();
 
@@ -122,6 +118,12 @@ class SettingsController extends BaseController
         $date = new Carbon(Input::get('date') . '-01');
         $amount = floatval(Input::get('amount'));
 
+        $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
+        if (is_null($account)) {
+            Session::flash('error', 'Invalid account selected.');
+            return Redirect::to(Session::get('previous'));
+        }
+
         $setting = new Setting;
 
 
@@ -131,14 +133,7 @@ class SettingsController extends BaseController
         $setting->name = 'specificAllowance';
         /** @noinspection PhpParamsInspection */
         $setting->user()->associate(Auth::user());
-        if (!is_null(Input::get('account_id'))) {
-            $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
-            if (is_null($account)) {
-                Session::flash('error', 'Invalid account selected.');
-                return Redirect::to(Session::get('previous'));
-            }
-            $setting->account()->associate($account);
-        }
+        $setting->account()->associate($account);
 
         // validate
         $validator = Validator::make($setting->toArray(), Setting::$rules);
@@ -164,9 +159,7 @@ class SettingsController extends BaseController
      */
     public function editAllowance(Setting $setting)
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
         $accounts = AccountHelper::accountsAsSelectList();
 
         return View::make('settings.edit-allowance')->with('setting', $setting)->with('accounts', $accounts);
@@ -182,6 +175,14 @@ class SettingsController extends BaseController
     public function postEditAllowance(Setting $setting)
     {
         $setting->value = floatval(Input::get('value'));
+        $account = Auth::user()->accounts()->find(intval(Input::get('account_id')));
+        if (is_null($account)) {
+            Session::flash('error', 'Invalid account selected.');
+            return Redirect::to(Session::get('previous'));
+        }
+        $setting->account()->associate($account);
+
+
         $validator = Validator::make($setting->toArray(), Setting::$rules);
         if ($validator->fails() || floatval(Input::get('value')) == 0) {
             Session::flash('error', 'Because of an error, the allowance could not be added.');
@@ -202,9 +203,7 @@ class SettingsController extends BaseController
      */
     public function deleteAllowance(Setting $setting)
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
 
         return View::make('settings.delete-allowance')->with(
             'setting', $setting
