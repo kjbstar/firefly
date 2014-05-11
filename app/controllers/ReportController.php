@@ -66,9 +66,15 @@ class ReportController extends BaseController
 
 
         $expenses = [
-            'category'    => ReportHelper::expensesGrouped($date, 'month', Type::whereType('category')->rememberForever()->first()),
-            'budget'      => ReportHelper::expensesGrouped($date, 'month', Type::whereType('budget')->rememberForever()->first()),
-            'beneficiary' => ReportHelper::expensesGrouped($date, 'month', Type::whereType('beneficiary')->rememberForever()->first()),
+            'category' => ReportHelper::expensesGrouped(
+                    $date, 'month', Type::whereType('category')->rememberForever()->first()
+                ),
+            'budget' => ReportHelper::expensesGrouped(
+                    $date, 'month', Type::whereType('budget')->rememberForever()->first()
+                ),
+            'beneficiary' => ReportHelper::expensesGrouped(
+                    $date, 'month', Type::whereType('beneficiary')->rememberForever()->first()
+                ),
         ];
 
         return View::make('reports.month')->with('date', $date)->with('title', $title)->with('summary', $summary)->with(
@@ -91,7 +97,9 @@ class ReportController extends BaseController
     {
         $key = 'reportmonthPieChart' . $year . $month . $type;
         if (Cache::has($key)) {
+            // @codeCoverageIgnoreStart
             return Response::json(Cache::get($key));
+            // @codeCoverageIgnoreEnd
         }
 
         // get data:
@@ -148,8 +156,7 @@ class ReportController extends BaseController
 
         return View::make('reports.year')->with('date', $date)->with('title', $title)->with('summary', $summary)->with(
             'biggest', $biggest
-        )->with('incomes', $incomes)->with('months', $months)->with('sharedAccounts',$sharedAccounts);
-
+        )->with('incomes', $incomes)->with('months', $months)->with('sharedAccounts', $sharedAccounts);
     }
 
     /**
@@ -251,7 +258,7 @@ class ReportController extends BaseController
             $transactions = $account->transactions()->inYear($start)->count();
             $transfersTo = $account->transfersto()->inYear($start)->count();
             $transfersFrom = $account->transfersfrom()->inYear($start)->count();
-            if($transactions == 0 && $transfersTo  == 0 && $transfersFrom == 0) {
+            if ($transactions == 0 && $transfersTo == 0 && $transfersFrom == 0) {
                 unset($accounts[$index]);
             } else {
                 $chart->addColumn($account->name, 'number');
@@ -289,8 +296,8 @@ class ReportController extends BaseController
      */
     public function compareYear($yearOne, $yearTwo)
     {
-        $dateOne = Carbon::createFromDate($yearOne,1,1);
-        $dateTwo = Carbon::createFromDate($yearTwo,1,1);
+        $dateOne = Carbon::createFromDate($yearOne, 1, 1);
+        $dateTwo = Carbon::createFromDate($yearTwo, 1, 1);
         $title = 'Comparing ' . $dateOne->format('Y') . ' with ' . $dateTwo->format('Y');
 
         // income expenses for both years.

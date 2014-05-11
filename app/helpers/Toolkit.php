@@ -72,9 +72,7 @@ class Toolkit
         if (Cache::has($key)) {
             return Cache::get($key);
         } else {
-            $account = Auth::user()->accounts()->orderBy(
-                'openingbalancedate', 'ASC'
-            )->first();
+            $account = Auth::user()->accounts()->orderBy('openingbalancedate', 'ASC')->first();
             if ($account) {
                 $date = $account->openingbalancedate;
             } else {

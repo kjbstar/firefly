@@ -36,7 +36,15 @@ class ReportControllerTest extends TestCase
         $view = $response->original;
         $this->assertResponseOk();
         $this->assertEquals('Reports', $view['title']);
-        $this->assertCount(1, $view['years']);
+
+        // years should be counted.
+        /** @var $oldestAccount Account */
+        $oldestAccount = Auth::user()->accounts()->orderBy('openingbalancedate', 'ASC')->first();
+        $now = new Carbon;
+
+        $diff = $oldestAccount->openingbalancedate->diffInYears($now);
+
+        $this->assertCount($diff+1, $view['years']);
         // TODO foreach year, count=12?
     }
 
@@ -76,6 +84,17 @@ class ReportControllerTest extends TestCase
     }
 
     /**
+     * @covers ReportController::monthPieChart
+     * @expect NotFoundException
+     */
+    public function testMonthPieChartError()
+    {
+        $date = Carbon::createFromDate(2014, 1, 1);
+
+        $this->action('GET', 'ReportController@monthPieChart', [$date->format('Y'), $date->format('m'), 'false']);
+    }
+
+    /**
      * @covers ReportController::year
      */
     public function testYear()
@@ -104,6 +123,21 @@ class ReportControllerTest extends TestCase
     }
 
     /**
+     * @covers ReportController::monthAccounts
+     */
+    public function testMonthAccountsPastMonth()
+    {
+        $date = Carbon::createFromDate(2013, 1, 1);
+        $response = $this->action('GET', 'ReportController@monthAccounts', [$date->format('Y'), $date->format('m')]);
+        $jsonContent = $response->getContent();
+        $json = json_decode($jsonContent);
+        $this->assertResponseOk();
+
+        $count = Account::count();
+        $this->assertCount($count + 1, $json->cols);
+    }
+
+    /**
      * @covers ReportController::yearAccounts
      */
     public function testYearAccounts()
@@ -120,6 +154,25 @@ class ReportControllerTest extends TestCase
         $count = 365;
         $this->assertCount($count, $json->rows);
     }
+
+    /**
+     * @covers ReportController::yearAccounts
+     */
+    public function testYearAccountsNoActiveAccounts()
+    {
+        $date = Carbon::createFromDate(2013, 1, 1);
+        $response = $this->action('GET', 'ReportController@yearAccounts', [$date->format('Y'), $date->format('m')]);
+        $jsonContent = $response->getContent();
+        $json = json_decode($jsonContent);
+        $this->assertResponseOk();
+
+        // TODO check if the count is correct for the accounts in the chart.
+
+        // days in year
+        $count = 365;
+        $this->assertCount($count, $json->rows);
+    }
+
 
     /**
      * @covers ReportController::compareYear
