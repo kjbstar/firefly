@@ -131,6 +131,7 @@ class TransactionControllerTest extends TestCase
         $this->assertEquals($count, $newCount);
         $this->assertSessionHas('error');
     }
+
     /**
      * @covers TransactionController::postAdd
      */
@@ -333,16 +334,55 @@ class TransactionControllerTest extends TestCase
     }
 
     /**
+     * @covers TransactionController::postEdit
+     */
+    public function testPostEditFailsTrigger()
+    {
+        $user = User::where('username', 'admin')->first();
+        $account = Account::first();
+        Eloquent::unguard();
+        $transaction = Transaction::create(
+            [
+                'created_at'       => date('Y-m-d H:i:s'),
+                'updated_at'       => date('Y-m-d H:i:s'),
+                'user_id'          => $user->id,
+                'account_id'       => $account->id,
+                'predictable_id'   => null,
+                'description'      => 'Test transaction',
+                'amount'           => 1000,
+                'date'             => '2014-01-02',
+                'ignoreprediction' => 0,
+                'ignoreallowance'  => 0,
+                'mark'             => 0,
+            ]
+        );
+        Eloquent::reguard();
+
+        $newData = [
+            'description' => 'Bla bla bla bla',
+            'account_id'  => -1,
+            'amount'      => 1000,
+            'date'        => '2014-01-02',
+        ];
+
+
+        $this->call('POST', '/home/transaction/' . $transaction->id . '/edit/', $newData);
+        $this->assertResponseStatus(302);
+        $this->assertSessionHas('error');
+        $transaction->delete();
+    }
+
+    /**
      * @covers TransactionController::delete
      */
     public function testDelete()
     {
         $transaction = Transaction::first();
-        $response = $this->action('GET', 'TransactionController@delete',$transaction->id);
+        $response = $this->action('GET', 'TransactionController@delete', $transaction->id);
         $view = $response->original;
         $this->assertResponseOk();
         $this->assertSessionHas('previous');
-        $this->assertEquals('Delete transaction '.$transaction->description, $view['title']);
+        $this->assertEquals('Delete transaction ' . $transaction->description, $view['title']);
     }
 
     /**
@@ -370,11 +410,11 @@ class TransactionControllerTest extends TestCase
         );
         Eloquent::reguard();
         $count = Transaction::count();
-        $this->action('POST', 'TransactionController@postDelete',$transaction->id);
+        $this->action('POST', 'TransactionController@postDelete', $transaction->id);
         $newCount = Transaction::count();
         $this->assertResponseStatus(302);
         $this->assertSessionHas('success');
-        $this->assertEquals($count-1,$newCount);
+        $this->assertEquals($count - 1, $newCount);
 
     }
 }
