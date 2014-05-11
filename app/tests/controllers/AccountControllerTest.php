@@ -14,7 +14,6 @@ class AccountControllerTest extends TestCase
     }
     /**
      * @covers AccountController::index
-     * @todo   implement
      */
     public function testIndex()
     {

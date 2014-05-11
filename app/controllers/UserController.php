@@ -28,7 +28,7 @@ class UserController extends BaseController
              'password' => Input::get('password')], true
         )
         ) {
-            return Redirect::to('/home');
+            return Redirect::route('home');
         } else {
             return View::make('user.login')->with('warning', 'Incorrect login details');
         }
@@ -53,10 +53,10 @@ class UserController extends BaseController
      */
     public function register()
     {
-        if(Config::get('firefly.allowRegistration')) {
+        if (Config::get('firefly.allowRegistration')) {
             return View::make('user.register')->with('title', 'Register');
         } else {
-            return View::make('error.general')->with('message','Sorry, this instance does not allow registration.');
+            return View::make('error.general')->with('message', 'Sorry, this instance does not allow registration.');
         }
     }
 
@@ -70,10 +70,8 @@ class UserController extends BaseController
     function activate($code)
     {
         if (Auth::check()) {
-            return View::make('error.500');
+            return View::make('error.general')->with('message', 'You are logged in!');
         }
-
-
         $user = User::where('activation', $code)->first();
         if ($user) {
             $user->sendPasswordMail();
@@ -94,27 +92,26 @@ class UserController extends BaseController
      */
     public function postRegister()
     {
-        if(!Config::get('firefly.allowRegistration')) {
-            return View::make('error.general')->with('message','Sorry, this instance does not allow registration.');
+        if (!Config::get('firefly.allowRegistration')) {
+            return View::make('error.general')->with('message', 'Sorry, this instance does not allow registration.');
         }
         $data = ['email'      => Input::get('email'),
                  'username'   => Input::get('email'),
-                 'activation' => Str::random(64), 'password' => Str::random(60),
+                 'activation' => Str::random(64),
+                 'password'   => Str::random(60),
                  'origin'     => 'Firefly'
 
         ];
         $user = new User($data);
         $validator = Validator::make($user->toArray(), User::$rules);
         if ($validator->fails()) {
-            return View::make('user.register')->with(
-                'warning', 'Invalid e-mail address.'
-            )->with('title', 'Register');
+            return View::make('user.register')->with('warning', 'Invalid e-mail address.')->with('title', 'Register');
         } else {
             $result = $user->sendRegistrationMail();
             $user->save();
-            if($result) {
+            if ($result) {
 
-            return View::make('user.registered')->with('title', 'Registered!');
+                return View::make('user.registered')->with('title', 'Registered!');
             } else {
                 return View::make('error.500');
             }
@@ -139,9 +136,7 @@ class UserController extends BaseController
      */
     public function postReset()
     {
-        $user = User::where('username', Input::get('username'))->whereNull(
-            'reset'
-        )->first();
+        $user = User::where('username', Input::get('username'))->whereNull('reset')->first();
         if ($user) {
             $user->reset = Str::random(64);
             $user->save();
