@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class TransactionController
  */
@@ -174,9 +175,7 @@ class TransactionController extends BaseController
      */
     public function delete(Transaction $transaction)
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
 
         return View::make('transactions.delete')->with('transaction', $transaction)->with(
             'title', 'Delete transaction ' . $transaction->description

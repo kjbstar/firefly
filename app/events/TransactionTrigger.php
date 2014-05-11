@@ -16,8 +16,20 @@ class TransactionTrigger
      */
     public function createTransaction(Transaction $transaction)
     {
-        // update the account:
+        Log::debug('Start with createTransactionTrigger for ' . $transaction->description);
         $account = $transaction->account()->first();
+        if(is_null($account) || is_null($transaction->account_id)) {
+            Log::error('No account, return FALSE');
+            return false;
+        }
+        // update the account:
+        if($transaction->date < $account->openingbalancedate) {
+            Log::error('Date before account date, return FALSE');
+            return false;
+        }
+
+
+
         $account->currentbalance += floatval($transaction->amount);
         $account->save();
 
@@ -110,17 +122,11 @@ class TransactionTrigger
             $triggerPrediction = true;
             $this->triggerAccountChanged($transaction);
         }
-        if ($transaction->date->format('Y-m-d') != $transaction->getOriginal(
-                'date'
-            )
-        ) {
+        if ($transaction->date->format('Y-m-d') != $transaction->getOriginal('date')) {
             $triggerPrediction = true;
             $this->triggerDateChanged($transaction);
         }
-        if ($transaction->amount != floatval(
-                $transaction->getOriginal('amount')
-            )
-        ) {
+        if ($transaction->amount != floatval($transaction->getOriginal('amount'))) {
             $triggerPrediction = true;
             $this->triggerAmountChanged($transaction);
         }
