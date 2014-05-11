@@ -311,6 +311,7 @@ class ReportHelper
             ->leftJoin('accounts', 'accounts.id', '=', 'transactions.account_id')
             ->where('accounts.shared', 0)
             ->get(['transactions.*']);
+
         // get the transfers TO a shared account
         // with this $type and $date.
         $transfers = Auth::user()->transfers()->with(
