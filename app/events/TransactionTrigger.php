@@ -24,6 +24,7 @@ class TransactionTrigger
         }
         // update the account:
         if($transaction->date < $account->openingbalancedate) {
+            Session::flash('error_extended','The transaction date cannot be before the account\'s opening date ('.$account->openingbalancedate->format('Y-m-d').').');
             Log::error('Date before account date, return FALSE');
             return false;
         }

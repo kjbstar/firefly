@@ -79,12 +79,10 @@ class AccountController extends BaseController
         $result = $account->save();
 
         // it failed again (can't actually fail)!
-        // @codeCoverageIgnoreStart
         if (!$result) {
             Session::flash('error', 'Could not save the new account. Is the account name unique?');
             return Redirect::route('addaccount')->withErrors($validator)->withInput();
         }
-        // @codeCoverageIgnoreEnd
 
         // success!
         Cache::userFlush();

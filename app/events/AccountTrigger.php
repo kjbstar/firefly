@@ -121,7 +121,7 @@ class AccountTrigger
     {
         $balance = floatval($account->getOriginal('openingbalance'));
         $newDate = $account->openingbalancedate;
-        $account->balancemodifiers()->beforeDay($newDate)->delete();
+        $account->balancemodifiers()->beforeDate($newDate)->delete();
 
         // update one on new date (if it exists, it doesn't have to).
         $balanceModifier = $account->balancemodifiers()->onDay($newDate)->first();
@@ -176,16 +176,18 @@ class AccountTrigger
     public function createAccount(Account $account)
     {
         // create new BM for that day (if necessary).
-        $count = Balancemodifier::whereAccountId($account->id)->whereDate($account->openingbalancedate)->count();
-        if ($count == 0) {
-            $balanceModifier = new Balancemodifier;
-            $balanceModifier->date = $account->openingbalancedate;
-            $balanceModifier->account()->associate($account);
-            $balanceModifier->balance = $account->openingbalance;
-            $balanceModifier->save();
+        if ($this->validateAccountName($account)) {
+            $count = Balancemodifier::whereAccountId($account->id)->whereDate($account->openingbalancedate)->count();
+            if ($count == 0) {
+                $balanceModifier = new Balancemodifier;
+                $balanceModifier->date = $account->openingbalancedate;
+                $balanceModifier->account()->associate($account);
+                $balanceModifier->balance = $account->openingbalance;
+                $balanceModifier->save();
+            }
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     /**
@@ -213,6 +215,7 @@ class AccountTrigger
 
         foreach ($accounts as $dbAccount) {
             if ($dbAccount->name == $account->name) {
+                Session::flash('error_extended','Accout name "'.$account->name.'" is already used.');
                 return false;
             }
         }

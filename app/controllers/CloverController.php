@@ -70,7 +70,7 @@ class CloverController extends BaseController
                 if ($child->getName() == 'line') {
                     $lineNumber = intval($child->attributes()->num->__toString());
                     $count = intval($child->attributes()->count->__toString());
-                    $covered[$lineNumber] = ($count == 1);
+                    $covered[$lineNumber] = ($count > 0);
                 }
             }
 
