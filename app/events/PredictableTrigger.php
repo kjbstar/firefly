@@ -21,13 +21,14 @@ class PredictableTrigger
         if (is_null($predictable->id)) {
             $predictables = $user->predictables()->get();
         } else {
-            $predictables = $user->predictables()->where(
-                'id', '!=', $predictable->id
-            )->get();
+            $predictables = $user->predictables()->where('id', '!=', $predictable->id)->get();
         }
         foreach ($predictables as $dbp) {
 
             if ($predictable->description == $dbp->description) {
+                Session::flash(
+                    'error_extended', 'A predictable searching for "' . $predictable->description . '" already exists.'
+                );
                 return false;
             }
         }
@@ -48,16 +49,9 @@ class PredictableTrigger
      */
     public function subscribe(Illuminate\Events\Dispatcher $events)
     {
-        $events->listen(
-            'eloquent.creating: Predictable',
-            'PredictableTrigger@validatePredictable'
-        );
+        $events->listen('eloquent.creating: Predictable','PredictableTrigger@validatePredictable');
         $events->listen('eloquent.saved: Predictable', 'PredictableTrigger@jobPredictable');
-
-        $events->listen(
-            'eloquent.updating: Predictable',
-            'PredictableTrigger@validatePredictable'
-        );
+        $events->listen('eloquent.updating: Predictable','PredictableTrigger@validatePredictable');
     }
 
 }

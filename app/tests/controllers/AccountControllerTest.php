@@ -125,6 +125,30 @@ class AccountControllerTest extends TestCase
     }
 
     /**
+     * @covers AccountController::postAdd
+     */
+    public function testPostAddFailsTrigger()
+    {
+        $account = Account::first();
+        $newData = [
+            'name'               => $account->name,
+            'openingbalance'     => 1000,
+            'openingbalancedate' => '2014-01-01',
+            'inactive'           => 0,
+        ];
+        $count = Account::count();
+
+        // this should create a new account.
+        $this->action('POST', 'AccountController@postAdd', $newData);
+
+        $newCount = Account::count();
+
+        $this->assertSessionHas('error');
+        $this->assertResponseStatus(302);
+        $this->assertEquals($count, $newCount);
+    }
+
+    /**
      * @covers AccountController::edit
      */
     public function testEdit()

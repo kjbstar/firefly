@@ -72,6 +72,7 @@ class AccountController extends BaseController
         // validation failed!
         if ($validator->fails()) {
             Session::flash('error', 'Validation failed. Please try harder.');
+            Session::flash('error_extended', $validator->messages()->first());
             return Redirect::route('addaccount')->withErrors($validator)->withInput();
         }
 
@@ -132,6 +133,7 @@ class AccountController extends BaseController
         // failed!
         if ($validator->fails()) {
             Session::flash('error', 'Could not save the account.');
+            Session::flash('error_extended', $validator->messages()->first());
             return Redirect::route('editaccount', $account->id)->withInput()->withErrors($validator);
         }
 
@@ -161,9 +163,8 @@ class AccountController extends BaseController
      */
     public function delete(Account $account)
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-        }
+        Session::put('previous', URL::previous());
+
 
         return View::make('accounts.delete')->with('account', $account)->with(
             'title', 'Delete account "' . $account->name . '"'
@@ -337,16 +338,13 @@ class AccountController extends BaseController
      */
     public function predict(Account $account, $year, $month, $day)
     {
-        $date = Carbon::createFromDate($year,$month,$day);
+        $date = Carbon::createFromDate($year, $month, $day);
         $basicPrediction = $account->predictOnDate($date);
         $information = $account->predictionInformation($date);
 
-        return View::make('accounts.predict')->with('prediction',$basicPrediction)->with('date',$date)
-
-            ->with('information',$information);
-
-
-        return 1;
+        return View::make('accounts.predict')->with('prediction', $basicPrediction)->with('date', $date)->with(
+            'information', $information
+        );
     }
 
 }

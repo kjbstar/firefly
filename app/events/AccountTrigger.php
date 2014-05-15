@@ -31,28 +31,29 @@ class AccountTrigger
      */
     public function editAccount(Account $account)
     {
+        $result = true;
         if ($this->validateAccountName($account)) {
             $originalDate = new Carbon($account->getOriginal(
                 'openingbalancedate'
             ));
             if ($account->openingbalancedate < $originalDate) {
-                $this->triggerAccountDateToPast($account);
+                $result = $this->triggerAccountDateToPast($account);
             } else {
                 if ($account->openingbalancedate > $originalDate) {
-                    $this->triggerAccountDateToFuture($account);
+                    $result = $this->triggerAccountDateToFuture($account);
                 }
             }
-            if (floatval($account->openingbalance) != floatval(
-                    $account->getOriginal('openingbalance')
-                )
-            ) {
-                $this->triggerAccountAmountChanged($account);
+            if($result === false) {
+                return false;
+            }
+            if (floatval($account->openingbalance) != floatval($account->getOriginal('openingbalance'))) {
+                $result = $this->triggerAccountAmountChanged($account);
             }
         } else {
             return false;
         }
 
-        return true;
+        return $result;
 
 
     }
@@ -69,7 +70,7 @@ class AccountTrigger
      *
      * @return boolean
      */
-    private function triggerAccountDateToPast(Account $account)
+    public function triggerAccountDateToPast(Account $account)
     {
         $balance = floatval($account->getOriginal('openingbalance'));
         $start = $account->openingbalancedate;
@@ -99,7 +100,8 @@ class AccountTrigger
         $end->addDay();
         $balanceModifier = $account->balancemodifiers()->onDay($end)->first();
         if (is_null($balanceModifier)) {
-            return View::make('error.500');
+            Session::flash('error_extended','Found a weird database inconsistency. Cancelling!');
+            return false;
         } else {
             $balanceModifier->balance -= floatval($balance);
             $balanceModifier->save();
@@ -133,6 +135,7 @@ class AccountTrigger
         }
         $balanceModifier->balance += $balance;
         $balanceModifier->save();
+        return true;
     }
 
     /**
@@ -156,7 +159,8 @@ class AccountTrigger
 
         // THERE SHOULD BE A BALANCE MODIFIER
         if (is_null($balanceModifier)) {
-            return View::make('error.500');
+            Session::flash('error_extended','Found a weird database inconsistency. Sorry!');
+            return false;
         } else {
             $balanceModifier->balance += $difference;
             $balanceModifier->save();
@@ -202,15 +206,13 @@ class AccountTrigger
             $user = User::find($account->user_id);
         }
         if (is_null($user)) {
+            Session::flash('error_extended','Found no user!');
             return false;
         }
         if (is_null($account->id)) {
             $accounts = $user->accounts()->get();
         } else {
-
-            $accounts = $user->accounts()->where(
-                'id', '!=', $account->id
-            )->get();
+            $accounts = $user->accounts()->where('id', '!=', $account->id)->get();
         }
 
         foreach ($accounts as $dbAccount) {
@@ -230,16 +232,10 @@ class AccountTrigger
      */
     public function subscribe(Illuminate\Events\Dispatcher $events)
     {
-        $events->listen(
-            'eloquent.created: Account', 'AccountTrigger@createAccount'
-        );
-        $events->listen(
-            'eloquent.updating: Account', 'AccountTrigger@editAccount'
-        );
+        $events->listen('eloquent.created: Account', 'AccountTrigger@createAccount');
+        $events->listen('eloquent.updating: Account', 'AccountTrigger@editAccount');
         // validate the name of the (new) account:
-        $events->listen(
-            'eloquent.creating: Account', 'AccountTrigger@validateAccountName'
-        );
+        $events->listen('eloquent.creating: Account', 'AccountTrigger@validateAccountName');
     }
 
 }

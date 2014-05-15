@@ -21,13 +21,12 @@ class PiggyTrigger
         if (is_null($piggy->id)) {
             $piggies = $user->piggybanks()->get();
         } else {
-            $piggies = $user->piggybanks()->where(
-                'id', '!=', $piggy->id
-            )->get();
+            $piggies = $user->piggybanks()->where('id', '!=', $piggy->id)->get();
         }
         foreach ($piggies as $dbp) {
 
             if ($piggy->name == $dbp->name) {
+                Session::flash('error_extended','Piggy bank with name "'.$piggy->name.'" already exists.');
                 Log::error('Piggy trigger: ' . $piggy->name.' exists already (#'.$dbp->id.')');
                 return false;
             }
@@ -41,15 +40,8 @@ class PiggyTrigger
      */
     public function subscribe(Illuminate\Events\Dispatcher $events)
     {
-        $events->listen(
-            'eloquent.creating: Piggybank',
-            'PiggyTrigger@validatePiggy'
-        );
-
-        $events->listen(
-            'eloquent.updating: Piggybank',
-            'PiggyTrigger@validatePiggy'
-        );
+        $events->listen('eloquent.creating: Piggybank','PiggyTrigger@validatePiggy');
+        $events->listen('eloquent.updating: Piggybank','PiggyTrigger@validatePiggy');
     }
 
 }

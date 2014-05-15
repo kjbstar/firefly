@@ -75,9 +75,9 @@ class ComponentController extends BaseController
         // get data
         $parentID = intval(Input::get('parent_component_id')) > 0 ? intval(Input::get('parent_component_id')) : null;
         $data = [
-            'name'                => Input::get('name'),
+            'name' => Input::get('name'),
             'parent_component_id' => $parentID,
-            'reporting'           => Input::get('reporting') == '1' ? 1 : 0,
+            'reporting' => Input::get('reporting') == '1' ? 1 : 0,
         ];
         // create the new component
         $component = new Component($data);
@@ -91,6 +91,7 @@ class ComponentController extends BaseController
         // validation fails!
         if ($validator->fails()) {
             Session::flash('error', 'Could not save the new ' . $type->type);
+            Session::flash('error_extended',$validator->messages()->first());
             return Redirect::route('addcomponent', $type->id)->withErrors($validator)->withInput();
         }
         // try to save it:

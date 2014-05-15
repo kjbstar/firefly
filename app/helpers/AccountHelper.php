@@ -67,7 +67,7 @@ class AccountHelper
         $result = $result->merge($transfersTo);
         $result = $result->sortBy(
             function ($a) {
-                return $a->created_at;
+                return $a->date;
             }
         )->reverse();
         return $result;

@@ -18,17 +18,20 @@ class TransactionTrigger
     {
         Log::debug('Start with createTransactionTrigger for ' . $transaction->description);
         $account = $transaction->account()->first();
-        if(is_null($account) || is_null($transaction->account_id)) {
+        if (is_null($account) || is_null($transaction->account_id)) {
+            Session::flash('error_extended', 'Transaction without account is impossible.');
             Log::error('No account, return FALSE');
             return false;
         }
         // update the account:
-        if($transaction->date < $account->openingbalancedate) {
-            Session::flash('error_extended','The transaction date cannot be before the account\'s opening date ('.$account->openingbalancedate->format('Y-m-d').').');
+        if ($transaction->date < $account->openingbalancedate) {
+            Session::flash(
+                'error_extended', 'The transaction date cannot be before the account\'s opening date ('
+                . $account->openingbalancedate->format('Y-m-d') . ').'
+            );
             Log::error('Date before account date, return FALSE');
             return false;
         }
-
 
 
         $account->currentbalance += floatval($transaction->amount);
@@ -36,9 +39,7 @@ class TransactionTrigger
 
 
         // update or create balancemodifier on that date:
-        $balanceModifier = $account->balancemodifiers()->onDay(
-            $transaction->date
-        )->first();
+        $balanceModifier = $account->balancemodifiers()->onDay($transaction->date)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier;
             $balanceModifier->account()->associate($account);
@@ -67,9 +68,7 @@ class TransactionTrigger
 
 
         // update or create balancemodifier
-        $balanceModifier = $account->balancemodifiers()->onDay(
-            $transaction->date
-        )->first();
+        $balanceModifier = $account->balancemodifiers()->onDay($transaction->date)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier;
             $balanceModifier->account()->associate($account);
@@ -114,6 +113,9 @@ class TransactionTrigger
         Log::debug('Trigger edit on transaction #' . $transaction->id);
         $account = $transaction->account()->first();
         if ($transaction->date < $account->openingbalancedate) {
+            Session::flash(
+                'error_extended', 'The transaction\'s data cannot be before the account\'s opening balance date.'
+            );
             Log::debug('Date before date');
             return false;
         }
@@ -154,9 +156,7 @@ class TransactionTrigger
     {
         $date = new Carbon($transaction->getOriginal('date'));
         $newAccount = Auth::user()->accounts()->find($transaction->account_id);
-        $oldAccount = Auth::user()->accounts()->find(
-            $transaction->getOriginal('account_id')
-        );
+        $oldAccount = Auth::user()->accounts()->find($transaction->getOriginal('account_id'));
 
         // remove the amount from the old BM
         $oldBm = $oldAccount->balancemodifiers()->onDay($date)->first();
@@ -169,9 +169,7 @@ class TransactionTrigger
         $oldBm->balance -= floatval($transaction->getOriginal('amount'));
         $oldBm->save();
         // update the account's current balance:
-        $oldAccount->currentbalance -= floatval(
-            $transaction->getOriginal('amount')
-        );
+        $oldAccount->currentbalance -= floatval($transaction->getOriginal('amount'));
         $oldAccount->save();
 
         // add the amount to the new BM:
@@ -186,9 +184,7 @@ class TransactionTrigger
         $newBm->save();
 
         // update the new account:
-        $newAccount->currentbalance += floatval(
-            $transaction->getOriginal('amount')
-        );
+        $newAccount->currentbalance += floatval($transaction->getOriginal('amount'));
         $newAccount->save();
 
         // return, we're done here!
