@@ -42,7 +42,7 @@
             saving up, set a target amount for this piggy bank.">Target</label>
             <div class="col-sm-8">
                 <div class="input-group">
-                    <span class="input-group-addon">&euro;</span>
+                    <span class="input-group-addon">{{$currency}}</span>
                     <input type="number" value="{{$prefilled['target']}}"
                            name="target" step="any" class="form-control"
                            id="inputTarget">

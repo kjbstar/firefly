@@ -6,7 +6,7 @@
     <div class="col-lg-12 col-md-12">
         <h2>Settings</h2>
 
-        <p>There are some settings for Firefly. It's not much yet, but enjoy!.</p>
+        <p>There are some settings for Firefly. It's not much yet, but enjoy!</p>
 
 
     </div>
@@ -14,6 +14,18 @@
 <div class="row">
     <div class="col-lg-6 col-md-6">
         {{Form::open()}}
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Currency</h3>
+            </div>
+            <div class="panel-body">
+                <p>
+                    What currency do you want Firefly to display?
+                </p>
+                {{Form::select('currency',$currencies,$currency->value,['class' => 'form-control',])}}
+            </div>
+        </div>
 
         <div class="panel panel-info">
             <div class="panel-heading">
@@ -46,6 +58,8 @@
                 </div>
             </div>
         @endif
+
+
 
             {{Form::submit('Submit',['class' => 'btn btn-info'])}}
         {{Form::close()}}

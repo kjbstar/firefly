@@ -33,7 +33,7 @@
 
                 <div class="col-sm-9">
                     <div class="input-group">
-                        <span class="input-group-addon">&euro;</span>
+                        <span class="input-group-addon">{{$currency}}</span>
                         @if($balance < $pig->amount*-1)
                         <input type="number" max="-{{$pig->amount}}"
                                min="{{$balance}}" value="0"

@@ -5,6 +5,10 @@ use Carbon\Carbon as Carbon;
 
 App::before(
     function ($request) {
+
+        // currency
+        View::share('currency', Config::get('firefly.currencies')[Setting::getSetting('currency')->value]['symbol']);
+
         // process session period
         $now = new Carbon;
         $now->modify('midnight');

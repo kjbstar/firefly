@@ -41,7 +41,7 @@
             <label for="inputAmount" class="col-sm-3 control-label">Amount</label>
             <div class="col-sm-9">
                 <div class="input-group">
-                    <span class="input-group-addon">&euro;</span>
+                    <span class="input-group-addon">{{$currency}}</span>
                     <input type="number" value="{{{$prefilled['amount']}}}" name="amount" step="any"
                            class="form-control" id="inputAmount">
                 </div>

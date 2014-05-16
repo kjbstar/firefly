@@ -96,20 +96,22 @@ if (!function_exists('array_unshift_assoc')) {
 if (!function_exists('mf')) {
     function mf($n, $coloured = false, $list = false)
     {
+
         $n = floatval($n);
         $string = number_format($n, 2, ',', '.');
+        $currency = Config::get('firefly.currencies')[Setting::getSetting('currency')->value];
 
         if ($coloured === true && $n === 0.0) {
-            return '<span style="color:#999">&#8364; ' . $string . '</span>';
+            return '<span style="color:#999">'.$currency['symbol'].' ' . $string . '</span>';
         }
         if ($coloured === true && $n > 0) {
-            return '<span class="text-success">&#8364; ' . $string . '</span>';
+            return '<span class="text-success">'.$currency['symbol'].' ' . $string . '</span>';
         }
         if ($coloured === true && $n < 0) {
-            return '<span class="text-danger">&#8364; ' . $string . '</span>';
+            return '<span class="text-danger">'.$currency['symbol'].' ' . $string . '</span>';
         }
-
-        return '&#8364; ' . $string;
+//
+        return $currency['code'].' ' . $string;
     }
 }
 

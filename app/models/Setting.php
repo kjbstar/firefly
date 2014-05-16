@@ -37,9 +37,7 @@ class Setting extends Eloquent
      */
     public static function findSetting($name)
     {
-        return Auth::user()->settings()->where(
-            'name', $name
-        )->first();
+        return Auth::user()->settings()->where('name', $name)->first();
 
     }
 

@@ -41,5 +41,6 @@ class BaseController extends Controller
             Cache::forever('types', $types);
             View::share('types', $types);
         }
+
     }
 }

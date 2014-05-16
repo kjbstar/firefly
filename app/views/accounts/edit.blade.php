@@ -33,7 +33,7 @@
             <label for="inputOpeningbalance" class="col-sm-4 control-label">Opening balance</label>
             <div class="col-sm-8">
                 <div class="input-group">
-                    <span class="input-group-addon">&euro;</span>
+                    <span class="input-group-addon">{{$currency}}</span>
                     <input type="number" value="{{{$prefilled['openingbalance']}}}" name="openingbalance" step="any"
                            class="form-control" id="inputOpeningbalance">
                 </div>
