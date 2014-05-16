@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "88f48d576538e60339f3575af51cf17d",
+    "hash": "7962aac32e6906f8ce47ec7372962251",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -2504,12 +2504,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/padraic/mockery.git",
-                "reference": "715721895260a951d9cb9c2b9269d5333fb37a5e"
+                "reference": "2169d215819d7011110ce00de10869ec329c0667"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/mockery/zipball/715721895260a951d9cb9c2b9269d5333fb37a5e",
-                "reference": "715721895260a951d9cb9c2b9269d5333fb37a5e",
+                "url": "https://api.github.com/repos/padraic/mockery/zipball/2169d215819d7011110ce00de10869ec329c0667",
+                "reference": "2169d215819d7011110ce00de10869ec329c0667",
                 "shasum": ""
             },
             "require": {
@@ -2562,7 +2562,7 @@
                 "test double",
                 "testing"
             ],
-            "time": "2014-05-02 12:25:43"
+            "time": "2014-05-16 09:29:12"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -2660,12 +2660,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-skeleton-generator.git",
-                "reference": "e933d394bdfacec34b7ff4e8fc53c625e09e9721"
+                "reference": "c0eeb18f31893c2f0c387bce84f8a3816a0eacd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-skeleton-generator/zipball/e933d394bdfacec34b7ff4e8fc53c625e09e9721",
-                "reference": "e933d394bdfacec34b7ff4e8fc53c625e09e9721",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-skeleton-generator/zipball/c0eeb18f31893c2f0c387bce84f8a3816a0eacd1",
+                "reference": "c0eeb18f31893c2f0c387bce84f8a3816a0eacd1",
                 "shasum": ""
             },
             "require": {
@@ -2711,7 +2711,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-05-12 06:07:26"
+            "time": "2014-05-14 17:42:22"
         },
         {
             "name": "satooshi/php-coveralls",
@@ -2719,12 +2719,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/satooshi/php-coveralls.git",
-                "reference": "9fce7133a1d79b19f38a8fc975009703468172f0"
+                "reference": "b7271847c84d160f5b0aae83e45c225e8ffc96f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/satooshi/php-coveralls/zipball/9fce7133a1d79b19f38a8fc975009703468172f0",
-                "reference": "9fce7133a1d79b19f38a8fc975009703468172f0",
+                "url": "https://api.github.com/repos/satooshi/php-coveralls/zipball/b7271847c84d160f5b0aae83e45c225e8ffc96f4",
+                "reference": "b7271847c84d160f5b0aae83e45c225e8ffc96f4",
                 "shasum": ""
             },
             "require": {
@@ -2786,7 +2786,7 @@
                 "github",
                 "test"
             ],
-            "time": "2014-03-27 16:05:26"
+            "time": "2014-05-14 13:09:37"
         },
         {
             "name": "sebastian/version",

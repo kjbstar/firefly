@@ -6,6 +6,9 @@ use Carbon\Carbon as Carbon;
  */
 class AccountController extends BaseController
 {
+    public function __construct(Firefly\Storage\Account\AccountRepositoryInterface $account) {
+        $this->account = $account;
+    }
 
     /**
      * Shows the index page.
@@ -15,17 +18,8 @@ class AccountController extends BaseController
     public function index()
     {
         // get the accounts:
-        $accounts = Auth::user()->accounts()->orderBy('inactive')->orderBy('name')->get();
-
-        // get balances:
-        $date = new Carbon;
-        $balances = [];
-        foreach ($accounts as $account) {
-            $balances[$account->id] = floatval($account->balanceOnDate($date));
-        }
-        return View::make('accounts.index')->with('accounts', $accounts)->with('balances', $balances)->with(
-            'title', 'All accounts'
-        );
+        $accounts = $this->account->all();
+        return View::make('accounts.index')->with('accounts', $accounts)->with('title', 'All accounts');
     }
 
     /**

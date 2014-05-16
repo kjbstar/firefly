@@ -110,6 +110,7 @@ return [
         'Barryvdh\Debugbar\ServiceProvider',
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
         'DaveJamesMiller\Breadcrumbs\ServiceProvider',
+        'Firefly\Storage\StorageServiceProvider'
     ],
 
 

@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @method static \Account notInactive()
  * @method static \Account shared()
  * @method static \Account notShared()
+ * @property string                                                           $lastactivityedate
  */
 class Account extends Eloquent
 {
@@ -83,8 +84,9 @@ class Account extends Eloquent
      *
      * @return float
      */
-    public function balanceOnDate(Carbon $date)
+    public function balanceOnDate(Carbon $date = null)
     {
+        $date = is_null($date) ? new Carbon : $date;
 
         if ($date < $this->openingbalancedate) {
             $date = $this->openingbalancedate;
@@ -164,8 +166,8 @@ class Account extends Eloquent
          * (ie predicting a bigger expense)
          * we change the optimistic prediction:
          */
-        Log::debug('Data[least] ('.$data['least'].') vs Data[pred] ('.$data['prediction'].')');
-        if($data['least'] > $data['prediction']) {
+        Log::debug('Data[least] (' . $data['least'] . ') vs Data[pred] (' . $data['prediction'] . ')');
+        if ($data['least'] > $data['prediction']) {
 
             $data['least'] = $data['prediction'];
         }
@@ -209,9 +211,11 @@ class Account extends Eloquent
                     DB::Raw('SUM(`amount`) as `sum_of_day`')
                 ]
             );
-        $information->each(function($x) {
+        $information->each(
+            function ($x) {
                 $x->day = new Carbon($x->day);
-            });
+            }
+        );
         return $information;
 
     }
