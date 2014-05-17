@@ -165,7 +165,7 @@
             @foreach($result['result']['accounts'] as $a)
             <tr>
                 <td><a href="{{URL::Route('accountoverview',$a->id)}}" title="{{{$a->name}}}">{{{$a->name}}}</a></td>
-                <td>{{mf($a->balanceOnDate(new Carbon\Carbon),true)}}</td>
+                <td>{{mf(0,true)}}</td>
             </tr>
             @endforeach
         </table>

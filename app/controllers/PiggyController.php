@@ -6,6 +6,11 @@ use Carbon\Carbon as Carbon;
  */
 class PiggyController extends BaseController
 {
+    public function __construct(\Firefly\Storage\Setting\SettingRepositoryInterface $settings,
+\Firefly\Helper\Account\AccountHelperInterface $accountHelper) {
+        $this->settings = $settings;
+        $this->accountHelper = $accountHelper;
+    }
 
     /**
      * Index for piggies.
@@ -14,15 +19,15 @@ class PiggyController extends BaseController
      */
     public function index()
     {
-        $piggyAccount = Setting::getSetting('piggyAccount');
-        if (intval($piggyAccount->value) == 0) {
+        $piggyAccount = $this->settings->getSettingValue('piggyAccount');
+        if (intval($piggyAccount) == 0) {
             return Redirect::route('piggyselect');
         }
         // get piggy banks:
         $piggies = Auth::user()->piggybanks()->orderBy('order', 'ASC')->get();
         // get account:
-        $account = Auth::user()->accounts()->find($piggyAccount->value);
-        $balance = $account->balanceOnDate(new Carbon);
+        $account = Auth::user()->accounts()->find($piggyAccount);
+        $balance = $this->accountHelper->balanceOnDate($account);
 
         $totalTarget = 0;
         foreach ($piggies as $pig) {
@@ -283,7 +288,7 @@ class PiggyController extends BaseController
         // get account:
         $piggyAccount = Setting::getSetting('piggyAccount');
         $account = Auth::user()->accounts()->find($piggyAccount->value);
-        $balance = $account->balanceOnDate(new Carbon);
+        $balance = $this->accountHelper->balanceOnDate($account);
 
         foreach ($piggies as $current) {
             $balance -= $current->amount;

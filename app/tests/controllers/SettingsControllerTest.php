@@ -32,15 +32,12 @@ class SettingsControllerTest extends TestCase
         foreach(Setting::get() as $s) {
             $s->delete();
         }
-        $count = Setting::count();
         $response = $this->action('GET', 'SettingsController@index');
         $view = $response->original;
-        $newCount = Setting::count();
 
         $this->assertResponseOk();
         $this->assertEquals('Settings',$view['title']);
         $this->assertSessionHas('previous');
-        $this->assertEquals($count+3,$newCount);
     }
 
     /**
@@ -55,7 +52,7 @@ class SettingsControllerTest extends TestCase
             'frontpageAccount' => $account->id,
             'currency' => 1
         ];
-        $this->action('POST', 'SettingsController@index',$data);
+        $this->action('POST', 'SettingsController@postIndex',$data);
         $this->assertResponseStatus(302);
 
         $predictionStart = DB::table('settings')->where('name','predictionStart')->first();

@@ -1,13 +1,17 @@
 <?php
 use Carbon\Carbon as Carbon;
+use Firefly\Helper\Account\AccountHelperInterface as AHI;
+use Firefly\Storage\Account\AccountRepositoryInterface as ARI;
 
 /**
  * Class AccountController
  */
 class AccountController extends BaseController
 {
-    public function __construct(Firefly\Storage\Account\AccountRepositoryInterface $account) {
-        $this->account = $account;
+    public function __construct(ARI $accounts, AHI $helper)
+    {
+        $this->accounts = $accounts;
+        $this->helper = $helper;
     }
 
     /**
@@ -18,7 +22,7 @@ class AccountController extends BaseController
     public function index()
     {
         // get the accounts:
-        $accounts = $this->account->all();
+        $accounts = $this->accounts->all();
         return View::make('accounts.index')->with('accounts', $accounts)->with('title', 'All accounts');
     }
 
@@ -53,22 +57,23 @@ class AccountController extends BaseController
             'currentbalance'     => floatval(Input::get('openingbalance')),
             'openingbalancedate' => Input::get('openingbalancedate'),
             'inactive'           => Input::get('inactive') == '1' ? 1 : 0,
-            'shared'             => Input::get('shared') == '1' ? 1 : 0
+            'shared'             => Input::get('shared') == '1' ? 1 : 0,
+            'user_id'            => Auth::user()->id
         ];
         // create the new account:
-        $account = new Account($data);
-        /** @noinspection PhpParamsInspection */
-        $account->user()->associate(Auth::user());
+        $account = $this->accounts->initialize($data);
 
         // validate it:
         $validator = Validator::make($account->toArray(), Account::$rules);
 
         // validation failed!
         if ($validator->fails()) {
+            Log::debug('Validation failed on new account.');
             Session::flash('error', 'Validation failed. Please try harder.');
             Session::flash('error_extended', $validator->messages()->first());
             return Redirect::route('addaccount')->withErrors($validator)->withInput();
         }
+        Log::debug('Validation NOT failed on new account.');
 
         // try to save it:
         $result = $account->save();
@@ -276,7 +281,7 @@ class AccountController extends BaseController
 
         $now = new Carbon;
         if ($now < $date) {
-            $balance = $account->balanceOnDate($date);
+            $balance = $this->helper->balanceOnDate($account, $date);
             $above = $balance;
             $below = $balance;
         }
@@ -287,13 +292,13 @@ class AccountController extends BaseController
             if ($current < $now) {
                 // get the past:
                 $certain = true;
-                $balance = $account->balanceOnDate($current);
+                $balance = $this->helper->balanceOnDate($account, $date);
                 $above = $balance;
                 $below = $balance;
             } else {
                 // predict the future:
                 $certain = false;
-                $prediction = $account->predictOnDate($current);
+                $prediction = $this->helper->predictOnDate($account, $date);
 
                 /** @noinspection PhpUndefinedVariableInspection */
                 $above -= $prediction['least'];
@@ -333,8 +338,8 @@ class AccountController extends BaseController
     public function predict(Account $account, $year, $month, $day)
     {
         $date = Carbon::createFromDate($year, $month, $day);
-        $basicPrediction = $account->predictOnDate($date);
-        $information = $account->predictionInformation($date);
+        $basicPrediction = $this->helper->predictOnDate($account, $date);
+        $information = $this->helper->predictionInformation($account, $date);
 
         return View::make('accounts.predict')->with('prediction', $basicPrediction)->with('date', $date)->with(
             'information', $information

@@ -20,6 +20,9 @@ class HomeHelper
      */
     public static function homeAccountList(Carbon $date)
     {
+        /** @var $accountHelper \Firefly\Helper\Account\AccountHelperInterface */
+        $accountHelper = App::make('Firefly\Helper\Account\AccountHelperInterface');
+
         $key = 'homeAccountList' . $date->format('Ymd');
         if (Cache::has($key)) {
             return Cache::get($key);
@@ -35,7 +38,7 @@ class HomeHelper
                 'id'      => $account->id,
                 'url'     => $url,
                 'homeurl' => $homeURL,
-                'current' => $account->balanceOnDate($date),
+                'current' => $accountHelper->balanceOnDate($account,$date),
                 'shared'  => $account->shared == 1 ? true : false,
             ];
         }

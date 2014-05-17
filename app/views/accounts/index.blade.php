@@ -36,7 +36,7 @@
                     @endif
                 </td>
                 @endif
-                <td>{{mf($a->balanceOnDate(),true)}}</td>
+                <td>{{mf(0,true)}}</td>
                 <td>
                     <div class="btn-group">
                         <a href="{{URL::Route('editaccount',$a->id)}}" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span></a> <a href="{{URL::Route('deleteaccount',[$a->id])}}" class="btn btn-default btn-danger"><span class="glyphicon glyphicon-trash"></span></a>

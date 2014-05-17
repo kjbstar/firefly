@@ -32,6 +32,7 @@ class Setting extends Eloquent
 
     /**
      * @param $name
+     * @deprecated Will be removed.
      *
      * @return mixed
      */
@@ -55,6 +56,7 @@ class Setting extends Eloquent
      * Return a setting by name.
      *
      * @param $name
+     * @deprecated Since v2.1.4
      *
      * @return Setting
      */
@@ -98,46 +100,6 @@ class Setting extends Eloquent
             Cache::put($key, $userSetting, 2880);
             return $userSetting;
         }
-    }
-
-    /**
-     * Gets the description as a decrypted string.
-     *
-     * TODO expand into other types.
-     *
-     * @param $value
-     *
-     * @return null|string
-     */
-    public function getValueAttribute($value)
-    {
-        $type = isset($this->attributes['type']) ? $this->attributes['type'] : 'default';
-        $return = null;
-        switch ($type) {
-            case 'date':
-                $return = new Carbon($value);
-                break;
-            case 'float':
-                $return = floatval($value);
-                break;
-            case 'int':
-                $return = intval($value);
-                break;
-            case 'string':
-                $return = trim($value);
-                break;
-        }
-        return $return;
-    }
-
-    /**
-     * Set the description as an encrypted string.
-     *
-     * @param $value
-     */
-    public function setValueAttribute($value)
-    {
-        $this->attributes['value'] = $value;
     }
 
     /**

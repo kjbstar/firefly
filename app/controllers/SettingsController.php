@@ -1,11 +1,19 @@
 <?php
 use Carbon\Carbon as Carbon;
+use Firefly\Storage\Setting\SettingRepositoryInterface as ASI;
+use Firefly\Storage\Account\AccountRepositoryInterface as ARI;
 
 /**
  * Class SettingsController
  */
 class SettingsController extends BaseController
 {
+    public function __construct(ASI $settings,ARI $accounts)
+    {
+        $this->settings = $settings;
+        $this->accounts = $accounts;
+
+    }
 
     /**
      * Show the index for the settings.
@@ -17,24 +25,23 @@ class SettingsController extends BaseController
         Session::put('previous', URL::previous());
 
         // let's grab the settings that might be available.
-        $predictionStart = Toolkit::getPredictionStart();
-        $frontpageAccount = Toolkit::getFrontpageAccount();
-
+        $predictionStart = $this->settings->getSettingValue('predictionStart');
+        $frontpageAccount = $this->settings->getSettingValue('frontPageAccount');
 
         // get the available currencies and put them in a list:
         $currencies = [];
-        foreach(Config::get('firefly.currencies') as $index => $currency) {
+        foreach (Config::get('firefly.currencies') as $index => $currency) {
             $currencies[$index] = $currency['name'];
         }
-        $currency = Setting::getSetting('currency');
+        $currency = $this->settings->getSettingValue('currency');
 
         // and the setting that controls which accounts (and
         // subsequent predictions) you want to see on the front page:
-        $accountList = AccountHelper::accountsAsSelectList();
+        $accountList = $this->accounts->selectList();
 
         return View::make('settings.index')->with('title', 'Settings')->with('predictionStart', $predictionStart)->with(
             'accountList', $accountList
-        )->with('frontpageAccount', $frontpageAccount)->with('currencies',$currencies)->with('currency',$currency);
+        )->with('frontpageAccount', $frontpageAccount)->with('currencies', $currencies)->with('currency', $currency);
 
     }
 
@@ -45,18 +52,15 @@ class SettingsController extends BaseController
      */
     public function postIndex()
     {
-        // save all settings. For now, just the predictionStart one.
-        $predictionStart = Setting::findSetting('predictionStart');
-        $frontpageAccount = Setting::findSetting('frontpageAccount');
-        $currency = Setting::findSetting('currency');
-
-        $predictionStart->value = Input::get('predictionStart');
-        $frontpageAccount->value = Input::get('frontpageAccount');
-        $currency->value = intval(Input::get('currency'));
-
-        $predictionStart->save();
-        $frontpageAccount->save();
-        $currency->save();
+        $list = ['predictionStart','frontpageAccount','currency'];
+        foreach($list as $s) {
+            $set = $this->settings->getSetting($s);
+            if(is_null($set)) {
+                $set = $this->settings->create($s);
+            }
+            $set->value = Input::get($s);
+            $set->save();
+        }
 
         Cache::userFlush();
         Session::flash('success', 'Settings saved!');

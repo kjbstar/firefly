@@ -111,7 +111,7 @@ if (!function_exists('mf')) {
             return '<span class="text-danger">'.$currency['symbol'].' ' . $string . '</span>';
         }
 //
-        return $currency['code'].' ' . $string;
+        return $currency['symbol'].' ' . $string;
     }
 }
 

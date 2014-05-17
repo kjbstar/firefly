@@ -23,7 +23,7 @@
                 <p>
                     What currency do you want Firefly to display?
                 </p>
-                {{Form::select('currency',$currencies,$currency->value,['class' => 'form-control',])}}
+                {{Form::select('currency',$currencies,$currency,['class' => 'form-control',])}}
             </div>
         </div>
 
@@ -38,7 +38,7 @@
                 </p>
 
                 <p>
-                    <input type="date" name="predictionStart" value="{{$predictionStart->format('Y-m-d')}}" class="form-control"/>
+                    <input type="date" name="predictionStart" value="{{$predictionStart}}" class="form-control"/>
                 </p>
 
             </div>
@@ -54,7 +54,7 @@
                     The frontpage used to be capable of showing just one account. It has a small drop down
                     now, but still defaults to this account:
                 </p>
-                {{Form::select('frontpageAccount',$accountList,$frontpageAccount->id,['class' => 'form-control',])}}
+                {{Form::select('frontpageAccount',$accountList,$frontpageAccount,['class' => 'form-control',])}}
                 </div>
             </div>
         @endif

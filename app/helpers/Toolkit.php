@@ -33,8 +33,9 @@ class Toolkit
 
     /**
      * @return mixed
+     * @deprecated This is deprecated
      */
-    public static function getFrontpageAccount()
+    public static function  getFrontpageAccount()
     {
         /** @noinspection PhpUndefinedFieldInspection */
         $key = 'frontPageAccount';
@@ -54,6 +55,7 @@ class Toolkit
 
     /**
      * @return string
+     * @deprecated This is deprecated
      */
     public static function getPredictionStart()
     {

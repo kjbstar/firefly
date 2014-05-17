@@ -10,6 +10,7 @@ class AccountControllerTest extends TestCase
     {
         parent::setUp();
         $user = User::whereUsername('admin')->first();
+        Auth::login($user);
         $this->be($user);
     }
     /**
@@ -107,14 +108,13 @@ class AccountControllerTest extends TestCase
     public function testPostAddFailsValidator()
     {
         $newData = [
-            'name'               => null,
             'openingbalance'     => 1000,
             'openingbalancedate' => '2014-01-01',
             'inactive'           => 0,
         ];
         $count = Account::count();
 
-        // this should create a new account.
+        // this should not create a new account.
         $this->action('POST', 'AccountController@postAdd', $newData);
 
         $newCount = Account::count();

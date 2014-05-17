@@ -7,7 +7,24 @@ App::before(
     function ($request) {
 
         // currency
+
         View::share('currency', Config::get('firefly.currencies')[Setting::getSetting('currency')->value]['symbol']);
+
+        // types
+        if (Cache::has('types')) {
+            View::share('types', Cache::get('types'));
+        } else {
+            try {
+                $types = Type::orderBy('type')->get();
+            } catch (QueryException $e) {
+                echo '<p>Database error. Did you run <span style="font-family:monospace;">
+                php artisan migrate:refresh --seed</span>?</p>';
+                echo '<p><span style="color:red;">Error:</span> '.$e->getMessage().'</p>';
+                exit();
+            }
+            Cache::forever('types', $types);
+            View::share('types', $types);
+        }
 
         // process session period
         $now = new Carbon;
@@ -42,8 +59,6 @@ Route::filter(
         if (!defined('OBJS')) {
             define('OBJS', Str::plural($segment));
         }
-
-
     }
 );
 

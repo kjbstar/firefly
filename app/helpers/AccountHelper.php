@@ -3,6 +3,8 @@ use Carbon\Carbon as Carbon;
 
 /**
  * Class AccountHelper
+ *
+ * @deprecated Will be replaced.
  */
 class AccountHelper
 {
@@ -10,6 +12,8 @@ class AccountHelper
     /**
      * Gets a list of accounts used in a account select list. Excludes hidden
      * ones.
+     *
+     * @deprecated No longer used since 2.1.4
      *
      * @return array
      */
@@ -26,6 +30,7 @@ class AccountHelper
     /**
      * @param Account $account
      *
+     * @deprecated No longer used since 2.1.4
      * @return array
      */
     public static function months(Account $account)
@@ -34,6 +39,9 @@ class AccountHelper
         $end->firstOfMonth();
         $start = $account->openingbalancedate;
         $start->firstOfMonth();
+
+        /** @var $accountHelper \Firefly\Helper\Account\AccountHelperInterface */
+        $accountHelper = App::make('Firefly\Helper\Account\AccountHelperInterface');
         $list = [];
         while ($end >= $start) {
             $url = URL::Route(
@@ -43,7 +51,7 @@ class AccountHelper
                 'url'     => $url,
                 'title'   => $end->format('F Y'),
                 'date'    => clone $end,
-                'balance' => $account->balanceOnDate($end)
+                'balance' => $accountHelper->balanceOnDate($account, $end)
             ];
             $end->subMonth();
         }
@@ -86,6 +94,8 @@ class AccountHelper
      * @param Carbon  $start
      * @param Carbon  $end
      *
+     * @deprecated No longer used since 2.1.4
+     *
      * @return array
      */
     public static function getMarkedTransactions(
@@ -118,6 +128,7 @@ class AccountHelper
     }
 
     /**
+     * @deprecated Will be replaced.
      * @return array
      */
     public static function emptyPrefilledAray()
@@ -126,12 +137,13 @@ class AccountHelper
             'name'               => '',
             'openingbalance'     => '',
             'openingbalancedate' => date('Y-m-d'),
-            'inactive'             => false,
+            'inactive'           => false,
             'shared'             => false
         ];
     }
 
     /**
+     * @deprecated Will be replaced.
      * @return array
      */
     public static function prefilledFromOldInput()
@@ -140,13 +152,15 @@ class AccountHelper
             'name'               => Input::old('name'),
             'openingbalance'     => Input::old('openingbalance'),
             'openingbalancedate' => Input::old('openingbalancedate'),
-            'inactive'             => intval(Input::old('inactive')) == 1 ? true : false,
+            'inactive'           => intval(Input::old('inactive')) == 1 ? true : false,
             'shared'             => intval(Input::old('shared')) == 1 ? true : false
         ];
     }
 
     /**
      * @param Account $account
+     *
+     * @deprecated No longer used since 2.1.4
      *
      * @return array
      */
@@ -156,7 +170,7 @@ class AccountHelper
             'name'               => $account->name,
             'openingbalance'     => $account->openingbalance,
             'openingbalancedate' => $account->openingbalancedate->format('Y-m-d'),
-            'inactive'             => $account->inactive == 1 ? true : false,
+            'inactive'           => $account->inactive == 1 ? true : false,
             'shared'             => $account->shared == 1 ? true : false,
 
         ];

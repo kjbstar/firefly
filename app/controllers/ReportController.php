@@ -6,6 +6,10 @@ use Carbon\Carbon as Carbon;
  */
 class ReportController extends BaseController
 {
+
+    public function __construct(\Firefly\Helper\Account\AccountHelperInterface $accountHelper) {
+        $this->accountHelper = $accountHelper;
+    }
     /**
      * Index for report controller
      *
@@ -202,7 +206,7 @@ class ReportController extends BaseController
 
             foreach ($accounts as $account) {
                 if ($current <= $now) {
-                    $row[] = $account->balanceOnDate($current);
+                    $row[] = $this->accountHelper->balanceOnDate($account,$current);
                 } else {
                     $row[] = null;
                 }
@@ -271,7 +275,7 @@ class ReportController extends BaseController
 
             foreach ($accounts as $account) {
                 if ($current <= $now) {
-                    $row[] = $account->balanceOnDate($current);
+                    $row[] = $this->accountHelper->balanceOnDate($account,$current);
                 } else {
                     $row[] = null;
                 }
