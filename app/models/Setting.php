@@ -5,17 +5,17 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 /**
  * Setting
  *
- * @property integer $id
+ * @property integer        $id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property integer $user_id
- * @property integer $account_id
- * @property string $type
- * @property string $name
+ * @property integer        $user_id
+ * @property integer        $account_id
+ * @property string         $type
+ * @property string         $name
  * @property \Carbon\Carbon $date
- * @property string $value
- * @property-read \Account $account
- * @property-read \User $user
+ * @property string         $value
+ * @property-read \Account  $account
+ * @property-read \User     $user
  */
 class Setting extends Eloquent
 {
@@ -28,7 +28,7 @@ class Setting extends Eloquent
             'account_id' => 'exists:accounts,id'
         ];
     protected $guarded = ['id', 'created_at', 'updated_at'];
-    protected $fillable = ['user_id', 'name', 'date', 'type', 'value','account_id'];
+    protected $fillable = ['user_id', 'name', 'date', 'type', 'value', 'account_id'];
 
     /**
      * @param $name
@@ -67,6 +67,17 @@ class Setting extends Eloquent
             return Cache::get($key);
             // @codeCoverageIgnoreEnd
         } else {
+            // user might not be logged in!
+            if (!Auth::user()) {
+                $configInfo = Config::get('firefly.' . $name);
+                $userSetting = new Setting;
+                $userSetting->name = $name;
+                $userSetting->account_id = null;
+                $userSetting->type = $configInfo['type'];
+                $userSetting->value = $configInfo['value'];
+                /** @noinspection PhpParamsInspection */
+                return $userSetting;
+            }
             $userSetting = Auth::user()->settings()->where('name', $name)->first();
 
             if (is_null($userSetting)) {
