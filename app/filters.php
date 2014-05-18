@@ -1,14 +1,11 @@
 <?php
-
-use Carbon\Carbon as Carbon;
-
-
 App::before(
     function ($request) {
-
-        // currency
-
-        View::share('currency', Config::get('firefly.currencies')[Setting::getSetting('currency')->value]['symbol']);
+        // add currency preference to view.
+        /** @var $settings \Firefly\Storage\Setting\SettingRepositoryInterface */
+        $settings = App::make('Firefly\Storage\Setting\SettingRepositoryInterface');
+        $currency = $settings->getSettingValue('currency') ? : 0;
+        View::share('currency', Config::get('firefly.currencies')[$currency]['symbol']);
 
         // types
         if (Cache::has('types')) {
@@ -17,51 +14,18 @@ App::before(
             try {
                 $types = Type::orderBy('type')->get();
             } catch (QueryException $e) {
-                echo '<p>Database error. Did you run <span style="font-family:monospace;">
-                php artisan migrate:refresh --seed</span>?</p>';
-                echo '<p><span style="color:red;">Error:</span> '.$e->getMessage().'</p>';
+                echo '<p>Database error. Did you follow the installation guidelines?</p>';
+                echo '<p><span style="color:red;">Error:</span> ' . $e->getMessage() . '</p>';
                 exit();
             }
             Cache::forever('types', $types);
             View::share('types', $types);
         }
-
-        // process session period
-        $now = new Carbon;
-        $now->modify('midnight');
-        if (!Session::has('period')) {
-            Session::put('period', $now);
-        }
-
-        if (Session::get('period') < $now) {
-            // in the past:
-            Session::put('when', -1);
-            Session::get('period')->endOfMonth();
-        } else {
-            if ($now == Session::get('period')) {
-                // now
-                Session::put('when', 0);
-            } else {
-                // future
-                Session::get('period')->startOfMonth();
-                Session::put('when', 1);
-            }
-        }
     }
 );
 
-Route::filter(
-    'meta', function ($response, $request) {
-        $segment = $request->segment(2);
-        if (!defined('OBJ')) {
-            define('OBJ', Str::singular($segment));
-        }
-        if (!defined('OBJS')) {
-            define('OBJS', Str::plural($segment));
-        }
-    }
-);
-
+Route::filter('addAccountFilter', 'Firefly\Filter\AccountFilter@addAccount');
+Route::filter('editAccountFilter', 'Firefly\Filter\AccountFilter@editAccount');
 
 App::after(
     function ($request, $response) {

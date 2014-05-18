@@ -20,7 +20,7 @@
             <label for="inputName" class="col-sm-4 control-label">Name</label>
             <div class="col-sm-8">
                 <input type="text" name="name" class="form-control"
-                       value="{{{$prefilled['name']}}}" id="inputName"
+                       value="{{{Session::get('account')['name']}}}" id="inputName"
                        placeholder="Name">
                 @if($errors->has('name'))
                 <span class="text-danger">{{$errors->first('name')
@@ -43,7 +43,7 @@
             <div class="col-sm-8">
                 <div class="input-group">
                     <span class="input-group-addon">{{$currency}}</span>
-                    <input type="number" value="{{{$prefilled['openingbalance']}}}" name="openingbalance" step="any"
+                    <input type="number" value="{{{Session::get('account')['openingbalance']}}}" name="openingbalance" step="any"
                            class="form-control" id="inputOpeningbalance">
                 </div>
                 @if($errors->has('openingbalance'))
@@ -66,7 +66,7 @@
                    Firefly.">Opening balance
                 date</label>
             <div class="col-sm-8"t>
-                <input type="date" value="{{{$prefilled['openingbalancedate']}}}" name="openingbalancedate"
+                <input type="date" value="{{{Session::get('account')['openingbalancedate']}}}" name="openingbalancedate"
                        class="form-control" id="inputOpeningbalancedate">
                 @if($errors->has('openingbalancedate'))
                 <span class="text-danger">{{$errors->first
@@ -81,7 +81,7 @@
             <div class="col-sm-8">
                 <div class="checkbox">
                     <label>
-                        @if($prefilled['shared'] == true)
+                        @if(Session::get('account')['shared'] == true)
                         <input type="checkbox" name="shared" checked="checked" value="1">
                         @else
                         <input type="checkbox" name="shared" value="1">

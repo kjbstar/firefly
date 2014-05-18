@@ -67,11 +67,9 @@ class AccountControllerTest extends TestCase
         $view = $response->original;
 
         $this->assertResponseOk();
+        $this->assertSessionHas('account');
 
         $this->assertEquals('Add a new account', $view['title']);
-
-        $this->assertEquals($oldData['name'], $view['prefilled']['name']);
-        $this->assertEquals($oldData['openingbalancedate'], $view['prefilled']['openingbalancedate']);
     }
 
     /**
@@ -162,7 +160,7 @@ class AccountControllerTest extends TestCase
         $this->assertSessionHas('previous');
         $this->assertEquals('Edit account "' . $account->name . '"', $view['title']);
         $this->assertEquals($account->name, $view['account']->name);
-        $this->assertEquals($account->name, $view['prefilled']['name']);
+        $this->assertSessionHas('account');
 
     }
 
@@ -187,7 +185,7 @@ class AccountControllerTest extends TestCase
         $this->assertResponseOk();
         $this->assertEquals('Edit account "' . $account->name . '"', $view['title']);
         $this->assertEquals($account->name, $view['account']->name);
-        $this->assertEquals($oldData['name'], $view['prefilled']['name']);
+        $this->assertSessionHas('account');
 
     }
 

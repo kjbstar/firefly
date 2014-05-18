@@ -1,35 +1,9 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
-
-/**
- * Account
- *
- * @property integer                                                          $id
- * @property \Carbon\Carbon                                                   $created_at
- * @property \Carbon\Carbon                                                   $updated_at
- * @property integer                                                          $user_id
- * @property string                                                           $name
- * @property float                                                            $openingbalance
- * @property \Carbon\Carbon                                                   $openingbalancedate
- * @property float                                                            $currentbalance
- * @property boolean                                                          $inactive
- * @property boolean                                                          $shared
- * @property-read \User                                                       $user
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]        $transfersto
- * @property-read \Illuminate\Database\Eloquent\Collection|\Predictable[]     $predictables
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transfer[]        $transfersfrom
- * @property-read \Illuminate\Database\Eloquent\Collection|\Balancemodifier[] $balancemodifiers
- * @property-read \Illuminate\Database\Eloquent\Collection|\Transaction[]     $transactions
- * @method static \Account notInactive()
- * @method static \Account shared()
- * @method static \Account notShared()
- * @property string                                                           $lastactivityedate
- */
-class Account extends Eloquent
+class Account extends Elegant
 {
 
-    public static $rules
+    protected $rules
         = ['name'               => 'required|between:1,40',
            'openingbalance'     => 'required|numeric',
            'openingbalancedate' => 'required|date|after:1950-01-01',
@@ -40,6 +14,7 @@ class Account extends Eloquent
     protected $fillable
         = ['name', 'openingbalance', 'openingbalancedate', 'currentbalance',
            'inactive', 'user_id', 'shared'];
+    protected $uniqueName = true;
 
 
     /**

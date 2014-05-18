@@ -33,14 +33,7 @@ class AccountController extends BaseController
      */
     public function add()
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-            $prefilled = AccountHelper::emptyPrefilledAray();
-        } else {
-            $prefilled = AccountHelper::prefilledFromOldInput();
-        }
-
-        return View::make('accounts.add')->with('title', 'Add a new account')->with('prefilled', $prefilled);
+        return View::make('accounts.add')->with('title', 'Add a new account');
     }
 
     /**
@@ -61,29 +54,17 @@ class AccountController extends BaseController
             'user_id'            => Auth::user()->id
         ];
         // create the new account:
+
+        /** @var $account Account */
         $account = $this->accounts->initialize($data);
 
-        // validate it:
-        $validator = Validator::make($account->toArray(), Account::$rules);
-
-        // validation failed!
-        if ($validator->fails()) {
-            Log::debug('Validation failed on new account.');
+        if(!$account->validate()) {
             Session::flash('error', 'Validation failed. Please try harder.');
-            Session::flash('error_extended', $validator->messages()->first());
-            return Redirect::route('addaccount')->withErrors($validator)->withInput();
+            Session::flash('error_extended', $account->errors()->first());
+            return Redirect::route('addaccount')->withErrors($account->validator())->withInput();
         }
-        Log::debug('Validation NOT failed on new account.');
-
-        // try to save it:
-        $result = $account->save();
-
-        // it failed again (can't actually fail)!
-        if (!$result) {
-            Session::flash('error', 'Could not save the new account. Is the account name unique?');
-            return Redirect::route('addaccount')->withErrors($validator)->withInput();
-        }
-
+        // save it
+        $account->save();
         // success!
         Cache::userFlush();
         Session::flash('success', 'The new account has been created.');
@@ -99,15 +80,7 @@ class AccountController extends BaseController
      */
     public function edit(Account $account)
     {
-        if (!Input::old()) {
-            Session::put('previous', URL::previous());
-            $prefilled = AccountHelper::prefilledFromAccount($account);
-        } else {
-            $prefilled = AccountHelper::prefilledFromOldInput();
-        }
-        return View::make('accounts.edit')->with('title', 'Edit account "' . $account->name . '"')->with(
-            'account', $account
-        )->with('prefilled', $prefilled);
+        return View::make('accounts.edit')->with('title', 'Edit account "' . $account->name . '"')->with('account', $account);
     }
 
     /**
@@ -126,24 +99,13 @@ class AccountController extends BaseController
         $account->inactive = Input::get('inactive') == '1' ? 1 : 0;
         $account->shared = Input::get('shared') == '1' ? 1 : 0;
 
-        // validate it:
-        $validator = Validator::make($account->toArray(), Account::$rules);
 
-        // failed!
-        if ($validator->fails()) {
+        if(!$account->validate()) {
             Session::flash('error', 'Could not save the account.');
-            Session::flash('error_extended', $validator->messages()->first());
-            return Redirect::route('editaccount', $account->id)->withInput()->withErrors($validator);
+            Session::flash('error_extended', $account->errors()->first());
+            return Redirect::route('editaccount', $account->id)->withInput()->withErrors($account->validator());
         }
-
-        // try to save it
-        $result = $account->save();
-
-        // failed again!
-        if (!$result) {
-            Session::flash('error', 'Could not save the account. Is the account name unique?');
-            return Redirect::route('editaccount', $account->id)->withInput()->withErrors($validator);
-        }
+        $account->save();
 
         // success!
         Cache::userFlush();

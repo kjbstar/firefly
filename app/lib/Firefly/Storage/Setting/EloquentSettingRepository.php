@@ -20,6 +20,9 @@ class EloquentSettingRepository implements SettingRepositoryInterface
 
     public function getSetting($name)
     {
+        if (is_null(\Auth::user())) {
+            return null;
+        }
         return \Auth::user()->settings()->whereName($name)->first();
     }
 
@@ -43,6 +46,9 @@ class EloquentSettingRepository implements SettingRepositoryInterface
 
     public function getSettingValue($name)
     {
+        if (is_null(\Auth::user())) {
+            return null;
+        }
         $setting = \Auth::user()->settings()->whereName($name)->first();
         if ($setting) {
             return $setting->value;
