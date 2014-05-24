@@ -51,6 +51,8 @@ Route::filter(
         }
     }
 );
+// always authenticate home routes:
+Route::when('home/*', 'auth');
 
 
 Route::filter(
