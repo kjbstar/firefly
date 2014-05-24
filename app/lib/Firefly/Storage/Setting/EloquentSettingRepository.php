@@ -20,25 +20,25 @@ class EloquentSettingRepository implements SettingRepositoryInterface
 
     public function getSetting($name)
     {
-        if (is_null(\Auth::user())) {
+        if (!\Auth::check()) {
             return null;
         }
         return \Auth::user()->settings()->whereName($name)->first();
     }
 
-    public function getSettingByDate($name, Carbon $date)
+    public function getSettingByDate($name, \Carbon\Carbon $date)
     {
         // TODO: Implement getSettingByDate() method.
         die('Not yet implemented.');
     }
 
-    public function getSettingByAccount($name, Account $account)
+    public function getSettingByAccount($name, \Account $account)
     {
         // TODO: Implement getSettingByAccount() method.
         die('Not yet implemented.');
     }
 
-    public function getSettingByAccountAndDate($name, Account $account, Carbon $date)
+    public function getSettingByAccountAndDate($name, \Account $account, \Carbon\Carbon $date)
     {
         // TODO: Implement getSettingByAccountAndDate() method.
         die('Not yet implemented.');
@@ -46,7 +46,7 @@ class EloquentSettingRepository implements SettingRepositoryInterface
 
     public function getSettingValue($name)
     {
-        if (is_null(\Auth::user())) {
+        if (!\Auth::check()) {
             return null;
         }
         $setting = \Auth::user()->settings()->whereName($name)->first();
@@ -58,22 +58,39 @@ class EloquentSettingRepository implements SettingRepositoryInterface
         }
     }
 
-    public function getSettingValueByDate($name, Carbon $date)
+    public function getSettingValueByDate($name, \Carbon\Carbon $date)
     {
-        // TODO: Implement getSettingValueByDate() method.
-        die('Not yet implemented.');
+        if (!\Auth::check()) {
+            return null;
+        }
+        $setting = \Auth::user()->settings()->whereName($name)->whereDate($date->format('Y-m-d'))->first();
+        if ($setting) {
+            return $setting->value;
+        } else {
+            // no more default settings bullshit.
+            return null;
+        }
+
     }
 
-    public function getSettingValueByAccount($name, Account $account)
+    public function getSettingValueByAccount($name, \Account $account)
     {
         // TODO: Implement getSettingValueByAccount() method.
         die('Not yet implemented.');
     }
 
-    public function getSettingValueByAccountAndDate($name, Account $account, Carbon $date)
+    public function getSettingValueByAccountAndDate($name, \Account $account, \Carbon\Carbon $date)
     {
-        // TODO: Implement getSettingValueByAccountAndDate() method.
-        die('Not yet implemented.');
+        if (!\Auth::check()) {
+            return null;
+        }
+        $setting = \Auth::user()->settings()->whereAccountId($account->id)->whereName($name)->whereDate($date->format('Y-m-d'))->first();
+        if ($setting) {
+            return $setting->value;
+        } else {
+            // no more default settings bullshit.
+            return null;
+        }
     }
 
     public function getDefaultSetting($name)
