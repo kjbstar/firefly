@@ -200,16 +200,22 @@ class HomeHelper
             $spentOnShared = floatval(
                 Auth::user()->transfers()->leftJoin('accounts', 'accounts.id', '=', 'transfers.accountto_id')->where(
                     'accounts.shared', 1
-                )->where('accountto_id', $account->id)->inMonth($date)->where('ignoreallowance', 0)->sum('amount')
+                )->where('accountfrom_id', $account->id)->inMonth($date)->where('ignoreallowance', 0)->sum('amount')
             );
 
+            // if this account is shared, transfers away from it are expenses:
+            $spentInTransfers = 0;
+            if(!is_null($account) && $account->shared == 1) {
+                $spentInTransfers = floatval($account->transfersfrom()->inMonth($date)->where('ignoreallowance',0)->sum('amount'));
+            }
+
             // save it as the spent amount:
-            $allowance['spent'] = $spent + $spentOnShared;
+            $allowance['spent'] = $spent + $spentOnShared + $spentInTransfers;
             // if we have overspent:
-            if ($spent > $amount) {
+            if ($allowance['spent'] > $amount) {
                 $allowance['over'] = true;
             }
-            $allowance['pct'] = round(($spent / $amount) * 100);
+            $allowance['pct'] = round(($allowance['spent'] / $amount) * 100);
         }
         Cache::forever($key, $allowance);
         return $allowance;
