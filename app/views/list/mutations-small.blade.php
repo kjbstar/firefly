@@ -9,7 +9,7 @@
             @endif
             @endforeach
         </td>
-        <td>
+        <td style="width: 90px;">
             <small>{{$m->date->format('M jS')}}</small>
         </td>
         <td>
@@ -17,7 +17,7 @@
                 {{{$m->description}}}
             </a>
         </td>
-        <td>
+        <td style="width:90px;">
             @if(get_class($m) == 'Transfer')
             <span title="{{{$m->accountfrom->name}}} &rarr; {{{$m->accountto->name}}}">{{mf($m->amount,true)}}</span>
             @else

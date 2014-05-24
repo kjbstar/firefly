@@ -57,7 +57,8 @@
                 @endif
             </div>
             <p>
-                {{mf($allowance['amount'])}} - {{mf ($allowance['spent'])}} = {{mf($allowance['amount'] - $allowance['spent'],true)}} </p>
+                <span title="Your allowance for the current month and account.">{{mf($allowance['amount'])}}</span> -
+                <span title="Spent this month">{{mf ($allowance['spent'])}}</span> = <span title="Left!">{{mf($allowance['amount'] - $allowance['spent'],true)}}</span></p>
         </div>
         @endif
 

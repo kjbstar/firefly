@@ -1,7 +1,8 @@
 <table class="table table-bordered">
-<?php $sum=0;$limit=0;$left=0;?>
+<?php $sum=0;$limit=0;$left=0;$sumBudgetted=0;$leftBudgetted=0;?>
 @foreach($budgets as $id => $budget)
     <?php $sum+=$budget['expense'];$limit+=$budget['limit'];$left+=($budget['limit']+$budget['expense']);?>
+    <?php if($id!=0) {$sumBudgetted+=$budget['expense'];$leftBudgetted+=($budget['limit']+$budget['expense']);}?>
     <tr>
         <td colspan="2">
             {{$budget['iconTag']}}
@@ -48,26 +49,6 @@
                 </div>
             @endif
             @endif
-
-            {{--
-            @if(isset($budget['limit']) && $budget['limit'] < $budget['spent'])
-            <!-- overspent bar -->
-            <div class="progress">
-                <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{$budget['pct']}}%;">{{mf($budget['spent'])}}</div>
-                <div class="progress-bar progress-bar-danger" role="progressbar" style="width: {{100-$budget['pct']}}%;"></div>
-            </div>
-            @elseif(isset($budget['limit']) && $budget['limit'] >= $budget['spent'])
-            <!-- normal bar -->
-            <div class="progress">
-                <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{$budget['pct']}}%;">{{mf($budget['spent'])}}</div>
-            </div>
-            @elseif(!isset($budget['limit']))
-            <!-- full blue bar -->
-            <div class="progress">
-                <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%;">{{mf($budget['spent'])}}</div>
-            </div>
-            @endif
-            --}}
         </td>
     </tr>
     @endif
@@ -77,5 +58,11 @@
         <td>{{mf($sum*-1,false)}}</td>
         <td>{{mf($limit,true)}}</td>
         <td>{{mf($left,true)}}</td>
+    </tr>
+    <tr>
+        <td><em>Sums (only budgetted)</em></td>
+        <td>{{mf($sumBudgetted*-1,false)}}</td>
+        <td>{{mf($limit,true)}}</td>
+        <td>{{mf($leftBudgetted,true)}}</td>
     </tr>
 </table>
