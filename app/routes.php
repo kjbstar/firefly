@@ -1,8 +1,5 @@
 <?php
 
-// always authenticate home routes:
-Route::when('/home*', 'auth');
-
 // models:
 Route::model('user', 'User');
 Route::model('type', 'Type');
