@@ -98,6 +98,7 @@ if (!function_exists('mf')) {
     {
 
         $n = floatval($n);
+        $n = round($n,2);
         $string = number_format($n, 2, ',', '.');
         $currency = Config::get('firefly.currencies')[Setting::getSetting('currency')->value];
 
