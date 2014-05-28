@@ -12,9 +12,6 @@ class DatabaseSeeder extends Seeder
     {
         Eloquent::unguard();
         $env = App::environment();
-        if ($env == 'local') {
-            exit('LOCAL');
-        }
 
         // create the types
         $this->call('SeedTypes');
