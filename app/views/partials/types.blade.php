@@ -1,6 +1,6 @@
 <!-- all component types in a loop! -->
 @foreach(Type::allTypes() as $i => $type)
-<!--<div class="form-group">
+<div class="form-group">
     <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
     <div class="col-sm-9">
         <input type="text" value="{{{$prefilled[$type->type] or ''}}}"
@@ -14,10 +14,10 @@
 
                id="input{{$type->type}}" autocomplete="off" />
     </div>
-</div>-->
+</div>
 
 
-<div class="form-group">
+<!--<div class="form-group">
     <label for="input{{$type->type}}" class="col-sm-3 control-label">{{ucfirst($type->type)}}</label>
     <div class="col-sm-9">
         <select name="{{$type->type}}" id="input{{$type->type}}" class="form-control">            
@@ -29,7 +29,7 @@
             @endforeach
         </select>
     </div>
-</div>
+</div>-->
 
 
 @endforeach
