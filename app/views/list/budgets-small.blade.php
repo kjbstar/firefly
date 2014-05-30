@@ -8,7 +8,7 @@
             {{$budget['iconTag']}}
             <small style="font-weight: normal">{{{$budget['parentName'] or ''}}}</small>
             @if($id != 0)
-            <a href="{{URL::Route('componentoverview',$id)}}" title="Overview for {{{$budget['name']}}}">{{{$budget['name']}}}</a>
+            <a href="{{URL::Route('componentoverview',$id)}}/{{$today->format('Y')}}/{{$today->format('m')}}" title="Overview for {{{$budget['name']}}}">{{{$budget['name']}}}</a>
             @else
             <a href="{{URL::Route('empty',[3,$today->format('Y'),$today->format('m')])}}" title="Overview for {{{$budget['name']}}}">{{{$budget['name']}}}</a>
             @endif
