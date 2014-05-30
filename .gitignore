@@ -10,3 +10,4 @@ vendor
 clover.xml
 firefly.sublime-project
 firefly.sublime-workspace
+bootstrap/compiled.php
