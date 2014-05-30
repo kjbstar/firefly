@@ -42,7 +42,7 @@ class HomeHelper
                 'current' => $accountHelper->balanceOnDate($account,$date),
                 'shared'  => $account->shared == 1 ? true : false,
             ];
-            $total[] = $account->balanceOnDate($date);
+            $total[] = $accountHelper->balanceOnDate($account,$date);
         }
 
         $accounts[] = [
