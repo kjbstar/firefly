@@ -1,8 +1,5 @@
 <?php
 
-// always authenticate home routes:
-Route::when('/home*', 'auth');
-
 // models:
 Route::model('user', 'User');
 Route::model('type', 'Type');
@@ -39,8 +36,10 @@ Route::pattern('othermonth', '[0-9]+');
  * ACCOUNT CONTROLLER
  *  */
 Route::get('/home/account',['uses' => 'AccountController@index', 'as' => 'accounts']);
-Route::get('/home/account/add',['uses' => 'AccountController@add', 'as' => 'addaccount']);
-Route::get('/home/account/{account}/edit',['uses' => 'AccountController@edit', 'as' => 'editaccount']);
+Route::get('/home/account/add',['uses' => 'AccountController@add', 'as' => 'addaccount','before' => 'addAccountFilter']);
+
+
+Route::get('/home/account/{account}/edit',['uses' => 'AccountController@edit', 'as' => 'editaccount','before' => 'editAccountFilter']);
 Route::get('/home/account/{account}/delete',['uses' => 'AccountController@delete', 'as' => 'deleteaccount']);
 
 Route::get('/home/account/{account}/overview/chart/{year}/{month}',['uses' => 'AccountController@overviewChartByMonth']);

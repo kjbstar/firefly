@@ -16,7 +16,7 @@
             <label for="inputName" class="col-sm-4 control-label">Name</label>
             <div class="col-sm-8">
                 <input type="text" name="name" class="form-control"
-                       value="{{{$prefilled['name']}}}" id="inputName"
+                       value="{{{Session::get('account')['name']}}}" id="inputName"
                        placeholder="{{{$account->name}}}">
                 @if($errors->has('name'))
                 <span class="text-danger">{{$errors->first('name')}}</span>
@@ -33,8 +33,8 @@
             <label for="inputOpeningbalance" class="col-sm-4 control-label">Opening balance</label>
             <div class="col-sm-8">
                 <div class="input-group">
-                    <span class="input-group-addon">&euro;</span>
-                    <input type="number" value="{{{$prefilled['openingbalance']}}}" name="openingbalance" step="any"
+                    <span class="input-group-addon">{{$currency}}</span>
+                    <input type="number" value="{{{Session::get('account')['openingbalance']}}}" name="openingbalance" step="any"
                            class="form-control" id="inputOpeningbalance">
                 </div>
                 @if($errors->has('openingbalance'))
@@ -53,7 +53,7 @@
             <div class="col-sm-8"t>
                 <input 
                     
-                    type="date" value="{{{$prefilled['openingbalancedate']}}}" name="openingbalancedate"
+                    type="date" value="{{{Session::get('account')['openingbalancedate']}}}" name="openingbalancedate"
                     class="form-control" id="inputOpeningbalancedate">
                 @if($errors->has('openingbalancedate'))
                 <span class="text-danger">{{$errors->first('openingbalancedate')}}</span>
@@ -70,7 +70,7 @@
             <div class="col-sm-8">
                 <div class="checkbox">
                     <label>
-                        @if($prefilled['inactive'] == true)
+                        @if(Session::get('account')['inactive'] == true)
                         <input checked="checked" name="inactive" value="1" type="checkbox">
                         @else
                         <input name="inactive" value="1" type="checkbox">
@@ -87,7 +87,7 @@
           <div class="col-sm-8">
               <div class="checkbox">
                   <label>
-                      @if($prefilled['shared'] == true)
+                      @if(Session::get('account')['shared'] == true)
                       <input type="checkbox" name="shared" checked="checked" value="1">
                       @else
                       <input type="checkbox" name="shared" value="1">

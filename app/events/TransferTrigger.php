@@ -26,9 +26,7 @@ class TransferTrigger
         $accountTo->save();
 
         // update or create balancemodifier for TO account.
-        $balanceModifier = $accountTo->balancemodifiers()->onDay(
-            $transfer->date
-        )->first();
+        $balanceModifier = $accountTo->balancemodifiers()->onDay($transfer->date)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier;
             $balanceModifier->account()->associate($accountTo);
@@ -41,9 +39,7 @@ class TransferTrigger
         unset($balanceModifier);
 
         // update or create balancemodifier for FROM account:
-        $balanceModifierFrom = $accountFrom->balancemodifiers()->onDay(
-            $transfer->date
-        )->first();
+        $balanceModifierFrom = $accountFrom->balancemodifiers()->onDay($transfer->date)->first();
         if (is_null($balanceModifierFrom)) {
             $balanceModifierFrom = new Balancemodifier;
             $balanceModifierFrom->account()->associate($accountFrom);
@@ -83,17 +79,14 @@ class TransferTrigger
         $accountFrom = $transfer->accountfrom()->first();
         $accountTo = $transfer->accountto()->first();
         $oldDate = new Carbon($transfer->getOriginal('date'));
-        if ($transfer->date < $accountFrom->openingbalancedate
-            || $transfer->date < $accountTo->openingbalancedate
-        ) {
+        if ($transfer->date < $accountFrom->openingbalancedate || $transfer->date < $accountTo->openingbalancedate) {
             return false;
         }
         if ($accountFrom->id == $accountTo->id) {
             return false;
         }
 
-        if ($accountFrom->id != intval($transfer->getOriginal('accountfrom_id'))
-        ) {
+        if ($accountFrom->id != intval($transfer->getOriginal('accountfrom_id'))) {
             $this->triggerAccountFromChanged($transfer);
         }
 
@@ -151,9 +144,7 @@ class TransferTrigger
             $newBm->balance = 0;
         }
         $newBm->balance -= floatval($transfer->getOriginal('amount'));
-        $newAccount->currentbalance -= floatval(
-            $transfer->getOriginal('amount')
-        );
+        $newAccount->currentbalance -= floatval($transfer->getOriginal('amount'));
         $newBm->save();
         $newAccount->save();
 
@@ -169,9 +160,7 @@ class TransferTrigger
      */
     private function triggerAccountToChanged(Transfer $transfer)
     {
-        $oldAccount = Auth::user()->accounts()->find(
-            $transfer->getOriginal('accountto_id')
-        );
+        $oldAccount = Auth::user()->accounts()->find($transfer->getOriginal('accountto_id'));
         $newAccount = $transfer->accountto()->first();
         $date = new Carbon($transfer->getOriginal('date'));
 
@@ -183,9 +172,7 @@ class TransferTrigger
             $oldBm->balance = 0;
         }
         $oldBm->balance -= floatval($transfer->getOriginal('amount'));
-        $oldAccount->currentbalance -= floatval(
-            $transfer->getOriginal('amount')
-        );
+        $oldAccount->currentbalance -= floatval($transfer->getOriginal('amount'));
         $oldBm->save();
         $oldAccount->save();
 
@@ -198,9 +185,7 @@ class TransferTrigger
             $newBm->balance = 0;
         }
         $newBm->balance += floatval($transfer->getOriginal('amount'));
-        $newAccount->currentbalance += floatval(
-            $transfer->getOriginal('amount')
-        );
+        $newAccount->currentbalance += floatval($transfer->getOriginal('amount'));
         $newBm->save();
         $newAccount->save();
 
@@ -224,8 +209,7 @@ class TransferTrigger
         $oldDate = new Carbon($transfer->getOriginal('date'));
 
         // first put the money back on the old date:
-        $balanceModifier = $accountFrom->balancemodifiers()->onDay($oldDate)
-            ->first();
+        $balanceModifier = $accountFrom->balancemodifiers()->onDay($oldDate)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier();
             $balanceModifier->account()->associate($accountFrom);
@@ -237,9 +221,7 @@ class TransferTrigger
         unset($balanceModifier);
 
         // then remove it form the new date:
-        $balanceModifier = $accountFrom->balancemodifiers()->onDay(
-            $transfer->date
-        )->first();
+        $balanceModifier = $accountFrom->balancemodifiers()->onDay($transfer->date)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier();
             $balanceModifier->account()->associate($accountFrom);
@@ -252,35 +234,28 @@ class TransferTrigger
         // update the new account. same as above, but in reverse.
         // remove the money from the old date. its no longer received on
         // that date
-        $balanceModifier = $accountTo->balancemodifiers()->onDay($oldDate)
-            ->first();
+        $balanceModifier = $accountTo->balancemodifiers()->onDay($oldDate)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier();
             $balanceModifier->account()->associate($accountTo);
             $balanceModifier->date = $oldDate;
             $balanceModifier->balance = 0;
         }
-        $balanceModifier->balance -= floatval(
-            $transfer->getOriginal('amount')
-        );
+        $balanceModifier->balance -= floatval($transfer->getOriginal('amount'));
         $balanceModifier->save();
         unset($balanceModifier);
 
         // update the new date's balancemodifier. On that date,
         // we receive the amount.
 
-        $balanceModifier = $accountTo->balancemodifiers()->onDay(
-            $transfer->date
-        )->first();
+        $balanceModifier = $accountTo->balancemodifiers()->onDay($transfer->date)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier();
             $balanceModifier->account()->associate($accountTo);
             $balanceModifier->date = $transfer->date;
             $balanceModifier->balance = 0;
         }
-        $balanceModifier->balance += floatval(
-            $transfer->getOriginal('amount')
-        );
+        $balanceModifier->balance += floatval($transfer->getOriginal('amount'));
         $balanceModifier->save();
         unset($balanceModifier);
     }
@@ -300,9 +275,7 @@ class TransferTrigger
         $accountTo = $transfer->accountto()->first();
         $diff = $transfer->amount - floatval($transfer->getOriginal('amount'));
 
-        $balanceModifier = $accountFrom->balancemodifiers()->onDay(
-            $transfer->date
-        )->first();
+        $balanceModifier = $accountFrom->balancemodifiers()->onDay($transfer->date)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier();
             $balanceModifier->account()->associate($accountFrom);
@@ -316,9 +289,7 @@ class TransferTrigger
         unset($balanceModifier);
 
         // reverse for the other account
-        $balanceModifier = $accountTo->balancemodifiers()->onDay(
-            $transfer->date
-        )->first();
+        $balanceModifier = $accountTo->balancemodifiers()->onDay($transfer->date)->first();
         if (is_null($balanceModifier)) {
             $balanceModifier = new Balancemodifier();
             $balanceModifier->account()->associate($accountTo);
@@ -384,15 +355,9 @@ class TransferTrigger
      */
     public function subscribe(Illuminate\Events\Dispatcher $events)
     {
-        $events->listen(
-            'eloquent.creating: Transfer', 'TransferTrigger@createTransfer'
-        );
-        $events->listen(
-            'eloquent.updating: Transfer', 'TransferTrigger@editTransfer'
-        );
-        $events->listen(
-            'eloquent.deleted: Transfer', 'TransferTrigger@deleteTransfer'
-        );
+        $events->listen('eloquent.creating: Transfer', 'TransferTrigger@createTransfer');
+        $events->listen('eloquent.updating: Transfer', 'TransferTrigger@editTransfer');
+        $events->listen('eloquent.deleted: Transfer', 'TransferTrigger@deleteTransfer');
     }
 
 }

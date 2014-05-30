@@ -32,15 +32,12 @@ class SettingsControllerTest extends TestCase
         foreach(Setting::get() as $s) {
             $s->delete();
         }
-        $count = Setting::count();
         $response = $this->action('GET', 'SettingsController@index');
         $view = $response->original;
-        $newCount = Setting::count();
 
         $this->assertResponseOk();
         $this->assertEquals('Settings',$view['title']);
         $this->assertSessionHas('previous');
-        $this->assertEquals($count+2,$newCount);
     }
 
     /**
@@ -52,9 +49,10 @@ class SettingsControllerTest extends TestCase
         $account = Account::first();
         $data = [
             'predictionStart' => '2014-01-01',
-            'frontpageAccount' => $account->id
+            'frontpageAccount' => $account->id,
+            'currency' => 1
         ];
-        $this->action('POST', 'SettingsController@index',$data);
+        $this->action('POST', 'SettingsController@postIndex',$data);
         $this->assertResponseStatus(302);
 
         $predictionStart = DB::table('settings')->where('name','predictionStart')->first();
@@ -62,6 +60,9 @@ class SettingsControllerTest extends TestCase
 
         $frontpageAccount = DB::table('settings')->where('name','frontpageAccount')->first();
         $this->assertEquals($data['frontpageAccount'],$frontpageAccount->value);
+        $currency = DB::table('settings')->where('name','currency')->first();
+        $this->assertEquals($data['currency'],$currency->value);
+
     }
 
     /**

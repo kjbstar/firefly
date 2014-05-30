@@ -1,48 +1,31 @@
 <?php
-
-use Carbon\Carbon as Carbon;
-
-
 App::before(
     function ($request) {
-        // process session period
-        $now = new Carbon;
-        $now->modify('midnight');
-        if (!Session::has('period')) {
-            Session::put('period', $now);
-        }
+        // add currency preference to view.
+        /** @var $settings \Firefly\Storage\Setting\SettingRepositoryInterface */
+        $settings = App::make('Firefly\Storage\Setting\SettingRepositoryInterface');
+        $currency = $settings->getSettingValue('currency') ? : 0;
+        View::share('currency', Config::get('firefly.currencies')[$currency]['symbol']);
 
-        if (Session::get('period') < $now) {
-            // in the past:
-            Session::put('when', -1);
-            Session::get('period')->endOfMonth();
+        // types
+        if (Cache::has('types')) {
+            View::share('types', Cache::get('types'));
         } else {
-            if ($now == Session::get('period')) {
-                // now
-                Session::put('when', 0);
-            } else {
-                // future
-                Session::get('period')->startOfMonth();
-                Session::put('when', 1);
+            try {
+                $types = Type::orderBy('type')->get();
+            } catch (QueryException $e) {
+                echo '<p>Database error. Did you follow the installation guidelines?</p>';
+                echo '<p><span style="color:red;">Error:</span> ' . $e->getMessage() . '</p>';
+                exit();
             }
+            Cache::forever('types', $types);
+            View::share('types', $types);
         }
     }
 );
 
-Route::filter(
-    'meta', function ($response, $request) {
-        $segment = $request->segment(2);
-        if (!defined('OBJ')) {
-            define('OBJ', Str::singular($segment));
-        }
-        if (!defined('OBJS')) {
-            define('OBJS', Str::plural($segment));
-        }
-
-
-    }
-);
-
+Route::filter('addAccountFilter', 'Firefly\Filter\AccountFilter@addAccount');
+Route::filter('editAccountFilter', 'Firefly\Filter\AccountFilter@editAccount');
 
 App::after(
     function ($request, $response) {
@@ -68,6 +51,8 @@ Route::filter(
         }
     }
 );
+// always authenticate home routes:
+Route::when('home/*', 'auth');
 
 
 Route::filter(

@@ -10,6 +10,7 @@ class AccountControllerTest extends TestCase
     {
         parent::setUp();
         $user = User::whereUsername('admin')->first();
+        Auth::login($user);
         $this->be($user);
     }
     /**
@@ -66,11 +67,9 @@ class AccountControllerTest extends TestCase
         $view = $response->original;
 
         $this->assertResponseOk();
+        $this->assertSessionHas('account');
 
         $this->assertEquals('Add a new account', $view['title']);
-
-        $this->assertEquals($oldData['name'], $view['prefilled']['name']);
-        $this->assertEquals($oldData['openingbalancedate'], $view['prefilled']['openingbalancedate']);
     }
 
     /**
@@ -107,7 +106,30 @@ class AccountControllerTest extends TestCase
     public function testPostAddFailsValidator()
     {
         $newData = [
-            'name'               => null,
+            'openingbalance'     => 1000,
+            'openingbalancedate' => '2014-01-01',
+            'inactive'           => 0,
+        ];
+        $count = Account::count();
+
+        // this should not create a new account.
+        $this->action('POST', 'AccountController@postAdd', $newData);
+
+        $newCount = Account::count();
+
+        $this->assertSessionHas('error');
+        $this->assertResponseStatus(302);
+        $this->assertEquals($count, $newCount);
+    }
+
+    /**
+     * @covers AccountController::postAdd
+     */
+    public function testPostAddFailsTrigger()
+    {
+        $account = Account::first();
+        $newData = [
+            'name'               => $account->name,
             'openingbalance'     => 1000,
             'openingbalancedate' => '2014-01-01',
             'inactive'           => 0,
@@ -138,7 +160,7 @@ class AccountControllerTest extends TestCase
         $this->assertSessionHas('previous');
         $this->assertEquals('Edit account "' . $account->name . '"', $view['title']);
         $this->assertEquals($account->name, $view['account']->name);
-        $this->assertEquals($account->name, $view['prefilled']['name']);
+        $this->assertSessionHas('account');
 
     }
 
@@ -163,7 +185,7 @@ class AccountControllerTest extends TestCase
         $this->assertResponseOk();
         $this->assertEquals('Edit account "' . $account->name . '"', $view['title']);
         $this->assertEquals($account->name, $view['account']->name);
-        $this->assertEquals($oldData['name'], $view['prefilled']['name']);
+        $this->assertSessionHas('account');
 
     }
 

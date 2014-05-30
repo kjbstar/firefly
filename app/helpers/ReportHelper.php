@@ -93,12 +93,15 @@ class ReportHelper
             $expenses += $shared;
         }
 
+        /** @var $accountHelper \Firefly\Helper\Account\AccountHelperInterface */
+        $accountHelper = App::make('Firefly\Helper\Account\AccountHelperInterface');
+
         // get the net worth:
         $nwEnd = 0;
         $nwStart = 0;
         foreach (Auth::user()->accounts()->notInactive()->notShared()->get() as $account) {
-            $nwEnd += $account->balanceOnDate($end);
-            $nwStart += $account->balanceOnDate($start);
+            $nwEnd += $accountHelper->balanceOnDate($account, $end);
+            $nwStart += $accountHelper->balanceOnDate($account, $start);
         }
 
 
@@ -311,6 +314,7 @@ class ReportHelper
             ->leftJoin('accounts', 'accounts.id', '=', 'transactions.account_id')
             ->where('accounts.shared', 0)
             ->get(['transactions.*']);
+
         // get the transfers TO a shared account
         // with this $type and $date.
         $transfers = Auth::user()->transfers()->with(
@@ -395,6 +399,10 @@ class ReportHelper
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
+
+        /** @var $accountHelper \Firefly\Helper\Account\AccountHelperInterface */
+        $accountHelper = App::make('Firefly\Helper\Account\AccountHelperInterface');
+
         $date->startOfMonth();
         $eom = clone $date;
         $eom->endOfMonth();
@@ -430,8 +438,8 @@ class ReportHelper
                 $sum = 0;
             }
             // balance for startOfMonth
-            $account->startOfMonth = $account->balanceOnDate($date);
-            $account->endOfMonth = $account->balanceOnDate($eom);
+            $account->startOfMonth = $accountHelper->balanceOnDate($account, $date);
+            $account->endOfMonth = $accountHelper->balanceOnDate($account, $eom);
 
             $result[] = [
                 'account'          => $account,

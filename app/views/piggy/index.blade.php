@@ -10,6 +10,8 @@
         <p class="lead">
         @if($balance > 0)
             Left to divide: {{mf($balance,true)}} <br />
+        @elseif($balance < 0)
+            Too much in piggy banks! Remove {{mf($balance,true)}} <br />
         @endif
         <small>Total target: {{mf($totalTarget)}}</small>
         </p>

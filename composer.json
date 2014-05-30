@@ -2,16 +2,18 @@
     "name": "grumpydictator/firefly",
     "description": "A web-application to manage your finances.",
     "license": "MIT",
-    "keywords": ["finance","finances","manager","euro","laravel","money","financials","budgets","transactions","transfers","management"],
+    "keywords": ["finance", "finances", "manager", "euro", "laravel", "money", "financials", "budgets", "transactions", "transfers", "management"],
     "homepage": "https://github.com/JC5/firefly",
     "php": ">=5.4.0",
     "type": "project",
-    "authors": [{
-        "name": "James Cole",
-        "email": "thegrumpydictator@gmail.com",
-        "homepage": "https://github.com/JC5",
-        "role": "Developer"
-    }],
+    "authors": [
+        {
+            "name": "James Cole",
+            "email": "thegrumpydictator@gmail.com",
+            "homepage": "https://github.com/JC5",
+            "role": "Developer"
+        }
+    ],
     "support": {
         "email": "thegrumpydictator@gmail.com",
         "issues": "https://github.com/JC5/firefly/issues?state=open",
@@ -27,7 +29,8 @@
         "barryvdh/laravel-debugbar": "dev-master",
         "barryvdh/laravel-ide-helper": "1.*",
         "satooshi/php-coveralls": "dev-master",
-        "phpunit/phpunit-skeleton-generator": "2.0.*@dev"
+        "phpunit/phpunit-skeleton-generator": "2.0.*@dev",
+        "mockery/mockery": "dev-master"
     },
     "autoload": {
         "classmap": [
@@ -41,7 +44,10 @@
             "app/database/migrations",
             "app/database/seeds",
             "app/tests/TestCase.php"
-        ]
+        ],
+        "psr-0": {
+            "Firefly": "app/lib/"
+        }
     },
     "scripts": {
         "post-install-cmd": [
@@ -52,7 +58,6 @@
         ],
         "post-update-cmd": [
             "php artisan clear-compiled",
-            "php artisan ide-helper:generate",
             "php artisan optimize"
         ],
         "post-create-project-cmd": [

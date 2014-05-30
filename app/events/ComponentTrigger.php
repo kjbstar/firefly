@@ -20,9 +20,10 @@ class ComponentTrigger
         }
 
         // also run the validator again.
-        $validator = Validator::make($component->toArray(),Component::$rules);
-        if($validator->fails()) {
-            Log::error('Validator failed while making component: ' . print_r($validator->messages()->all(),true));
+        $validator = Validator::make($component->toArray(), Component::$rules);
+        if ($validator->fails()) {
+            Session::flash('error_extended', $validator->messages()->first());
+            Log::error('Validator failed while making component: ' . print_r($validator->messages()->all(), true));
             return false;
         }
 
@@ -35,6 +36,10 @@ class ComponentTrigger
         }
         foreach ($components as $dbc) {
             if ($component->name == $dbc->name) {
+                Session::flash(
+                    'error_extended',
+                    'There is already a ' . $component->type->type . ' with the name "' . $component->name . '".'
+                );
                 Log::debug('Found a duplicate component: ' . $component->name . ' matches existing ' . $dbc->name);
                 return false;
             }
@@ -46,21 +51,22 @@ class ComponentTrigger
                 $component->id
             )
         ) {
+            Session::flash('error_extended', 'Cannot attach component to itself!');
             Log::debug('Found a parent_component problem.');
             return false;
         }
         // component cannot be attached to a component which already
         // is a child:
         if (!is_null($component->parent_component_id)) {
-            $parent = $user->components()->find(
-                $component->parent_component_id
-            );
+            $parent = $user->components()->find($component->parent_component_id);
             // parent must be valid parent:
             if (is_null($parent)) {
+                Session::flash('error_extended', 'Cannot attach to this component, does not exist.');
                 Log::debug('Invalid parent.');
                 return false;
             }
             if (!is_null($parent->parent_component_id)) {
+                Session::flash('error_extended', 'Parent is a child, cannot nest connections.');
                 Log::debug('Parent already a parent.');
                 return false;
             }
@@ -76,13 +82,8 @@ class ComponentTrigger
      */
     public function subscribe(Illuminate\Events\Dispatcher $events)
     {
-        $events->listen(
-            'eloquent.creating: Component', 'ComponentTrigger@validateComponent'
-        );
-
-        $events->listen(
-            'eloquent.updating: Component', 'ComponentTrigger@validateComponent'
-        );
+        $events->listen('eloquent.creating: Component', 'ComponentTrigger@validateComponent');
+        $events->listen('eloquent.updating: Component', 'ComponentTrigger@validateComponent');
     }
 
 }

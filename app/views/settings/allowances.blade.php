@@ -41,7 +41,7 @@
                 </p>
                 <p>
                 <div class="input-group">
-                    <span class="input-group-addon">&euro;</span>
+                    <span class="input-group-addon">{{$currency}}</span>
                     <input type="number" name="defaultAllowance"
                           class="form-control"
                    value="{{{$defaultAllowance->value > 0 ?

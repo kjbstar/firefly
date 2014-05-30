@@ -1,11 +1,16 @@
 <?php
 use Carbon\Carbon as Carbon;
-
+use Firefly\Storage\Setting\SettingRepositoryInterface as SRI;
 /**
  * Class HomeController
  */
 class HomeController extends BaseController
 {
+
+    public function __construct(SRI $settings)
+    {
+        $this->settings = $settings;
+    }
 
 
     /**
@@ -32,7 +37,7 @@ class HomeController extends BaseController
      *
      * @return \Illuminate\View\View
      */
-    public function home($year = null, $month = null, Account $fpAccount = null)
+    public function home($year = null, $month = null, Account $account = null)
     {
         $today = Toolkit::parseDate($year, $month, new Carbon);
         $actual = new Carbon;
@@ -50,23 +55,27 @@ class HomeController extends BaseController
          * as well, signifying the fact that an allowance can be set for each
          * one.
          */
-        if (is_null($fpAccount)) {
-            $fpAccount = Toolkit::getFrontpageAccount();
+        if (is_null($account)) {
+            $accountId = $this->settings->getSettingValue('frontPageAccount');
+            $account = is_null($accountId)
+                ? Auth::user()->accounts()->first()
+                : Auth::user()->accounts()->find($accountId);
+            unset($accountId);
         }
         // get all kinds of lists:
         $accounts = HomeHelper::homeAccountList($today);
-        $allowance = HomeHelper::getAllowance($today, $fpAccount);
-        $predictables = HomeHelper::getPredictables($today, $fpAccount);
-        $budgets = HomeHelper::budgetOverview($today, $fpAccount);
-        $transactions = HomeHelper::transactions($today, $fpAccount);
+        $allowance = HomeHelper::getAllowance($today, $account);
+        $predictables = HomeHelper::getPredictables($today, $account);
+        $budgets = HomeHelper::budgetOverview($today, $account);
+        $transactions = HomeHelper::transactions($today, $account);
 
-        $transfers = HomeHelper::transfers($today, $fpAccount);
+        $transfers = HomeHelper::transfers($today, $account);
 
-        $history = HomeHelper::history($fpAccount);
+        $history = HomeHelper::history($account);
 
         return View::make('home.home')->with('title', 'Home')->with('accounts', $accounts)->with('today', $today)->with(
             'history', $history
-        )->with('allowance', $allowance)->with('transactions', $transactions)->with('fpAccount', $fpAccount)->with(
+        )->with('allowance', $allowance)->with('transactions', $transactions)->with('fpAccount', $account)->with(
                 'budgets', $budgets
             )->with('predictables', $predictables)->with('transfers', $transfers);
     }

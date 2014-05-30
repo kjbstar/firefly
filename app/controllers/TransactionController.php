@@ -1,10 +1,14 @@
 <?php
 
+use Firefly\Storage\Account\AccountRepositoryInterface as ARI;
 /**
  * Class TransactionController
  */
 class TransactionController extends BaseController
 {
+    public function __construct(ARI $accounts) {
+        $this->accounts = $accounts;
+    }
 
     /**
      * Shows the index with all transactions.
@@ -40,7 +44,7 @@ class TransactionController extends BaseController
             $prefilled = TransactionHelper::prefilledFromPredictable($predictable);
         }
 
-        $accounts = AccountHelper::accountsAsSelectList();
+        $accounts = $this->accounts->selectList();
 
         return View::make('transactions.add')->with('title', 'Add a transaction')->with('accounts', $accounts)->with(
             'prefilled', $prefilled

@@ -26,7 +26,7 @@
 
             <div class="col-sm-9">
                 <div class="input-group">
-                    <span class="input-group-addon">&euro;</span>
+                    <span class="input-group-addon">{{$currency}}</span>
                     <input type="number" value="{{$limit->amount}}" step="any" name="amount"
                            class="form-control" id="inputAmount">
                 </div>

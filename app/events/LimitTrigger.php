@@ -23,6 +23,7 @@ class LimitTrigger
                 $limit->date->format('Y-m-d')
             )->count();
         }
+        Session::flash('error_extended','Already a limit for this combination.');
         return $count == 0;
 
 
