@@ -3,33 +3,9 @@
 @section('content')
 <!-- TOP BAR -->
 <div class="row">
-    <div class="col-lg-12 col-md-12">
-        <h1>Firefly
-            <small>The current state of affairs</small>
-        </h1>
-        <div class="btn-group">
-            <a href="{{URL::Route('addtransaction')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transaction</a>
-              <a href="{{URL::Route('addtransfer')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add transfer</a>
-        </div>
-    </div>
-</div>
-
-
-<!-- MAIN ACCOUNT CHART -->
-<div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12">
-        <h3>Accounts</h3>
-        <div id="home-accounts-chart"></div>
-
-    </div>
-</div>
-
-
-<!-- MOST IMPORTANT INFO -->
-
-<div class="row">
     <!-- LIJST MET ACCOUNTS -->
     <div class="col-lg-4 col-md-4 col-sm-12">
+        <h3>Accounts</h3>
         <table class="table table-condensed table-bordered">
             @foreach($accounts as $account)
             <tr @if($account['name'] == 'TOTAL') style="border-top: solid 2px grey" @endif>
@@ -44,9 +20,31 @@
             </tr>
             @endforeach          
         </table>
-    </div>
-<!-- ALLOWANCE BAR -->
+        <div class="btn-group">
+            <a href="{{URL::Route('addtransaction')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Ajouter 1 transaction</a>
+            <a href="{{URL::Route('addtransfer')}}" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Ajouter 1 transfert</a>
+        </div>
+    </div>    
     <div class="col-lg-8 col-md-12 col-sm-12">
+        <div id="home-accounts-chart"></div>
+    </div>
+</div>
+
+
+<!-- MAIN ACCOUNT CHART -->
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+
+    </div>
+</div>
+
+
+<!-- MOST IMPORTANT INFO -->
+
+<div class="row">
+<!-- ALLOWANCE BAR -->
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h3>Limite</h3>
         @if($allowance['amount'] > 0)
         <div class="tab-pane active" id="budgeting-tab">
             <div class="progress progress-striped" style="margin-bottom:0;height:10px;"><div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{$allowance['days']}}" aria-valuemin="0" aria-valuemax="100" style="width:{{$allowance['days']}}%;"><span class="sr-only">{{$allowance['days']}}% Complete</span></div></div>
@@ -72,7 +70,7 @@
     <!-- ALL BUDGETS IN COLLAPSE. -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         @if($fpAccount)
-            <h4>Budgets</h4>
+            <h3>Budgets</h3>
             @include('list.budgets-small')
         @endif
 
@@ -80,7 +78,7 @@
     <!-- TRANSACTIONS -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         @if($fpAccount)
-            <h4>Transactions</h4>
+            <h3>Transactions</h3>
             @include('list.mutations-small',['mutations' => $transactions])
         @endif
     </div>
@@ -89,14 +87,14 @@
     <!-- TRANSFERS -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         @if($fpAccount)
-            <h4>Transfers</h4>
+            <h3>Transfers</h3>
             @include('list.mutations-small',['mutations' => $transfers])
         @endif
     </div>
     <!-- PREDICTABES -->
     <div class="col-lg-6 col-md-12 col-sm-12">
         @if(count($predictables) > 0)
-        <h4>Predictables</h4>
+        <h3>Predictables</h3>
         @include('list.predictables-small')
         @endif
     </div>
